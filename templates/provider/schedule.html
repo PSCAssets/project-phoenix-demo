@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+{% block title %}Schedule — Dr. Sarah Lee{% endblock %}
+{% block head %}
+<style>
+  :root { --ew-green: #00A67E; }
+  .sidebar {
+    position: fixed; top: 60px; left: 0; width: 48px; height: calc(100vh - 60px);
+    background: #F2EDE4; display: flex; flex-direction: column;
+    align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
+    transition: width 0.22s ease; overflow: hidden;
+  }
+  .sidebar.expanded { width: 200px !important; }
+  .sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
+  .sib-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+    color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+    transition: background .15s, color .15s; position: relative; white-space: nowrap;
+  }
+  .sib-item:hover { background: rgba(107,33,168,0.08); }
+  .sib-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+  .sib-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .sib-badge { position: absolute; top: 6px; right: 8px; background: #EF4444; color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px; padding: 1px 5px; min-width: 16px; text-align: center; }
+  .sib-label { display: none; font-size: 12px; font-weight: 500; color: #6B7280; }
+  .sidebar.expanded .sib-label { display: inline; }
+  .sidebar.expanded .sib-item { flex-direction: row !important; justify-content: flex-start !important; padding: 9px 14px !important; gap: 12px !important; font-size: 0 !important; }
+  .sidebar.expanded .sib-item.active .sib-label { color: #6B21A8; }
+  .sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .sib-avatar { width: 32px; height: 32px; border-radius: 50%; background: #00A67E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+  .sib-toggle { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #E5E0D8; background: #F2EDE4; cursor: pointer; color: #6B7280; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .sib-toggle:hover { background: #E5E0D8; }
+  .sib-toggle svg { width: 14px; height: 14px; }
+  .sched-page { margin-left: 56px !important; padding: 24px 28px; max-width: 1400px; }
+  .sched-topbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .sched-topbar h1 { font-size: 20px; font-weight: 700; color: #111827; }
+  .sched-week-nav { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .sched-week-label { font-size: 14px; font-weight: 600; color: #374151; min-width: 200px; text-align: center; }
+  .sched-nav-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #E5E0D8; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6B7280; font-size: 16px; }
+  .sched-nav-btn:hover { background: #FAF7F2; color: #111827; }
+  .sched-legend { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  /* Calendar grid */
+  .cal-wrap { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+  .cal-header { display: grid; grid-template-columns: 64px repeat(5, 1fr); border-bottom: 2px solid #E5E0D8; }
+  .cal-header-time { background: #F2EDE4; }
+  .cal-col-head { padding: 10px 12px; text-align: center; border-left: 1px solid #E5E0D8; }
+  .col-day { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #9CA3AF; letter-spacing: 0.05em; }
+  .col-date { font-size: 22px; font-weight: 700; color: #111827; line-height: 1.1; }
+  .col-today .col-date { color: #6B21A8; }
+  .col-today { background: #F5F0FA; }
+  .cal-body { display: grid; grid-template-columns: 64px repeat(5, 1fr); position: relative; }
+  .cal-time-col { display: flex; flex-direction: column; }
+  .cal-time-slot { height: 44px; display: flex; align-items: flex-start; padding-top: 4px; justify-content: flex-end; padding-right: 10px; font-size: 11px; color: #9CA3AF; border-bottom: 1px solid #E5E0D8; box-sizing: border-box; }
+  .cal-day-col { border-left: 1px solid #E5E0D8; position: relative; display: flex; flex-direction: column; }
+  .cal-day-col.today-col { background: #FAF7F2; }
+  .cal-slot { height: 44px; border-bottom: 1px solid #E5E0D8; box-sizing: border-box; position: relative; }
+  .cal-slot.half { border-bottom-style: dashed; border-bottom-color: #E5E0D8; }
+  .appt {
+    position: absolute; left: 4px; right: 4px; border-radius: 6px;
+    padding: 5px 8px; overflow: hidden; cursor: pointer; z-index: 2;
+    transition: filter 0.1s;
+  }
+  .appt:hover { filter: brightness(0.93); box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+  /* Fix 14: appointment detail popover */
+  .appt-detail-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:2000; justify-content:center; align-items:center; }
+  .appt-detail-modal.open { display:flex; }
+  .appt-detail-card { background:#fff; border-radius:12px; width:420px; max-width:94vw; box-shadow:0 20px 60px rgba(0,0,0,0.2); overflow:hidden; }
+  .appt-detail-hd { padding:16px 20px 12px; border-bottom:1px solid #E5E0D8; display:flex; align-items:center; justify-content:space-between; }
+  .appt-detail-hd h3 { font-size:15px; font-weight:700; color:#111827; }
+  .appt-detail-close { background:none; border:none; font-size:20px; cursor:pointer; color:#6B7280; line-height:1; padding:0; }
+  .appt-detail-body { padding:18px 20px; }
+  .appt-detail-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid #F3F4F6; font-size:13px; }
+  .appt-detail-row:last-of-type { border-bottom:none; }
+  .appt-detail-key { color:#6B7280; font-weight:500; }
+  .appt-detail-val { color:#111827; font-weight:600; }
+  .appt-detail-ft { padding:14px 20px; border-top:1px solid #E5E0D8; display:flex; justify-content:space-between; align-items:center; }
+  .btn-open-chart { background:#6B21A8; color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; }
+  .btn-open-chart:hover { background:#5B1898; }
+  .appt-title { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .appt-sub { font-size: 10px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .appt-dur { font-size: 10px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+  /* Type colors */
+  .appt-video    { background: #1A5276; }
+  .appt-phone    { background: #1A5276; }
+  .appt-followup { background: #1A5276; }
+  .appt-a1c       { background: #1A5276; }
+  .appt-telehealth { background: #1A5276; }
+  .appt-annual    { background: #1A5276; }
+
+  .appt-available {
+    background: #D1FAE5;
+    border: 1.5px dashed #34D399;
+    box-shadow: none;
+  }
+  .appt-available .appt-title { color: #065F46; font-weight: 700; }
+  .appt-available .appt-sub   { color: #059669; font-size: 10px; }
+  .appt-available .appt-dur   { color: #6B7280; }
+  /* Fix 9: consult-type-specific available slots */
+  .appt-avail-pv { background: #CCFBF1; border: 1.5px dashed #0D9488; }
+  .appt-avail-pv .appt-title { color: #0F766E; }
+  .appt-avail-pv .appt-sub   { color: #0D9488; }
+  .appt-avail-phone { background: #F0FDF4; border: 1.5px dashed #22C55E; }
+  .appt-avail-phone .appt-title { color: #15803D; }
+  .appt-avail-phone .appt-sub   { color: #16A34A; }
+  .appt-avail-video { background: #EFF6FF; border: 1.5px dashed #3B82F6; }
+  .appt-avail-video .appt-title { color: #1D4ED8; }
+  .appt-avail-video .appt-sub   { color: #3B82F6; }
+  /* Fix 12: multi-hour availability blocks */
+  .avail-block { position: absolute; left: 2px; right: 2px; border-radius: 7px; z-index: 1; overflow: hidden; }
+  .avail-block-teal { background: rgba(0, 168, 126, 0.09); border: 2px dashed #00A67E; }
+  .avail-block-blue { background: rgba(59, 130, 246, 0.09); border: 2px dashed #3B82F6; }
+  .avail-block-inner { padding: 7px 10px; }
+  .avail-block-name { font-size: 11px; font-weight: 700; color: #065F46; line-height: 1.2; margin-bottom: 2px; }
+  .avail-block-teal .avail-block-name { color: #065F46; }
+  .avail-block-blue .avail-block-name { color: #1D4ED8; }
+  .avail-block-time { font-size: 10px; color: #6B7280; margin-bottom: 4px; }
+  .avail-block-pills { display: flex; gap: 5px; flex-wrap: wrap; }
+  .avail-block-pill { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 9px; }
+  .avail-block-teal .avail-block-pill { background: #CCFBF1; color: #0F766E; }
+  .avail-block-blue .avail-block-pill { background: #DBEAFE; color: #1D4ED8; }
+  /* Fix 10: day/month view */
+  .day-view-header { padding: 12px 16px; background: #F5F0FA; border-bottom: 2px solid #E5E0D8; font-size: 15px; font-weight: 700; color: #6B21A8; }
+  .day-view-row { display: flex; border-bottom: 1px solid #E5E0D8; min-height: 52px; }
+  .day-view-time { width: 64px; flex-shrink: 0; font-size: 11px; color: #9CA3AF; padding: 8px 10px 0 0; text-align: right; }
+  .day-view-cell { flex: 1; padding: 4px 8px; position: relative; min-height: 52px; }
+  .day-appt-card { background: #6B21A8; color: #fff; border-radius: 7px; padding: 7px 10px; margin-bottom: 4px; }
+  .day-appt-card.phone { background: #00897B; }
+  .day-appt-card.video { background: #1B4F8A; }
+  .day-appt-card.async { background: #7C3AED; }
+  .day-appt-card.annual { background: #1E3A5F; }
+  .day-appt-card.available { background: #F0FDF4; border: 1.5px dashed #22C55E; }
+  .day-appt-name { font-size: 12px; font-weight: 700; }
+  .day-appt-meta { font-size: 10px; opacity: 0.85; margin-top: 2px; }
+  .day-avail-card { background: #F0FDF4; border: 1.5px dashed #22C55E; border-radius: 7px; padding: 7px 10px; margin-bottom: 4px; font-size: 11px; color: #15803D; font-weight: 600; }
+  /* Month grid */
+  .month-grid { display: grid; grid-template-columns: repeat(7,1fr); }
+  .month-dow { padding: 8px; text-align: center; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #9CA3AF; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; border-right: 1px solid #E5E0D8; }
+  .month-cell { min-height: 80px; border-right: 1px solid #E5E0D8; border-bottom: 1px solid #E5E0D8; padding: 6px 8px; cursor: pointer; }
+  .month-cell:hover { background: #FAF7F2; }
+  .month-cell.today-cell { background: #F5F0FA; }
+  .month-cell.other-month { opacity: 0.4; }
+  .month-date-num { font-size: 13px; font-weight: 700; color: #374151; margin-bottom: 4px; }
+  .month-cell.today-cell .month-date-num { color: #6B21A8; }
+  .month-dot-row { display: flex; gap: 3px; flex-wrap: wrap; margin-bottom: 3px; }
+  .month-dot { width: 7px; height: 7px; border-radius: 50%; background: #6B21A8; }
+
+  .appt-unavail {
+    background: repeating-linear-gradient(45deg, #F3F4F6, #F3F4F6 5px, #E5E0D8 5px, #E5E0D8 10px);
+    border: 1px solid #E5E0D8;
+  }
+  .appt-unavail .appt-title { color: #6B7280; font-weight: 600; }
+  .appt-unavail .appt-dur   { color: #9CA3AF; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar" id="schedSidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="sib-label">Dashboard</span>
+    </div>
+    <div class="sib-item" title="Queue" onclick="window.location.href='/provider/queue'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <span class="sib-label">Queue</span>
+    </div>
+    <div class="sib-item active" title="Schedule" onclick="window.location.href='/provider/schedule'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="sib-label">Schedule</span>
+    </div>
+    <div class="sib-item" title="Messages" onclick="window.location.href='/provider/messages'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="sib-label">Messages</span>
+      <span class="sib-badge">3</span>
+    </div>
+    <div class="sib-item" title="Alerts" onclick="window.location.href='/provider/notifications'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="sib-label">Alerts</span>
+    </div>
+    <div class="sib-item" title="Settings" onclick="window.location.href='/provider/settings'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="sib-label">Settings</span>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sib-avatar">SL</div>
+    <button class="sib-toggle" onclick="toggleSchedSidebar()" id="schedToggleBtn" title="Expand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</nav>
+<div class="sched-page">
+  <div class="sched-topbar">
+    <h1>Schedule</h1>
+    <div style="font-size:13px;color:#6B7280;">Dr. Sarah Lee, MD</div>
+    <div style="display:flex;border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;margin-right:8px;">
+      <button onclick="setSchedView('day',this)" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#F3F4F6;color:#374151;">Day</button>
+      <button onclick="setSchedView('week',this)" id="schedViewWeek" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">Week</button>
+      <button onclick="setSchedView('month',this)" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#F3F4F6;color:#374151;">Month</button>
+    </div>
+    <div class="sched-week-nav">
+      <button class="sched-nav-btn">&#8249;</button>
+      <div class="sched-week-label">Jun 9 – Jun 13, 2026</div>
+      <button class="sched-nav-btn">&#8250;</button>
+    </div>
+    <button onclick="openAddTimeModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Time</button>
+    <button onclick="editAvailability()" style="background:#fff;border:1.5px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">Edit Availability</button>
+  </div>
+  <div class="sched-legend">
+    <span class="legend-item"><span class="legend-dot" style="background:#D1FAE5;border:1.5px dashed #34D399"></span>Available</span>
+    <span class="legend-item"><span class="legend-dot" style="background:#E5E0D8"></span>Unavailable</span>
+  </div>
+  <!-- WEEK VIEW (default) -->
+  <div id="viewWeek">
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <div class="cal-header-time"></div>
+      <div class="cal-col-head"><div class="col-day">Mon</div><div class="col-date">9</div></div>
+      <div class="cal-col-head"><div class="col-day">Tue</div><div class="col-date">10</div></div>
+      <div class="cal-col-head col-today"><div class="col-day">Wed</div><div class="col-date">11</div></div>
+      <div class="cal-col-head"><div class="col-day">Thu</div><div class="col-date">12</div></div>
+      <div class="cal-col-head"><div class="col-day">Fri</div><div class="col-date">13</div></div>
+    </div>
+    <div class="cal-body" id="calBody">
+      <div class="cal-time-col" id="timeCol"></div>
+      <div class="cal-day-col" id="col0"></div>
+      <div class="cal-day-col" id="col1"></div>
+      <div class="cal-day-col today-col" id="col2"></div>
+      <div class="cal-day-col" id="col3"></div>
+      <div class="cal-day-col" id="col4"></div>
+    </div>
+  </div>
+  </div>
+
+  <!-- DAY VIEW (Fix 10) -->
+  <div id="viewDay" style="display:none;">
+  <div class="cal-wrap">
+    <div class="day-view-header">Wednesday, June 11 — 4 appointments · 2 open slots</div>
+    <div class="day-view-row">
+      <div class="day-view-time">8:00 AM</div>
+      <div class="day-view-cell">
+        <div class="day-appt-card annual"><div class="day-appt-name">Annual Visit — Aisha N.</div><div class="day-appt-meta">Women's Health · 45 min · No SLA</div></div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">9:00 AM</div>
+      <div class="day-view-cell">
+        <div class="day-appt-card phone"><div class="day-appt-name">Phone Consult — James R.</div><div class="day-appt-meta">STI Panel · 15 min · SLA: OK</div></div>
+        <div class="day-appt-card async" style="background:#0D9488;"><div class="day-appt-name">A1C Treat Consult — Sandra G.</div><div class="day-appt-meta">A1C Mgmt · 15 min</div></div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">10:00 AM</div>
+      <div class="day-view-cell">
+        <div class="day-avail-card">📞 Available — Phone only · 30 min open slot</div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">11:00 AM</div>
+      <div class="day-view-cell" style="color:#9CA3AF;font-size:12px;padding-top:10px;">—</div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">12:00 PM</div>
+      <div class="day-view-cell">
+        <div class="day-appt-card" style="background:repeating-linear-gradient(45deg,#F3F4F6,#F3F4F6 5px,#E5E0D8 5px,#E5E0D8 10px);border:1px solid #E5E0D8;"><div class="day-appt-name" style="color:#6B7280;">Lunch Break</div><div class="day-appt-meta" style="color:#9CA3AF;">60 min · Unavailable</div></div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">1:00 PM</div>
+      <div class="day-view-cell">
+        <div class="day-appt-card" style="background:#7C3AED;"><div class="day-appt-name">Follow-up — David K.</div><div class="day-appt-meta">Weight Mgmt · 15 min · SLA: 2h remaining</div></div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">2:00 PM</div>
+      <div class="day-view-cell">
+        <div class="day-appt-card video"><div class="day-appt-name">Telehealth Consult — Owen T.</div><div class="day-appt-meta">A1C Mgmt · Video · 15 min</div></div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">3:00 PM</div>
+      <div class="day-view-cell">
+        <div class="day-avail-card" style="background:#EFF6FF;border-color:#3B82F6;color:#1D4ED8;">🎥 Available — Video only · 30 min open slot</div>
+      </div>
+    </div>
+    <div class="day-view-row">
+      <div class="day-view-time">4:00 PM</div>
+      <div class="day-view-cell" style="color:#9CA3AF;font-size:12px;padding-top:10px;">—</div>
+    </div>
+    <div class="day-view-row" style="border-bottom:none;">
+      <div class="day-view-time">5:00 PM</div>
+      <div class="day-view-cell" style="color:#9CA3AF;font-size:12px;padding-top:10px;">—</div>
+    </div>
+  </div>
+  </div>
+
+  <!-- MONTH VIEW (Fix 10) -->
+  <div id="viewMonth" style="display:none;">
+  <div class="cal-wrap">
+    <div class="month-grid" id="monthGrid"></div>
+  </div>
+  </div>
+</div>
+<!-- Add Time Modal -->
+<div id="addTimeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:400px;max-width:90vw;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+    <div style="font-size:17px;font-weight:700;color:#111827;margin-bottom:18px;">Add Time Block</div>
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div><label style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;display:block;margin-bottom:4px;">Date</label><input type="date" style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><label style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;display:block;margin-bottom:4px;">Start Time</label><input type="time" style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;"></div>
+        <div><label style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;display:block;margin-bottom:4px;">End Time</label><input type="time" style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;"></div>
+      </div>
+      <div><label style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;display:block;margin-bottom:4px;">Type</label><select style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;"><option>Available</option><option>Blocked</option></select></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button onclick="closeAddTimeModal()" style="background:#fff;border:1.5px solid #E5E0D8;border-radius:7px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
+      <button onclick="closeAddTimeModal()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;">Save</button>
+    </div>
+  </div>
+</div>
+<!-- Edit Mode Toast -->
+<div id="editToast" style="display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1F2937;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:600;white-space:nowrap;">Availability editing mode — click any slot to modify</div>
+
+<!-- Fix 14: Appointment Detail Modal -->
+<div class="appt-detail-modal" id="apptDetailModal">
+  <div class="appt-detail-card">
+    <div class="appt-detail-hd">
+      <h3 id="apptDetailTitle">Appointment</h3>
+      <button class="appt-detail-close" onclick="closeApptDetail()">×</button>
+    </div>
+    <div class="appt-detail-body">
+      <div class="appt-detail-row"><span class="appt-detail-key">Patient</span><a id="apptDetailPatient" href="/provider/chart/1" style="color:#6B21A8;font-weight:700;font-size:13px;text-decoration:none;"></a></div>
+      <div class="appt-detail-row"><span class="appt-detail-key">Consult Type</span><span class="appt-detail-val" id="apptDetailType"></span></div>
+      <div class="appt-detail-row"><span class="appt-detail-key">Care Product</span><span class="appt-detail-val" id="apptDetailProduct"></span></div>
+      <div class="appt-detail-row"><span class="appt-detail-key">Duration</span><span class="appt-detail-val" id="apptDetailDuration"></span></div>
+      <div class="appt-detail-row"><span class="appt-detail-key">SLA Status</span><span class="appt-detail-val" id="apptDetailSla" style="color:#059669;">Within SLA</span></div>
+      <div style="margin-top:12px;padding:10px;background:#FAF7F2;border-radius:7px;font-size:12px;color:#6B7280;line-height:1.5;" id="apptDetailNotes"></div>
+    </div>
+    <div class="appt-detail-ft">
+      <a href="#" onclick="closeApptDetail();return false;" style="font-size:12px;color:#9CA3AF;text-decoration:none;">Close</a>
+      <a id="apptDetailChartLink" href="/provider/chart/1" class="btn-open-chart">Open Chart →</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function toggleSchedSidebar() {
+  var s = document.getElementById('schedSidebar');
+  var t = document.getElementById('schedToggleBtn');
+  if (s) s.classList.toggle('expanded');
+  if (t) {
+    var exp = s && s.classList.contains('expanded');
+    t.innerHTML = exp
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  }
+}
+function setSchedView(view, btn) {
+  document.querySelectorAll('.sched-topbar button[onclick^="setSchedView"]').forEach(function(b) {
+    b.style.background = '#F3F4F6'; b.style.color = '#374151';
+  });
+  btn.style.background = '#6B21A8'; btn.style.color = '#fff';
+  // Fix 10: show/hide view divs
+  var views = ['viewWeek','viewDay','viewMonth'];
+  var map = { week:'viewWeek', day:'viewDay', month:'viewMonth' };
+  views.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = (id === map[view]) ? '' : 'none';
+  });
+}
+function openAddTimeModal() {
+  var m = document.getElementById('addTimeModal');
+  if (m) m.style.display = 'flex';
+}
+function closeAddTimeModal() {
+  var m = document.getElementById('addTimeModal');
+  if (m) m.style.display = 'none';
+}
+document.getElementById('addTimeModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddTimeModal();
+});
+function editAvailability() {
+  var t = document.getElementById('editToast');
+  if (t) { t.style.display = 'block'; setTimeout(function() { t.style.display = 'none'; }, 3500); }
+  var calWrap = document.querySelector('.cal-wrap');
+  if (calWrap) { calWrap.style.outline = '2px solid #6B21A8'; calWrap.style.outlineOffset = '2px'; setTimeout(function() { calWrap.style.outline = ''; }, 3500); }
+}
+const SLOT_H = 44; // px per 30-min slot
+const START_HOUR = 8;
+const END_HOUR = 17;
+const SLOTS = (END_HOUR - START_HOUR) * 2;
+
+// Build time column
+const timeCol = document.getElementById('timeCol');
+for (let i = 0; i < SLOTS; i++) {
+  const h = START_HOUR + Math.floor(i / 2);
+  const m = i % 2 === 0 ? '00' : '30';
+  const ampm = h < 12 ? 'AM' : 'PM';
+  const h12 = h > 12 ? h - 12 : h;
+  const label = i % 2 === 0 ? `${h12}:${m} ${ampm}` : '';
+  const div = document.createElement('div');
+  div.className = 'cal-time-slot' + (i % 2 !== 0 ? ' half' : '');
+  div.textContent = label;
+  timeCol.appendChild(div);
+}
+
+// Build day slot backgrounds
+for (let d = 0; d < 5; d++) {
+  const col = document.getElementById('col' + d);
+  for (let i = 0; i < SLOTS; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'cal-slot' + (i % 2 !== 0 ? ' half' : '');
+    col.appendChild(slot);
+  }
+}
+
+// Appointments: [day(0=Mon), startHour, startMin, durationMins, type, label, sublabel]
+// Fix 9: available slot types use avail-video / avail-phone / avail-pv
+const APPTS = [
+  // MONDAY
+  [0, 8,  0, 45, 'annual',      'Annual Visit',        'Marcus J. · Testosterone'],
+  [0, 9,  0, 15, 'a1c',         'A1C Treat Consult',   'Sandra G. · A1C Mgmt'],
+  [0, 9, 15, 15, 'telehealth',  'Telehealth Consult',  'Patricia W. · Women\'s Health'],
+  [0, 9, 30, 15, 'followup',    'Follow-up',           'Owen T. · A1C Mgmt'],
+  [0,12,  0, 60, 'unavail',     'Lunch Break',         'Unavailable'],
+  [0,13, 30, 15, 'phone',       'Phone Consult',       'Rachel L. · STI Treatment'],
+  [0,16,  0, 60, 'unavail',     'Admin Block',         'Administrative time'],
+
+  // TUESDAY
+  [1, 9,  0, 45, 'annual',     'Annual Visit',         'Camille D. · Weight Mgmt'],
+  [1,10,  0, 15, 'a1c',        'A1C Treat Consult',    'Michael G. · A1C Mgmt'],
+  [1,10, 15, 15, 'followup',   'Follow-up',            'Thomas C. · ED Treatment'],
+  [1,12,  0, 60, 'unavail',    'Lunch Break',          'Unavailable'],
+  [1,14,  0, 15, 'telehealth', 'Telehealth Consult',   'Henry O. · ED Treatment'],
+  [1,14, 15, 15, 'phone',      'Phone Consult',        'Brianna M. · Women\'s Health'],
+
+  // WEDNESDAY (today)
+  [2, 8,  0, 45, 'annual',      'Annual Visit',        'Aisha N. · Women\'s Health'],
+  [2, 9,  0, 15, 'phone',       'Phone Consult',       'James R. · STI Panel'],
+  [2, 9, 15, 15, 'a1c',         'A1C Treat Consult',   'Sandra G. · A1C Mgmt'],
+  [2, 9, 30, 15, 'a1c',         'A1C Treat Consult',   'Michael G. · A1C Mgmt'],
+  [2,12,  0, 60, 'unavail',     'Lunch Break',         'Unavailable'],
+  [2,13,  0, 15, 'followup',    'Follow-up',           'David K. · Weight Mgmt'],
+  [2,14,  0, 15, 'telehealth',  'Telehealth Consult',  'Owen T. · A1C Mgmt'],
+
+  // THURSDAY
+  [3, 8,  0, 45, 'annual',     'Annual Visit',         'Rachel L. · STI Treatment'],
+  [3, 9,  0, 15, 'a1c',        'A1C Treat Consult',    'Camille D. · Thyroid Panel'],
+  [3, 9, 15, 15, 'phone',      'Phone Consult',        'Henry O. · ED Treatment'],
+  [3, 9, 30, 15, 'followup',   'Follow-up',            'Patricia W. · Testosterone'],
+  [3,12,  0, 60, 'unavail',    'Lunch Break',          'Unavailable'],
+  [3,13, 15, 15, 'a1c',        'A1C Treat Consult',    'Thomas C. · A1C Mgmt'],
+  [3,15, 30, 15, 'phone',      'Phone Consult',        'Sandra G. · A1C Mgmt'],
+
+  // FRIDAY
+  [4, 9,  0, 45, 'annual',      'Annual Visit',        'Marcus J. · Testosterone'],
+  [4,10,  0, 15, 'followup',    'Follow-up',           'Brianna M. · Women\'s Health'],
+  [4,10, 15, 15, 'telehealth',  'Telehealth Consult',  'James R. · STI Panel'],
+  [4,12,  0, 60, 'unavail',     'Lunch Break',         'Unavailable'],
+  [4,13,  0, 15, 'a1c',         'A1C Treat Consult',   'David K. · A1C Mgmt'],
+];
+
+const TYPE_LABELS = {
+  video: 'Video Consult', phone: 'Phone Consult',
+  a1c: 'A1C Treat Consult', telehealth: 'Telehealth Consult',
+  annual: 'Annual Visit', followup: 'Follow-up',
+  available: 'Available', unavail: 'Unavailable',
+  'avail-pv': 'Available', 'avail-phone': 'Available', 'avail-video': 'Available'
+};
+
+// Fix 12: multi-hour availability blocks for all 5 days
+// Each entry: [colIdx, startHour, endHour, colorClass, blockName, timeRange, pills[]]
+const AVAIL_BLOCKS = [
+  [0, 8, 12, 'teal', 'Morning Block', '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+  [1, 8, 12, 'teal', 'Morning Block', '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+  [2, 13, 15, 'blue', 'Afternoon Block', '1:00 PM – 3:00 PM', ['🎥 Video']],
+  [3, 9, 12, 'teal', 'Morning Block', '9:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+  [4, 14, 16, 'blue', 'Afternoon Block', '2:00 PM – 4:00 PM', ['🎥 Video']],
+];
+AVAIL_BLOCKS.forEach(function(entry) {
+  var colIdx = entry[0], sh = entry[1], eh = entry[2], color = entry[3];
+  var blockName = entry[4], timeRange = entry[5], pills = entry[6];
+  var col = document.getElementById('col' + colIdx);
+  if (!col) return;
+  var topOffset = (sh - START_HOUR) * 2 * SLOT_H;
+  var height = (eh - sh) * 2 * SLOT_H;
+  var frame = document.createElement('div');
+  frame.className = 'avail-block avail-block-' + color;
+  frame.style.top = topOffset + 'px';
+  frame.style.height = height + 'px';
+  var pillsHtml = pills.map(function(p) { return '<span class="avail-block-pill">' + p + '</span>'; }).join('');
+  frame.innerHTML = '<div class="avail-block-inner"><div class="avail-block-name">' + blockName + '</div><div class="avail-block-time">' + timeRange + '</div><div class="avail-block-pills">' + pillsHtml + '</div></div>';
+  col.appendChild(frame);
+});
+
+var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+APPTS.forEach(function(appt) {
+  var day = appt[0], sh = appt[1], sm = appt[2], dur = appt[3], type = appt[4], label = appt[5], sublabel = appt[6];
+  var col = document.getElementById('col' + day);
+  var topOffset = ((sh - START_HOUR) * 2 + sm / 30) * SLOT_H;
+  var height = (dur / 30) * SLOT_H - 4;
+  var el = document.createElement('div');
+  var cssType = type.startsWith('avail-') ? 'available appt-' + type : type;
+  el.className = 'appt appt-' + cssType;
+  el.style.top = topOffset + 'px';
+  el.style.height = height + 'px';
+  el.style.zIndex = '3';
+  el.innerHTML = '<div class="appt-title">' + label + '</div><div class="appt-sub">' + sublabel + '</div><div class="appt-dur">' + dur + ' min</div>';
+  // Fix 14: clickable appointment detail
+  if (!type.startsWith('avail-') && type !== 'unavail') {
+    el.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openApptDetail(label, sublabel, type, dur, sh, sm, day);
+    });
+  }
+  col.appendChild(el);
+});
+
+// Fix 14: Appointment detail modal
+var TYPE_LABEL_MAP = {
+  phone: 'Phone Call', video: 'Video Consult', followup: 'Follow-up',
+  a1c: 'A1C Treat Consult', telehealth: 'Telehealth Consult', annual: 'Annual Visit', unavail: 'Unavailable'
+};
+function openApptDetail(label, sublabel, type, dur, sh, sm, day) {
+  var parts = sublabel.split(' · ');
+  var patient = parts[0] || 'Patient';
+  var product = parts[1] || 'General';
+  var hr = sh % 12 || 12;
+  var ampm = sh < 12 ? 'AM' : 'PM';
+  var minStr = sm === 0 ? ':00' : ':' + sm;
+  document.getElementById('apptDetailTitle').textContent = label;
+  document.getElementById('apptDetailPatient').textContent = patient;
+  document.getElementById('apptDetailType').textContent = TYPE_LABEL_MAP[type] || label;
+  document.getElementById('apptDetailProduct').textContent = product;
+  document.getElementById('apptDetailDuration').textContent = dur + ' min · ' + hr + minStr + ' ' + ampm;
+  document.getElementById('apptDetailNotes').textContent = '"' + patient + ' — ' + product + ' consult. Duration: ' + dur + ' min. Provider: Dr. Sarah Lee, MD."';
+  document.getElementById('apptDetailModal').classList.add('open');
+}
+function closeApptDetail() {
+  document.getElementById('apptDetailModal').classList.remove('open');
+}
+document.getElementById('apptDetailModal').addEventListener('click', function(e) {
+  if (e.target === this) closeApptDetail();
+});
+
+// Fix 10: Build month grid (June 2026)
+(function buildMonthGrid() {
+  const grid = document.getElementById('monthGrid');
+  if (!grid) return;
+  const DOWS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  DOWS.forEach(function(d) {
+    var h = document.createElement('div'); h.className = 'month-dow'; h.textContent = d; grid.appendChild(h);
+  });
+  // June 2026 starts on Monday (day index 1 in Sun-start grid)
+  var startPad = 1; // 1 empty cell before Jun 1
+  for (var p = 0; p < startPad; p++) {
+    var e = document.createElement('div'); e.className = 'month-cell other-month';
+    e.innerHTML = '<div class="month-date-num" style="color:#D1D5DB;">31</div>';
+    grid.appendChild(e);
+  }
+  var apptDays = {9:4, 10:3, 11:4, 12:3, 13:3, 3:1, 4:2, 5:2, 16:2, 17:3, 18:2, 23:1, 24:2, 25:3};
+  var openDays = {9:1, 10:2, 11:2, 12:1, 13:2};
+  for (var d = 1; d <= 30; d++) {
+    var cell = document.createElement('div');
+    cell.className = 'month-cell' + (d === 11 ? ' today-cell' : '');
+    cell.title = 'Click to view day';
+    var appts = apptDays[d] || 0;
+    var open = openDays[d] || 0;
+    var dots = '';
+    for (var i = 0; i < Math.min(appts, 4); i++) dots += '<span class="month-dot"></span>';
+    cell.innerHTML = '<div class="month-date-num">' + d + '</div>' +
+      (dots ? '<div class="month-dot-row">' + dots + '</div>' : '') +
+      (appts ? '<div style="font-size:10px;color:#6B7280;">' + appts + ' appt' + (appts > 1 ? 's' : '') + (open ? ' · ' + open + ' open' : '') + '</div>' : '');
+    // clicking a month cell switches to day view
+    cell.onclick = function() { setSchedView('day', document.querySelector('button[onclick*="\'day\'"]')); };
+    grid.appendChild(cell);
+  }
+  // pad remaining cells
+  var total = startPad + 30;
+  var remainder = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (var r = 1; r <= remainder; r++) {
+    var fe = document.createElement('div'); fe.className = 'month-cell other-month';
+    fe.innerHTML = '<div class="month-date-num" style="color:#D1D5DB;">' + r + '</div>';
+    grid.appendChild(fe);
+  }
+})();
+</script>
+{% endraw %}
+{% endblock %}

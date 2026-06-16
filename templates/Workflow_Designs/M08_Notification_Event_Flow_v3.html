@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notification Engine — Event Trigger to Delivery Flow</title>
+<style>
+  body { margin: 0; padding: 20px; background: #f5f5f5; font-family: Arial, sans-serif; }
+  h1 { font-family: Arial, sans-serif; font-size: 18px; color: #1F3864; margin: 0 0 12px 0; text-align: center; }
+  .subtitle { font-family: Arial, sans-serif; font-size: 12px; color: #555; text-align: center; margin-bottom: 16px; }
+  svg { display: block; margin: 0 auto; background: white; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<h1>Notification Engine — Event Trigger to Delivery Flow</h1>
+<p class="subtitle">Module 08 · Telehealth Platform Rebuild · v3 · 2026-06-05</p>
+
+<svg width="1260" height="1620" viewBox="0 0 1260 1620" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Notification Engine — Event Trigger to Delivery Flow</title>
+  <desc>Swimlane diagram showing how a platform event flows through the notification engine to delivery across Platform Event, Notification Engine, and Recipient lanes.</desc>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27AE60"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C"/>
+    </marker>
+    <marker id="arrow-teal" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2E86AB"/>
+    </marker>
+  </defs>
+
+  <!-- ============================================================ -->
+  <!-- LANE BACKGROUNDS -->
+  <!-- ============================================================ -->
+  <rect x="0" y="60" width="420" height="1380" fill="#EFF6FF"/>
+  <rect x="420" y="60" width="420" height="1380" fill="#F8F9FA"/>
+  <rect x="840" y="60" width="420" height="1380" fill="#F0FFF4"/>
+
+  <!-- HEADER LANES y:0-60 -->
+  <rect x="0" y="0" width="420" height="60" fill="#1F3864"/>
+  <text x="210" y="36" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="white">PLATFORM EVENT</text>
+
+  <rect x="420" y="0" width="420" height="60" fill="#2C4A7C"/>
+  <text x="630" y="36" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="white">NOTIFICATION ENGINE</text>
+
+  <rect x="840" y="0" width="420" height="60" fill="#1F3864"/>
+  <text x="1050" y="36" text-anchor="middle" font-family="Arial" font-size="13" font-weight="bold" fill="white">RECIPIENT</text>
+
+  <!-- Lane dividers -->
+  <line x1="420" y1="0" x2="420" y2="1440" stroke="#ccc" stroke-width="1.5"/>
+  <line x1="840" y1="0" x2="840" y2="1440" stroke="#ccc" stroke-width="1.5"/>
+
+  <!-- ============================================================ -->
+  <!-- START OVAL y:80 Event lane -->
+  <!-- ============================================================ -->
+  <ellipse cx="210" cy="100" rx="165" ry="30" fill="#1F3864"/>
+  <text x="210" y="96" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Platform Event Occurs</text>
+  <text x="210" y="112" text-anchor="middle" font-family="Arial" font-size="9" fill="#b0bcd8">Lab result · Appt confirmed · Message · Consult submitted</text>
+
+  <!-- Arrow right from oval to Engine lane box -->
+  <line x1="375" y1="100" x2="493" y2="100" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="434" y="93" text-anchor="middle" font-family="Arial" font-size="10" fill="#555">triggers</text>
+
+  <!-- ENGINE BOX: Notification Engine Receives Event y:80 -->
+  <rect x="498" y="80" width="264" height="52" rx="6" fill="#2E86AB"/>
+  <text x="630" y="101" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Notification Engine</text>
+  <text x="630" y="117" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Receives Event</text>
+
+  <!-- Arrow down from engine box -->
+  <line x1="630" y1="132" x2="630" y2="158" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- SECTION DIVIDER y:158 -->
+  <!-- ============================================================ -->
+  <rect x="0" y="158" width="1260" height="30" fill="#EBF3FB"/>
+  <text x="630" y="177" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">STEP 1 — TRIGGER TYPE</text>
+
+  <!-- ============================================================ -->
+  <!-- DECISION 1 y:198 Engine lane -->
+  <!-- cx:630, top:198, mid:238, bottom:278 -->
+  <!-- ============================================================ -->
+  <polygon points="630,198 710,238 630,278 550,238" fill="#F39C12" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="630" y="233" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="white">Trigger</text>
+  <text x="630" y="247" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="white">type?</text>
+
+  <!-- LEFT "Real-time" → Event lane Fire Immediately box -->
+  <line x1="550" y1="238" x2="430" y2="238" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="490" y="231" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Real-time</text>
+
+  <!-- Fire Immediately box (teal, Event lane) -->
+  <rect x="45" y="218" width="280" height="40" rx="6" fill="#2E86AB"/>
+  <text x="185" y="242" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Fire Immediately</text>
+
+  <!-- RIGHT "Time-based" → Recipient lane Schedule box -->
+  <line x1="710" y1="238" x2="850" y2="238" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="780" y="231" text-anchor="middle" font-family="Arial" font-size="9" fill="#555">Time-based</text>
+
+  <!-- Schedule at Offset box (teal, Recipient lane) -->
+  <rect x="855" y="210" width="360" height="56" rx="6" fill="#2E86AB"/>
+  <text x="1035" y="231" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Schedule at Offset</text>
+  <text x="1035" y="247" text-anchor="middle" font-family="Arial" font-size="10" fill="white">e.g. 24hr before, 2hr before appt</text>
+
+  <!-- Merge both paths back to Engine lane at y:318 -->
+  <!-- Left path merge -->
+  <line x1="185" y1="258" x2="185" y2="318" stroke="#555" stroke-width="1.5"/>
+  <line x1="185" y1="318" x2="620" y2="318" stroke="#555" stroke-width="1.5"/>
+  <!-- Right path merge -->
+  <line x1="1035" y1="266" x2="1035" y2="318" stroke="#555" stroke-width="1.5"/>
+  <line x1="1035" y1="318" x2="640" y2="318" stroke="#555" stroke-width="1.5"/>
+  <!-- Center down arrow -->
+  <line x1="630" y1="318" x2="630" y2="338" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- SECTION DIVIDER y:338 -->
+  <!-- ============================================================ -->
+  <rect x="0" y="338" width="1260" height="30" fill="#EBF3FB"/>
+  <text x="630" y="357" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">STEP 2 — TEMPLATE LOOKUP</text>
+
+  <!-- ============================================================ -->
+  <!-- ENGINE BOX: Look Up Care Product Template y:378 -->
+  <!-- ============================================================ -->
+  <rect x="490" y="378" width="280" height="60" rx="6" fill="#2E86AB"/>
+  <text x="630" y="399" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Look Up Care Product Template</text>
+  <text x="630" y="415" text-anchor="middle" font-family="Arial" font-size="10" fill="white">For this event type + care product</text>
+
+  <!-- Arrow down to Decision 2 -->
+  <line x1="630" y1="438" x2="630" y2="458" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- DECISION 2 y:458 Engine lane -->
+  <!-- cx:630, top:458, mid:498, bottom:538 -->
+  <!-- ============================================================ -->
+  <polygon points="630,458 710,498 630,538 550,498" fill="#F39C12" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="630" y="490" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">Care product</text>
+  <text x="630" y="504" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">template found?</text>
+
+  <!-- YES → RIGHT to Use Care Product Template box -->
+  <line x1="710" y1="498" x2="850" y2="498" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="780" y="491" text-anchor="middle" font-family="Arial" font-size="10" fill="#27AE60">YES</text>
+
+  <!-- Use Care Product Template box (green, right lane) -->
+  <rect x="855" y="468" width="360" height="60" rx="6" fill="#27AE60"/>
+  <text x="1035" y="489" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Use Care Product Template ✓</text>
+  <text x="1035" y="505" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Highest priority — applied to notification</text>
+
+  <!-- NO → DOWN arrow -->
+  <line x1="630" y1="538" x2="630" y2="558" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="638" y="551" font-family="Arial" font-size="10" fill="#555">NO</text>
+
+  <!-- ============================================================ -->
+  <!-- ENGINE BOX: Look Up Global Default Template y:558 -->
+  <!-- ============================================================ -->
+  <rect x="490" y="558" width="280" height="60" rx="6" fill="#2E86AB"/>
+  <text x="630" y="579" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Look Up Global Default Template</text>
+  <text x="630" y="595" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Platform-wide fallback</text>
+
+  <!-- Arrow down to Decision 3 -->
+  <line x1="630" y1="618" x2="630" y2="638" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- DECISION 3 y:638 Engine lane -->
+  <!-- cx:630, top:638, mid:678, bottom:718 -->
+  <!-- ============================================================ -->
+  <polygon points="630,638 710,678 630,718 550,678" fill="#F39C12" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="630" y="671" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">Global default</text>
+  <text x="630" y="684" text-anchor="middle" font-family="Arial" font-size="9" font-weight="bold" fill="white">found?</text>
+
+  <!-- YES → RIGHT to Use Global Default Template box -->
+  <line x1="710" y1="678" x2="850" y2="678" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="780" y="671" text-anchor="middle" font-family="Arial" font-size="10" fill="#27AE60">YES</text>
+
+  <!-- Use Global Default Template box (green, right lane) -->
+  <rect x="855" y="648" width="360" height="60" rx="6" fill="#27AE60"/>
+  <text x="1035" y="669" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Use Global Default Template ✓</text>
+  <text x="1035" y="685" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Second priority — applied to notification</text>
+
+  <!-- NO → DOWN arrow -->
+  <line x1="630" y1="718" x2="630" y2="738" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="638" y="731" font-family="Arial" font-size="10" fill="#555">NO</text>
+
+  <!-- ============================================================ -->
+  <!-- ENGINE BOX: No Notification Sent y:738 (red) -->
+  <!-- ============================================================ -->
+  <rect x="490" y="738" width="280" height="60" rx="6" fill="#E74C3C"/>
+  <text x="630" y="759" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">No Notification Sent</text>
+  <text x="630" y="775" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Logged as unconfigured event</text>
+
+  <!-- Both YES paths (from right lane) route DOWN then merge LEFT to Engine lane at y:820 -->
+  <!-- From Care Product template box (y:528) -->
+  <line x1="1035" y1="528" x2="1035" y2="820" stroke="#27AE60" stroke-width="1.5"/>
+  <!-- From Global Default template box (y:708) -->
+  <line x1="1215" y1="678" x2="1215" y2="820" stroke="#27AE60" stroke-width="1.5"/>
+  <line x1="1215" y1="820" x2="1035" y2="820" stroke="#27AE60" stroke-width="1.5"/>
+  <!-- Merge to Engine center -->
+  <line x1="1035" y1="820" x2="640" y2="820" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+
+  <!-- ============================================================ -->
+  <!-- SECTION DIVIDER y:838 -->
+  <!-- ============================================================ -->
+  <rect x="0" y="838" width="1260" height="30" fill="#EBF3FB"/>
+  <text x="630" y="857" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">STEP 3 — DELIVERY (PATIENT &amp; PROVIDER IN PARALLEL)</text>
+
+  <!-- Arrow down from merge point to split -->
+  <line x1="630" y1="820" x2="630" y2="868" stroke="#27AE60" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="630" y1="868" x2="630" y2="878" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Split horizontal at y:880 -->
+  <line x1="210" y1="878" x2="1050" y2="878" stroke="#555" stroke-width="1.5"/>
+  <!-- Left branch down -->
+  <line x1="210" y1="878" x2="210" y2="898" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Right branch down -->
+  <line x1="1050" y1="878" x2="1050" y2="898" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- LEFT DELIVERY PATH — Event lane (Patient) -->
+  <!-- ============================================================ -->
+
+  <!-- Patient Email box y:898 -->
+  <rect x="30" y="898" width="360" height="52" rx="6" fill="#2E86AB"/>
+  <text x="210" y="919" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Patient Email</text>
+  <text x="210" y="935" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Sent if email configured for event</text>
+
+  <!-- Arrow down -->
+  <line x1="210" y1="950" x2="210" y2="970" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Patient SMS box y:970 -->
+  <rect x="30" y="970" width="360" height="60" rx="6" fill="#2E86AB"/>
+  <text x="210" y="991" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Patient SMS</text>
+  <text x="210" y="1007" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Sent only if: patient opted in AND</text>
+  <text x="210" y="1021" text-anchor="middle" font-family="Arial" font-size="10" fill="white">care product SMS enabled</text>
+
+  <!-- ============================================================ -->
+  <!-- RIGHT DELIVERY PATH — Recipient lane (Provider) -->
+  <!-- ============================================================ -->
+
+  <!-- Provider In-Platform Notification box y:898 -->
+  <rect x="855" y="898" width="360" height="52" rx="6" fill="#2E86AB"/>
+  <text x="1035" y="919" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Provider In-Platform Notification</text>
+  <text x="1035" y="935" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Queue badge updated</text>
+
+  <!-- Arrow down -->
+  <line x1="1035" y1="950" x2="1035" y2="970" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Provider Email box y:970 -->
+  <rect x="855" y="970" width="360" height="52" rx="6" fill="#2E86AB"/>
+  <text x="1035" y="991" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Provider Email</text>
+  <text x="1035" y="1007" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Sent if email configured for event</text>
+
+  <!-- All four paths merge at y:1060 back to Engine lane center -->
+  <line x1="210" y1="1030" x2="210" y2="1060" stroke="#555" stroke-width="1.5"/>
+  <line x1="1035" y1="1022" x2="1035" y2="1060" stroke="#555" stroke-width="1.5"/>
+  <line x1="210" y1="1060" x2="630" y2="1060" stroke="#555" stroke-width="1.5"/>
+  <line x1="630" y1="1060" x2="1035" y2="1060" stroke="#555" stroke-width="1.5"/>
+  <line x1="630" y1="1060" x2="630" y2="1080" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- SECTION DIVIDER y:1080 -->
+  <!-- ============================================================ -->
+  <rect x="0" y="1080" width="1260" height="30" fill="#EBF3FB"/>
+  <text x="630" y="1099" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">STEP 4 — LOGGING</text>
+
+  <!-- Arrow down -->
+  <line x1="630" y1="1110" x2="630" y2="1130" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============================================================ -->
+  <!-- DECISION 4 y:1130 Engine lane -->
+  <!-- cx:630, top:1130, mid:1170, bottom:1210 -->
+  <!-- ============================================================ -->
+  <polygon points="630,1130 710,1170 630,1210 550,1170" fill="#F39C12" stroke="#E67E22" stroke-width="1.5"/>
+  <text x="630" y="1163" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="white">Delivery</text>
+  <text x="630" y="1177" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="white">successful?</text>
+
+  <!-- YES → RIGHT: Logged in Patient Activity Timeline (green) -->
+  <line x1="710" y1="1170" x2="850" y2="1170" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arrow-green)"/>
+  <text x="780" y="1163" text-anchor="middle" font-family="Arial" font-size="10" fill="#27AE60">YES</text>
+
+  <!-- Logged in Patient Activity Timeline box (green, right lane) -->
+  <rect x="855" y="1140" width="360" height="60" rx="6" fill="#27AE60"/>
+  <text x="1035" y="1161" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Logged in Patient Activity Timeline</text>
+  <text x="1035" y="1177" text-anchor="middle" font-family="Arial" font-size="10" fill="white">Event · channel · recipient · timestamp</text>
+
+  <!-- NO → LEFT: Logged as Delivery Failure (red) -->
+  <line x1="550" y1="1170" x2="430" y2="1170" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+  <text x="490" y="1163" text-anchor="middle" font-family="Arial" font-size="10" fill="#E74C3C">NO</text>
+
+  <!-- Logged as Delivery Failure box (red, left lane) -->
+  <rect x="30" y="1140" width="390" height="60" rx="6" fill="#E74C3C"/>
+  <text x="225" y="1161" text-anchor="middle" font-family="Arial" font-size="11" font-weight="bold" fill="white">Logged as Delivery Failure</text>
+  <text x="225" y="1177" text-anchor="middle" font-family="Arial" font-size="10" fill="white">No retry V1.0 · Admin reviews in error log</text>
+
+  <!-- ============================================================ -->
+  <!-- KEY RULES BOX y:1240 (amber border) -->
+  <!-- ============================================================ -->
+  <rect x="20" y="1240" width="1220" height="116" rx="6" fill="#FFFBF0" stroke="#F39C12" stroke-width="2"/>
+  <text x="40" y="1262" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">KEY RULES — Template Cascade &amp; Delivery Logic</text>
+  <text x="40" y="1280" font-family="Arial" font-size="10" fill="#333">▸  Template priority: Care Product–specific template (highest) → Global Default template (fallback) → No notification sent (logged as unconfigured).</text>
+  <text x="40" y="1297" font-family="Arial" font-size="10" fill="#333">▸  Patient SMS requires two conditions: patient has explicitly opted in AND the care product has SMS delivery enabled — both must be true.</text>
+  <text x="40" y="1314" font-family="Arial" font-size="10" fill="#333">▸  V1.0 has no retry logic for failed deliveries — failures are logged in the admin error log for manual review.</text>
+  <text x="40" y="1331" font-family="Arial" font-size="10" fill="#333">▸  Real-time triggers fire immediately on event receipt; time-based triggers are queued and evaluated against the configured offset.</text>
+  <text x="40" y="1348" font-family="Arial" font-size="10" fill="#333">▸  All delivery events (success and failure) write to the patient activity timeline for audit and visibility.</text>
+
+  <!-- ============================================================ -->
+  <!-- LEGEND y:1376 (light gray border) -->
+  <!-- ============================================================ -->
+  <rect x="20" y="1376" width="1220" height="110" rx="6" fill="#F8F9FA" stroke="#ccc" stroke-width="1.5"/>
+  <text x="40" y="1398" font-family="Arial" font-size="11" font-weight="bold" fill="#1F3864">LEGEND</text>
+
+  <!-- Navy box sample -->
+  <rect x="40" y="1408" width="60" height="20" rx="3" fill="#1F3864"/>
+  <text x="108" y="1422" font-family="Arial" font-size="10" fill="#333">Navy — Event source / headers</text>
+
+  <!-- Teal box sample -->
+  <rect x="320" y="1408" width="60" height="20" rx="3" fill="#2E86AB"/>
+  <text x="388" y="1422" font-family="Arial" font-size="10" fill="#333">Teal — Engine action / delivery channel</text>
+
+  <!-- Green box sample -->
+  <rect x="620" y="1408" width="60" height="20" rx="3" fill="#27AE60"/>
+  <text x="688" y="1422" font-family="Arial" font-size="10" fill="#333">Green — Success / logged outcome</text>
+
+  <!-- Amber diamond sample -->
+  <polygon points="870,1418 890,1428 870,1438 850,1428" fill="#F39C12"/>
+  <text x="898" y="1432" font-family="Arial" font-size="10" fill="#333">Amber — Decision point</text>
+
+  <!-- Red box sample -->
+  <rect x="1080" y="1408" width="60" height="20" rx="3" fill="#E74C3C"/>
+  <text x="1148" y="1422" font-family="Arial" font-size="10" fill="#333">Red — Failure / no-send</text>
+
+  <text x="40" y="1456" font-family="Arial" font-size="10" fill="#333">▸  Version: M08_Notification_Event_Flow_v3  ·  Date: 2026-06-05  ·  Owner: Justin Woller  ·  Module 08 — Telehealth Platform Rebuild</text>
+  <text x="40" y="1473" font-family="Arial" font-size="10" fill="#777">▸  Do not edit directly — all changes flow through the DB first. Tracker = DB view only.</text>
+
+</svg>
+</body>
+</html>

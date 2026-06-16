@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M01 — Permissions Matrix</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; color: #222; }
+
+  .frame-header {
+    background: #1F3864; color: #fff; padding: 12px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; border-bottom: 3px solid #2E86AB;
+  }
+  .frame-header .title { font-size: 14px; font-weight: 700; }
+  .badge { background: #2E86AB; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin-left: 10px; }
+  .badge-green { background: #27AE60; }
+  .frame-meta { color: #b0c4de; font-size: 11px; }
+
+  .portal-shell { display: flex; height: calc(100vh - 55px); min-height: 700px; background: #f4f6f9; }
+
+  /* Sidebar */
+  .sidebar { width: 200px; background: #1F3864; flex-shrink: 0; display: flex; flex-direction: column; }
+  .sidebar-logo { padding: 16px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 700; color: #fff; }
+  .sidebar-logo span { font-size: 10px; font-weight: 400; color: #8aa; display: block; margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 10px 0; }
+  .nav-section { font-size: 9px; color: #6a85a8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 10px 14px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 14px; font-size: 12px; color: #b0c4de; cursor: pointer; }
+  .nav-item.active { background: rgba(46,134,171,0.25); color: #fff; border-left: 3px solid #2E86AB; }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #8aa; }
+
+  /* Main content */
+  .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* Top bar */
+  .top-bar {
+    background: #fff; padding: 14px 22px; border-bottom: 1px solid #e0e4ea;
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .page-title { font-size: 18px; font-weight: 700; color: #1F3864; }
+  .top-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-export {
+    border: 1.5px solid #27AE60; color: #27AE60; background: #fff;
+    padding: 7px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: 600;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .readonly-badge {
+    background: #f4f6f9; border: 1px solid #d5d9e0; color: #888;
+    padding: 5px 12px; border-radius: 5px; font-size: 12px;
+  }
+
+  /* Tab row */
+  .tabs {
+    background: #fff; padding: 0 22px; border-bottom: 2px solid #e0e4ea; display: flex; flex-shrink: 0;
+  }
+  .tab { padding: 11px 20px; font-size: 13px; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: #2E86AB; font-weight: 700; border-bottom-color: #2E86AB; }
+
+  /* Table wrapper for horizontal scroll */
+  .table-wrapper { flex: 1; overflow: auto; padding: 16px 22px 8px; }
+
+  /* Matrix table */
+  .matrix-table { border-collapse: collapse; min-width: 1200px; font-size: 12px; }
+
+  /* Sticky column 1 and sticky header */
+  .matrix-table th, .matrix-table td { border: 1px solid #e0e4ea; white-space: nowrap; }
+
+  /* Profile name header row */
+  .matrix-table thead tr.profile-row th {
+    background: #1F3864; color: #fff; text-align: center;
+    padding: 8px 10px; font-size: 11px; font-weight: 700;
+    position: sticky; top: 0; z-index: 3;
+    min-width: 70px;
+  }
+  .matrix-table thead tr.profile-row th:first-child {
+    background: #1F3864; text-align: left; min-width: 220px;
+    position: sticky; left: 0; top: 0; z-index: 4;
+  }
+
+  /* Category header rows */
+  .matrix-table tr.cat-header td {
+    background: #1F3864; color: #fff; font-weight: 700; font-size: 12px;
+    padding: 8px 12px; position: sticky; left: 0;
+  }
+  .matrix-table tr.cat-header td.full-span {
+    /* spans all columns */
+  }
+
+  /* Right name column (first col sticky) */
+  .matrix-table td.right-name {
+    background: #f8f9fa; font-size: 12px; color: #333; padding: 7px 12px;
+    position: sticky; left: 0; z-index: 2; border-right: 2px solid #d0d5dd;
+    min-width: 220px; max-width: 220px;
+  }
+  .matrix-table tr:hover td.right-name { background: #EEF6FB; }
+
+  /* Data cells */
+  .matrix-table td.cell {
+    text-align: center; padding: 6px 4px; vertical-align: middle; min-width: 70px;
+  }
+  .matrix-table tr:hover td.cell { background: #f5f8ff; }
+
+  .check-yes { color: #27AE60; font-size: 15px; font-weight: 700; }
+  .check-no { color: #e0e4ea; font-size: 13px; }
+
+  /* Category section labels in first column spanning full row */
+  .cat-label-cell {
+    background: #EEF3FA; color: #1F3864; font-weight: 700; font-size: 12px;
+    padding: 7px 12px; letter-spacing: 0.3px;
+    position: sticky; left: 0; z-index: 2;
+  }
+
+  /* Footer inside table-wrapper */
+  .matrix-footer {
+    padding: 10px 0; font-size: 11px; color: #888; text-align: right;
+    border-top: 1px solid #e0e4ea; margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  /* Annotation bar */
+  .annotation-bar {
+    background: #f4f6f9; border-top: 2px solid #2E86AB;
+    padding: 12px 28px; font-size: 11px; color: #555;
+    display: flex; gap: 24px; flex-wrap: wrap; flex-shrink: 0;
+  }
+  .ann-item { display: flex; align-items: flex-start; gap: 6px; }
+  .ann-num { background: #2E86AB; color: #fff; border-radius: 50%; width: 18px; height: 18px; min-width: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-top: 1px; }
+
+  /* Legend inline */
+  .legend-row {
+    background: #fff; padding: 8px 22px; border-bottom: 1px solid #e8eaed;
+    display: flex; gap: 20px; align-items: center; font-size: 12px; color: #555; flex-shrink: 0;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+</style>
+</head>
+<body>
+
+<!-- Frame header -->
+<div class="frame-header">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="title">M01 — Permissions Matrix</div>
+    <span class="badge">Mockup 4 of 4</span>
+    <span class="badge badge-green">M01_Permissions_Matrix_v1</span>
+  </div>
+  <div class="frame-meta">Project Phoenix · M01 Roles &amp; Responsibilities · June 5, 2026</div>
+</div>
+
+<div class="portal-shell">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">Everlywell<span>Admin Portal</span></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item"><span class="nav-icon">&#128202;</span> Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">&#128101;</span> User Management</div>
+      <div class="nav-item active"><span class="nav-icon">&#128084;</span> Profiles</div>
+      <div class="nav-section">Configuration</div>
+      <div class="nav-item"><span class="nav-icon">&#128186;</span> Care Products</div>
+      <div class="nav-item"><span class="nav-icon">&#128203;</span> Workflows</div>
+      <div class="nav-section">Compliance</div>
+      <div class="nav-item"><span class="nav-icon">&#128196;</span> Audit Log</div>
+      <div class="nav-item"><span class="nav-icon">&#128218;</span> Reports</div>
+    </div>
+    <div class="sidebar-footer">&#9679; Admin User<br><span style="font-size:10px;">System Admin</span></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="page-title">Permissions Matrix</div>
+      <div class="top-actions">
+        <span class="readonly-badge">Read-only view</span>
+        <button class="btn-export">&#8595; Export to Excel</button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab">Users</div>
+      <div class="tab">Profiles</div>
+      <div class="tab active">Permissions Matrix</div>
+    </div>
+
+    <!-- Legend row -->
+    <div class="legend-row">
+      <strong style="color:#1F3864;">Legend:</strong>
+      <div class="legend-item"><span class="check-yes" style="font-size:14px;">&#10003;</span> Right granted to profile</div>
+      <div class="legend-item"><span style="color:#e0e4ea; font-size:13px;">&#9744;</span> Right not granted</div>
+      <div class="legend-item" style="margin-left:20px; color:#888;">Scroll right to view all 13 profiles. Scroll down for all rights. First column and header row are sticky.</div>
+    </div>
+
+    <!-- Matrix table -->
+    <div class="table-wrapper">
+      <table class="matrix-table">
+        <thead>
+          <tr class="profile-row">
+            <th style="text-align:left; font-size:11px;">Right / Permission</th>
+            <th title="Provider MD/DO">MD/DO</th>
+            <th title="Provider NP">NP</th>
+            <th title="Provider PA">PA</th>
+            <th title="Provider Genetic Counselor">GC</th>
+            <th title="Registered Nurse">RN</th>
+            <th title="Medical Assistant">MA</th>
+            <th title="Care Team Coordinator">CT-Coord</th>
+            <th title="Scheduling Coordinator">Sched</th>
+            <th title="External Scheduler">Ext-Sched</th>
+            <th title="System Admin">Sys-Admin</th>
+            <th title="Platform Admin">Plat-Admin</th>
+            <th title="Legal / Compliance">Legal-Comp</th>
+            <th title="Partner Read-Only">Partner-RO</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- CLINICAL RIGHTS -->
+          <tr>
+            <td class="cat-label-cell" colspan="14" style="background:#1F3864; color:#fff; position:sticky; left:0;">&#128138;&nbsp; CLINICAL RIGHTS</td>
+          </tr>
+          <tr>
+            <td class="right-name">View Patient Chart</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Clinical Consult Notes</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Write Clinical Consult Notes</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Co-Sign Clinical Note</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Attest Genetic Order</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Prescribe Medication</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Approve Lab Order</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Lab Results</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Flag Clinical Escalation</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Intake Responses</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+
+          <!-- QUEUE RIGHTS -->
+          <tr>
+            <td class="cat-label-cell" colspan="14" style="background:#1F3864; color:#fff; position:sticky; left:0;">&#128203;&nbsp; QUEUE RIGHTS</td>
+          </tr>
+          <tr>
+            <td class="right-name">Access Provider Queue</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Access RN Queue</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Access MA Queue</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Access Care Team Queue</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Pull Consult from Queue</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Reassign Consult</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View All Queues (Supervisor)</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+
+          <!-- SCHEDULING RIGHTS -->
+          <tr>
+            <td class="cat-label-cell" colspan="14" style="background:#1F3864; color:#fff; position:sticky; left:0;">&#128340;&nbsp; SCHEDULING RIGHTS</td>
+          </tr>
+          <tr>
+            <td class="right-name">View Provider Availability</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Manage Own Availability</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Book Patient Appointment</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+
+          <!-- ADMIN PORTAL RIGHTS -->
+          <tr>
+            <td class="cat-label-cell" colspan="14" style="background:#1F3864; color:#fff; position:sticky; left:0;">&#9881;&nbsp; ADMIN PORTAL RIGHTS</td>
+          </tr>
+          <tr>
+            <td class="right-name">Access Admin Portal</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Manage User Accounts</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Manage Profiles</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Configure Care Products</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Audit Log</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+
+          <!-- REPORTING RIGHTS -->
+          <tr>
+            <td class="cat-label-cell" colspan="14" style="background:#1F3864; color:#fff; position:sticky; left:0;">&#128202;&nbsp; REPORTING RIGHTS</td>
+          </tr>
+          <tr>
+            <td class="right-name">View Clinical Reports</td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Compliance Reports (M13)</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">View Partner Reports</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+          </tr>
+          <tr>
+            <td class="right-name">Export Report Data</td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-yes">&#10003;</span></td>
+            <td class="cell"><span class="check-no">&#9744;</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- Matrix footer note -->
+      <div class="matrix-footer">
+        Last updated by System Admin on June 4, 2026 &nbsp;|&nbsp; 13 profiles &nbsp;|&nbsp; 30 rights shown (all categories) &nbsp;|&nbsp; Read-only — edit in Profile Editor
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Annotation bar -->
+<div class="annotation-bar">
+  <div class="ann-item">
+    <div class="ann-num">1</div>
+    <div><strong>Sticky headers</strong> — first column (right name) and header row (profile names) remain fixed on scroll in both directions.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">2</div>
+    <div><strong>Category header rows</strong> — dark navy full-width rows group rights by domain. No editing possible from this view.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">3</div>
+    <div><strong>Partner-RO isolation</strong> — Partner Read-Only has almost all empty cells except View Partner Reports, visually confirming least-privilege access.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">4</div>
+    <div><strong>Co-Sign / Attest uniqueness</strong> — only MD/DO has Co-Sign. Only MD/DO and GC have Attest Genetic Order. Clearly visible in the matrix.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">5</div>
+    <div><strong>Export to Excel</strong> — generates a full matrix spreadsheet for compliance review, credentialing, and audit. Read-only in-platform.</div>
+  </div>
+</div>
+
+</body>
+</html>

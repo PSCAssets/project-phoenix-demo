@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>M01 — Provider Onboarding & Role Assignment Flow</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #222; }
+  .diagram-title { font-size: 15px; font-weight: bold; color: #1F3864; border-left: 4px solid #1F3864; padding-left: 10px; margin-bottom: 4px; }
+  .diagram-sub { font-size: 11px; color: #666; margin-bottom: 24px; font-style: italic; }
+  svg { display: block; max-width: 1100px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+</style>
+</head>
+<body>
+<div class="diagram-title">Workflow — Provider Onboarding & Role Assignment · M01</div>
+<div class="diagram-sub">From Verifiable sync to active portal access. Covers profile creation, role assignment, state licensing, and rights configuration.</div>
+
+<svg viewBox="0 0 1060 820" xmlns="http://www.w3.org/2000/svg" font-family="Arial" font-size="12">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#1F3864"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#C0392B"/>
+    </marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#1F7A4A"/>
+    </marker>
+  </defs>
+
+  <!-- Legend -->
+  <rect x="20" y="16" width="14" height="14" rx="2" fill="#1F3864"/>
+  <text x="40" y="27" font-size="11" fill="#333">System Admin / Platform Admin action</text>
+  <rect x="240" y="16" width="14" height="14" rx="2" fill="#1F7A4A"/>
+  <text x="260" y="27" font-size="11" fill="#333">System automated</text>
+  <rect x="390" y="16" width="14" height="14" rx="2" fill="#0D6EFD" opacity="0.7"/>
+  <text x="410" y="27" font-size="11" fill="#333">Verifiable (external)</text>
+  <rect x="550" y="16" width="14" height="14" rx="2" fill="#F5DFA0"/>
+  <rect x="550" y="16" width="14" height="14" rx="2" fill="none" stroke="#B8730A"/>
+  <text x="570" y="27" font-size="11" fill="#333">Decision</text>
+
+  <!-- COLUMN HEADERS -->
+  <rect x="10" y="42" width="1040" height="24" rx="4" fill="#1F3864"/>
+  <text x="530" y="58" text-anchor="middle" font-size="12" font-weight="bold" fill="white">PROVIDER ONBOARDING &amp; ROLE ASSIGNMENT FLOW</text>
+
+  <!-- ===== STEP 1: Trigger ===== -->
+  <rect x="390" y="82" width="280" height="52" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="530" y="104" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">New Provider Ready to Onboard</text>
+  <text x="530" y="120" text-anchor="middle" font-size="11" fill="#555">Admin initiates onboarding in Admin Portal</text>
+
+  <!-- Arrow down -->
+  <line x1="530" y1="134" x2="530" y2="156" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STEP 2: Verifiable lookup -->
+  <rect x="360" y="156" width="340" height="52" rx="8" fill="#DBEAFE" stroke="#0D6EFD" stroke-width="1.5" opacity="0.9"/>
+  <text x="530" y="178" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Verifiable License Lookup</text>
+  <text x="530" y="194" text-anchor="middle" font-size="11" fill="#555">System pulls active licenses by NPI / provider name</text>
+
+  <line x1="530" y1="208" x2="530" y2="230" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- DECISION: License found? -->
+  <polygon points="530,230 660,268 530,306 400,268" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="530" y="264" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Active License</text>
+  <text x="530" y="280" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Found?</text>
+
+  <!-- No branch — left -->
+  <line x1="400" y1="268" x2="200" y2="268" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="295" y="260" text-anchor="middle" font-size="11" fill="#C0392B" font-weight="bold">No</text>
+  <rect x="60" y="242" width="140" height="52" rx="8" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="130" y="264" text-anchor="middle" font-size="12" font-weight="bold" fill="#C0392B">Cannot Onboard</text>
+  <text x="130" y="280" text-anchor="middle" font-size="11" fill="#555">Admin notified — resolve</text>
+  <text x="130" y="292" text-anchor="middle" font-size="11" fill="#555">licensing before retry</text>
+
+  <!-- Yes branch — down -->
+  <line x1="530" y1="306" x2="530" y2="328" stroke="#1F7A4A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="545" y="322" font-size="11" fill="#1F7A4A" font-weight="bold">Yes</text>
+
+  <!-- STEP 3: Create provider profile -->
+  <rect x="360" y="328" width="340" height="64" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="530" y="350" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Create Provider Profile</text>
+  <text x="530" y="366" text-anchor="middle" font-size="11" fill="#555">Admin sets: Name, NPI, Role (MD/DO, NP, PA, GC, RN…)</text>
+  <text x="530" y="381" text-anchor="middle" font-size="11" fill="#555">Verifiable-confirmed states auto-populate license scope</text>
+
+  <line x1="530" y1="392" x2="530" y2="414" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STEP 4: Assign care products -->
+  <rect x="360" y="414" width="340" height="64" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="530" y="436" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Assign Care Products &amp; Client</text>
+  <text x="530" y="452" text-anchor="middle" font-size="11" fill="#555">Admin selects care products provider will service</text>
+  <text x="530" y="467" text-anchor="middle" font-size="11" fill="#555">and associates with client account (if applicable)</text>
+
+  <line x1="530" y1="478" x2="530" y2="500" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STEP 5: Rights auto-assigned -->
+  <rect x="340" y="500" width="380" height="64" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="530" y="522" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Rights Auto-Assigned by Role</text>
+  <text x="530" y="538" text-anchor="middle" font-size="11" fill="#333">System applies default rights set for provider role</text>
+  <text x="530" y="553" text-anchor="middle" font-size="11" fill="#333">Admin can add/remove individual rights post-creation</text>
+
+  <line x1="530" y1="564" x2="530" y2="586" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- STEP 6: Supervision config (conditional) -->
+  <polygon points="530,586 680,620 530,654 380,620" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="530" y="614" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Supervised Role?</text>
+  <text x="530" y="630" text-anchor="middle" font-size="11" fill="#6E4C00">(NP, PA, GC)</text>
+
+  <!-- Yes — right branch -->
+  <line x1="680" y1="620" x2="820" y2="620" stroke="#B8730A" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="746" y="613" text-anchor="middle" font-size="11" fill="#B8730A" font-weight="bold">Yes</text>
+  <rect x="820" y="594" width="200" height="52" rx="8" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="920" y="616" text-anchor="middle" font-size="12" font-weight="bold" fill="#B8730A">Configure Supervision</text>
+  <text x="920" y="631" text-anchor="middle" font-size="11" fill="#555">Assign supervising MD per state</text>
+  <text x="920" y="644" text-anchor="middle" font-size="11" fill="#555">(M04-SUP-001)</text>
+  <!-- Arrow from supervision back down -->
+  <line x1="920" y1="646" x2="920" y2="720" stroke="#B8730A" stroke-width="1.5"/>
+  <line x1="920" y1="720" x2="620" y2="720" stroke="#B8730A" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- No — down -->
+  <line x1="530" y1="654" x2="530" y2="720" stroke="#1F7A4A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="545" y="690" font-size="11" fill="#1F7A4A" font-weight="bold">No</text>
+
+  <!-- STEP 7: Activate & invite -->
+  <rect x="340" y="720" width="280" height="64" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="480" y="742" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Activate Profile &amp; Send Invite</text>
+  <text x="480" y="758" text-anchor="middle" font-size="11" fill="#333">System sends setup email with 48-hr link</text>
+  <text x="480" y="773" text-anchor="middle" font-size="11" fill="#333">Provider creates credentials &amp; logs in</text>
+
+  <!-- Annotation: audit log -->
+  <rect x="650" y="728" width="180" height="40" rx="6" fill="#F5F5F5" stroke="#CCC" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="740" y="744" text-anchor="middle" font-size="11" fill="#666">All steps logged in</text>
+  <text x="740" y="758" text-anchor="middle" font-size="11" fill="#666">M12 Audit Trail</text>
+</svg>
+</body>
+</html>

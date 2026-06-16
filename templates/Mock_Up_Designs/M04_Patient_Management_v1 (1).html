@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Management — Search and Record View</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #F5F6FA; color: #1A2B45; min-width: 1440px; }
+
+  .top-header { background: #1F3864; color: #fff; padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 16px; font-weight: 700; }
+  .breadcrumb { font-size: 13px; color: #9BB5D8; }
+  .breadcrumb span { color: #fff; }
+  .user-info { font-size: 13px; color: #9BB5D8; display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #2E86AB; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+  .page-header { background: #fff; border-bottom: 1px solid #E2E6EF; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-size: 18px; font-weight: 700; color: #1F3864; }
+
+  .page-layout { display: flex; height: calc(100vh - 112px); }
+
+  /* Left search panel */
+  .search-panel { width: 320px; background: #fff; border-right: 1px solid #E2E6EF; display: flex; flex-direction: column; flex-shrink: 0; }
+  .sp-top { padding: 16px; border-bottom: 1px solid #E2E6EF; }
+  .search-input-wrap { position: relative; margin-bottom: 12px; }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #8A97B1; font-size: 14px; }
+  .search-input { width: 100%; border: 1px solid #D0D7E6; border-radius: 6px; padding: 9px 12px 9px 32px; font-size: 13px; font-family: Arial, sans-serif; }
+  .search-input:focus { outline: none; border-color: #2E86AB; }
+  .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1.5px solid transparent; }
+  .chip.active { background: #1F3864; color: #fff; border-color: #1F3864; }
+  .chip:not(.active) { background: #fff; color: #6B7A99; border-color: #D0D7E6; }
+  .chip:not(.active):hover { border-color: #2E86AB; color: #2E86AB; }
+
+  .patient-list { flex: 1; overflow-y: auto; }
+  .patient-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid #F0F2F8; cursor: pointer; }
+  .patient-item:hover { background: #F5F6FA; }
+  .patient-item.selected { background: #EEF6FA; border-left: 3px solid #2E86AB; }
+  .patient-initials { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .patient-info { flex: 1; }
+  .patient-name { font-size: 13px; font-weight: 700; color: #1F3864; }
+  .patient-meta { font-size: 11px; color: #8A97B1; margin-top: 2px; }
+  .patient-program { font-size: 11px; font-weight: 700; color: #2E86AB; margin-top: 2px; }
+  .patient-status { font-size: 10px; padding: 2px 7px; border-radius: 8px; font-weight: 700; flex-shrink: 0; align-self: flex-start; margin-top: 3px; }
+  .status-active { background: #E8F5EE; color: #22A067; }
+  .status-inactive { background: #F5F6FA; color: #8A97B1; }
+
+  /* Right record view */
+  .record-panel { flex: 1; overflow-y: auto; background: #F5F6FA; }
+  .record-header-bar { background: #fff; border-bottom: 1px solid #E2E6EF; padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; }
+  .record-name { font-size: 20px; font-weight: 700; color: #1F3864; }
+  .record-meta { font-size: 13px; color: #6B7A99; margin-top: 2px; display: flex; align-items: center; gap: 12px; }
+  .record-id { font-weight: 700; color: #3A4A6B; font-family: monospace; }
+  .record-actions { display: flex; gap: 10px; }
+  .record-btn { padding: 7px 16px; border-radius: 5px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; border: 1.5px solid; }
+  .btn-outline-sm { background: #fff; color: #2E86AB; border-color: #2E86AB; }
+  .btn-outline-sm:hover { background: #EEF6FA; }
+  .btn-danger-sm { background: #fff; color: #C62828; border-color: #EFA0A0; }
+  .btn-danger-sm:hover { background: #FFF0F0; }
+
+  /* Tab bar */
+  .record-tabs { background: #fff; border-bottom: 2px solid #E2E6EF; padding: 0 28px; display: flex; gap: 0; }
+  .record-tab { padding: 11px 18px; font-size: 13px; font-weight: 700; cursor: pointer; color: #8A97B1; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .record-tab.active { color: #2E86AB; border-bottom-color: #2E86AB; }
+  .record-tab:hover:not(.active) { color: #3A4A6B; }
+
+  /* Overview content */
+  .overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 20px 28px; }
+  .stat-card { background: #fff; border: 1px solid #E2E6EF; border-radius: 8px; padding: 16px; }
+  .stat-label { font-size: 11px; font-weight: 700; color: #8A97B1; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .stat-val { font-size: 22px; font-weight: 700; color: #1F3864; }
+  .stat-sub { font-size: 12px; color: #6B7A99; margin-top: 4px; }
+
+  .detail-section { padding: 0 28px 20px; }
+  .section-title { font-size: 14px; font-weight: 700; color: #1F3864; margin-bottom: 14px; }
+  .info-card { background: #fff; border: 1px solid #E2E6EF; border-radius: 8px; padding: 18px 20px; margin-bottom: 14px; }
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #F0F2F8; font-size: 13px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: #6B7A99; }
+  .info-val { color: #1A2B45; font-weight: 700; }
+
+  /* Activity timeline */
+  .timeline { background: #fff; border: 1px solid #E2E6EF; border-radius: 8px; padding: 16px 20px; }
+  .timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F0F2F8; }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-dot { width: 10px; height: 10px; border-radius: 50%; background: #2E86AB; flex-shrink: 0; margin-top: 4px; }
+  .timeline-dot.green { background: #22A067; }
+  .timeline-dot.gray { background: #C0C8D8; }
+  .timeline-content { flex: 1; }
+  .timeline-event { font-size: 13px; font-weight: 700; color: #1A2B45; }
+  .timeline-detail { font-size: 12px; color: #6B7A99; margin-top: 2px; }
+  .timeline-time { font-size: 11px; color: #B0BBC8; flex-shrink: 0; margin-top: 3px; }
+
+  .record-action-bar { padding: 16px 28px; display: flex; gap: 12px; background: #fff; border-top: 1px solid #E2E6EF; }
+  .btn-primary { background: #2E86AB; color: #fff; border: none; border-radius: 6px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; }
+  .btn-outline2 { background: #fff; color: #2E86AB; border: 1.5px solid #2E86AB; border-radius: 6px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <div class="brand">EverlyWell Admin Portal</div>
+  <div class="breadcrumb">Admin Portal &rsaquo; <span>Patient Management</span></div>
+  <div class="user-info"><div class="user-avatar">JW</div>Justin Woller</div>
+</div>
+
+<div class="page-header">
+  <div class="page-title">Patient Management — Search and Record View</div>
+  <span style="font-size:12px;color:#8A97B1;">12,847 patients in system</span>
+</div>
+
+<div class="page-layout">
+
+  <!-- Search Panel -->
+  <div class="search-panel">
+    <div class="sp-top">
+      <div class="search-input-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input class="search-input" type="text" placeholder="Search name, email, phone, ID, DOB...">
+      </div>
+      <div class="filter-chips">
+        <div class="chip active">All Programs</div>
+        <div class="chip">Enrolled</div>
+        <div class="chip">Inactive</div>
+      </div>
+    </div>
+    <div class="patient-list">
+
+      <div class="patient-item">
+        <div class="patient-initials" style="background:#E87B5A;">SJ</div>
+        <div class="patient-info">
+          <div class="patient-name">Sarah Johnson</div>
+          <div class="patient-meta">DOB: 04/12/1985 &bull; PT-00841</div>
+          <div class="patient-program">Weight Management</div>
+        </div>
+        <span class="patient-status status-active">Active</span>
+      </div>
+
+      <div class="patient-item selected">
+        <div class="patient-initials" style="background:#2E86AB;">MC</div>
+        <div class="patient-info">
+          <div class="patient-name">Michael Chen</div>
+          <div class="patient-meta">DOB: 08/23/1978 &bull; PT-00847</div>
+          <div class="patient-program">Thyroid Care</div>
+        </div>
+        <span class="patient-status status-active">Active</span>
+      </div>
+
+      <div class="patient-item">
+        <div class="patient-initials" style="background:#8B5EA8;">ER</div>
+        <div class="patient-info">
+          <div class="patient-name">Emily Rodriguez</div>
+          <div class="patient-meta">DOB: 02/14/1990 &bull; PT-00849</div>
+          <div class="patient-program">Genetics Pre-Screening</div>
+        </div>
+        <span class="patient-status status-active">Active</span>
+      </div>
+
+      <div class="patient-item">
+        <div class="patient-initials" style="background:#8A97B1;">JW</div>
+        <div class="patient-info">
+          <div class="patient-name">James Wilson</div>
+          <div class="patient-meta">DOB: 11/30/1965 &bull; PT-00612</div>
+          <div class="patient-program">Weight Management</div>
+        </div>
+        <span class="patient-status status-inactive">Inactive</span>
+      </div>
+
+      <div class="patient-item">
+        <div class="patient-initials" style="background:#22A067;">LP</div>
+        <div class="patient-info">
+          <div class="patient-name">Lisa Park</div>
+          <div class="patient-meta">DOB: 07/04/1982 &bull; PT-00851</div>
+          <div class="patient-program">Weight Management</div>
+        </div>
+        <span class="patient-status status-active">Active</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Record Panel -->
+  <div class="record-panel">
+    <div class="record-header-bar">
+      <div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="record-name">Michael Chen</div>
+          <span class="patient-status status-active" style="font-size:12px;padding:3px 10px;">Active</span>
+        </div>
+        <div class="record-meta">
+          <span class="record-id">PT-00847</span>
+          <span>&bull; DOB: Aug 23, 1978 (47 y/o)</span>
+          <span>&bull; M</span>
+          <span>&bull; mchen@email.com</span>
+          <span>&bull; (415) 555-0194</span>
+        </div>
+      </div>
+      <div class="record-actions">
+        <button class="record-btn btn-outline-sm">Account Recovery</button>
+        <button class="record-btn btn-outline-sm">Edit Enrollment</button>
+        <button class="record-btn btn-outline-sm">Transfer Provider</button>
+      </div>
+    </div>
+
+    <div class="record-tabs">
+      <div class="record-tab active">Overview</div>
+      <div class="record-tab">Consult History</div>
+      <div class="record-tab">Enrollment</div>
+      <div class="record-tab">Documents</div>
+      <div class="record-tab">Activity Log</div>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="overview-grid">
+      <div class="stat-card">
+        <div class="stat-label">Account Status</div>
+        <div style="font-size:15px;font-weight:700;color:#22A067;">&#9679; Active</div>
+        <div class="stat-sub">Since Jan 15, 2026</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Open Consults</div>
+        <div class="stat-val">1</div>
+        <div class="stat-sub">Thyroid Care — In Progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Last Activity</div>
+        <div style="font-size:16px;font-weight:700;color:#1F3864;">2 days ago</div>
+        <div class="stat-sub">Jun 2, 2026 at 3:14 PM</div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="section-title">Enrollment Details</div>
+      <div class="info-card">
+        <div class="info-row"><span class="info-key">Enrolled Program</span><span class="info-val">Thyroid Care — Video Consultation</span></div>
+        <div class="info-row"><span class="info-key">Enrollment Date</span><span class="info-val">January 15, 2026</span></div>
+        <div class="info-row"><span class="info-key">Assigned Provider</span><span class="info-val">Dr. Sarah Martinez, MD</span></div>
+        <div class="info-row"><span class="info-key">Assigned Care Team</span><span class="info-val">Jessica Kim, RN</span></div>
+        <div class="info-row"><span class="info-key">Billing Status</span><span class="info-val" style="color:#22A067;">Insurance Active — Aetna PPO</span></div>
+        <div class="info-row"><span class="info-key">Licensed State</span><span class="info-val">California (CA)</span></div>
+      </div>
+
+      <div class="section-title">Recent Activity</div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot green"></div>
+          <div class="timeline-content">
+            <div class="timeline-event">Consult completed — Thyroid Follow-up #3</div>
+            <div class="timeline-detail">Dr. Sarah Martinez completed consult. Treatment plan updated. Lab order placed.</div>
+          </div>
+          <div class="timeline-time">Jun 2, 2026</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-content">
+            <div class="timeline-event">Lab results released — TSH Panel</div>
+            <div class="timeline-detail">LabCorp results received and attached to patient chart.</div>
+          </div>
+          <div class="timeline-time">May 30, 2026</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot gray"></div>
+          <div class="timeline-content">
+            <div class="timeline-event">Patient message sent</div>
+            <div class="timeline-detail">Patient sent secure message to care team re: medication side effects.</div>
+          </div>
+          <div class="timeline-time">May 28, 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

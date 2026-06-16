@@ -1,0 +1,962 @@
+{% extends "base.html" %}
+{% block title %}NP Dashboard — Maria Rodriguez{% endblock %}
+{% block head %}
+<style>
+
+  :root {
+    --ew-green: #00A67E;
+    --ew-green-dark: #007F5F;
+    --ew-green-light: #E6F7F2;
+    --sidebar-w: 48px;
+    --navy: #6B21A8;
+    --p1: #DC2626; --p1-bg: #FEE2E2;
+    --p2: #D97706; --p2-bg: #FEF3C7;
+    --p3: #0369A1; --p3-bg: #E0F2FE;
+    --p4: #6B7280; --p4-bg: #F2EDE4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+         font-size: 13px; background: #FAF7F2; display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar {
+    width: var(--sidebar-w); min-width: var(--sidebar-w);
+    background: #F2EDE4; display: flex; flex-direction: column;
+    align-items: center; padding: 12px 0; z-index: 100; height: 100vh;
+  }
+  .sidebar-logo { margin-bottom: 24px; padding: 8px; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+    color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+    transition: background .15s, color .15s; position: relative;
+  }
+  .nav-item:hover { background: rgba(107,33,168,0.08); color: #6B7280; }
+  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; border-right: 3px solid #6B21A8; }
+  .nav-item svg { width: 18px; height: 18px; }
+  .nav-badge {
+    position: absolute; top: 6px; right: 8px; background: #EF4444;
+    color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px;
+    padding: 1px 5px; min-width: 16px; text-align: center;
+  }
+  .sidebar-footer {
+    padding: 10px 6px; border-top: 1px solid #E5E0D8;
+    width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .provider-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: #0D9488;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 12px; cursor: pointer;
+  }
+
+  /* Collapsible sidebar */
+  .sidebar { transition: width 0.22s ease; overflow: hidden; }
+  .sidebar.expanded { width: 200px !important; }
+  .nav-label { display: none; font-size: 12px; font-weight: 500; white-space: nowrap; color: #6B7280; }
+  .sidebar.expanded .nav-label { display: inline; }
+  .sidebar.expanded .nav-item {
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    padding: 9px 14px !important;
+    gap: 12px !important;
+    font-size: 0 !important;
+  }
+  .sidebar.expanded .nav-item.active .nav-label { color: #6B21A8; }
+  .sidebar-toggle {
+    width: 28px; height: 28px; border-radius: 6px; border: 1px solid #E5E0D8;
+    background: #F2EDE4; cursor: pointer; color: #6B7280;
+    display: flex; align-items: center; justify-content: center; margin-top: 8px;
+    transition: background 0.15s;
+  }
+  .sidebar-toggle:hover { background: #E5E0D8; color: #1F2937; }
+  .sidebar-toggle svg { width: 14px; height: 14px; }
+  .sidebar-back {
+    display: flex; align-items: center; gap: 6px;
+    padding: 8px 12px; color: #6B7280; font-size: 9px;
+    text-decoration: none; border-radius: 6px; width: 100%;
+    transition: background 0.15s;
+  }
+  .sidebar-back:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
+  .sidebar-back svg { width: 14px; height: 14px; flex-shrink: 0; }
+  .sidebar.expanded .sidebar-back { font-size: 12px; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    background: var(--navy); color: #fff;
+    padding: 8px 20px; min-height: 52px; display: flex; align-items: center; gap: 16px;
+    flex-shrink: 0;
+  }
+  .topbar-title { font-size: 16px; font-weight: 700; color: #fff; }
+  .topbar-sub { font-size: 12px; color: #8B9BB4; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .notif-bell { position: relative; cursor: pointer; color: #8B9BB4; transition: color .15s; }
+  .notif-bell:hover { color: #fff; }
+  .notif-bell svg { width: 20px; height: 20px; }
+  .notif-dot { position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #EF4444; border-radius: 50%; border: 2px solid var(--navy); }
+  .topbar-provider { display: flex; align-items: center; gap: 8px; }
+  .topbar-avatar { width: 30px; height: 30px; border-radius: 50%; background: #0D9488; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 11px; }
+  .topbar-name { font-size: 12px; color: #CBD5E1; }
+  .topbar-role { font-size: 10px; color: #6B7280; }
+  .topbar-license-warn { font-size: 10px; color: #F59E0B; margin-top: 3px; }
+  .topbar-license-warn a { color: #F59E0B; text-decoration: underline; cursor: pointer; font-weight: 600; }
+
+  .dash-body { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  .greeting-bar { display: flex; align-items: center; gap: 12px; }
+  .greeting-text h2 { font-size: 18px; font-weight: 700; color: #111827; }
+  .greeting-bar .btn-queue {
+    margin-left: auto; background: var(--ew-green); color: #fff;
+    padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; display: flex; align-items: center; gap: 6px;
+  }
+  .greeting-bar .btn-queue:hover { background: var(--ew-green-dark); }
+  .greeting-bar .btn-queue svg { width: 14px; height: 14px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .stat-card.accent-green { border-left: 3px solid var(--ew-green); }
+  .stat-card.accent-red   { border-left: 3px solid #DC2626; }
+  .stat-card.accent-amber { border-left: 3px solid #D97706; }
+  .stat-card.accent-blue  { border-left: 3px solid #6B21A8; }
+  .stat-card.accent-navy  { border-left: 3px solid var(--navy); }
+  .stat-label { font-size: 11px; color: #6B7280; font-weight: 500; }
+  .stat-value { font-size: 26px; font-weight: 800; color: #111827; line-height: 1.1; }
+  .stat-sub { font-size: 10px; color: #9CA3AF; }
+  .stat-value.red { color: #DC2626; }
+  .stat-value.amber { color: #D97706; }
+  .stat-value.green { color: var(--ew-green); }
+
+  .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .widget-grid.three-col { grid-template-columns: 1fr 1fr 1fr; }
+  .widget-full { grid-column: 1 / -1; }
+
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; display: flex; flex-direction: column; overflow: hidden; }
+  .widget-header { padding: 12px 16px; border-bottom: 1px solid #F2EDE4; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .widget-title { font-size: 13px; font-weight: 700; color: #111827; flex: 1; }
+  .widget-count { background: #F2EDE4; color: #1F2937; font-size: 10px; font-weight: 700; border-radius: 20px; padding: 2px 8px; }
+  .widget-count.red { background: #FEE2E2; color: #DC2626; }
+  .widget-count.amber { background: #FEF3C7; color: #D97706; }
+  .widget-count.green { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .widget-action { font-size: 11px; color: var(--ew-green); cursor: pointer; font-weight: 500; }
+  .widget-action:hover { text-decoration: underline; }
+  .widget-body { padding: 0; flex: 1; overflow: hidden; }
+
+  .program-filter { font-size: 11px; padding: 3px 6px; border-radius: 5px; border: 1px solid #E5E0D8; background: #fff; color: #1F2937; cursor: pointer; outline: none; }
+  .program-filter:focus { border-color: var(--ew-green); }
+
+  .sortable-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .sortable-table thead tr { background: #F2EDE4; border-bottom: 1px solid #E5E0D8; }
+  .sortable-table thead th { font-size: 10px; font-weight: 600; color: #6B7280; padding: 6px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid #E5E0D8; user-select: none; }
+  .sortable-table thead th.sortable { cursor: pointer; }
+  .sortable-table thead th.sortable:hover { color: #1F2937; background: #F2EDE4; }
+  .sortable-table thead th .sort-arrow { display: inline-block; margin-left: 3px; opacity: 0.4; font-size: 9px; }
+  .sortable-table thead th.sort-asc .sort-arrow::after { content: '▲'; opacity: 1; }
+  .sortable-table thead th.sort-desc .sort-arrow::after { content: '▼'; opacity: 1; }
+  .sortable-table thead th:not(.sort-asc):not(.sort-desc) .sort-arrow::after { content: '⇅'; }
+  .sortable-table tbody tr { border-bottom: 1px solid #FAF7F2; cursor: pointer; transition: background .1s; }
+  .sortable-table tbody tr:last-child { border-bottom: none; }
+  .sortable-table tbody tr:hover { background: #FAF7F2; }
+  .sortable-table tbody td { padding: 8px 12px; vertical-align: middle; }
+
+  .pri-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .pri-dot.p1 { background: var(--p1); }
+  .pri-dot.p2 { background: var(--p2); }
+  .pri-dot.p3 { background: var(--p3); }
+  .pri-dot.p4 { background: var(--p4); }
+  .cr-patient { font-weight: 600; color: #111827; font-size: 12px; min-width: 48px; }
+  .cr-id { font-size: 10px; color: #9CA3AF; }
+  .cr-program { font-size: 10px; color: #1F2937; background: #F2EDE4; border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+  .cr-type { font-size: 10px; color: #6B7280; white-space: nowrap; }
+  .cr-wait { font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .cr-wait.ok    { color: var(--ew-green); }
+  .cr-wait.warn  { color: #D97706; }
+  .cr-wait.breach { color: #DC2626; }
+  .cr-status { font-size: 10px; padding: 2px 7px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+  .cr-status.in-progress { background: #D1FAE5; color: #065F46; }
+  .cr-status.pending     { background: #FEF3C7; color: #92400E; }
+  .cr-status.lab         { background: #E0F2FE; color: #075985; }
+  .cr-status.escalated   { background: #FEE2E2; color: #991B1B; }
+  .cr-btn { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 4px; border: none; cursor: pointer; white-space: nowrap; background: var(--ew-green); color: #fff; }
+  .cr-btn:hover { background: var(--ew-green-dark); }
+  .cr-btn.secondary { background: #F2EDE4; color: #1F2937; }
+  .cr-btn.secondary:hover { background: #E5E0D8; }
+
+  .sla-breach-dot { width: 10px; height: 10px; border-radius: 50%; background: #DC2626; flex-shrink: 0; display: inline-block; }
+  .sla-patient { font-weight: 600; color: #111827; font-size: 12px; }
+  .sla-detail { font-size: 10px; color: #6B7280; }
+  .sla-timer { font-size: 12px; font-weight: 800; white-space: nowrap; }
+  .sla-timer.warn   { color: #D97706; }
+  .sla-timer.breach { color: #DC2626; }
+
+  .notif-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #FAF7F2; cursor: pointer; transition: background .1s; }
+  .notif-row:hover { background: #FAF7F2; }
+  .notif-row:last-child { border-bottom: none; }
+  .notif-row.unread { background: #F0FDF9; }
+  .notif-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notif-icon svg { width: 14px; height: 14px; }
+  .notif-icon.green  { background: var(--ew-green-light); color: var(--ew-green); }
+  .notif-icon.red    { background: #FEE2E2; color: #DC2626; }
+  .notif-icon.amber  { background: #FEF3C7; color: #D97706; }
+  .notif-icon.blue   { background: #EFF6FF; color: #6B21A8; }
+  .notif-text { flex: 1; min-width: 0; }
+  .notif-title { font-size: 12px; font-weight: 600; color: #111827; }
+  .notif-sub { font-size: 11px; color: #6B7280; margin-top: 1px; }
+  .notif-time { font-size: 10px; color: #9CA3AF; white-space: nowrap; margin-top: 2px; }
+  .notif-unread-dot { width: 7px; height: 7px; background: var(--ew-green); border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .widget-subtitle { font-size: 10px; color: #9CA3AF; font-weight: 400; display: block; margin-top: 1px; }
+
+  .sched-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #FAF7F2; }
+  .sched-row:last-child { border-bottom: none; }
+  .sched-time { text-align: center; min-width: 52px; }
+  .sched-hour { font-size: 13px; font-weight: 800; color: #111827; }
+  .sched-ampm { font-size: 9px; color: #6B7280; text-transform: uppercase; }
+  .sched-divider { width: 2px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+  .sched-divider.video { background: #6B21A8; }
+  .sched-divider.phone { background: var(--ew-green); }
+  .sched-info { flex: 1; }
+  .sched-patient { font-size: 12px; font-weight: 600; color: #111827; }
+  .sched-detail { font-size: 11px; color: #6B7280; margin-top: 1px; }
+  .sched-badge { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .sched-badge.video { background: #EFF6FF; color: #6B21A8; }
+  .sched-badge.phone { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .sched-countdown { font-size: 11px; color: #6B7280; white-space: nowrap; text-align: right; min-width: 54px; }
+  .sched-countdown.soon { color: #D97706; font-weight: 700; }
+
+  .item-row { display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-bottom: 1px solid #FAF7F2; }
+  .item-row:last-child { border-bottom: none; }
+  .item-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .item-icon svg { width: 14px; height: 14px; }
+  .item-icon.rx  { background: #F0FDF4; color: #16A34A; }
+  .item-icon.lab { background: #EFF6FF; color: #6B21A8; }
+  .item-icon.lab.critical { background: #FEE2E2; color: #DC2626; }
+  .item-info { flex: 1; min-width: 0; }
+  .item-patient { font-size: 12px; font-weight: 600; color: #111827; }
+  .item-detail { font-size: 11px; color: #6B7280; }
+  .item-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .item-tag.critical { background: #FEE2E2; color: #991B1B; }
+  .item-tag.pending  { background: #FEF3C7; color: #92400E; }
+  .item-tag.new      { background: var(--ew-green-light); color: var(--ew-green-dark); }
+
+  .chart-area { padding: 14px 16px 10px; }
+  .chart-filters { display: flex; gap: 6px; margin-bottom: 12px; }
+  .chart-filter-btn { font-size: 11px; padding: 4px 10px; border-radius: 20px; cursor: pointer; border: 1px solid #E5E0D8; background: #fff; color: #6B7280; font-weight: 500; transition: all .15s; }
+  .chart-filter-btn.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 90px; }
+  .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .chart-bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--ew-green); transition: height .3s; min-height: 4px; cursor: pointer; position: relative; }
+  .chart-bar:hover { background: var(--ew-green-dark); }
+  .chart-bar.today { background: var(--navy); }
+  .chart-bar-label { font-size: 9px; color: #9CA3AF; }
+  .chart-bar-val { font-size: 9px; color: #6B7280; font-weight: 600; }
+  .chart-legend { display: flex; gap: 14px; margin-top: 8px; }
+  .chart-legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #6B7280; }
+  .chart-legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+  .pending-wait { font-size: 11px; font-weight: 700; color: #D97706; white-space: nowrap; min-width: 42px; text-align: right; }
+
+  .dash-body::-webkit-scrollbar { width: 6px; }
+  .dash-body::-webkit-scrollbar-track { background: transparent; }
+  .dash-body::-webkit-scrollbar-thumb { background: #E5E0D8; border-radius: 3px; }
+
+  .consult-hidden { display: none !important; }
+
+  /* SLA breach banner */
+  .sla-breach-banner {
+    background: #FEF2F2; border-bottom: 2px solid #FECACA;
+    padding: 7px 20px; display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: #991B1B; flex-shrink: 0; z-index: 4;
+  }
+  .sla-breach-banner svg { width: 14px; height: 14px; flex-shrink: 0; color: #DC2626; }
+
+  /* demo-nav-offset */
+  .sidebar { top: 60px !important; height: calc(100vh - 60px) !important; width: 48px !important; transition: width 0.22s ease !important; }
+  .sidebar.expanded { width: 200px !important; }
+  .main    { position: fixed !important; top: 60px !important; left: 48px !important; right: 0 !important; bottom: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; transition: left 0.22s ease !important; }
+  body.sidebar-expanded .main { left: 200px !important; }
+
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="16" fill="#00A67E"/>
+      <path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="sidebar-nav">
+    <a href="/provider/np" class="sidebar-back" title="My Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      <span class="nav-label" style="color:#6B21A8;font-weight:600;">My Dashboard</span>
+    </a>
+    <div class="nav-item active" title="My Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" title="Patient Queue" onclick="window.location.href='/provider/queue'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      <span class="nav-label">Queue</span>
+      <span class="nav-badge">8</span>
+    </div>
+    <div class="nav-item" title="My Schedule" onclick="window.location.href='/provider/schedule'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span class="nav-label">Schedule</span>
+    </div>
+    <div class="nav-item" title="Messages" onclick="window.location.href='/provider/messages'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+      <span class="nav-label">Messages</span>
+      <span class="nav-badge">2</span>
+    </div>
+    <div class="nav-item" title="Notifications" onclick="window.location.href='/provider/notifications'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+      <span class="nav-label">Alerts</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item" title="Settings" onclick="window.location.href='/provider/settings'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+      <span class="nav-label">Settings</span>
+    </div>
+    <div class="nav-item" title="Provider Oversight" onclick="window.location.href='/provider/oversight'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span class="nav-label">Oversight</span>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    {% set _sdn = session.get('display_name', 'Maria Rodriguez, NP').split(',')[0] %}
+    {% set _sparts = _sdn.split(' ') %}
+    <div class="provider-avatar" title="{{ _sdn }}">{{ _sparts[0][0] }}{{ _sparts[1][0] if _sparts|length > 1 else '' }}</div>
+    <div style="font-size:9px;color:#6B7280;text-align:center" class="sidebar-dr-name">{{ _sdn }}</div>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebarToggleBtn" title="Expand sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">My Dashboard</div>
+      <div class="topbar-sub">Nurse Practitioner · Clinical Support</div>
+    </div>
+    <div class="topbar-right">
+      <div class="notif-bell" onclick="alert('Notification inbox — 3 unread alerts')" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <div class="notif-dot"></div>
+      </div>
+      <div class="topbar-provider">
+        <div class="topbar-avatar">{{ session.get('display_name', 'Maria Rodriguez')[0] }}{{ session.get('display_name', 'Maria Rodriguez').split(' ')[1][0] if session.get('display_name', 'Maria Rodriguez').split(' ')|length > 1 else '' }}</div>
+        <div>
+          <div class="topbar-name">{{ session.get('display_name', 'Maria Rodriguez, NP') }}</div>
+          <div class="topbar-role">Nurse Practitioner · Clinical Support</div>
+          <div class="topbar-license-warn">⚠ Texas NP license expires in <strong>24 days</strong> (Jun 21, 2026) — <a onclick="alert('Opening Verifiable license renewal portal...')">Renew via Verifiable</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLA Overdue Banner -->
+  <div class="sla-breach-banner" style="position:relative;z-index:4;background:#FEF2F2;border-bottom:2px solid #FECACA;padding:7px 20px;display:flex;align-items:center;gap:10px;font-size:12px;color:#991B1B;flex-shrink:0;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2" style="width:14px;height:14px;flex-shrink:0;">
+      <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span><strong>SLA Alert</strong> — CST-2026-11021 (N.K. — A1C Management) has exceeded its response SLA by 11 minutes.</span>
+  </div>
+
+  <div class="dash-body">
+
+    <div class="greeting-bar">
+      <div class="greeting-text">
+        <h2>Good morning, {{ session.get('display_name', 'Maria Rodriguez, NP').split(' ')[0] }}</h2>
+      </div>
+      <a href="/provider/queue" class="btn-queue" style="margin-left:auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+        </svg>
+        Go to Patient Queue
+      </a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card accent-green">
+        <div class="stat-label">Completed Today</div>
+        <div class="stat-value green">5</div>
+        <div class="stat-sub">+2 vs. yesterday</div>
+      </div>
+      <div class="stat-card accent-navy">
+        <div class="stat-label">Active Consults</div>
+        <div class="stat-value">8</div>
+        <div class="stat-sub">Assigned to you</div>
+      </div>
+      <div class="stat-card accent-amber">
+        <div class="stat-label">Pending Chart Close</div>
+        <div class="stat-value amber">2</div>
+        <div class="stat-sub">Requires signature</div>
+      </div>
+      <div class="stat-card accent-red">
+        <div class="stat-label">SLA Alerts</div>
+        <div class="stat-value red">2</div>
+        <div class="stat-sub">1 over SLA · 1 warning</div>
+      </div>
+    </div>
+
+    <div class="widget-grid">
+
+      <div class="widget">
+        <div class="widget-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <div class="widget-title">Active Consults</div>
+          <span class="widget-count" id="consultCount">7</span>
+          <select class="program-filter" id="programFilter" onchange="filterConsultsByDropdown()">
+            <option value="all">All Care Products</option>
+            <option value="A1C Management">A1C Management</option>
+            <option value="Weight Management">Weight Management</option>
+            <option value="Thyroid">Thyroid</option>
+            <option value="Lipid / Cardio">Lipid / Cardio</option>
+            <option value="Women's Health">Women's Health</option>
+            <option value="Testosterone">Testosterone</option>
+          </select>
+          <select class="program-filter" id="typeFilter" onchange="filterConsultsByDropdown()">
+            <option value="all">All Types</option>
+            <option value="Async">Async</option>
+            <option value="Phone">Phone</option>
+            <option value="Video">Video</option>
+            <option value="AE Review">AE Review</option>
+          </select>
+          <span class="widget-action" onclick="alert('Patient Queue — filtered to your assigned consults')">View all →</span>
+        </div>
+        <div class="widget-body">
+          <div id="ctFilterBar" style="display:flex;gap:8px;margin-bottom:12px;align-items:center;padding:8px 12px 0;">
+            <span style="font-size:12px;color:#6B7280;font-weight:500;margin-right:4px;">Filter:</span>
+            <button class="ct-filter-btn active" data-filter="all" onclick="filterConsults('all',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #6B21A8;background:#6B21A8;color:#fff;cursor:pointer;">All</button>
+            <button class="ct-filter-btn" data-filter="phone" onclick="filterConsults('phone',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Phone</button>
+            <button class="ct-filter-btn" data-filter="video" onclick="filterConsults('video',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Video</button>
+            <button class="ct-filter-btn" data-filter="async" onclick="filterConsults('async',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Async</button>
+          </div>
+          <table class="sortable-table" id="consultsTable">
+            <thead>
+              <tr>
+                <th style="width:36px"></th>
+                <th style="width:90px">Patient</th>
+                <th class="sortable" data-col="program" data-table="consultsTable" style="width:120px">Care Product <span class="sort-arrow"></span></th>
+                <th class="sortable" data-col="type" data-table="consultsTable" style="width:72px">Type <span class="sort-arrow"></span></th>
+                <th class="sortable" data-col="wait" data-table="consultsTable" style="width:70px">Wait Time <span class="sort-arrow"></span></th>
+                <th class="sortable" data-col="status" data-table="consultsTable" style="width:90px">Status <span class="sort-arrow"></span></th>
+                <th style="width:52px"></th>
+              </tr>
+            </thead>
+            <tbody id="consultTbody">
+              <tr data-program="A1C Management" data-type="Async" data-wait-sec="11460" data-status="SLA Alert" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><div class="pri-dot p1" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">N.K.</div><div class="cr-id">CST-2026-11021</div></td>
+                <td><span class="cr-program">A1C Management</span></td>
+                <td><span class="cr-type">Async</span></td>
+                <td><span class="cr-wait breach">3h 11m</span></td>
+                <td><span class="cr-status escalated">SLA Alert</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
+              </tr>
+              <tr data-program="Weight Management" data-type="Phone" data-wait-sec="10080" data-status="In Progress" onclick="window.location.href='/provider/chart?type=phone'" style="cursor:pointer">
+                <td><div class="pri-dot p1" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">D.M.</div><div class="cr-id">CST-2026-11014</div></td>
+                <td><span class="cr-program">Weight Management</span></td>
+                <td><span class="cr-type">Phone</span></td>
+                <td><span class="cr-wait breach">2h 48m</span></td>
+                <td><span class="cr-status in-progress">In Progress</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=phone'">Open</button></td>
+              </tr>
+              <tr data-program="Thyroid" data-type="Async" data-wait-sec="6720" data-status="In Progress" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><div class="pri-dot p2" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">B.A.</div><div class="cr-id">CST-2026-11028</div></td>
+                <td><span class="cr-program">Thyroid</span></td>
+                <td><span class="cr-type">Async</span></td>
+                <td><span class="cr-wait warn">1h 52m</span></td>
+                <td><span class="cr-status in-progress">In Progress</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
+              </tr>
+              <tr data-program="Testosterone" data-type="AE Review" data-wait-sec="5460" data-status="SLA Alert" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><div class="pri-dot p2" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">F.O.</div><div class="cr-id">CST-2026-11033</div></td>
+                <td><span class="cr-program">Testosterone</span></td>
+                <td><span class="cr-type">AE Review</span></td>
+                <td><span class="cr-wait warn">1h 31m</span></td>
+                <td><span class="cr-status escalated">SLA Alert</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
+              </tr>
+              <tr data-program="Weight Management" data-type="Video" data-wait-sec="3480" data-status="In Progress" onclick="window.location.href='/provider/chart?type=video'" style="cursor:pointer">
+                <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">C.W.</div><div class="cr-id">CST-2026-11041</div></td>
+                <td><span class="cr-program">Weight Management</span></td>
+                <td><span class="cr-type">Video</span></td>
+                <td><span class="cr-wait ok">58m</span></td>
+                <td><span class="cr-status in-progress">In Progress</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=video'">Open</button></td>
+              </tr>
+              <tr data-program="Lipid / Cardio" data-type="Async" data-wait-sec="2640" data-status="Pend. Patient" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">S.T.</div><div class="cr-id">CST-2026-11045</div></td>
+                <td><span class="cr-program">Lipid / Cardio</span></td>
+                <td><span class="cr-type">Async</span></td>
+                <td><span class="cr-wait ok">44m</span></td>
+                <td><span class="cr-status pending">Pend. Patient</span></td>
+                <td><button class="cr-btn secondary" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">View</button></td>
+              </tr>
+              <tr data-program="Women's Health" data-type="Async" data-wait-sec="1320" data-status="In Progress" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><div class="pri-dot p4" style="margin:0 auto"></div></td>
+                <td><div class="cr-patient">L.V.</div><div class="cr-id">CST-2026-11052</div></td>
+                <td><span class="cr-program">Women's Health</span></td>
+                <td><span class="cr-type">Async</span></td>
+                <td><span class="cr-wait ok">22m</span></td>
+                <td><span class="cr-status in-progress">In Progress</span></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <div class="widget">
+          <div class="widget-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <div class="widget-title">SLA Alerts</div>
+            <span class="widget-count red">2</span>
+          </div>
+          <div class="widget-body">
+            <table class="sortable-table" id="slaTable">
+              <thead>
+                <tr>
+                  <th style="width:28px"></th>
+                  <th class="sortable" data-col="patient" data-table="slaTable" style="width:160px">Patient <span class="sort-arrow"></span></th>
+                  <th class="sortable" data-col="detail" data-table="slaTable">Detail <span class="sort-arrow"></span></th>
+                  <th class="sortable" data-col="timer" data-table="slaTable" style="width:72px">Timer <span class="sort-arrow"></span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-patient="N.K. CST-2026-11021" data-detail="A1C Management Async" data-timer-sec="660">
+                  <td><span class="sla-breach-dot"></span></td>
+                  <td>
+                    <div class="sla-patient">N.K. · CST-2026-11021</div>
+                    <div class="sla-detail">A1C Management · Async · SLA was 3h 00m</div>
+                  </td>
+                  <td><div style="font-size:11px;color:#DC2626;font-weight:500;">SLA overdue — Async consult exceeded 3h 00m limit</div></td>
+                  <td><div class="sla-timer breach" id="slaTimer1">+11:00</div></td>
+                </tr>
+                <tr data-patient="D.M. CST-2026-11014" data-detail="Weight Management Phone" data-timer-sec="1920">
+                  <td></td>
+                  <td>
+                    <div class="sla-patient">D.M. · CST-2026-11014</div>
+                    <div class="sla-detail">Weight Management · Phone · 32m until SLA</div>
+                  </td>
+                  <td><div style="font-size:11px;color:#F97316;font-weight:500;">Phone SLA approaching — 32m remaining</div></td>
+                  <td><div class="sla-timer warn" id="slaTimer2">32:00</div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-header">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <div class="widget-title">Pending Patient Response <span style="font-size:10px;font-weight:400;color:#9CA3AF;margin-left:4px;">(Async only)</span></div>
+            <span class="widget-count amber">2</span>
+          </div>
+          <div class="widget-body">
+            <table class="sortable-table" id="pendingTable">
+              <thead>
+                <tr>
+                  <th style="width:28px"></th>
+                  <th style="width:140px">Patient</th>
+                  <th class="sortable" data-col="type" data-table="pendingTable" style="width:60px">Type <span class="sort-arrow"></span></th>
+                  <th style="width:130px">Stage</th>
+                  <th class="sortable" data-col="duration" data-table="pendingTable" style="width:72px">Duration <span class="sort-arrow"></span></th>
+                  <th style="width:80px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-type="Async" data-duration-sec="79200" onclick="alert('View CST-2026-11045')">
+                  <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
+                  <td>
+                    <div class="cr-patient">S.T. · CST-2026-11045</div>
+                    <div style="font-size:11px;color:#6B7280">Lipid / Cardio — awaiting lab questionnaire</div>
+                  </td>
+                  <td><span class="cr-type">Async</span></td>
+                  <td style="font-size:10px;color:#6B7280;white-space:nowrap">Questionnaire Sent</td>
+                  <td><span class="pending-wait" style="margin-left:0;text-align:left">22h</span></td>
+                  <td><button class="cr-btn secondary" onclick="event.stopPropagation();alert('Sending follow-up to S.T. for CST-2026-11045')">Follow Up</button></td>
+                </tr>
+                <tr data-type="Async" data-duration-sec="100800" onclick="alert('View CST-2026-11037')">
+                  <td><div class="pri-dot p4" style="margin:0 auto"></div></td>
+                  <td>
+                    <div class="cr-patient">R.M. · CST-2026-11037</div>
+                    <div style="font-size:11px;color:#6B7280">Women's Health — awaiting intake form</div>
+                  </td>
+                  <td><span class="cr-type">Async</span></td>
+                  <td style="font-size:10px;color:#6B7280;white-space:nowrap">Awaiting Patient Response</td>
+                  <td><span class="pending-wait" style="margin-left:0;text-align:left">1d 4h</span></td>
+                  <td><button class="cr-btn secondary" onclick="event.stopPropagation();alert('Sending follow-up to R.M. for CST-2026-11037')">Follow Up</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="widget-grid" style="grid-template-columns: 1fr 1fr 1.2fr 1.3fr">
+
+      <div class="widget">
+        <div class="widget-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2">
+            <path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z"/>
+            <line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          <div class="widget-title">Refill Requests</div>
+          <span class="widget-count">3</span>
+          <span class="widget-action" onclick="alert('View all refill requests')">View all →</span>
+        </div>
+        <div class="widget-body">
+          <table class="sortable-table" id="refillTable">
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th class="sortable" data-col="patient" data-table="refillTable">Patient / Medication <span class="sort-arrow"></span></th>
+                <th class="sortable" data-col="status" data-table="refillTable" style="width:68px">Status <span class="sort-arrow"></span></th>
+                <th style="width:78px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-patient="B.A. CST-2026-11028" data-status="New" onclick="alert('Reviewing refill for B.A.')">
+                <td><div class="item-icon rx" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div></td>
+                <td><div class="item-patient">B.A. · CST-2026-11028</div><div class="item-detail">Metformin ER 1000mg · A1C Mgmt</div></td>
+                <td><span class="item-tag new">New</span></td>
+                <td style="text-align:right"><a href="/provider/chart/1" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart</a></td>
+              </tr>
+              <tr data-patient="F.O. CST-2026-11033" data-status="Pending" onclick="alert('Reviewing refill for F.O.')">
+                <td><div class="item-icon rx" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div></td>
+                <td><div class="item-patient">F.O. · CST-2026-11033</div><div class="item-detail">Testosterone Cypionate 200mg · Testosterone</div></td>
+                <td><span class="item-tag pending">Pending</span></td>
+                <td style="text-align:right"><a href="/provider/chart/2" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart</a></td>
+              </tr>
+              <tr data-patient="L.V. CST-2026-11052" data-status="New" onclick="alert('Reviewing refill for L.V.')">
+                <td><div class="item-icon rx" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div></td>
+                <td><div class="item-patient">L.V. · CST-2026-11052</div><div class="item-detail">Progesterone 100mg · Women's Health</div></td>
+                <td><span class="item-tag new">New</span></td>
+                <td style="text-align:right"><a href="/provider/chart/3" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2">
+            <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8l-5-5H9z"/>
+            <polyline points="9 3 9 8 19 8"/>
+          </svg>
+          <div class="widget-title">Lab Requisitions / Alerts</div>
+          <span class="widget-count red">1</span>
+          <span class="widget-action" onclick="alert('View all lab results')">View all →</span>
+        </div>
+        <div class="widget-body">
+          <table class="sortable-table" id="labTable">
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th class="sortable" data-col="patient" data-table="labTable">Patient / Lab <span class="sort-arrow"></span></th>
+                <th class="sortable" data-col="status" data-table="labTable" style="width:72px">Status <span class="sort-arrow"></span></th>
+                <th style="width:78px"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-patient="D.M. CST-2026-11014" data-status="Critical" onclick="alert('Reviewing critical lab for D.M.')">
+                <td><div class="item-icon lab critical" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div></td>
+                <td><div class="item-patient">D.M. · CST-2026-11014</div><div class="item-detail">HbA1c 8.4% Critical — Weight Mgmt</div></td>
+                <td><span class="item-tag critical">Critical</span></td>
+                <td style="text-align:right"><a href="/provider/chart/1" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart</a></td>
+              </tr>
+              <tr data-patient="N.K. CST-2026-11021" data-status="Pending" onclick="alert('Reviewing lab for N.K.')">
+                <td><div class="item-icon lab" style="width:24px;height:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8l-5-5H9z"/><polyline points="9 3 9 8 19 8"/></svg></div></td>
+                <td><div class="item-patient">N.K. · CST-2026-11021</div><div class="item-detail">Comprehensive Metabolic Panel — Pending · A1C</div></td>
+                <td><span class="item-tag pending">Pending</span></td>
+                <td style="text-align:right"><a href="/provider/chart/2" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <div class="widget-title">Upcoming Schedule</div>
+          <span class="widget-action" onclick="alert('Full schedule view')">View all →</span>
+        </div>
+        <div class="widget-body">
+          <div class="sched-row">
+            <div class="sched-time"><div class="sched-hour">11:30</div><div class="sched-ampm">AM</div></div>
+            <div class="sched-divider video"></div>
+            <div class="sched-info"><div class="sched-patient">C.W. · CST-2026-11041</div><div class="sched-detail">Weight Management — Video Follow-up</div></div>
+            <span class="sched-badge video">Video</span>
+            <div class="sched-countdown soon">1h 04m away</div>
+          </div>
+          <div class="sched-row">
+            <div class="sched-time"><div class="sched-hour">2:00</div><div class="sched-ampm">PM</div></div>
+            <div class="sched-divider phone"></div>
+            <div class="sched-info"><div class="sched-patient">F.O. · CST-2026-11033</div><div class="sched-detail">Testosterone — Phone AE Review</div></div>
+            <span class="sched-badge phone">Phone</span>
+            <div class="sched-countdown">3h 34m</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+          </svg>
+          <div style="flex:1">
+            <div class="widget-title">Recent Activity Feed</div>
+            <span class="widget-subtitle">System-generated alerts — not requiring action</span>
+          </div>
+          <span class="widget-count">4</span>
+          <span class="widget-action" onclick="alert('View full activity feed')">View all →</span>
+        </div>
+        <div class="widget-body">
+          <div class="notif-row unread" onclick="alert('SLA Alert — CST-2026-11021')">
+            <div class="notif-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div class="notif-text">
+              <div class="notif-title">SLA Alert — CST-2026-11021</div>
+              <div class="notif-sub">N.K. · A1C Management · Async</div>
+              <div class="notif-time">11m ago</div>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-row unread" onclick="alert('Critical lab result — D.M.')">
+            <div class="notif-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8l-5-5H9z"/><polyline points="9 3 9 8 19 8"/></svg></div>
+            <div class="notif-text">
+              <div class="notif-title">Critical Lab: HbA1c 8.4% — D.M.</div>
+              <div class="notif-sub">Weight Management · Review required</div>
+              <div class="notif-time">28m ago</div>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-row unread" onclick="alert('Patient message from F.O.')">
+            <div class="notif-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+            <div class="notif-text">
+              <div class="notif-title">New message from F.O.</div>
+              <div class="notif-sub">Testosterone · CST-2026-11033</div>
+              <div class="notif-time">44m ago</div>
+            </div>
+            <div class="notif-unread-dot"></div>
+          </div>
+          <div class="notif-row" onclick="alert('Refill request from B.A.')">
+            <div class="notif-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/></svg></div>
+            <div class="notif-text">
+              <div class="notif-title">Refill request — B.A.</div>
+              <div class="notif-sub">Metformin ER 1000mg · A1C Management</div>
+              <div class="notif-time">1h 22m ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+        </svg>
+        <div class="widget-title">Consult Volume — This Week</div>
+        <div class="chart-filters" style="margin-left:auto;margin-bottom:0">
+          <button class="chart-filter-btn active" onclick="setChartFilter(this,'week')">Week</button>
+          <button class="chart-filter-btn" onclick="setChartFilter(this,'month')">Month</button>
+          <button class="chart-filter-btn" onclick="setChartFilter(this,'all')">All Time</button>
+        </div>
+      </div>
+      <div class="chart-area">
+        <div class="chart-bars" id="chartBars"></div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--ew-green)"></div> Prior days</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--navy)"></div> Today (in progress)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+let breachSecs = 11 * 60 + 0;
+let warnSecs   = 32 * 60;
+function pad(n) { return String(n).padStart(2,'0'); }
+function tickTimers() {
+  breachSecs++;
+  warnSecs = Math.max(0, warnSecs - 1);
+  const bm = Math.floor(breachSecs/60), bs = breachSecs%60;
+  const wm = Math.floor(warnSecs/60),   ws = warnSecs%60;
+  document.getElementById('slaTimer1').textContent = `+${pad(bm)}:${pad(bs)}`;
+  document.getElementById('slaTimer2').textContent = `${pad(wm)}:${pad(ws)}`;
+  if (warnSecs === 0) {
+    document.getElementById('slaTimer2').classList.remove('warn');
+    document.getElementById('slaTimer2').classList.add('breach');
+  }
+}
+setInterval(tickTimers, 1000);
+
+const weekData  = [{ day:'Mon', val:9 },{ day:'Tue', val:12 },{ day:'Wed', val:8 },{ day:'Thu', val:6, today:true },{ day:'Fri', val:0 }];
+const monthData = [{ day:'W1', val:41 },{ day:'W2', val:38 },{ day:'W3', val:44 },{ day:'W4', val:28 }];
+const allData   = [{ day:'Jan', val:145 },{ day:'Feb', val:162 },{ day:'Mar', val:178 },{ day:'Apr', val:169 },{ day:'May', val:141 }];
+
+function renderChart(data) {
+  const max = Math.max(...data.map(d=>d.val), 1);
+  const bars = document.getElementById('chartBars');
+  bars.innerHTML = data.map(d => {
+    const h = Math.round((d.val / max) * 86);
+    return `<div class="chart-bar-wrap"><div class="chart-bar-val">${d.val || ''}</div><div class="chart-bar${d.today?' today':''}" style="height:${h}px" title="${d.day}: ${d.val} consults${d.today?' (in progress)':''}"></div><div class="chart-bar-label">${d.day}</div></div>`;
+  }).join('');
+}
+
+function setChartFilter(btn, key) {
+  document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChart({ week: weekData, month: monthData, all: allData }[key]);
+}
+renderChart(weekData);
+
+function filterConsultsByDropdown() {
+  const program = document.getElementById('programFilter').value;
+  const type    = document.getElementById('typeFilter').value;
+  const tbody   = document.getElementById('consultTbody');
+  const rows    = tbody.querySelectorAll('tr');
+  let visible   = 0;
+  rows.forEach(row => {
+    const rowProgram = row.getAttribute('data-program');
+    const rowType    = row.getAttribute('data-type');
+    const matchProg  = program === 'all' || rowProgram === program;
+    const matchType  = type === 'all' || rowType === type;
+    if (matchProg && matchType) { row.classList.remove('consult-hidden'); visible++; }
+    else { row.classList.add('consult-hidden'); }
+  });
+  document.getElementById('consultCount').textContent = visible;
+}
+
+function filterConsults(type, btn) {
+  document.querySelectorAll('.ct-filter-btn').forEach(b => {
+    b.style.background = '#fff'; b.style.color = '#374151'; b.style.borderColor = '#E5E0D8';
+  });
+  btn.style.background = '#6B21A8'; btn.style.color = '#fff'; btn.style.borderColor = '#6B21A8';
+  document.querySelectorAll('#consultsTable tbody tr[data-type]').forEach(row => {
+    row.style.display = (type === 'all' || row.dataset.type.toLowerCase() === type) ? '' : 'none';
+  });
+}
+
+const sortState = {};
+function getSortValue(row, col) {
+  switch(col) {
+    case 'program':  return row.getAttribute('data-program') || '';
+    case 'type':     return row.getAttribute('data-type') || '';
+    case 'wait':     return parseInt(row.getAttribute('data-wait-sec') || '0', 10);
+    case 'status':   return row.getAttribute('data-status') || '';
+    case 'patient':  return row.getAttribute('data-patient') || '';
+    case 'detail':   return row.getAttribute('data-detail') || '';
+    case 'timer':    return parseInt(row.getAttribute('data-timer-sec') || '0', 10);
+    case 'duration': return parseInt(row.getAttribute('data-duration-sec') || '0', 10);
+    default:         return '';
+  }
+}
+document.querySelectorAll('th.sortable').forEach(th => {
+  th.addEventListener('click', function() {
+    const col = this.getAttribute('data-col');
+    const tableId = this.getAttribute('data-table');
+    const table = document.getElementById(tableId);
+    const tbody = table.querySelector('tbody');
+    const key = tableId + '_' + col;
+    const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
+    sortState[key] = dir;
+    table.querySelectorAll('th.sortable').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+    this.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.sort((a, b) => {
+      const av = getSortValue(a, col), bv = getSortValue(b, col);
+      if (typeof av === 'number' && typeof bv === 'number') return dir === 'asc' ? av - bv : bv - av;
+      return dir === 'asc' ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+    rows.forEach(r => tbody.appendChild(r));
+  });
+});
+
+// Sidebar collapse/expand
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  const main = document.querySelector('.main');
+  const btn = document.getElementById('sidebarToggleBtn');
+  const expanded = sidebar.classList.toggle('expanded');
+  document.body.classList.toggle('sidebar-expanded', expanded);
+  if (main) main.style.setProperty('left', expanded ? '200px' : '48px', 'important');
+  btn.querySelector('svg').style.transform = expanded ? 'rotate(180deg)' : '';
+  localStorage.setItem('sidebarExpanded', expanded ? '1' : '0');
+}
+
+// Restore sidebar state from localStorage
+(function() {
+  if (localStorage.getItem('sidebarExpanded') === '1') {
+    const sidebar = document.querySelector('.sidebar');
+    const main = document.querySelector('.main');
+    const btn = document.getElementById('sidebarToggleBtn');
+    if (sidebar) { sidebar.classList.add('expanded'); document.body.classList.add('sidebar-expanded'); }
+    if (main) main.style.setProperty('left', '200px', 'important');
+    if (btn) btn.querySelector('svg').style.transform = 'rotate(180deg)';
+  }
+})();
+</script>
+{% endraw %}
+{% endblock %}

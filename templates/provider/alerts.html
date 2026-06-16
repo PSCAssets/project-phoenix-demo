@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Alerts{% endblock %}
+{% block head %}
+<style>
+  :root { --ew-green: #00A67E; --sidebar-w: 48px; }
+  .sidebar {
+    position: fixed; top: 60px; left: 0; width: 48px; height: calc(100vh - 60px);
+    background: #F2EDE4; display: flex; flex-direction: column;
+    align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
+    transition: width 0.22s ease; overflow: hidden;
+  }
+  .sidebar.expanded { width: 200px !important; }
+  .sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+    color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+    transition: background .15s, color .15s; position: relative; white-space: nowrap;
+  }
+  .nav-item:hover { background: rgba(107,33,168,0.08); }
+  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-badge {
+    position: absolute; top: 6px; right: 8px; background: #EF4444;
+    color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px;
+    padding: 1px 5px; min-width: 16px; text-align: center;
+  }
+  .nav-label { display: none; font-size: 12px; font-weight: 500; color: #6B7280; }
+  .sidebar.expanded .nav-label { display: inline; }
+  .sidebar.expanded .nav-item { flex-direction: row !important; justify-content: flex-start !important; padding: 9px 14px !important; gap: 12px !important; font-size: 0 !important; }
+  .sidebar.expanded .nav-item.active .nav-label { color: #6B21A8; }
+  .sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .provider-avatar { width: 32px; height: 32px; border-radius: 50%; background: #00A67E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+  .sidebar-toggle { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #E5E0D8; background: #F2EDE4; cursor: pointer; color: #6B7280; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .sidebar-toggle:hover { background: #E5E0D8; }
+  .sidebar-toggle svg { width: 14px; height: 14px; }
+  .alerts-page { margin-left: 48px; }
+  .alerts-page { padding: 28px 32px; max-width: 860px; }
+  .alerts-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .alerts-header h1 { font-size: 22px; font-weight: 700; color: #111827; }
+  .alerts-count-badge { background: #EF4444; color: #fff; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .alert-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; transition: opacity 0.25s; }
+  .alert-card.dismissed { display: none; }
+  .alert-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .icon-red    { background: #FEE2E2; }
+  .icon-blue   { background: #DBEAFE; }
+  .icon-amber  { background: #FEF3C7; }
+  .icon-gray   { background: #F3F4F6; }
+  .alert-body { flex: 1; min-width: 0; }
+  .alert-title { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+  .alert-meta  { font-size: 12px; color: #6B7280; margin-bottom: 6px; }
+  .alert-desc  { font-size: 13px; color: #374151; line-height: 1.5; }
+  .alert-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-view    { background: #F5F0FA; color: #6B21A8; border: none; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-dismiss { background: #FAF7F2; color: #6B7280; border: 1px solid #E5E0D8; border-radius: 6px; padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-view:hover { background: #EDE9FE; }
+  .btn-dismiss:hover { background: #F2EDE4; }
+  .alert-ts { font-size: 11px; color: #9CA3AF; white-space: nowrap; margin-top: 2px; }
+  .empty-state { text-align: center; padding: 48px 24px; color: #6B7280; font-size: 14px; display: none; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar" id="provSidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-item" title="Dashboard" onclick="window.location.href='/provider/'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-label">Dashboard</span>
+    </div>
+    <div class="nav-item" title="Queue" onclick="window.location.href='/provider/queue'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      <span class="nav-label">Queue</span>
+    </div>
+    <div class="nav-item" title="Schedule" onclick="window.location.href='/provider/schedule'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="nav-label">Schedule</span>
+    </div>
+    <div class="nav-item" title="Messages" onclick="window.location.href='/provider/messages'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="nav-label">Messages</span>
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-item active" title="Alerts" onclick="window.location.href='/provider/alerts'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span class="nav-label">Alerts</span>
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item" title="Settings" onclick="window.location.href='/provider/settings'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="nav-label">Settings</span>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="provider-avatar">SL</div>
+    <button class="sidebar-toggle" onclick="toggleProvSidebar()" id="sidebarToggleBtn" title="Expand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+</nav>
+<div class="alerts-page">
+  <div class="alerts-header">
+    <h1>Alerts</h1>
+    <span class="alerts-count-badge" id="alertCount">5</span>
+  </div>
+
+  <div class="alert-card" id="alert0">
+    <div class="alert-icon icon-red">⚠️</div>
+    <div class="alert-body">
+      <div class="alert-title">SLA Overdue — Thomas Chen</div>
+      <div class="alert-meta">Consult C-20260528-005 · ED Treatment · 10 min ago</div>
+      <div class="alert-desc">This consult has exceeded its SLA threshold at 2h 00m wait time. Immediate review required.</div>
+      <div class="alert-actions">
+        <button class="btn-view" onclick="window.location.href='/provider/queue'">View Queue</button>
+        <button class="btn-dismiss" onclick="dismissAlert('alert0')">Dismiss</button>
+      </div>
+    </div>
+    <div class="alert-ts">10 min ago</div>
+  </div>
+
+  <div class="alert-card" id="alert1">
+    <div class="alert-icon icon-blue">🧪</div>
+    <div class="alert-body">
+      <div class="alert-title">Lab Result Ready — F.H.</div>
+      <div class="alert-meta">Skincare Panel · 25 min ago</div>
+      <div class="alert-desc">Skincare panel results have been uploaded and are ready for provider review. Patient has been notified.</div>
+      <div class="alert-actions">
+        <button class="btn-view" onclick="window.location.href='/provider/chart/1'">View Chart</button>
+        <button class="btn-dismiss" onclick="dismissAlert('alert1')">Dismiss</button>
+      </div>
+    </div>
+    <div class="alert-ts">25 min ago</div>
+  </div>
+
+  <div class="alert-card" id="alert2">
+    <div class="alert-icon icon-amber">⚡</div>
+    <div class="alert-body">
+      <div class="alert-title">License Expiry — Texas NP License</div>
+      <div class="alert-meta">Credential Management · 1 hr ago</div>
+      <div class="alert-desc">Your Texas Nurse Practitioner license expires in <strong>24 days</strong>. Renew via Verifiable to avoid disruption to patient care.</div>
+      <div class="alert-actions">
+        <button class="btn-view">Open Verifiable</button>
+        <button class="btn-dismiss" onclick="dismissAlert('alert2')">Dismiss</button>
+      </div>
+    </div>
+    <div class="alert-ts">1 hr ago</div>
+  </div>
+
+  <div class="alert-card" id="alert3">
+    <div class="alert-icon icon-amber">⚠️</div>
+    <div class="alert-body">
+      <div class="alert-title">SLA Warning — G.O.</div>
+      <div class="alert-meta">Testosterone Async Consult · 2 hr ago</div>
+      <div class="alert-desc">Testosterone async consult has <strong>44 minutes</strong> remaining before SLA threshold. Please review shortly.</div>
+      <div class="alert-actions">
+        <button class="btn-view" onclick="window.location.href='/provider/queue'">View Queue</button>
+        <button class="btn-dismiss" onclick="dismissAlert('alert3')">Dismiss</button>
+      </div>
+    </div>
+    <div class="alert-ts">2 hr ago</div>
+  </div>
+
+  <div class="alert-card" id="alert4">
+    <div class="alert-icon icon-gray">💬</div>
+    <div class="alert-body">
+      <div class="alert-title">Patient Message — Owen Taylor</div>
+      <div class="alert-meta">Hair Loss · 3 hr ago</div>
+      <div class="alert-desc">Owen Taylor sent a follow-up message regarding his appointment on Thursday. No action required unless you want to respond.</div>
+      <div class="alert-actions">
+        <button class="btn-view" onclick="window.location.href='/provider/messages'">Open Messages</button>
+        <button class="btn-dismiss" onclick="dismissAlert('alert4')">Dismiss</button>
+      </div>
+    </div>
+    <div class="alert-ts">3 hr ago</div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <div style="font-size:32px;margin-bottom:12px;">✅</div>
+    <div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px;">All clear</div>
+    <div>No active alerts at this time.</div>
+  </div>
+
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function toggleProvSidebar() {
+  var s = document.getElementById('provSidebar');
+  var t = document.getElementById('sidebarToggleBtn');
+  if (s) s.classList.toggle('expanded');
+  if (t) {
+    var exp = s && s.classList.contains('expanded');
+    t.innerHTML = exp
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  }
+}
+function dismissAlert(id) {
+  document.getElementById(id).classList.add('dismissed');
+  const remaining = document.querySelectorAll('.alert-card:not(.dismissed)').length;
+  document.getElementById('alertCount').textContent = remaining;
+  if (remaining === 0) {
+    document.getElementById('emptyState').style.display = 'block';
+  }
+}
+</script>
+{% endraw %}
+{% endblock %}

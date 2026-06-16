@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}My Documents — Everlywell{% endblock %}
+{% block head %}
+<style>
+  :root{--navy:#2D5C2E;--green:#3E8168;--green-dark:#2D5F4E;--green-light:#F0FDF4;--white:#FFFFFF;--bg:#FAF7F2;--border:#D4E4DC;--gray:#64748B;--text:#1E293B;--blue:#2D5C2E;--blue-bg:#F2EDE4;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);display:flex;min-height:100vh;}
+  .sidenav{width:240px;background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+  .nav-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .nav-logo-text{font-size:18px;font-weight:700;color:#fff;}
+  .nav-logo-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .nav-user{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .nav-user-name{font-size:13px;font-weight:600;color:#fff;}
+  .nav-user-prog{font-size:11px;color:rgba(255,255,255,0.5);}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:rgba(255,255,255,0.7);border-radius:6px;margin:1px 8px;position:relative;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-item.active{background:rgba(62,129,104,0.25);color:#fff;}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--green);border-radius:0 2px 2px 0;margin-left:8px;}
+  .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .nav-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1);}
+  .main{margin-left:240px;flex:1;min-height:100vh;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;position:sticky;top:0;z-index:50;}
+  .topbar-title{font-size:18px;font-weight:700;color:var(--navy);}
+  .content{padding:24px 28px;max-width:860px;}
+  .doc-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .doc-table th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;background:#FAF7F2;border-bottom:1px solid var(--border);}
+  .doc-table td{padding:13px 16px;font-size:13px;color:#374151;border-bottom:1px solid #F5F0EA;vertical-align:middle;}
+  .doc-table tr:last-child td{border-bottom:none;}
+  .signed-badge{background:#D1FAE5;color:#065F46;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;}
+  .pending-badge{background:#FEF3C7;color:#92400E;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;}
+  .btn-download{background:#F2EDE4;color:#2D5C2E;border:1px solid #C8DCC8;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;}
+  .btn-upload-doc{background:#2D5C2E;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .btn-upload-doc:hover{background:#1E4220;}
+  .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;align-items:center;justify-content:center;}
+  .modal-backdrop.open{display:flex;}
+  .upload-modal{background:#fff;border-radius:14px;width:520px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+  .um-label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;}
+  .um-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;color:var(--text);margin-bottom:14px;}
+  .um-select{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:14px;}
+  .um-textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:70px;margin-bottom:14px;}
+  .drop-zone{border:2px dashed var(--border);border-radius:10px;padding:28px;text-align:center;cursor:pointer;margin-bottom:14px;background:#FAF7F2;transition:border-color 0.15s;}
+  .drop-zone:hover{border-color:#2D5C2E;}
+</style>
+{% endblock %}
+{% block content %}
+  <aside class="sidenav">
+    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Patient Portal</div></div>
+    <div class="nav-user">
+      <div class="nav-avatar" style="background:#0EA5E9">JR</div>
+      <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
+    </div>
+    <nav style="padding:8px 0;flex:1;">
+      <a href="/patient/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="/patient/consultations" class="nav-item"><span class="nav-icon">💬</span> My Consultations</a>
+      <a href="/patient/appointments" class="nav-item"><span class="nav-icon">📅</span> Appointments</a>
+      <a href="/patient/messages" class="nav-item"><span class="nav-icon">✉️</span> Messages <span class="nav-badge">2</span></a>
+      <a href="/patient/labs" class="nav-item"><span class="nav-icon">🧪</span> Lab Results</a>
+      <a href="/patient/health-profile" class="nav-item"><span class="nav-icon">👤</span> Health Profile</a>
+      <a href="/patient/documents" class="nav-item active"><span class="nav-icon">📄</span> Documents</a>
+      <a href="/patient/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+  </aside>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">My Documents</div><button class="btn-upload-doc" onclick="openUploadModal()">Upload Document +</button></div>
+    <div class="content">
+      <table class="doc-table">
+        <thead><tr><th>Document Name</th><th>Type</th><th>Date</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600">Telehealth Consent Form</td><td><span class="signed-badge">Consent</span></td><td>May 15, 2026</td><td><a href="#" class="btn-download" onclick="alert('Opening document...');return false;">View</a></td></tr>
+          <tr><td style="font-weight:600">Weight Management Lab Results</td><td><span class="signed-badge">Lab Report</span></td><td>Jun 3, 2026</td><td><a href="#" class="btn-download" onclick="alert('Opening document...');return false;">View</a></td></tr>
+          <tr><td style="font-weight:600">Treatment Summary — Weight Management</td><td><span class="signed-badge">Clinical Summary</span></td><td>Jun 5, 2026</td><td><a href="#" class="btn-download" onclick="alert('Opening document...');return false;">View</a></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<!-- Upload Document Modal -->
+<div class="modal-backdrop" id="uploadModal" onclick="if(event.target===this)closeUploadModal()">
+  <div class="upload-modal">
+    <div style="padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;">
+      <div style="flex:1;font-size:16px;font-weight:700;color:var(--text);">Upload Document</div>
+      <button onclick="closeUploadModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6B7280;">✕</button>
+    </div>
+    <div style="padding:24px;">
+      <label class="um-label">Document Type</label>
+      <select class="um-select" id="umDocType">
+        <option value="">— Select document type —</option>
+        <option>Lab Report</option>
+        <option>Consent Form</option>
+        <option>Clinical Summary</option>
+        <option>Insurance Card</option>
+        <option>ID / Identification</option>
+        <option>Prescription</option>
+        <option>Other</option>
+      </select>
+      <label class="um-label">File</label>
+      <div class="drop-zone" onclick="document.getElementById('umFileInput').click()">
+        <div style="font-size:28px;margin-bottom:8px;">📎</div>
+        <div style="font-size:13px;color:var(--gray);">Click to browse or drag &amp; drop your file here</div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">PDF, PNG, JPG up to 20 MB</div>
+        <div id="umFileName" style="font-size:12px;font-weight:600;color:#2D5C2E;margin-top:6px;"></div>
+      </div>
+      <input type="file" id="umFileInput" style="display:none" onchange="document.getElementById('umFileName').textContent=this.files[0]?this.files[0].name:''">
+      <label class="um-label">Document Name</label>
+      <input class="um-input" id="umDocName" placeholder="e.g. HbA1c Results — Jun 2026">
+      <label class="um-label">Date</label>
+      <input type="date" class="um-input" id="umDocDate">
+      <label class="um-label">Notes (optional)</label>
+      <textarea class="um-textarea" id="umDocNotes" placeholder="Add any notes about this document..."></textarea>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeUploadModal()" style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
+      <button onclick="submitUpload()" style="background:#2D5C2E;color:#fff;border:none;border-radius:8px;padding:8px 22px;font-size:13px;font-weight:600;cursor:pointer;">Upload Document</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function openUploadModal() {
+  document.getElementById('uploadModal').classList.add('open');
+}
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.remove('open');
+  document.getElementById('umDocType').value = '';
+  document.getElementById('umDocName').value = '';
+  document.getElementById('umDocDate').value = '';
+  document.getElementById('umDocNotes').value = '';
+  document.getElementById('umFileName').textContent = '';
+  document.getElementById('umFileInput').value = '';
+}
+function submitUpload() {
+  var type = document.getElementById('umDocType').value || 'Document';
+  var name = document.getElementById('umDocName').value.trim() || 'Uploaded Document';
+  var date = document.getElementById('umDocDate').value;
+  var dateStr = date ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) : 'Jun 14, 2026';
+  var tbody = document.querySelector('.doc-table tbody');
+  var row = document.createElement('tr');
+  row.innerHTML = '<td style="font-weight:600">' + name + '</td><td><span class="signed-badge">' + type + '</span></td><td>' + dateStr + '</td><td><a href="#" class="btn-download" onclick="alert(\'Opening document...\');return false;">View</a></td>';
+  tbody.insertBefore(row, tbody.firstChild);
+  closeUploadModal();
+}
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Patient Search — Scheduler{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+
+/* demo-nav-offset */
+.sp-shell { margin-top: 60px; }
+
+.sp-topbar {
+  background: #6B21A8; color: #fff; padding: 0 24px; height: 52px;
+  display: flex; align-items: center; gap: 14px;
+}
+.sp-topbar-back { font-size: 12px; color: #8B9BB4; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.sp-topbar-back:hover { color: #fff; }
+.sp-topbar-title { font-size: 16px; font-weight: 700; }
+
+.sp-content { max-width: 1000px; margin: 0 auto; padding: 32px 24px; }
+.sp-heading { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.sp-sub { font-size: 13px; color: #6B7280; margin-bottom: 24px; }
+
+.search-box { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 20px; margin-bottom: 24px; display: flex; gap: 10px; }
+.search-input-wrap { flex: 1; position: relative; }
+.search-input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid #E5E0D8; border-radius: 8px; font-size: 14px; outline: none; }
+.search-input:focus { border-color: #6B21A8; box-shadow: 0 0 0 3px rgba(107,33,168,0.1); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+.search-btn { padding: 10px 22px; background: #6B21A8; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.search-btn:hover { background: #5B1898; }
+
+.results-widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.results-header { padding: 14px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 8px; }
+.results-title { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+.count-badge { background: #F3F4F6; color: #374151; font-size: 11px; font-weight: 700; border-radius: 20px; padding: 2px 10px; }
+
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: top; }
+tbody tr:last-child > td { border-bottom: none; }
+.patient-name { font-weight: 600; color: #111827; }
+.patient-id { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.cp-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EDE9FE; color: #5B21B6; margin: 1px; }
+.appt-upcoming { font-size: 11px; color: #059669; font-weight: 600; }
+.appt-none { font-size: 11px; color: #9CA3AF; }
+.action-link { color: #6B21A8; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; margin-right: 12px; }
+.action-link:hover { text-decoration: underline; }
+.action-link.red { color: #DC2626; }
+
+/* Expanded appointments inline */
+.appt-expand { display: none; padding: 12px 16px; background: #F9FAFB; border-top: 1px solid #E5E0D8; }
+.appt-expand.show { display: block; }
+.appt-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid #E5E0D8; font-size: 13px; }
+.appt-row:last-child { border-bottom: none; }
+.appt-date { font-weight: 600; color: #111827; min-width: 120px; }
+.appt-type { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #DBEAFE; color: #1D4ED8; }
+.appt-provider { color: #6B7280; flex: 1; }
+.appt-actions { display: flex; gap: 8px; }
+.appt-btn { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid #E5E0D8; background: #fff; color: #374151; }
+.appt-btn:hover { border-color: #6B21A8; color: #6B21A8; }
+.appt-btn.cancel-btn { border-color: #FECACA; color: #DC2626; }
+.appt-btn.cancel-btn:hover { background: #FEF2F2; }
+
+.no-results { padding: 40px 20px; text-align: center; color: #9CA3AF; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="sp-shell">
+  <div class="sp-topbar">
+    <a href="/scheduler/" class="sp-topbar-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Dashboard
+    </a>
+    <div class="sp-topbar-title">Patient Search</div>
+  </div>
+
+  <div class="sp-content">
+    <div class="sp-heading">Find a Patient</div>
+    <div class="sp-sub">Search by name or patient ID to view appointments and schedule.</div>
+
+    <div class="search-box">
+      <div class="search-input-wrap">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" class="search-input" id="spInput" placeholder="Search by patient name or ID…" oninput="runSearch()" onkeydown="if(event.key==='Enter')runSearch()">
+      </div>
+      <button class="search-btn" onclick="runSearch()">Search</button>
+    </div>
+
+    <div class="results-widget">
+      <div class="results-header">
+        <div class="results-title">Patients</div>
+        <div class="count-badge" id="countBadge">0 results</div>
+      </div>
+
+      <div id="spResults">
+        <div class="no-results">Enter a name or patient ID above to search.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+const PATIENTS = [
+  { id:'PT-2026-00441', name:'Marcus Johnson', dob:'Mar 15, 1988', state:'Texas', products:['Testosterone'], appts:[
+    { date:'Jun 18, 2026 · 10:00 AM', type:'Video', provider:'Dr. Sarah Lee, MD', product:'Testosterone' },
+    { date:'Jul 9, 2026 · 2:30 PM', type:'Video', provider:'Dr. Sarah Lee, MD', product:'Testosterone' },
+  ]},
+  { id:'PT-2026-00398', name:'Diana Martinez', dob:'Jul 22, 1991', state:'California', products:['Weight Management'], appts:[
+    { date:'Jun 20, 2026 · 11:30 AM', type:'Telephonic', provider:'Maria Rodriguez, NP', product:'Weight Management' },
+  ]},
+  { id:'PT-2026-00512', name:'Robert Kim', dob:'Dec 3, 1975', state:'New York', products:['A1C Management'], appts:[]},
+  { id:'PT-2026-00467', name:'Priya Sharma', dob:'May 8, 1985', state:'Illinois', products:["Women's Health","Skincare"], appts:[
+    { date:'Jun 16, 2026 · 9:00 AM', type:'Video', provider:'Maria Rodriguez, NP', product:"Women's Health" },
+  ]},
+  { id:'PT-2026-00388', name:'James Okafor', dob:'Feb 14, 1979', state:'Florida', products:['ED Treatment'], appts:[]},
+];
+
+function runSearch() {
+  const q = document.getElementById('spInput').value.trim().toLowerCase();
+  const results = q.length < 1 ? [] : PATIENTS.filter(p =>
+    p.name.toLowerCase().includes(q) || p.id.toLowerCase().includes(q)
+  );
+  renderResults(results, q);
+}
+
+function renderResults(results, q) {
+  const container = document.getElementById('spResults');
+  document.getElementById('countBadge').textContent = results.length + ' result' + (results.length !== 1 ? 's' : '');
+  if (results.length === 0) {
+    container.innerHTML = '<div class="no-results">' + (q ? 'No patients found for "' + q + '".' : 'Enter a name or patient ID above to search.') + '</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>Patient</th><th>DOB</th><th>State</th><th>Active Care Products</th><th>Upcoming Appointments</th><th>Actions</th></tr></thead><tbody>';
+  results.forEach((p, i) => {
+    const upcoming = p.appts.length > 0
+      ? '<span class="appt-upcoming">● ' + p.appts[0].date + '</span>'
+      : '<span class="appt-none">None scheduled</span>';
+    html += `<tr>
+      <td><div class="patient-name">${p.name}</div><div class="patient-id">${p.id}</div></td>
+      <td>${p.dob}</td>
+      <td>${p.state}</td>
+      <td>${p.products.map(pr => '<span class="cp-tag">'+pr+'</span>').join('')}</td>
+      <td>${upcoming}</td>
+      <td>
+        <a class="action-link" href="/scheduler/schedule">Schedule New</a>
+        <a class="action-link" onclick="toggleAppts(${i})">View Appointments</a>
+        <a class="action-link" href="/scheduler/schedule">Reschedule</a>
+      </td>
+    </tr>
+    <tr id="appt_${i}"><td colspan="6" style="padding:0;">
+      <div class="appt-expand" id="apptExpand_${i}">
+        ${p.appts.length === 0 ? '<div style="padding:12px 16px;color:#9CA3AF;font-size:13px;">No upcoming appointments.</div>' :
+        p.appts.map(a => `<div class="appt-row">
+          <div class="appt-date">${a.date}</div>
+          <span class="appt-type">${a.type}</span>
+          <div class="appt-provider">${a.provider} · ${a.product}</div>
+          <div class="appt-actions">
+            <button class="appt-btn" onclick="alert('Opening reschedule flow for ${p.name}')">Reschedule</button>
+            <button class="appt-btn cancel-btn" onclick="alert('Appointment cancelled for ${p.name}')">Cancel</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </td></tr>`;
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function toggleAppts(i) {
+  const el = document.getElementById('apptExpand_' + i);
+  if (el) el.classList.toggle('show');
+}
+</script>
+{% endraw %}
+{% endblock %}

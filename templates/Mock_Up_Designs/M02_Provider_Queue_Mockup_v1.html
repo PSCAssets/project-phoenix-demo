@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Phoenix — Provider Portal · Master Queue</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sidebar-w: 220px;
+    --topbar-h: 52px;
+    --filter-h: 46px;
+    --bg-page: #F4F5F7;
+    --bg-surface: #FFFFFF;
+    --bg-secondary: #F8F9FA;
+    --text-primary: #1A1D23;
+    --text-secondary: #6B7280;
+    --text-tertiary: #9CA3AF;
+    --border: rgba(0,0,0,0.10);
+    --border-med: rgba(0,0,0,0.16);
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --blue-mid: #B5D4F4;
+    --red: #E24B4A;
+    --red-light: #FFF0F0;
+    --red-mid: #FCEBEB;
+    --orange: #EF9F27;
+    --orange-light: #FFF8EE;
+    --orange-mid: #FAECE7;
+    --yellow: #D4A017;
+    --yellow-light: #FFFEF2;
+    --yellow-mid: #FAEEDA;
+    --green: #3B6D11;
+    --green-light: #F0F9E8;
+    --green-mid: #EAF3DE;
+    --radius: 8px;
+    --radius-sm: 6px;
+  }
+
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-page); color: var(--text-primary); font-size: 13px; display: flex; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--bg-surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .sidebar-header {
+    padding: 16px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo-mark {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--blue); display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark i { color: #fff; font-size: 16px; }
+  .logo-text { font-size: 13px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
+  .logo-sub { font-size: 11px; color: var(--text-secondary); font-weight: 400; }
+
+  .nav-section-label {
+    padding: 14px 16px 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 0;
+    position: relative;
+    transition: background 0.1s;
+  }
+  .nav-item:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .nav-item.active {
+    background: var(--blue-light);
+    color: var(--blue);
+    font-weight: 500;
+  }
+  .nav-item.active::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 4px; bottom: 4px;
+    width: 3px;
+    background: var(--blue);
+    border-radius: 3px 0 0 3px;
+  }
+  .nav-item i { font-size: 18px; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto;
+    font-size: 10px; font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--red); color: #fff;
+  }
+  .nav-badge.blue { background: var(--blue); }
+
+  .sidebar-footer {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--blue-light); color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+  }
+  .avatar-name { font-size: 12px; font-weight: 500; color: var(--text-primary); }
+  .avatar-role { font-size: 11px; color: var(--text-secondary); }
+
+  /* ── Main ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Topbar */
+  .topbar {
+    height: var(--topbar-h);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .page-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-right: 4px; }
+  .queue-toggle {
+    display: flex;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .tog { padding: 5px 16px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--text-secondary); transition: all 0.1s; }
+  .tog.active { background: var(--bg-surface); color: var(--text-primary); font-weight: 500; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+  .topbar-stats { display: flex; gap: 8px; margin-left: 4px; }
+  .stat-chip {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 12px; padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+  }
+  .stat-chip .num { font-weight: 600; }
+  .stat-chip.red .num { color: var(--red); }
+  .stat-chip.orange .num { color: #BA7517; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-secondary);
+    transition: background 0.1s;
+  }
+  .icon-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .icon-btn i { font-size: 16px; }
+  .notification-btn { position: relative; }
+  .notif-dot {
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--red); border: 2px solid var(--bg-surface);
+  }
+
+  /* SLA breach banner */
+  .breach-banner {
+    background: #FFF0F0;
+    border-bottom: 1px solid #F7C1C1;
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .breach-banner i { color: var(--red); font-size: 16px; flex-shrink: 0; }
+  .breach-text { font-size: 12px; font-weight: 500; color: #791F1F; }
+  .breach-text span { font-weight: 400; color: #A32D2D; }
+  .breach-dismiss { margin-left: auto; font-size: 11px; color: #A32D2D; cursor: pointer; border: none; background: none; text-decoration: underline; }
+
+  /* Filter bar */
+  .filter-bar {
+    height: var(--filter-h);
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .filter-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .filter-bar select, .filter-bar input[type="text"] {
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-med);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    height: 30px;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { outline: 2px solid var(--blue); outline-offset: -1px; }
+  .search-wrap { position: relative; }
+  .search-wrap i { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-tertiary); pointer-events: none; }
+  .search-wrap input { padding-left: 28px; width: 200px; }
+  .filter-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .filter-clear { font-size: 12px; color: var(--blue); cursor: pointer; border: none; background: none; margin-left: 4px; }
+  .filter-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .sort-info { font-size: 11px; color: var(--text-tertiary); }
+
+  /* Board */
+  .board-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 960px;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  thead tr {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-med);
+  }
+
+  th {
+    padding: 9px 14px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border-right: 1px solid var(--border);
+  }
+  th:last-child { border-right: none; }
+  th:hover { color: var(--text-primary); background: #ECEEF1; }
+  th.sorted { color: var(--blue); }
+  .sort-icon { opacity: 0.5; font-size: 12px; margin-left: 4px; vertical-align: -1px; }
+  th.sorted .sort-icon { opacity: 1; }
+
+  /* Section header rows */
+  tr.section-row td {
+    padding: 6px 14px;
+    background: var(--bg-secondary) !important;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 0.03em;
+  }
+  tr.section-row td .count { font-weight: 400; color: var(--text-tertiary); margin-left: 6px; }
+
+  /* Data rows */
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    border-right: 1px solid rgba(0,0,0,0.04);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  td:last-child { border-right: none; }
+
+  tr.sla-red td   { background: #FFF0F0; }
+  tr.sla-orange td { background: #FFF9F0; }
+  tr.sla-yellow td { background: #FFFDF0; }
+  tr.sla-ok td    { background: var(--bg-surface); }
+
+  tr:hover td { filter: brightness(0.975); cursor: pointer; }
+
+  /* Cell types */
+  .icon-cell { width: 36px; text-align: center; padding: 9px 8px; }
+  .patient-name { font-weight: 600; font-size: 13px; color: var(--text-primary); }
+  .patient-dob { font-size: 11px; color: var(--text-secondary); font-weight: 400; margin-top: 1px; }
+  .consult-id { font-size: 11px; color: var(--text-tertiary); font-family: 'SF Mono', 'Fira Code', monospace; }
+
+  .type-pill {
+    font-size: 11px; font-weight: 600;
+    padding: 2px 9px; border-radius: 12px;
+    display: inline-block; letter-spacing: 0.02em;
+  }
+  .t-async  { background: #DBEAFE; color: #1D4ED8; }
+  .t-phone  { background: #DCFCE7; color: #166534; }
+  .t-video  { background: #EDE9FE; color: #5B21B6; }
+  .t-refill { background: #FEF3C7; color: #92400E; }
+  .t-lab    { background: #FCE7F3; color: #9D174D; }
+
+  .program-cell { font-size: 12px; color: var(--text-secondary); }
+
+  .wait-time { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .wait-time.red    { color: var(--red); }
+  .wait-time.orange { color: #C2710C; }
+  .wait-time.yellow { color: #92400E; }
+  .wait-time.ok     { color: var(--text-secondary); font-weight: 500; }
+
+  .sla-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 12px;
+  }
+  .sla-badge .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .sb-red    { background: var(--red-mid);    color: #991B1B; }
+  .sb-orange { background: var(--orange-mid); color: #92400E; }
+  .sb-yellow { background: var(--yellow-mid); color: #78350F; }
+  .sb-ok     { background: var(--green-mid);  color: #14532D; }
+  .sb-red .dot    { background: var(--red); }
+  .sb-orange .dot { background: var(--orange); }
+  .sb-yellow .dot { background: #D4A017; }
+  .sb-ok .dot     { background: var(--green); }
+
+  .provider-cell { font-size: 12px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 7px; }
+  .provider-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--blue-light); color: var(--blue); font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .unassigned-cell { font-size: 12px; color: var(--text-tertiary); font-style: italic; }
+
+  .status-pill {
+    font-size: 11px; font-weight: 500;
+    padding: 2px 9px; border-radius: 12px;
+    display: inline-block;
+  }
+  .s-new       { background: #F3F4F6; color: var(--text-secondary); }
+  .s-assigned  { background: #DBEAFE; color: #1D4ED8; }
+  .s-progress  { background: #D1FAE5; color: #065F46; }
+  .s-pending   { background: #FEF3C7; color: #92400E; }
+  .s-escalated { background: #FCE7F3; color: #9D174D; }
+
+  .actions-cell { display: flex; gap: 6px; align-items: center; }
+  .take-btn {
+    font-size: 12px; font-weight: 600;
+    padding: 5px 14px; border-radius: 6px;
+    border: 1.5px solid var(--blue);
+    background: transparent; color: var(--blue);
+    cursor: pointer; transition: all 0.1s;
+  }
+  .take-btn:hover { background: var(--blue); color: #fff; }
+  .view-btn {
+    font-size: 12px;
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid var(--border-med);
+    background: transparent; color: var(--text-secondary);
+    cursor: pointer; transition: background 0.1s;
+  }
+  .view-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+  .escalate-btn {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 1px solid var(--border-med);
+    background: transparent; color: var(--text-tertiary);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.1s;
+  }
+  .escalate-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-mid); }
+  .escalate-btn i { font-size: 14px; }
+
+  /* Footer */
+  .footer {
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+  .legend { display: flex; gap: 16px; align-items: center; }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
+  .leg-swatch { width: 10px; height: 10px; border-radius: 3px; }
+  .footer-info { font-size: 11px; color: var(--text-tertiary); margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .footer-info i { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-mark"><i class="ti ti-stethoscope"></i></div>
+    <div>
+      <div class="logo-text">Provider Portal</div>
+      <div class="logo-sub">Project Phoenix</div>
+    </div>
+  </div>
+
+  <div class="nav-section-label">Workspace</div>
+  <div class="nav-item"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+  <div class="nav-item active"><i class="ti ti-list-check"></i> Queue <span class="nav-badge">14</span></div>
+  <div class="nav-item"><i class="ti ti-calendar-event"></i> Schedule</div>
+
+  <div class="nav-section-label">Clinical</div>
+  <div class="nav-item"><i class="ti ti-message-circle-2"></i> Messages <span class="nav-badge blue">3</span></div>
+  <div class="nav-item"><i class="ti ti-search"></i> Patient search</div>
+  <div class="nav-item"><i class="ti ti-bell"></i> Notifications <span class="nav-badge">2</span></div>
+
+  <div class="nav-section-label">Admin</div>
+  <div class="nav-item"><i class="ti ti-report"></i> Reports</div>
+  <div class="nav-item"><i class="ti ti-settings"></i> Settings</div>
+
+  <div class="sidebar-footer">
+    <div class="avatar">SL</div>
+    <div>
+      <div class="avatar-name">Dr. Sarah Lee, MD</div>
+      <div class="avatar-role">Internal Medicine · A1C, Weight</div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <span class="page-title">Queue</span>
+    <div class="queue-toggle">
+      <button class="tog">My queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">5</span></button>
+      <button class="tog active">Master queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">14</span></button>
+    </div>
+    <div class="topbar-stats">
+      <div class="stat-chip red"><i class="ti ti-alert-triangle" style="font-size:13px;color:var(--red);"></i> <span class="num">3</span> breached</div>
+      <div class="stat-chip orange"><i class="ti ti-clock" style="font-size:13px;color:#C2710C;"></i> <span class="num">3</span> urgent</div>
+      <div class="stat-chip"><span class="num" style="color:var(--text-primary);">9</span> unassigned</div>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" title="Refresh"><i class="ti ti-refresh"></i></button>
+      <button class="icon-btn notification-btn" title="Notifications"><i class="ti ti-bell"></i><div class="notif-dot"></div></button>
+      <button class="icon-btn" title="Settings"><i class="ti ti-settings"></i></button>
+    </div>
+  </div>
+
+  <!-- SLA Breach Banner -->
+  <div class="breach-banner">
+    <i class="ti ti-alert-circle"></i>
+    <span class="breach-text">3 consults have breached SLA. <span>Immediate action required — Marcus Johnson, Patricia Walsh, David Kim.</span></span>
+    <button class="breach-dismiss">Dismiss when actioned</button>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input type="text" placeholder="Search patient name or ID…">
+    </div>
+    <div class="filter-divider"></div>
+    <span class="filter-label">Type</span>
+    <select>
+      <option>All types</option>
+      <option>Async</option>
+      <option>Phone</option>
+      <option>Video</option>
+      <option>Refill</option>
+      <option>Lab</option>
+    </select>
+    <span class="filter-label">Program</span>
+    <select>
+      <option>All programs</option>
+      <option>A1C Management</option>
+      <option>STI Treatment</option>
+      <option>Thyroid Panel</option>
+      <option>Weight Management</option>
+      <option>ED Treatment</option>
+    </select>
+    <span class="filter-label">SLA state</span>
+    <select>
+      <option>All states</option>
+      <option>Breached</option>
+      <option>Urgent</option>
+      <option>Warning</option>
+      <option>On track</option>
+    </select>
+    <span class="filter-label">Assigned</span>
+    <select>
+      <option>All</option>
+      <option>Unassigned only</option>
+      <option>Assigned only</option>
+    </select>
+    <button class="filter-clear">Clear filters</button>
+    <div class="filter-right">
+      <span class="sort-info">Sorted by wait time (longest first)</span>
+    </div>
+  </div>
+
+  <!-- Board -->
+  <div class="board-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="icon-cell"></th>
+          <th>Patient <i class="ti ti-selector sort-icon"></i></th>
+          <th>Consult ID</th>
+          <th>Type</th>
+          <th>Program <i class="ti ti-selector sort-icon"></i></th>
+          <th class="sorted">Wait time <i class="ti ti-chevron-down sort-icon"></i></th>
+          <th>SLA status</th>
+          <th>Assigned to <i class="ti ti-selector sort-icon"></i></th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- BREACHED -->
+        <tr class="section-row">
+          <td colspan="10">
+            <i class="ti ti-alert-triangle" style="color:var(--red);font-size:13px;vertical-align:-2px;margin-right:6px;"></i>
+            Breached <span class="count">3 consults · SLA threshold exceeded</span>
+          </td>
+        </tr>
+
+        <tr class="sla-red">
+          <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">Marcus Johnson</div>
+            <div class="patient-dob">DOB 03/14/1978 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-001</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">A1C Management</td>
+          <td class="wait-time red">4h 22m</td>
+          <td><span class="sla-badge sb-red"><span class="dot"></span>Breached 22 min ago</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-red">
+          <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">Patricia Walsh</div>
+            <div class="patient-dob">DOB 07/22/1965 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-002</td>
+          <td><span class="type-pill t-lab">Lab</span></td>
+          <td class="program-cell">Thyroid Panel</td>
+          <td class="wait-time red">3h 08m</td>
+          <td><span class="sla-badge sb-red"><span class="dot"></span>Breached 8 min ago</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-red">
+          <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">David Kim</div>
+            <div class="patient-dob">DOB 11/05/1990 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-003</td>
+          <td><span class="type-pill t-phone">Phone</span></td>
+          <td class="program-cell">Weight Management</td>
+          <td class="wait-time red">2h 42m</td>
+          <td><span class="sla-badge sb-red"><span class="dot"></span>Breached 2 min ago</span></td>
+          <td>
+            <div class="provider-cell">
+              <div class="provider-avatar">RP</div> Dr. R. Patel
+            </div>
+          </td>
+          <td><span class="status-pill s-progress">In progress</span></td>
+          <td class="actions-cell">
+            <button class="view-btn">View</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <!-- URGENT -->
+        <tr class="section-row">
+          <td colspan="10">
+            <i class="ti ti-clock" style="color:var(--orange);font-size:13px;vertical-align:-2px;margin-right:6px;"></i>
+            Urgent <span class="count">3 consults · Breach imminent</span>
+          </td>
+        </tr>
+
+        <tr class="sla-orange">
+          <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">Rachel Lopez</div>
+            <div class="patient-dob">DOB 09/30/1988 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-004</td>
+          <td><span class="type-pill t-refill">Refill</span></td>
+          <td class="program-cell">STI Treatment · Doxycycline</td>
+          <td class="wait-time orange">2h 12m</td>
+          <td><span class="sla-badge sb-orange"><span class="dot"></span>18 min to breach</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-orange">
+          <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">Thomas Chen</div>
+            <div class="patient-dob">DOB 02/18/1983 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-005</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">ED Treatment</td>
+          <td class="wait-time orange">1h 59m</td>
+          <td><span class="sla-badge sb-orange"><span class="dot"></span>31 min to breach</span></td>
+          <td>
+            <div class="provider-cell">
+              <div class="provider-avatar">SL</div> Dr. S. Lee
+            </div>
+          </td>
+          <td><span class="status-pill s-progress">In progress</span></td>
+          <td class="actions-cell">
+            <button class="view-btn">View</button>
+          </td>
+        </tr>
+
+        <tr class="sla-orange">
+          <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
+          <td>
+            <div class="patient-name">Aisha Nwosu</div>
+            <div class="patient-dob">DOB 06/12/1995 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-006</td>
+          <td><span class="type-pill t-video">Video</span></td>
+          <td class="program-cell">A1C Management</td>
+          <td class="wait-time orange">1h 45m</td>
+          <td><span class="sla-badge sb-orange"><span class="dot"></span>45 min to breach</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <!-- WARNING -->
+        <tr class="section-row">
+          <td colspan="10">
+            <i class="ti ti-alert-circle" style="color:#D4A017;font-size:13px;vertical-align:-2px;margin-right:6px;"></i>
+            Warning <span class="count">4 consults · Approaching threshold</span>
+          </td>
+        </tr>
+
+        <tr class="sla-yellow">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Brianna Moore</div>
+            <div class="patient-dob">DOB 04/02/1999 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-007</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">Thyroid Panel</td>
+          <td class="wait-time yellow">58m</td>
+          <td><span class="sla-badge sb-yellow"><span class="dot"></span>Warning</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-yellow">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">James Rivera</div>
+            <div class="patient-dob">DOB 08/19/1976 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-008</td>
+          <td><span class="type-pill t-lab">Lab</span></td>
+          <td class="program-cell">STI Panel</td>
+          <td class="wait-time yellow">47m</td>
+          <td><span class="sla-badge sb-yellow"><span class="dot"></span>Warning</span></td>
+          <td>
+            <div class="provider-cell">
+              <div class="provider-avatar">AO</div> Dr. A. Okafor
+            </div>
+          </td>
+          <td><span class="status-pill s-progress">In progress</span></td>
+          <td class="actions-cell">
+            <button class="view-btn">View</button>
+          </td>
+        </tr>
+
+        <tr class="sla-yellow">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Elena Vasquez</div>
+            <div class="patient-dob">DOB 12/28/1991 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-009</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">Weight Management</td>
+          <td class="wait-time yellow">41m</td>
+          <td><span class="sla-badge sb-yellow"><span class="dot"></span>Warning</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-yellow">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Michael Grant</div>
+            <div class="patient-dob">DOB 05/11/1970 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-010</td>
+          <td><span class="type-pill t-refill">Refill</span></td>
+          <td class="program-cell">A1C Management</td>
+          <td class="wait-time yellow">33m</td>
+          <td><span class="sla-badge sb-yellow"><span class="dot"></span>Warning</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <!-- ON TRACK -->
+        <tr class="section-row">
+          <td colspan="10">
+            <i class="ti ti-circle-check" style="color:var(--green);font-size:13px;vertical-align:-2px;margin-right:6px;"></i>
+            On track <span class="count">4 consults · Within SLA</span>
+          </td>
+        </tr>
+
+        <tr class="sla-ok">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Sandra Garcia</div>
+            <div class="patient-dob">DOB 01/30/1986 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-011</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">Weight Management</td>
+          <td class="wait-time ok">12m</td>
+          <td><span class="sla-badge sb-ok"><span class="dot"></span>On track</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+          </td>
+        </tr>
+
+        <tr class="sla-ok">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Owen Taylor</div>
+            <div class="patient-dob">DOB 09/07/1993 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-012</td>
+          <td><span class="type-pill t-phone">Phone</span></td>
+          <td class="program-cell">A1C Management</td>
+          <td class="wait-time ok">8m</td>
+          <td><span class="sla-badge sb-ok"><span class="dot"></span>On track</span></td>
+          <td>
+            <div class="provider-cell">
+              <div class="provider-avatar">SL</div> Dr. S. Lee
+            </div>
+          </td>
+          <td><span class="status-pill s-assigned">Assigned</span></td>
+          <td class="actions-cell">
+            <button class="view-btn">View</button>
+          </td>
+        </tr>
+
+        <tr class="sla-ok">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Camille Dubois</div>
+            <div class="patient-dob">DOB 03/22/2001 · Female</div>
+          </td>
+          <td class="consult-id">C-20260528-013</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">STI Treatment</td>
+          <td class="wait-time ok">5m</td>
+          <td><span class="sla-badge sb-ok"><span class="dot"></span>On track</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+          </td>
+        </tr>
+
+        <tr class="sla-ok">
+          <td class="icon-cell"></td>
+          <td>
+            <div class="patient-name">Henry Osei</div>
+            <div class="patient-dob">DOB 07/14/1979 · Male</div>
+          </td>
+          <td class="consult-id">C-20260528-014</td>
+          <td><span class="type-pill t-video">Video</span></td>
+          <td class="program-cell">ED Treatment</td>
+          <td class="wait-time ok">2m</td>
+          <td><span class="sla-badge sb-ok"><span class="dot"></span>On track</span></td>
+          <td><span class="unassigned-cell">Unassigned</span></td>
+          <td><span class="status-pill s-new">New</span></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="legend">
+      <div class="leg"><div class="leg-swatch" style="background:#FFF0F0;border:1px solid #F09595;"></div> Breached</div>
+      <div class="leg"><div class="leg-swatch" style="background:#FFF9F0;border:1px solid #EF9F27;"></div> Urgent</div>
+      <div class="leg"><div class="leg-swatch" style="background:#FFFDF0;border:1px solid #FAC775;"></div> Warning</div>
+      <div class="leg"><div class="leg-swatch" style="background:#FFFFFF;border:1px solid #D1D5DB;"></div> On track</div>
+    </div>
+    <div class="footer-info">
+      <i class="ti ti-refresh"></i>
+      14 consults · Auto-refreshes every 60s · Last updated 2:31 PM
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

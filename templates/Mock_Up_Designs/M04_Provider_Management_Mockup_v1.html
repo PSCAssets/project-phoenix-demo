@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Portal — Provider Management</title>
+<style>
+  :root {
+    --navy:#002855;--green:#3E8168;--green-dk:#2D5F4E;--green-lt:#F0FDF4;--green-xl:#E8F5F0;
+    --white:#FFFFFF;--bg:#F4F8F6;--border:#D4E4DC;
+    --gray:#64748B;--gray-lt:#F1F5F9;--text:#1E293B;
+    --amber:#D97706;--amber-bg:#FFFBEB;
+    --red:#DC2626;--red-bg:#FEF2F2;
+    --blue:#2563EB;--blue-bg:#EFF6FF;
+    --purple:#7C3AED;--purple-bg:#EDE9FE;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;}
+
+  .topbar{height:52px;background:var(--navy);display:flex;align-items:center;padding:0 24px;gap:12px;}
+  .topbar-logo{font-size:15px;font-weight:700;color:#fff;}
+  .topbar-logo span{color:var(--green);}
+  .breadcrumb{font-size:12px;color:rgba(255,255,255,.5);}
+  .breadcrumb strong{color:rgba(255,255,255,.9);}
+
+  .page{padding:24px 28px;max-width:1300px;margin:0 auto;}
+  .page-header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .page-title{font-size:22px;font-weight:700;color:var(--navy);}
+  .page-sub{font-size:13px;color:var(--gray);margin-top:2px;}
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  .stat-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;}
+  .stat-val{font-size:28px;font-weight:700;color:var(--navy);line-height:1;}
+  .stat-label{font-size:11px;color:var(--gray);margin-top:4px;}
+  .stat-sub{font-size:11px;margin-top:2px;font-weight:600;}
+
+  /* FILTERS */
+  .filters-row{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap;}
+  .search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;width:280px;}
+  .search-box input{border:none;background:transparent;font-size:13px;color:var(--text);outline:none;width:100%;}
+  .filter-select{border:1.5px solid var(--border);border-radius:8px;padding:7px 10px;font-size:12px;color:var(--text);background:var(--white);outline:none;cursor:pointer;}
+  .btn{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);}
+  .btn.primary{background:var(--green);color:#fff;border-color:var(--green);}
+  .btn.secondary{background:transparent;color:var(--navy);}
+
+  /* PROVIDER TABLE */
+  .provider-table{background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+  .table-header{display:grid;grid-template-columns:2.5fr 1.2fr 1.5fr 1fr 1fr 1fr 0.8fr;padding:10px 16px;background:var(--navy);font-size:11px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.08em;}
+  .provider-row{display:grid;grid-template-columns:2.5fr 1.2fr 1.5fr 1fr 1fr 1fr 0.8fr;padding:12px 16px;border-bottom:1px solid var(--gray-lt);align-items:center;}
+  .provider-row:hover{background:var(--gray-lt);}
+  .provider-row:last-child{border-bottom:none;}
+  .provider-info{display:flex;align-items:center;gap:10px;}
+  .provider-avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+  .provider-name{font-size:13px;font-weight:700;color:var(--text);}
+  .provider-meta{font-size:11px;color:var(--gray);margin-top:1px;}
+  .status-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:4px;}
+  .status-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+  .status-badge.active{background:var(--green-lt);color:var(--green-dk);}
+  .status-badge.pending{background:var(--amber-bg);color:var(--amber);}
+  .status-badge.inactive{background:var(--gray-lt);color:var(--gray);}
+  .verifiable-badge{display:flex;align-items:center;gap:5px;font-size:11px;}
+  .v-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .v-dot.verified{background:#22C55E;}
+  .v-dot.expiring{background:var(--amber);}
+  .v-dot.expired{background:var(--red);}
+  .state-pills{display:flex;gap:3px;flex-wrap:wrap;}
+  .state-pill{font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:var(--blue-bg);color:var(--blue);}
+  .state-pill.expiring{background:var(--amber-bg);color:var(--amber);}
+  .action-btn{font-size:11px;color:var(--green);font-weight:600;cursor:pointer;background:transparent;border:none;padding:4px 8px;border-radius:4px;}
+  .action-btn:hover{background:var(--green-xl);}
+
+  /* ONBOARD PANEL */
+  .onboard-panel{position:fixed;top:0;right:0;bottom:0;width:460px;background:var(--white);border-left:1px solid var(--border);box-shadow:-4px 0 24px rgba(0,0,0,.12);z-index:200;display:flex;flex-direction:column;}
+  .panel-header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--navy);}
+  .panel-title{font-size:16px;font-weight:700;color:#fff;flex:1;}
+  .panel-close{font-size:20px;color:rgba(255,255,255,.6);cursor:pointer;}
+  .panel-body{flex:1;overflow-y:auto;padding:20px;}
+  .search-section{margin-bottom:20px;}
+  .search-label{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+  .verifiable-search{display:flex;gap:8px;}
+  .verifiable-input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--text);outline:none;}
+  .verifiable-input:focus{border-color:var(--green);}
+  .search-btn{background:var(--navy);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+  .result-card{background:var(--green-xl);border:2px solid var(--green);border-radius:12px;padding:16px;margin-bottom:16px;}
+  .result-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+  .result-avatar{width:44px;height:44px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;}
+  .result-name{font-size:15px;font-weight:700;color:var(--navy);}
+  .result-meta{font-size:12px;color:var(--gray);margin-top:2px;}
+  .verifiable-verified{font-size:11px;color:var(--green-dk);font-weight:700;display:flex;align-items:center;gap:4px;}
+  .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .field-item{display:flex;flex-direction:column;gap:2px;}
+  .field-label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;}
+  .field-value{font-size:12px;color:var(--text);font-weight:600;}
+  .licensed-states{margin-bottom:14px;}
+  .states-label{font-size:10px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+  .states-list{display:flex;gap:4px;flex-wrap:wrap;}
+  .program-assign{margin-bottom:16px;}
+  .panel-footer{padding:16px 20px;border-top:1px solid var(--border);display:flex;gap:10px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">Everly<span>well</span></div>
+  <span style="color:rgba(255,255,255,.3);margin:0 4px;">›</span>
+  <span class="breadcrumb">Admin Portal › <strong>Provider Management</strong></span>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+    <div style="width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">JW</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Provider Management</div>
+      <div class="page-sub">Manage provider accounts, credential status, program assignments, and schedules</div>
+    </div>
+    <button class="btn primary" style="margin-left:auto;" onclick="document.getElementById('onboardPanel').style.display='flex'">+ Onboard Provider</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-val">47</div>
+      <div class="stat-label">Active Providers</div>
+      <div class="stat-sub" style="color:var(--green);">↑ 3 this month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--amber);">6</div>
+      <div class="stat-label">Pending Setup</div>
+      <div class="stat-sub" style="color:var(--amber);">Invitation sent, not yet completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--red);">3</div>
+      <div class="stat-label">License Expiring Soon</div>
+      <div class="stat-sub" style="color:var(--red);">Within 60 days — review needed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">24</div>
+      <div class="stat-label">States Covered</div>
+      <div class="stat-sub" style="color:var(--gray);">Across all active providers</div>
+    </div>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <div class="search-box">
+      <span>🔍</span>
+      <input type="text" placeholder="Search provider name or NPI…">
+    </div>
+    <select class="filter-select">
+      <option>All Programs</option>
+      <option>A1C Management</option>
+      <option>Hormone Therapy</option>
+      <option>Weight Management</option>
+    </select>
+    <select class="filter-select">
+      <option>All States</option>
+      <option>California</option>
+      <option>New York</option>
+      <option>Texas</option>
+      <option>Florida</option>
+    </select>
+    <select class="filter-select">
+      <option>All Statuses</option>
+      <option>Active</option>
+      <option>Pending Setup</option>
+      <option>Inactive</option>
+    </select>
+    <select class="filter-select">
+      <option>Verifiable: All</option>
+      <option>Verified</option>
+      <option>Expiring Soon</option>
+      <option>Expired</option>
+    </select>
+  </div>
+
+  <!-- PROVIDER TABLE -->
+  <div class="provider-table">
+    <div class="table-header">
+      <div>Provider</div>
+      <div>Credential</div>
+      <div>Verifiable Status</div>
+      <div>Licensed States</div>
+      <div>Programs</div>
+      <div>Portal Status</div>
+      <div>Actions</div>
+    </div>
+
+    <div class="provider-row">
+      <div class="provider-info">
+        <div class="provider-avatar">EC</div>
+        <div>
+          <div class="provider-name">Dr. Emily Chen, MD</div>
+          <div class="provider-meta">NPI: 1234567890 · Internal Medicine</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text);">MD · Board Certified</div>
+      <div class="verifiable-badge"><div class="v-dot verified"></div><div><div style="font-size:12px;font-weight:600;color:var(--text);">Verified</div><div style="font-size:10px;color:var(--gray);">Updated 2h ago</div></div></div>
+      <div class="state-pills"><span class="state-pill">CA</span><span class="state-pill">NY</span><span class="state-pill">WA</span><span class="state-pill">CO</span><span style="font-size:10px;color:var(--gray);">+4</span></div>
+      <div style="font-size:11px;color:var(--text);">A1C · Hormone</div>
+      <div><span class="status-badge active">Active</span></div>
+      <div><button class="action-btn">View →</button></div>
+    </div>
+
+    <div class="provider-row">
+      <div class="provider-info">
+        <div class="provider-avatar">MW</div>
+        <div>
+          <div class="provider-name">Dr. Marcus Williams, MD</div>
+          <div class="provider-meta">NPI: 9876543210 · Endocrinology</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text);">MD · Board Certified</div>
+      <div class="verifiable-badge"><div class="v-dot expiring"></div><div><div style="font-size:12px;font-weight:600;color:var(--amber);">Expiring Soon</div><div style="font-size:10px;color:var(--gray);">FL license exp. Aug 15</div></div></div>
+      <div class="state-pills"><span class="state-pill">FL</span><span class="state-pill expiring">FL ⚠</span><span class="state-pill">TX</span><span class="state-pill">GA</span></div>
+      <div style="font-size:11px;color:var(--text);">A1C · Weight Mgmt</div>
+      <div><span class="status-badge active">Active</span></div>
+      <div><button class="action-btn">View →</button></div>
+    </div>
+
+    <div class="provider-row">
+      <div class="provider-info">
+        <div class="provider-avatar" style="background:#475569;">SR</div>
+        <div>
+          <div class="provider-name">Dr. Sarah Rodriguez, DO</div>
+          <div class="provider-meta">NPI: 5551234567 · Family Medicine</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text);">DO · Board Eligible</div>
+      <div class="verifiable-badge"><div class="v-dot verified"></div><div><div style="font-size:12px;font-weight:600;color:var(--text);">Verified</div><div style="font-size:10px;color:var(--gray);">Updated 6h ago</div></div></div>
+      <div class="state-pills"><span class="state-pill">OR</span><span class="state-pill">WA</span><span class="state-pill">ID</span></div>
+      <div style="font-size:11px;color:var(--text);">Hormone Therapy</div>
+      <div><span class="status-badge active">Active</span></div>
+      <div><button class="action-btn">View →</button></div>
+    </div>
+
+    <div class="provider-row" style="opacity:.7;">
+      <div class="provider-info">
+        <div class="provider-avatar" style="background:#94A3B8;">JK</div>
+        <div>
+          <div class="provider-name">Dr. James Kim, MD</div>
+          <div class="provider-meta">NPI: 7772223333 · General Practice</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text);">MD</div>
+      <div class="verifiable-badge"><div class="v-dot" style="background:#94A3B8;"></div><div><div style="font-size:12px;font-weight:600;color:var(--gray);">Pending</div><div style="font-size:10px;color:var(--gray);">Setup not complete</div></div></div>
+      <div style="font-size:11px;color:var(--gray);">—</div>
+      <div style="font-size:11px;color:var(--gray);">—</div>
+      <div><span class="status-badge pending">Pending Setup</span></div>
+      <div><button class="action-btn">Resend →</button></div>
+    </div>
+
+    <div class="provider-row" style="padding:10px 16px;">
+      <div style="grid-column:1/-1;text-align:center;font-size:12px;color:var(--gray);">
+        Showing 4 of 53 providers · <a href="#" style="color:var(--green);font-weight:600;">View all</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ONBOARD PANEL -->
+<div id="onboardPanel" class="onboard-panel" style="display:none;">
+  <div class="panel-header">
+    <div class="panel-title">Onboard New Provider</div>
+    <span class="panel-close" onclick="document.getElementById('onboardPanel').style.display='none'">×</span>
+  </div>
+  <div class="panel-body">
+
+    <div class="search-section">
+      <div class="search-label">Step 1 — Search Verifiable / Salesforce</div>
+      <div class="verifiable-search">
+        <input class="verifiable-input" type="text" placeholder="Enter provider name or NPI number…" value="1234509876">
+        <button class="search-btn">Search</button>
+      </div>
+      <div style="font-size:11px;color:var(--gray);margin-top:6px;">Searches Verifiable and Salesforce simultaneously. Credential data auto-populates.</div>
+    </div>
+
+    <!-- SEARCH RESULT -->
+    <div class="result-card">
+      <div class="result-header">
+        <div class="result-avatar">AJ</div>
+        <div style="flex:1;">
+          <div class="result-name">Dr. Aisha Johnson, MD</div>
+          <div class="result-meta">NPI: 1234509876 · Internal Medicine & Endocrinology</div>
+          <div class="verifiable-verified">✓ Verified in Verifiable · Last updated Jun 1, 2026</div>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field-item"><div class="field-label">Credential Type</div><div class="field-value">MD — Doctor of Medicine</div></div>
+        <div class="field-item"><div class="field-label">Board Certification</div><div class="field-value">ABIM — Internal Medicine</div></div>
+        <div class="field-item"><div class="field-label">Specialty</div><div class="field-value">Internal Medicine</div></div>
+        <div class="field-item"><div class="field-label">Salesforce Record</div><div class="field-value" style="color:var(--green);">Linked ✓</div></div>
+      </div>
+
+      <div class="licensed-states">
+        <div class="states-label">Active State Licenses (from Verifiable)</div>
+        <div class="states-list">
+          <span class="state-pill">CA</span><span class="state-pill">NY</span><span class="state-pill">TX</span>
+          <span class="state-pill">FL</span><span class="state-pill">WA</span><span class="state-pill">CO</span>
+          <span class="state-pill">AZ</span><span class="state-pill">GA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRAM ASSIGNMENT -->
+    <div class="program-assign">
+      <div class="search-label" style="margin-bottom:8px;">Step 2 — Assign to Programs & States</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--gray-lt);border-radius:8px;border:1.5px solid var(--border);">
+          <div><div style="font-size:13px;font-weight:600;color:var(--text);">A1C Management</div><div style="font-size:11px;color:var(--gray);">Async + Video · 8 states available</div></div>
+          <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer;">
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--green-xl);border-radius:8px;border:1.5px solid var(--green);">
+          <div><div style="font-size:13px;font-weight:600;color:var(--text);">Hormone Therapy</div><div style="font-size:11px;color:var(--gray);">Async + Video + Telephonic · 6 states available</div></div>
+          <input type="checkbox" checked style="width:16px;height:16px;cursor:pointer;">
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--gray-lt);border-radius:8px;border:1.5px solid var(--border);">
+          <div><div style="font-size:13px;font-weight:600;color:var(--text);">Weight Management</div><div style="font-size:11px;color:var(--gray);">Async only · 5 states available</div></div>
+          <input type="checkbox" style="width:16px;height:16px;cursor:pointer;">
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--blue-bg);border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;font-size:12px;color:#1D4ED8;">
+      📬 After saving, a portal setup invitation will be emailed to the provider. The invitation expires in 72 hours. Provider completes their own password and 2FA setup.
+    </div>
+
+  </div>
+  <div class="panel-footer">
+    <button class="btn secondary" style="flex:1;" onclick="document.getElementById('onboardPanel').style.display='none'">Cancel</button>
+    <button class="btn primary" style="flex:2;">Create Account & Send Invitation →</button>
+  </div>
+</div>
+
+</body>
+</html>

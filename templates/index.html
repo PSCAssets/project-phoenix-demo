@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Sign In{% endblock %}
+
+{% block head %}
+<style>
+  /* Override demo badge to red on login screen */
+  .nav-badge { background: #dc2626 !important; }
+
+  .login-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 24px 48px;
+    min-height: calc(100vh - 60px - 64px);
+  }
+
+  .login-heading {
+    text-align: center;
+    margin-bottom: 44px;
+  }
+  .login-heading h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #1D4ED8;
+    letter-spacing: -.4px;
+    margin-bottom: 8px;
+  }
+  .login-heading p {
+    font-size: .875rem;
+    color: #6b7280;
+  }
+
+  .user-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 268px);
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 44px;
+  }
+
+  .user-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 20px 20px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    border: 1.5px solid #E5E0D8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .user-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.11);
+  }
+
+  .user-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: .975rem;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.3;
+  }
+
+  .user-role {
+    font-size: .775rem;
+    color: #6b7280;
+    line-height: 1.5;
+    margin-bottom: 6px;
+  }
+
+  .login-btn {
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px 0;
+    background: #6B21A8;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: background .15s;
+  }
+  .login-btn:hover {
+    background: #5B1898;
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .login-footer {
+    font-size: .75rem;
+    color: #9ca3af;
+    text-align: center;
+    letter-spacing: .2px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-wrap">
+
+  <div class="login-heading">
+    <h1>Select your account to continue</h1>
+    <p>Project Phoenix — Demo Environment</p>
+  </div>
+
+  <div class="user-grid">
+
+    <!-- Row 1: MD, NP, RN -->
+    <div class="user-card">
+      <div class="user-avatar" style="background:#1B4F8A">SL</div>
+      <div class="user-name">Dr. Sarah Lee, MD</div>
+      <div class="user-role">Internal Medicine<br>Provider Portal MD</div>
+      <a href="{{ url_for('login', role='provider_md') }}" class="login-btn">Log in as Sarah</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#0D9488">MR</div>
+      <div class="user-name">Maria Rodriguez, NP</div>
+      <div class="user-role">Nurse Practitioner<br>Provider Portal NP</div>
+      <a href="{{ url_for('login', role='provider_np') }}" class="login-btn">Log in as Maria</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#00A99D">JM</div>
+      <div class="user-name">Jennifer Martinez, RN</div>
+      <div class="user-role">Clinical Team<br>Provider Portal RN</div>
+      <a href="{{ url_for('login', role='provider_rn') }}" class="login-btn">Log in as Jennifer</a>
+    </div>
+
+    <!-- Row 2: MA, GC, Scheduler -->
+    <div class="user-card">
+      <div class="user-avatar" style="background:#445D7A">MT</div>
+      <div class="user-name">Michael Torres, MA</div>
+      <div class="user-role">Medical Assistant<br>Provider Portal MA</div>
+      <a href="{{ url_for('login', role='provider_ma') }}" class="login-btn">Log in as Michael</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#6B5EA8">LP</div>
+      <div class="user-name">Lisa Park, MS CGC</div>
+      <div class="user-role">Genetic Counselor<br>Provider Portal GC</div>
+      <a href="{{ url_for('login', role='provider_gc') }}" class="login-btn">Log in as Lisa</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#D97706">DN</div>
+      <div class="user-name">David Nguyen</div>
+      <div class="user-role">Scheduling Coordinator<br>Scheduling</div>
+      <a href="{{ url_for('login', role='scheduler') }}" class="login-btn">Log in as David</a>
+    </div>
+
+    <!-- Row 3: Care Team, Patient, Admin -->
+    <div class="user-card">
+      <div class="user-avatar" style="background:#059669">AK</div>
+      <div class="user-name">Alex Kim</div>
+      <div class="user-role">Care Team<br>Care Team Portal</div>
+      <a href="{{ url_for('login', role='care_team') }}" class="login-btn">Log in as Alex</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#0EA5E9">JR</div>
+      <div class="user-name">Jamie Rivera</div>
+      <div class="user-role">Patient<br>Patient Portal</div>
+      <a href="{{ url_for('login', role='patient') }}" class="login-btn">Log in as Jamie</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#1D4ED8">CN</div>
+      <div class="user-name">Chris Navarro</div>
+      <div class="user-role">Platform Admin<br>Admin Portal</div>
+      <a href="{{ url_for('login', role='admin') }}" class="login-btn">Log in as Chris</a>
+    </div>
+
+  </div>
+
+  <div class="login-footer">Demo environment — not for clinical use</div>
+
+</div>
+{% endblock %}

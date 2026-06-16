@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>UC2 — New Async Consultation Standard Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0F2744;
+    --blue:    #1A5FA8;
+    --blue-lt: #EAF3FF;
+    --purple:  #5C4FCE;
+    --purp-lt: #F0EEFF;
+    --teal:    #0B7A75;
+    --teal-lt: #E6F7F6;
+    --coral:   #C84B31;
+    --coral-lt:#FEF0EC;
+    --red:     #B91C1C;
+    --red-lt:  #FEF2F2;
+    --green:   #15803D;
+    --green-lt:#F0FDF4;
+    --gray:    #4B5563;
+    --gray-lt: #F9FAFB;
+    --border:  #E2E8F0;
+    --text:    #1E293B;
+    --muted:   #64748B;
+    --white:   #FFFFFF;
+    --lane-bg-a: #F8FAFF;
+    --lane-bg-b: #FAFBFC;
+    --amber:   #92400E;
+    --amber-lt:#FFFBEB;
+  }
+
+  html, body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F1F4F8;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 24px;
+  }
+
+  .page { max-width: 1500px; margin: 0 auto; }
+
+  .doc-header {
+    background: var(--navy);
+    border-radius: 12px 12px 0 0;
+    padding: 20px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .doc-header .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: #7EB4E8;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .doc-header h1 { font-size: 20px; font-weight: 600; color: #FFFFFF; letter-spacing: -0.01em; }
+  .doc-header .meta { font-size: 12px; color: #7EB4E8; font-family: 'DM Mono', monospace; }
+
+  .info-bar {
+    background: var(--white);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .info-note {
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .info-note .badge {
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 9px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    color: #fff;
+  }
+  .info-note.amber-note  { background: #FEF9EC; border: 1.5px solid #FCD34D; color: #92400E; }
+  .info-note.amber-note .badge  { background: #92400E; }
+  .info-note.green-note  { background: var(--green-lt); border: 1.5px solid #86EFAC; color: var(--green); }
+  .info-note.green-note .badge  { background: var(--green); }
+  .info-note.blue-note   { background: var(--blue-lt);  border: 1.5px solid #93C5FD; color: var(--blue); }
+  .info-note.blue-note .badge   { background: var(--blue); }
+
+  .swimlane-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-top: none;
+    overflow: visible;
+  }
+
+  .lane {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--border);
+    min-height: 80px;
+  }
+  .lane:last-child { border-bottom: none; }
+
+  .lane-label {
+    width: 150px;
+    min-width: 150px;
+    padding: 16px 14px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    background: var(--lane-bg-a);
+    flex-shrink: 0;
+  }
+  .lane:nth-child(even) .lane-label { background: var(--lane-bg-b); }
+  .lane-label .lane-dot { width: 8px; height: 8px; border-radius: 50%; margin-bottom: 4px; }
+  .lane-label .lane-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .lane-label .lane-sub  { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; line-height: 1.4; }
+
+  .lane-content {
+    flex: 1;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .lane:nth-child(even) .lane-content { background: #FDFEFF; }
+
+  /* Conditional lane */
+  .lane.lane-conditional .lane-label { background: #FFFBEB; }
+  .lane.lane-conditional .lane-content { background: #FFFDF5; }
+
+  .node {
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: center;
+    border: 1.5px solid transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .node .sub {
+    font-size: 10px;
+    font-weight: 400;
+    opacity: 0.8;
+    margin-top: 3px;
+    display: block;
+    white-space: normal;
+  }
+  .node.oval  { border-radius: 999px; padding: 8px 20px; }
+  .node.diam  { border-radius: 4px; transform: rotate(0deg); }
+  .node.n-blue   { background: var(--blue-lt);  border-color: #93C5FD; color: var(--blue); }
+  .node.n-navy   { background: var(--navy);      border-color: var(--navy); color: #fff; }
+  .node.n-purple { background: var(--purp-lt);   border-color: #C4B5FD; color: var(--purple); }
+  .node.n-teal   { background: var(--teal-lt);   border-color: #99D6D3; color: var(--teal); }
+  .node.n-coral  { background: var(--coral-lt);  border-color: #FCA58E; color: var(--coral); }
+  .node.n-red    { background: var(--red-lt);    border-color: #FCA5A5; color: var(--red); }
+  .node.n-green  { background: var(--green-lt);  border-color: #86EFAC; color: var(--green); }
+  .node.n-gray   { background: var(--gray-lt);   border-color: var(--border); color: var(--gray); }
+  .node.n-amber  { background: var(--amber-lt);  border-color: #FCD34D; color: var(--amber); }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .arrow svg { width: 20px; height: 16px; }
+
+  /* Branch / decision styling */
+  .branch-wrap {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex: 1;
+  }
+  .branch-block {
+    flex: 1;
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1.5px dashed transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .branch-block.bb-amber {
+    background: var(--amber-lt);
+    border-color: #FCD34D;
+  }
+  .branch-block.bb-blue {
+    background: var(--blue-lt);
+    border-color: #93C5FD;
+  }
+  .branch-block .branch-title {
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .branch-block .branch-note {
+    font-size: 10px;
+    line-height: 1.5;
+    opacity: 0.85;
+  }
+  .branch-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 2px 10px;
+    border: 1.5px solid currentColor;
+    white-space: nowrap;
+    margin-bottom: 4px;
+  }
+
+  /* Config pill */
+  .config-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    background: #FFFBEB;
+    border: 1.5px solid #FCD34D;
+    color: #92400E;
+    border-radius: 999px;
+    padding: 3px 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .config-pill .gear { font-size: 11px; }
+
+  /* Ownership callout */
+  .ownership-box {
+    background: #EFF6FF;
+    border: 2px solid #3B82F6;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: #1E40AF;
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+  .ownership-box strong { font-weight: 700; display: block; margin-bottom: 2px; font-size: 12px; }
+
+  /* Auto-action box */
+  .auto-box {
+    background: var(--green-lt);
+    border: 1.5px solid #86EFAC;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--green);
+    line-height: 1.5;
+    flex-shrink: 0;
+  }
+  .auto-box strong { font-weight: 700; display: block; margin-bottom: 2px; font-size: 12px; }
+
+  /* Queue entry card */
+  .queue-card {
+    background: var(--blue-lt);
+    border: 1.5px solid #93C5FD;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--blue);
+    line-height: 1.5;
+    flex: 1;
+    max-width: 340px;
+  }
+  .queue-card .qc-title { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+  .queue-card .qc-fields { display: flex; flex-direction: column; gap: 2px; }
+  .queue-card .qc-field { font-size: 10px; }
+  .queue-card .qc-field span { font-weight: 600; }
+
+  /* Outcome blocks */
+  .outcome-row { display: flex; gap: 10px; width: 100%; align-items: stretch; }
+  .outcome-block { flex: 1; border-radius: 8px; padding: 12px 14px; border: 1.5px solid transparent; }
+  .outcome-block .out-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .outcome-block .out-sub { font-size: 10px; opacity: 0.8; line-height: 1.5; }
+  .outcome-block.ob-green  { background: var(--green-lt);  border-color: #86EFAC; color: var(--green); }
+
+  .escalate-note {
+    font-size: 10px;
+    color: var(--purple);
+    border: 1px dashed #C4B5FD;
+    border-radius: 6px;
+    padding: 5px 10px;
+    background: var(--purp-lt);
+    flex-shrink: 0;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--lane-bg-a);
+    flex-wrap: wrap;
+    border-radius: 0 0 12px 12px;
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .legend-dash { width: 16px; height: 2px; border-top: 2px dashed currentColor; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="doc-header">
+    <div>
+      <div class="label">Project Phoenix · Async Consult Module · Use Case 2</div>
+      <h1>New Async Consultation — Standard Flow</h1>
+    </div>
+    <div class="meta">May 2026 · Everlywell Confidential</div>
+  </div>
+
+  <!-- INFO NOTES -->
+  <div class="info-bar">
+    <div class="info-note green-note">
+      <span class="badge">NEW</span>
+      <span><strong>Lab result upload gate</strong> — for products where this feature is enabled, patients may upload an existing lab result (e.g., A1C from the past 6 months) to satisfy the lab requirement before proceeding to queue entry. The accepted timeframe is a <strong>configurable setting per product</strong>. This gate is optional and product-scoped — not applied globally.</span>
+    </div>
+    <div class="info-note blue-note">
+      <span class="badge">KEY</span>
+      <span><strong>Provider ownership model</strong> — a patient is <strong>not assigned to a provider</strong> until the provider takes the patient from the queue or an admin directly assigns them. The provider sees a <strong>consult notification</strong> in their queue, not the patient. The <strong>welcome message is sent automatically by the system</strong> at the moment provider takes ownership.</span>
+    </div>
+    <div class="info-note amber-note">
+      <span class="badge">NOTE</span>
+      <span><strong>Adverse effect routing</strong> — if patient selects "Adverse Effect" as the request type, the consult routes simultaneously to Provider Queue + RN/MA/Care Team Queue + Admin alert. This is covered in detail in a separate use case: <strong>UC3 — Adverse Effect Escalation Flow</strong>.</span>
+    </div>
+  </div>
+
+  <div class="swimlane-wrap">
+
+    <!-- ══ LANE 1: PATIENT — INITIATION ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#1A5FA8"></div>
+        <div class="lane-name">Patient Portal</div>
+        <div class="lane-sub">Initiation</div>
+      </div>
+      <div class="lane-content">
+        <div class="node oval n-gray">Patient logs in<span class="sub">Authenticated access</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-red">Safety / ER screening<span class="sub">"911 or ER" prompt — patient must acknowledge before proceeding</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-blue">Selects product / program<span class="sub">From enrolled active products</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-blue">Selects request type<span class="sub">Configurable picklist — routes based on selection</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-blue">Completes intake form<span class="sub">Program-specific · Required before queue entry</span></div>
+      </div>
+    </div>
+
+    <!-- ══ LANE 2: SYSTEM — SUBSCRIPTION CHECK ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#64748B"></div>
+        <div class="lane-name">System</div>
+        <div class="lane-sub">Validation</div>
+      </div>
+      <div class="lane-content">
+        <div class="node n-gray">Subscription check<span class="sub">Is consult included in plan or pay-per-consult?</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-gray">Intake validation<span class="sub">Required fields complete · Routing type determined</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-amber">Lab gate check<span class="sub">Is lab upload required or available for this product?</span></div>
+        <div class="arrow" style="color:#FCD34D;"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+          <div class="branch-tag" style="color:#15803D; background:#F0FDF4; border-color:#86EFAC;">Lab gate OFF → proceed to queue</div>
+          <div class="branch-tag" style="color:#92400E; background:#FFFBEB; border-color:#FCD34D;">Lab gate ON → see Lane 3</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LANE 3: LAB RESULT UPLOAD GATE (CONDITIONAL) ══ -->
+    <div class="lane lane-conditional">
+      <div class="lane-label" style="border-right:2px dashed #FCD34D;">
+        <div class="lane-dot" style="background:#92400E"></div>
+        <div class="lane-name">Lab Upload Gate</div>
+        <div class="lane-sub">Conditional — product config only</div>
+      </div>
+      <div class="lane-content" style="gap:14px;">
+
+        <div class="node n-amber">Patient prompted to upload lab result<span class="sub">e.g., A1C result from the past X months</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="branch-wrap" style="max-width:700px;">
+          <div class="branch-block bb-amber">
+            <div class="branch-title" style="color:#92400E;">Patient uploads lab result</div>
+            <div class="branch-note" style="color:#92400E;">System validates file format · Checks result date against configurable timeframe window · If within window → gate satisfied · Proceed to queue entry</div>
+            <div style="margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span class="config-pill"><span class="gear">⚙</span>Timeframe: configurable per product</span>
+              <span style="font-size:10px; color:#92400E;">e.g., "must be completed within last 6 months"</span>
+            </div>
+          </div>
+          <div class="branch-block bb-blue">
+            <div class="branch-title" style="color:var(--blue);">Patient does not have result / result too old</div>
+            <div class="branch-note" style="color:var(--blue);">System displays guidance message · Patient may be prompted to order a lab first (if ordering is available in-platform) · Or consult proceeds without lab gate satisfied, flagged for provider review</div>
+            <div style="margin-top:6px;">
+              <span style="font-size:10px; color:var(--blue); font-style:italic;">Behavior on gate failure is configurable per product</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ LANE 4: PATIENT QUEUE ENTRY ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#0B7A75"></div>
+        <div class="lane-name">Patient Queue Entry</div>
+        <div class="lane-sub">System action</div>
+      </div>
+      <div class="lane-content">
+        <div class="node n-teal">Patient enters provider queue<span class="sub">No provider assigned yet</span></div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="queue-card">
+          <div class="qc-title">Consult record created in queue</div>
+          <div class="qc-fields">
+            <div class="qc-field"><span>Consult type:</span> Async / Phone / Video (per program config)</div>
+            <div class="qc-field"><span>Request type:</span> from patient picklist selection</div>
+            <div class="qc-field"><span>SLA clock:</span> starts on queue entry</div>
+            <div class="qc-field"><span>Assigned provider:</span> None — pending ownership</div>
+            <div class="qc-field"><span>Intake form:</span> attached to record</div>
+            <div class="qc-field"><span>Lab result:</span> attached if uploaded</div>
+          </div>
+        </div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-teal">Patient notification sent<span class="sub">"Your request is in the queue" — modality-specific message</span></div>
+      </div>
+    </div>
+
+    <!-- ══ LANE 5: PROVIDER QUEUE ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#1A5FA8"></div>
+        <div class="lane-name">Provider Queue</div>
+        <div class="lane-sub">MD · DO · NP</div>
+      </div>
+      <div class="lane-content" style="flex-direction:column; align-items:flex-start; gap:12px; padding-top:16px; padding-bottom:16px;">
+
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <div class="node n-blue" style="min-width:230px; text-align:left; white-space:normal;">
+            Provider sees consult notification in queue
+            <span class="sub">Queue entry shows: patient name · consult type (Async/Phone/Video) · request type · time waiting · SLA countdown · lab result indicator if applicable</span>
+          </div>
+          <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="ownership-box" style="min-width:260px;">
+            <strong>⚡ Provider takes ownership</strong>
+            Provider pulls patient from queue <em>or</em> admin directly assigns patient to provider.<br/>
+            <span style="font-style:italic; font-size:10px;">This is the moment the patient is assigned to a provider — not before.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ LANE 6: SYSTEM — AUTO ACTIONS ON OWNERSHIP ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#15803D"></div>
+        <div class="lane-name">System</div>
+        <div class="lane-sub">Auto-actions on ownership</div>
+      </div>
+      <div class="lane-content" style="gap:14px;">
+
+        <div class="auto-box" style="min-width:260px;">
+          <strong>✉ Welcome message auto-sent to patient</strong>
+          System sends the configured welcome message automatically when provider takes ownership. Provider does not need to manually send it.<br/>
+          <span style="font-style:italic; font-size:10px; margin-top:4px; display:block;">Welcome message template is configurable per product / program.</span>
+        </div>
+
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="node n-green" style="white-space:normal; text-align:left;">
+          Consult record updated
+          <span class="sub">Assigned provider logged · Ownership timestamp recorded · Activity Timeline entry created: "Consult opened — Dr. [Name]" · Welcome message logged in Activity Timeline</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══ LANE 7: PROVIDER — CONSULT WORKSPACE ══ -->
+    <div class="lane">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#1A5FA8"></div>
+        <div class="lane-name">Provider</div>
+        <div class="lane-sub">Consult workspace</div>
+      </div>
+      <div class="lane-content">
+        <div class="node n-blue" style="white-space:normal; text-align:left; min-width:210px;">
+          Reviews chart &amp; intake
+          <span class="sub">Medical history · Intake form responses · Uploaded lab results (if any) · Activity Timeline</span>
+        </div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-blue" style="white-space:normal; text-align:left; min-width:210px;">
+          Responds to patient &amp; takes clinical action
+          <span class="sub">Posts provider message · E-prescribes via DoseSpot · Orders labs · Documents chart template</span>
+        </div>
+        <div class="arrow"><svg viewBox="0 0 20 16"><path d="M2 8h14M12 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="node n-blue" style="white-space:normal; text-align:left; min-width:210px;">
+          Exits chart — selects status
+          <span class="sub">Completed · Pending Patient Reply · Pending Labs · Refer to Clinical Team · Refer to CS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ LANE 8: OUTCOME ══ -->
+    <div class="lane" style="border-bottom:none;">
+      <div class="lane-label">
+        <div class="lane-dot" style="background:#15803D"></div>
+        <div class="lane-name">Outcome</div>
+        <div class="lane-sub">Resolution paths</div>
+      </div>
+      <div class="lane-content" style="align-items:stretch;">
+        <div class="outcome-row">
+
+          <div class="outcome-block ob-green">
+            <div class="out-title">Consult Completed</div>
+            <div class="out-sub">Provider selects "Completed" on exit · Billing record generated automatically · Patient portal notified of completion · Chart closed · Audit log entry created · Activity Timeline updated</div>
+          </div>
+
+          <div class="outcome-block" style="background:var(--blue-lt); border-color:#93C5FD; color:var(--blue);">
+            <div class="out-title">Consult Continues</div>
+            <div class="out-sub">Provider selects Pending Reply / Pending Labs / Refer Clinical Team · Chart remains open · SLA continues · Patient notified of status · Clinical team or system monitors for next trigger</div>
+          </div>
+
+          <div class="outcome-block" style="background:var(--purp-lt); border-color:#C4B5FD; color:var(--purple);">
+            <div class="out-title">Referred to Clinical Team</div>
+            <div class="out-sub">RN / MA / Care Team queue notified · Team member reviews and acts per role rights · Can escalate back to provider if needed · Chart remains open</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#1A5FA8"></div>Provider queue — MD · DO · NP</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0B7A75"></div>System / queue management</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#15803D"></div>Auto-action — triggered by ownership event</div>
+    <div class="legend-item"><div class="legend-dash" style="color:#FCD34D;"></div>Conditional — product-configured only</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#92400E"></div>Lab upload gate — timeframe is configurable per product</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#B91C1C"></div>Adverse effect — see UC3 for full escalation flow</div>
+  </div>
+
+</div>
+</body>
+</html>

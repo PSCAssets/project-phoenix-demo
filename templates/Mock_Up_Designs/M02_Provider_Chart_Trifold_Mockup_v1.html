@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M02 — Provider Chart Workspace (Trifold) v1</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --color-background-primary:   #FFFFFF;
+  --color-background-secondary: #F5F7F9;
+  --color-background-tertiary:  #EBEEF2;
+  --color-text-primary:   #0D1B2A;
+  --color-text-secondary: #5A6A7A;
+  --color-border-tertiary:  #D9DEE5;
+  --color-border-secondary: #B8C0CC;
+  --border-radius-lg: 8px;
+  --border-radius-md: 6px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #E8EDF2; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 16px; font-family: var(--font-sans); }
+
+/* ─── PORTAL SHELL ───────────────────────────────────────────────────── */
+.portal {
+  display: flex; flex-direction: column;
+  width: 1280px; height: 880px;
+  font-family: var(--font-sans); font-size: 13px;
+  color: var(--color-text-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--color-background-tertiary);
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14);
+}
+
+/* ─── HEADER ─────────────────────────────────────────────────────────── */
+.sf-header { background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+
+.sf-header-top { background: #0C2340; padding: 0 18px; display: flex; align-items: center; height: 34px; justify-content: space-between; }
+.sf-breadcrumb { font-size: 11px; color: #8AB4CC; display: flex; align-items: center; gap: 6px; }
+.sf-breadcrumb span { color: #C8DDE8; }
+.sf-provider-pill { font-size: 11px; color: #8AB4CC; display: flex; align-items: center; gap: 6px; }
+.sf-provider-pill strong { color: #C8DDE8; }
+
+.sf-record-bar { padding: 10px 18px; display: flex; align-items: center; gap: 14px; }
+.sf-avatar { width: 52px; height: 52px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid var(--color-border-tertiary); background: #C8DDF5; }
+.sf-avatar svg { width: 100%; height: 100%; }
+.sf-identity { flex: 1; min-width: 0; }
+.sf-program { font-size: 14px; font-weight: 500; color: #0070D2; margin-bottom: 1px; }
+.sf-record-type { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.sf-name { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.sf-meta-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 3px; }
+.sf-meta-item { display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--color-text-secondary); }
+.sf-meta-item strong { color: var(--color-text-primary); font-weight: 500; }
+.sf-meta-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); margin-right: 2px; }
+.sf-meta-divider { width: 1px; height: 11px; background: var(--color-border-tertiary); }
+
+.sf-stats { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.stat-chip { display: flex; flex-direction: column; padding: 5px 10px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); min-width: 80px; }
+.stat-chip-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); margin-bottom: 1px; }
+.stat-chip-val { font-size: 12px; font-weight: 500; }
+.stat-chip-val.blue   { color: #0070D2; }
+.stat-chip-val.green  { color: #0F6E56; }
+.stat-chip-val.amber  { color: #A05C00; }
+.stat-chip-val.orange { color: #C84B00; }
+.stat-chip-val.red    { color: #A32D2D; }
+.stat-chip.sla-warn { border-color: #FAC775; background: #FAEEDA; }
+.stat-chip.sla-warn .stat-chip-lbl { color: #A05C00; }
+
+.sf-action-row { display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
+.sf-btn { font-size: 11px; padding: 5px 10px; border-radius: 4px; border: 1px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; display: flex; align-items: center; gap: 4px; white-space: nowrap; font-weight: 500; transition: opacity 0.1s; }
+.sf-btn:hover { opacity: 0.85; }
+.sf-btn-primary { background: #0070D2; color: #fff; border-color: #0070D2; }
+.sf-btn-danger  { background: #FCEBEB; color: #A32D2D; border-color: #F09595; }
+.sf-btn-warn    { background: #FAEEDA; color: #633806; border-color: #FAC775; }
+.sf-btn-purple  { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+.sf-btn-teal    { background: #E1F5EE; color: #085041; border-color: #99D6D3; }
+
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.b-amber  { background: #FAEEDA; color: #633806; }
+.b-coral  { background: #FAECE7; color: #712B13; }
+.b-teal   { background: #E1F5EE; color: #085041; }
+.b-blue   { background: #E6F1FB; color: #0C447C; }
+.b-green  { background: #E4F5EC; color: #0A4F2D; }
+.b-orange { background: #FFF0E5; color: #8B3A00; border: 1px solid #FFBC80; }
+.b-red    { background: #FCEBEB; color: #A32D2D; border: 1px solid #F09595; animation: pulse-red 1.8s ease-in-out infinite; }
+@keyframes pulse-red { 0%,100%{opacity:1;} 50%{opacity:0.65;} }
+
+/* ─── CONCURRENT VIEWER BANNER ───────────────────────────────────────── */
+.concurrent-banner {
+  background: #EEF4FF; border-bottom: 0.5px solid #93C5FD; padding: 5px 18px;
+  display: flex; align-items: center; gap: 8px; font-size: 11px; color: #1D4ED8;
+}
+.concurrent-dot { width: 7px; height: 7px; border-radius: 50%; background: #3B82F6; animation: blink 2s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+/* ─── MAIN BODY ──────────────────────────────────────────────────────── */
+.main-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ─── LEFT PANEL: MEDICAL CHART ──────────────────────────────────────── */
+.left-col {
+  width: 230px; min-width: 230px;
+  background: var(--color-background-primary);
+  border-right: 0.5px solid var(--color-border-tertiary);
+  overflow-y: auto; display: flex; flex-direction: column;
+  transition: width 0.2s, min-width 0.2s;
+}
+.left-col.collapsed { width: 36px; min-width: 36px; overflow: hidden; }
+
+.collapse-btn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 10px;
+  cursor: pointer; border-bottom: 0.5px solid var(--color-border-tertiary);
+  color: var(--color-text-secondary); background: var(--color-background-secondary);
+  font-size: 14px; flex-shrink: 0;
+}
+.collapse-lbl { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; }
+
+.left-content { flex: 1; overflow-y: auto; overflow-x: hidden; }
+.accordion-section { border-bottom: 0.5px solid var(--color-border-tertiary); }
+.accordion-hdr { display: flex; align-items: center; justify-content: space-between; padding: 7px 12px; cursor: pointer; background: var(--color-background-secondary); user-select: none; }
+.accordion-hdr:hover { background: var(--color-background-tertiary); }
+.accordion-title { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-secondary); display: flex; align-items: center; gap: 5px; }
+.accordion-icon { font-size: 12px; color: var(--color-text-secondary); transition: transform 0.2s; }
+.accordion-icon.open { transform: rotate(180deg); }
+.accordion-body { display: none; }
+.accordion-body.open { display: block; }
+
+.l-item { padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.l-item:last-child { border-bottom: none; }
+.l-lbl { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 1px; }
+.l-val { font-size: 11px; color: var(--color-text-primary); }
+.l-val-warn { font-size: 11px; color: #A32D2D; font-weight: 500; }
+.l-val-ok { font-size: 11px; color: #0F6E56; }
+
+.med-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.med-row:last-child { border-bottom: none; }
+.med-name { font-size: 11px; font-weight: 500; }
+.med-dose { font-size: 10px; color: var(--color-text-secondary); }
+.pmh-wrap { padding: 6px 12px; }
+.pmh-tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 99px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); margin: 2px; color: var(--color-text-secondary); }
+
+/* ─── CENTER PANEL: VIDEO SESSION ────────────────────────────────────── */
+.center-col {
+  flex: 1; display: flex; flex-direction: column;
+  background: #111827;
+  border-right: 0.5px solid var(--color-border-tertiary);
+  overflow: hidden; position: relative;
+}
+
+/* SLA Banner inside video */
+.sla-banner {
+  background: rgba(255, 176, 100, 0.92); color: #5C2E00;
+  padding: 5px 14px; display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 500; flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,140,0,0.4);
+}
+.sla-clock { font-family: var(--font-mono); font-weight: 700; font-size: 13px; color: #5C2E00; }
+
+/* Video main area */
+.video-main { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+/* Patient video (main) */
+.video-patient {
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, #1E293B 0%, #0F172A 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.video-avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.video-avatar { width: 80px; height: 80px; border-radius: 50%; background: #C8DDF5; overflow: hidden; border: 3px solid rgba(255,255,255,0.2); }
+.video-avatar svg { width: 100%; height: 100%; }
+.video-name-tag { font-size: 12px; color: rgba(255,255,255,0.8); background: rgba(0,0,0,0.5); padding: 3px 10px; border-radius: 99px; }
+.video-status { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 3px; }
+
+/* Connection quality */
+.video-quality {
+  position: absolute; top: 10px; left: 12px;
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(0,0,0,0.5); border-radius: 99px; padding: 3px 9px;
+  font-size: 10px; color: rgba(255,255,255,0.8);
+}
+.quality-bars { display: flex; align-items: flex-end; gap: 2px; }
+.qb { width: 3px; border-radius: 1px; background: #22C55E; }
+
+/* Timer */
+.video-timer {
+  position: absolute; top: 10px; right: 12px;
+  background: rgba(0,0,0,0.5); border-radius: 99px; padding: 3px 10px;
+  font-size: 11px; font-family: var(--font-mono); color: rgba(255,255,255,0.8);
+  display: flex; align-items: center; gap: 5px;
+}
+.rec-dot { width: 7px; height: 7px; border-radius: 50%; background: #EF4444; animation: pulse-rec 1.2s ease-in-out infinite; }
+@keyframes pulse-rec { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+/* PiP: provider self-view */
+.video-pip {
+  position: absolute; bottom: 72px; right: 10px;
+  width: 120px; height: 80px;
+  background: #1E3A5F;
+  border-radius: 8px; border: 2px solid rgba(255,255,255,0.2);
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.pip-avatar { font-size: 28px; color: rgba(255,255,255,0.4); }
+.pip-label { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font-size: 9px; color: rgba(255,255,255,0.6); }
+
+/* Video controls bar */
+.video-controls {
+  background: rgba(15,23,42,0.95);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 10px 16px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  flex-shrink: 0;
+}
+.vc-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: rgba(255,255,255,0.1); border: none;
+  color: rgba(255,255,255,0.85); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; transition: background 0.15s;
+}
+.vc-btn:hover { background: rgba(255,255,255,0.2); }
+.vc-btn.active { background: rgba(255,255,255,0.2); }
+.vc-btn.muted { background: rgba(239,68,68,0.25); color: #FCA5A5; }
+.vc-btn.end-call { background: #DC2626; color: #fff; width: 50px; height: 50px; font-size: 20px; }
+.vc-btn.end-call:hover { background: #B91C1C; }
+.vc-label { font-size: 9px; color: rgba(255,255,255,0.45); margin-top: 2px; text-align: center; }
+.vc-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.vc-sep { width: 1px; height: 28px; background: rgba(255,255,255,0.1); margin: 0 4px; }
+
+/* Patient waiting indicator */
+.waiting-toast {
+  position: absolute; top: 46px; left: 50%; transform: translateX(-50%);
+  background: #0F6E56; color: #fff; border-radius: 99px;
+  padding: 6px 16px; font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3); white-space: nowrap;
+  animation: slideDown 0.3s ease;
+}
+@keyframes slideDown { from{opacity:0;transform:translateX(-50%) translateY(-8px);} to{opacity:1;transform:translateX(-50%) translateY(0);} }
+
+/* ─── RIGHT PANEL: CLINICAL DOCUMENTATION ───────────────────────────── */
+.right-col {
+  width: 360px; min-width: 360px;
+  background: var(--color-background-primary);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+
+/* Panel tabs */
+.doc-tabs {
+  display: flex; border-bottom: 0.5px solid var(--color-border-tertiary);
+  background: var(--color-background-secondary); flex-shrink: 0;
+}
+.doc-tab {
+  flex: 1; padding: 8px 6px; font-size: 11px; font-weight: 500;
+  color: var(--color-text-secondary); text-align: center; cursor: pointer;
+  border-bottom: 2px solid transparent; display: flex; align-items: center; justify-content: center; gap: 4px;
+  transition: all 0.15s;
+}
+.doc-tab.active { color: #0070D2; border-bottom-color: #0070D2; background: var(--color-background-primary); }
+.doc-tab:hover:not(.active) { background: var(--color-background-tertiary); }
+
+/* AI Context summary */
+.ai-context-bar {
+  background: #F0F4FF; border-bottom: 0.5px solid #C7D7F7;
+  padding: 8px 12px; flex-shrink: 0;
+}
+.ai-context-hdr {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 0;
+}
+.ai-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: #3C5FCC; display: flex; align-items: center; gap: 5px; }
+.ai-toggle-row { display: flex; align-items: center; gap: 8px; }
+.ai-toggle-lbl { font-size: 10px; color: #3C5FCC; }
+.toggle-switch { position: relative; width: 28px; height: 16px; cursor: pointer; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: #3B82F6; border-radius: 99px; transition: background 0.2s; }
+.toggle-thumb { position: absolute; top: 2px; left: 14px; width: 12px; height: 12px; background: #fff; border-radius: 50%; transition: left 0.2s; }
+.ai-summary-text { font-size: 11px; color: #1D3A8A; line-height: 1.5; margin-top: 5px; display: none; }
+.ai-summary-text.open { display: block; }
+.ai-expand { font-size: 10px; color: #3C5FCC; cursor: pointer; margin-top: 2px; display: inline-flex; align-items: center; gap: 3px; }
+
+/* Auto-save indicator */
+.autosave-bar {
+  background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary);
+  padding: 4px 12px; display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.autosave-lbl { font-size: 10px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 5px; }
+.save-dot { width: 6px; height: 6px; border-radius: 50%; background: #22C55E; }
+
+/* Template content */
+.doc-content { flex: 1; overflow-y: auto; padding: 0; }
+
+.template-section { border-bottom: 0.5px solid var(--color-border-tertiary); }
+.template-hdr { padding: 7px 12px; background: var(--color-background-secondary); font-size: 11px; font-weight: 600; color: var(--color-text-primary); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.template-hdr:hover { background: var(--color-background-tertiary); }
+.required-pill { font-size: 9px; background: #FAEEDA; color: #A05C00; padding: 1px 6px; border-radius: 99px; font-weight: 500; }
+.template-body { padding: 10px 12px; display: block; }
+.template-body.hidden { display: none; }
+
+/* AI draft block */
+.ai-draft-block {
+  background: #F0F4FF; border: 1px solid #C7D7F7; border-radius: 6px;
+  padding: 8px 10px; margin-bottom: 8px;
+}
+.ai-draft-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.ai-draft-lbl { font-size: 10px; font-weight: 600; color: #3C5FCC; text-transform: uppercase; letter-spacing: 0.06em; display: flex; align-items: center; gap: 4px; }
+.ai-draft-actions { display: flex; gap: 5px; }
+.ai-btn { font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid; cursor: pointer; font-weight: 500; }
+.ai-btn-accept { background: #E4F5EC; color: #0A4F2D; border-color: #86EFAC; }
+.ai-btn-reject { background: #FEF2F2; color: #7F1D1D; border-color: #FCA5A5; }
+.ai-draft-text { font-size: 11px; color: #1D3A8A; line-height: 1.55; }
+
+/* Form field */
+.field-group { margin-bottom: 10px; }
+.field-lbl { font-size: 10px; color: var(--color-text-secondary); margin-bottom: 3px; display: flex; align-items: center; gap: 5px; }
+.req-star { color: #DC2626; font-weight: 700; }
+.field-ta {
+  width: 100%; font-size: 11px; padding: 6px 8px; border-radius: 4px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary); resize: vertical; min-height: 56px;
+  font-family: var(--font-sans); line-height: 1.5;
+}
+.field-ta.required-empty { border-color: #F09595; background: #FFF9F9; }
+.field-ta:focus { outline: none; border-color: #0070D2; background: var(--color-background-primary); }
+.field-input {
+  width: 100%; font-size: 11px; padding: 5px 8px; border-radius: 4px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary); font-family: var(--font-sans);
+}
+.field-input:focus { outline: none; border-color: #0070D2; }
+
+/* ICD-10 chips */
+.icd-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.icd-chip { font-size: 10px; padding: 3px 8px; border-radius: 4px; background: #E4F5EC; border: 0.5px solid #86EFAC; color: #0A4F2D; display: flex; align-items: center; gap: 4px; }
+.icd-chip.ai-suggested { background: #F0F4FF; border-color: #93C5FD; color: #1D4ED8; }
+.icd-chip-x { cursor: pointer; color: inherit; opacity: 0.6; font-size: 11px; }
+.icd-chip-x:hover { opacity: 1; }
+
+/* DoseSpot panel */
+.dosespot-panel { display: none; flex: 1; flex-direction: column; }
+.dosespot-panel.active { display: flex; }
+.ds-header { padding: 12px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.ds-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.ds-iframe-placeholder {
+  flex: 1; background: #F8FAFB; display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 10px; padding: 20px; text-align: center;
+}
+.ds-iframe-placeholder i { font-size: 40px; color: #93C5FD; }
+.ds-iframe-placeholder p { font-size: 12px; color: var(--color-text-secondary); max-width: 220px; line-height: 1.5; }
+
+/* Orders panel */
+.orders-panel { display: none; flex-direction: column; }
+.orders-panel.active { display: flex; }
+.order-item { padding: 10px 12px; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: flex-start; gap: 9px; }
+.order-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+.order-icon.lab { background: #FFF0E5; color: #C84B00; }
+.order-icon.rx  { background: #E4F5EC; color: #0A4F2D; }
+.order-info { flex: 1; }
+.order-name { font-size: 11px; font-weight: 500; }
+.order-detail { font-size: 10px; color: var(--color-text-secondary); margin-top: 1px; }
+.order-status { font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 500; }
+
+/* Sign & close footer */
+.doc-footer {
+  border-top: 0.5px solid var(--color-border-tertiary);
+  padding: 10px 12px; background: var(--color-background-primary);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.footer-hint { font-size: 10px; color: var(--color-text-secondary); display: flex; align-items: center; gap: 5px; }
+.required-count { color: #DC2626; font-weight: 600; }
+
+/* ─── ESCALATE CONFIRM MODAL ─────────────────────────────────────────── */
+.modal-wrap { display:none; position:absolute; inset:0; background:rgba(0,0,0,0.45); z-index:30; align-items:center; justify-content:center; }
+.modal-wrap.open { display:flex; }
+.modal { background:var(--color-background-primary); border-radius:var(--border-radius-lg); border:0.5px solid var(--color-border-tertiary); padding:20px; width:420px; max-width:92%; box-shadow: 0 12px 40px rgba(0,0,0,0.2); }
+.modal-title { font-size:14px; font-weight:600; margin-bottom:4px; display:flex; align-items:center; justify-content:space-between; }
+.modal-subtitle { font-size:11px; color:var(--color-text-secondary); margin-bottom:14px; }
+.modal-close { cursor:pointer; font-size:17px; color:var(--color-text-secondary); background:none; border:none; }
+.modal-field { margin-bottom:11px; }
+.modal-lbl { font-size:11px; color:var(--color-text-secondary); margin-bottom:3px; }
+.modal-select { width:100%; font-size:12px; padding:6px 9px; border-radius:4px; border:0.5px solid var(--color-border-secondary); background:var(--color-background-secondary); color:var(--color-text-primary); }
+.modal-ta { width:100%; font-size:12px; padding:7px 9px; border-radius:4px; border:0.5px solid var(--color-border-secondary); background:var(--color-background-secondary); color:var(--color-text-primary); resize:none; height:80px; font-family:var(--font-sans); line-height:1.5; }
+.modal-footer { display:flex; justify-content:flex-end; gap:7px; margin-top:14px; padding-top:12px; border-top:0.5px solid var(--color-border-tertiary); }
+
+/* ─── SIGN & CLOSE CONFIRMATION MODAL ───────────────────────────────── */
+.sign-checklist { margin: 12px 0; display: flex; flex-direction: column; gap: 7px; }
+.check-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.check-icon { font-size: 14px; }
+.check-icon.pass { color: #16A34A; }
+.check-icon.warn { color: #EF4444; }
+
+/* ─── SCROLL STYLES ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<div class="portal" id="portal">
+
+  <!-- ── HEADER ───────────────────────────────────────────── -->
+  <div class="sf-header">
+    <div class="sf-header-top">
+      <div class="sf-breadcrumb">
+        <i class="ti ti-home"></i>
+        <i class="ti ti-chevron-right"></i>
+        <span>Queue</span>
+        <i class="ti ti-chevron-right"></i>
+        <span>Video Consults</span>
+        <i class="ti ti-chevron-right"></i>
+        <span>Sarah Martinez</span>
+      </div>
+      <div class="sf-provider-pill">
+        <i class="ti ti-stethoscope"></i>
+        <strong>Dr. J. Reyes, MD</strong>
+        <span style="color:#556B7D;">· Weight Loss Program</span>
+      </div>
+    </div>
+
+    <div class="sf-record-bar">
+      <!-- Patient avatar -->
+      <div class="sf-avatar">
+        <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+          <rect width="56" height="56" fill="#C8DDF5"/>
+          <ellipse cx="28" cy="22" rx="12" ry="13" fill="#AECBEE"/>
+          <ellipse cx="22.5" cy="19.5" rx="2.3" ry="2.8" fill="#fff"/>
+          <ellipse cx="33.5" cy="19.5" rx="2.3" ry="2.8" fill="#fff"/>
+          <circle cx="22.5" cy="20" r="1.4" fill="#2563EB"/>
+          <circle cx="33.5" cy="20" r="1.4" fill="#2563EB"/>
+          <path d="M24 27 Q28 31 32 27" stroke="#2563EB" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <ellipse cx="28" cy="44" rx="14" ry="10" fill="#5B9BD5"/>
+        </svg>
+      </div>
+
+      <!-- Identity -->
+      <div class="sf-identity">
+        <div class="sf-program">Weight Loss / GLP-1</div>
+        <div class="sf-record-type">Video consult · Follow-up #2 · <span style="color:#0070D2;">CST-2026-10841</span></div>
+        <div class="sf-name">Sarah Martinez</div>
+        <div class="sf-meta-inline">
+          <div class="sf-meta-item"><span class="sf-meta-lbl">Age</span><strong>34</strong></div>
+          <div class="sf-meta-divider"></div>
+          <div class="sf-meta-item"><span class="sf-meta-lbl">DOB</span><strong>03/17/1992</strong></div>
+          <div class="sf-meta-divider"></div>
+          <div class="sf-meta-item"><span class="sf-meta-lbl">Location</span><strong>Dallas, TX</strong></div>
+          <div class="sf-meta-divider"></div>
+          <div class="sf-meta-item"><span class="sf-meta-lbl">MRN</span><strong>ATH-884421</strong></div>
+          <div class="sf-meta-divider"></div>
+          <span class="badge b-teal">Subscription · Active</span>
+          <span class="badge b-orange" id="slaBadge"><i class="ti ti-clock"></i> SLA warning</span>
+        </div>
+      </div>
+
+      <!-- Stat chips -->
+      <div class="sf-stats">
+        <div class="stat-chip"><div class="stat-chip-lbl">Status</div><div class="stat-chip-val blue">In progress</div></div>
+        <div class="stat-chip sla-warn" title="SLA timer — warning state">
+          <div class="stat-chip-lbl">SLA remaining</div>
+          <div class="stat-chip-val orange" id="slaTimer">14:22</div>
+        </div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Session</div><div class="stat-chip-val green">Connected</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Rx on file</div><div class="stat-chip-val green">1 active</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Labs</div><div class="stat-chip-val amber">Pending review</div></div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sf-action-row">
+        <button class="sf-btn" title="View full intake form"><i class="ti ti-file-invoice"></i> Intake</button>
+        <button class="sf-btn sf-btn-purple" onclick="openModal('reassignModal')"><i class="ti ti-user-plus"></i> Reassign</button>
+        <button class="sf-btn sf-btn-warn" onclick="openModal('escalateModal')"><i class="ti ti-flag"></i> Escalate</button>
+        <button class="sf-btn sf-btn-danger" onclick="openModal('signModal')"><i class="ti ti-writing-sign"></i> Sign &amp; close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concurrent viewer banner -->
+  <div class="concurrent-banner">
+    <div class="concurrent-dot"></div>
+    <i class="ti ti-user" style="font-size:12px;"></i>
+    <span><strong>RN J. Patel</strong> is viewing this chart in read-only mode</span>
+    <span style="margin-left:auto; font-size:10px; color:#3B82F6;">Section locks active · Audit logged</span>
+  </div>
+
+  <!-- ── MAIN BODY ─────────────────────────────────────────── -->
+  <div class="main-body">
+
+    <!-- LEFT: MEDICAL CHART ─────────────────────────────── -->
+    <div class="left-col" id="leftCol">
+      <div class="collapse-btn" onclick="toggleChart()">
+        <i class="ti ti-layout-sidebar-left-collapse" id="collapseIcon" style="font-size:15px;"></i>
+        <span class="collapse-lbl" id="collapseLbl">Medical chart</span>
+      </div>
+      <div class="left-content" id="leftContent">
+
+        <!-- Medications -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-pill"></i>Medications</span>
+            <i class="ti ti-chevron-down accordion-icon open"></i>
+          </div>
+          <div class="accordion-body open">
+            <div class="med-row">
+              <div><div class="med-name">Semaglutide</div><div class="med-dose">0.5mg · Weekly</div></div>
+              <span class="badge b-teal" style="font-size:9px;">Active</span>
+            </div>
+            <div class="med-row">
+              <div><div class="med-name">Metformin</div><div class="med-dose">500mg · BID</div></div>
+              <span class="badge b-teal" style="font-size:9px;">Active</span>
+            </div>
+            <div class="med-row">
+              <div><div class="med-name">Lisinopril</div><div class="med-dose">10mg · Daily</div></div>
+              <span class="badge b-teal" style="font-size:9px;">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Allergies -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-alert-triangle"></i>Allergies</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-val-warn">Penicillin — hives</div></div>
+            <div class="l-item"><div class="l-val" style="color:var(--color-text-secondary);font-size:10px;font-style:italic;">No other known allergies</div></div>
+          </div>
+        </div>
+
+        <!-- Past Medical History -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-clipboard-list"></i>Past medical hx</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="pmh-wrap">
+              <span class="pmh-tag">Type 2 Diabetes</span>
+              <span class="pmh-tag">Hypertension</span>
+              <span class="pmh-tag">Obesity class I</span>
+              <span class="pmh-tag">GERD</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Past Surgical History -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-scissors"></i>Past surgical hx</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-val">Appendectomy (2018)</div></div>
+          </div>
+        </div>
+
+        <!-- Family History -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-users"></i>Family history</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Father</div><div class="l-val">T2DM, CAD</div></div>
+            <div class="l-item"><div class="l-lbl">Mother</div><div class="l-val">Hypertension</div></div>
+          </div>
+        </div>
+
+        <!-- Social History -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-heart"></i>Social history</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Tobacco</div><div class="l-val">Never</div></div>
+            <div class="l-item"><div class="l-lbl">Alcohol</div><div class="l-val">Occasional (social)</div></div>
+            <div class="l-item"><div class="l-lbl">Occupation</div><div class="l-val">Software engineer</div></div>
+          </div>
+        </div>
+
+        <!-- ROS -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-checklist"></i>Review of systems</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">GI</div><div class="l-val-warn">Mild nausea (GLP-1 related)</div></div>
+            <div class="l-item"><div class="l-lbl">CV / Resp / Neuro</div><div class="l-val l-val-ok">No concerns reported</div></div>
+          </div>
+        </div>
+
+        <!-- Vitals -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-activity"></i>Vitals</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Blood pressure</div><div class="l-val">126/80 mmHg</div></div>
+            <div class="l-item"><div class="l-lbl">Weight</div><div class="l-val l-val-ok">↓ 6.2 lbs since last visit</div></div>
+            <div class="l-item"><div class="l-lbl">BMI</div><div class="l-val">30.1 · Obese class I</div></div>
+            <div class="l-item"><div class="l-lbl">Heart rate</div><div class="l-val">72 bpm</div></div>
+          </div>
+        </div>
+
+        <!-- Lab Results -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-flask"></i>Lab results</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">A1C (05/10/2026)</div><div class="l-val l-val-ok">7.1% · Improving</div></div>
+            <div class="l-item"><div class="l-lbl">LDL / HDL</div><div class="l-val">138 / 51 mg/dL</div></div>
+            <div class="l-item"><div class="l-lbl">Fasting glucose</div><div class="l-val-warn">134 mg/dL · ↑ High</div></div>
+            <div class="l-item" style="background:#FFF9F9;"><div class="l-lbl" style="color:#A32D2D;">⚠ Lab req/alert pending</div><div class="l-val" style="font-size:10px; color:#A32D2D;">CBC ordered 05/20 — results pending provider review</div></div>
+          </div>
+        </div>
+
+        <!-- Insurance & Program -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-building-hospital"></i>Insurance &amp; program</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Insurance</div><div class="l-val">Aetna PPO</div></div>
+            <div class="l-item"><div class="l-lbl">Pharmacy</div><div class="l-val">Walgreens #2210 · Dallas TX</div></div>
+            <div class="l-item"><div class="l-lbl">Program</div><div class="l-val">Weight Loss / GLP-1 · Month 3</div></div>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span class="accordion-title"><i class="ti ti-info-circle"></i>Additional info</span>
+            <i class="ti ti-chevron-down accordion-icon"></i>
+          </div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Preferred language</div><div class="l-val">English</div></div>
+            <div class="l-item"><div class="l-lbl">Time zone</div><div class="l-val">CT (America/Chicago)</div></div>
+          </div>
+        </div>
+
+      </div><!-- /left-content -->
+    </div><!-- /left-col -->
+
+    <!-- CENTER: VIDEO SESSION ──────────────────────────── -->
+    <div class="center-col">
+      <!-- SLA warning strip -->
+      <div class="sla-banner">
+        <i class="ti ti-clock-hour-4" style="font-size:13px;"></i>
+        <span>SLA warning — </span>
+        <span class="sla-clock" id="slaBannerTimer">14:22</span>
+        <span> remaining · Consult must be closed or escalated before breach</span>
+        <button class="sf-btn sf-btn-warn" style="margin-left:auto;font-size:10px;padding:3px 8px;" onclick="openModal('escalateModal')"><i class="ti ti-flag"></i> Escalate now</button>
+      </div>
+
+      <!-- Video main feed -->
+      <div class="video-main">
+        <div class="video-patient">
+          <!-- Connection quality -->
+          <div class="video-quality">
+            <div class="quality-bars">
+              <div class="qb" style="height:4px;"></div>
+              <div class="qb" style="height:7px;"></div>
+              <div class="qb" style="height:11px;"></div>
+              <div class="qb" style="height:14px;"></div>
+            </div>
+            <span style="font-size:10px;">Good</span>
+          </div>
+
+          <!-- Session timer -->
+          <div class="video-timer">
+            <div class="rec-dot"></div>
+            <span id="sessionTimer">00:12:38</span>
+          </div>
+
+          <!-- Patient video placeholder -->
+          <div class="video-avatar-wrap">
+            <div class="video-avatar">
+              <svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+                <rect width="80" height="80" fill="#1E3A5F"/>
+                <ellipse cx="40" cy="30" rx="16" ry="18" fill="#4A8EC2"/>
+                <ellipse cx="40" cy="62" rx="20" ry="14" fill="#5B9BD5"/>
+              </svg>
+            </div>
+            <div class="video-name-tag">Sarah Martinez</div>
+            <div class="video-status">Video · Audio on</div>
+          </div>
+
+          <!-- PiP: provider self view -->
+          <div class="video-pip">
+            <div class="pip-avatar"><i class="ti ti-user"></i></div>
+            <div class="pip-label">You (Dr. J. Reyes)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls bar -->
+      <div class="video-controls">
+        <div class="vc-item">
+          <button class="vc-btn muted" id="muteBtn" onclick="toggleMute()" title="Mute microphone"><i class="ti ti-microphone-off"></i></button>
+          <div class="vc-label">Muted</div>
+        </div>
+        <div class="vc-item">
+          <button class="vc-btn active" id="camBtn" onclick="toggleCam()" title="Toggle camera"><i class="ti ti-video"></i></button>
+          <div class="vc-label">Camera on</div>
+        </div>
+        <div class="vc-sep"></div>
+        <div class="vc-item">
+          <button class="vc-btn" title="Share screen"><i class="ti ti-screen-share"></i></button>
+          <div class="vc-label">Screen</div>
+        </div>
+        <div class="vc-item">
+          <button class="vc-btn" title="Participants"><i class="ti ti-users"></i></button>
+          <div class="vc-label">Participants</div>
+        </div>
+        <div class="vc-item">
+          <button class="vc-btn" title="Chat"><i class="ti ti-message"></i></button>
+          <div class="vc-label">Chat</div>
+        </div>
+        <div class="vc-sep"></div>
+        <div class="vc-item">
+          <button class="vc-btn" title="More options"><i class="ti ti-dots"></i></button>
+          <div class="vc-label">More</div>
+        </div>
+        <div class="vc-sep"></div>
+        <div class="vc-item">
+          <button class="vc-btn end-call" onclick="openModal('signModal')" title="End call and close chart"><i class="ti ti-phone-off"></i></button>
+          <div class="vc-label" style="color:#FCA5A5;">End &amp; close</div>
+        </div>
+      </div>
+    </div><!-- /center-col -->
+
+    <!-- RIGHT: CLINICAL DOCUMENTATION ─────────────────── -->
+    <div class="right-col">
+
+      <!-- Panel tabs: Template | DoseSpot | Orders -->
+      <div class="doc-tabs">
+        <div class="doc-tab active" onclick="switchTab('template', this)"><i class="ti ti-notes" style="font-size:12px;"></i> Template</div>
+        <div class="doc-tab" onclick="switchTab('dosespot', this)"><i class="ti ti-pill" style="font-size:12px;"></i> DoseSpot</div>
+        <div class="doc-tab" onclick="switchTab('orders', this)"><i class="ti ti-clipboard-list" style="font-size:12px;"></i> Orders <span style="background:#E4F5EC;color:#0A4F2D;font-size:9px;padding:1px 5px;border-radius:99px;margin-left:2px;">2</span></div>
+      </div>
+
+      <!-- TEMPLATE TAB -->
+      <div id="templatePanel">
+        <!-- AI context bar -->
+        <div class="ai-context-bar">
+          <div class="ai-context-hdr">
+            <span class="ai-label"><i class="ti ti-brain" style="font-size:11px;"></i> AI Context Summary</span>
+            <div class="ai-toggle-row">
+              <span class="ai-toggle-lbl">AI assist</span>
+              <label class="toggle-switch">
+                <input type="checkbox" checked onchange="toggleAI(this)">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+          <span class="ai-expand" onclick="toggleAISummary(this)"><i class="ti ti-chevron-down" id="aiChevron"></i> Show summary</span>
+          <div class="ai-summary-text" id="aiSummaryText">
+            Sarah is a 34-year-old female on Month 3 of the GLP-1 Weight Loss program. She has lost 6.2 lbs since her last visit. Current A1C is 7.1% (improving from 7.6%). Reports mild nausea consistent with semaglutide — no vomiting. Fasting glucose remains elevated at 134 mg/dL. CBC pending. Today's visit: follow-up on weight progress, tolerability of 0.5mg dose, and consideration of dose titration to 1mg.
+          </div>
+        </div>
+
+        <!-- Auto-save -->
+        <div class="autosave-bar">
+          <span class="autosave-lbl"><div class="save-dot"></div> Saved just now</span>
+          <span style="font-size:10px;color:var(--color-text-secondary);">Auto-save every 30s</span>
+        </div>
+
+        <!-- Template sections -->
+        <div class="doc-content" id="docContent">
+
+          <!-- Chief Complaint -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              Chief Complaint
+              <span class="required-pill">Required</span>
+            </div>
+            <div class="template-body">
+              <div class="field-group">
+                <div class="field-lbl">Patient-reported chief complaint <span class="req-star">*</span></div>
+                <textarea class="field-ta" placeholder="Enter chief complaint...">Follow-up for weight management. Reports mild nausea with current semaglutide dose. Weight down 6.2 lbs since last visit.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- HPI -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              History of Present Illness
+              <span class="required-pill">Required</span>
+            </div>
+            <div class="template-body">
+              <!-- AI draft -->
+              <div class="ai-draft-block" id="hpiAIDraft">
+                <div class="ai-draft-hdr">
+                  <span class="ai-draft-lbl"><i class="ti ti-sparkles" style="font-size:10px;"></i> AI draft — review before accepting</span>
+                  <div class="ai-draft-actions">
+                    <button class="ai-btn ai-btn-accept" onclick="acceptDraft('hpiDraft', 'hpiAIDraft')">Accept</button>
+                    <button class="ai-btn ai-btn-reject" onclick="rejectDraft('hpiAIDraft')">Dismiss</button>
+                  </div>
+                </div>
+                <div class="ai-draft-text" id="hpiDraftText">
+                  34F presenting for Month 3 follow-up visit in the GLP-1 Weight Loss program. Patient reports consistent adherence to semaglutide 0.5mg weekly injection. She notes mild nausea occurring approximately 1–2 days after each injection, manageable without medication. No vomiting, diarrhea, or abdominal pain. Weight decreased by 6.2 lbs from prior visit. Patient reports improved energy levels and decreased appetite. No dizziness or palpitations. Denies hypoglycemic episodes.
+                </div>
+              </div>
+              <div class="field-group">
+                <div class="field-lbl">HPI <span class="req-star">*</span></div>
+                <textarea class="field-ta" id="hpiDraft" placeholder="Enter HPI or accept AI draft above..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assessment -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              Assessment &amp; Impression
+              <span class="required-pill">Required</span>
+            </div>
+            <div class="template-body">
+              <div class="field-group">
+                <div class="field-lbl">Clinical assessment <span class="req-star">*</span></div>
+                <textarea class="field-ta" placeholder="Enter clinical assessment...">Patient tolerating GLP-1 therapy with expected GI side effects at current dose. Weight trend positive. A1C improving. Fasting glucose still elevated — consider Metformin dose adjustment.</textarea>
+              </div>
+              <!-- ICD-10 -->
+              <div class="field-group">
+                <div class="field-lbl"><i class="ti ti-tag" style="font-size:10px;"></i> ICD-10 codes</div>
+                <div class="icd-chips">
+                  <div class="icd-chip">E11.65 <span class="icd-chip-x" onclick="removeChip(this)">×</span></div>
+                  <div class="icd-chip">E66.09 <span class="icd-chip-x" onclick="removeChip(this)">×</span></div>
+                  <div class="icd-chip ai-suggested" title="AI suggested">✦ Z71.3 <span class="icd-chip-x" onclick="removeChip(this)">×</span></div>
+                  <div class="icd-chip ai-suggested" title="AI suggested">✦ R11.0 <span class="icd-chip-x" onclick="removeChip(this)">×</span></div>
+                </div>
+                <div style="font-size:10px;color:var(--color-text-secondary);margin-top:5px;">✦ = AI suggested · confirm before signing</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plan -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              Plan
+              <span class="required-pill">Required</span>
+            </div>
+            <div class="template-body">
+              <div class="field-group">
+                <div class="field-lbl">Treatment plan <span class="req-star">*</span></div>
+                <textarea class="field-ta" placeholder="Enter treatment plan...">1. Continue semaglutide 0.5mg weekly × 4 weeks. Titrate to 1.0mg at next visit if nausea has resolved.
+2. Increase Metformin to 1000mg BID — address fasting glucose elevation.
+3. Order CBC follow-up once results available from pending requisition.
+4. Lifestyle: continue low-carb diet, 150 min/week moderate exercise.
+5. Follow-up video consult in 4 weeks.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Steps / Follow-up -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              Follow-up &amp; Next Steps
+            </div>
+            <div class="template-body hidden">
+              <div class="field-group">
+                <div class="field-lbl">Follow-up type</div>
+                <select class="field-input" style="font-size:11px;padding:5px 8px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);">
+                  <option>Video consult in 4 weeks</option>
+                  <option>Async consult in 2 weeks</option>
+                  <option>Phone consult — patient preference</option>
+                  <option>No follow-up required</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <div class="field-lbl">Patient instructions (visible to patient)</div>
+                <textarea class="field-ta" style="min-height:48px;" placeholder="Instructions for patient...">Take the updated Metformin dose with food to reduce GI side effects. Continue weekly semaglutide injection. Log nausea episodes in the patient app. Your next scheduled visit is in 4 weeks.</textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Provider signature note -->
+          <div class="template-section">
+            <div class="template-hdr" onclick="toggleSection(this)">
+              Provider Attestation
+              <span class="required-pill">Required</span>
+            </div>
+            <div class="template-body hidden">
+              <div class="field-group">
+                <div class="field-lbl">Attestation <span class="req-star">*</span></div>
+                <textarea class="field-ta" style="min-height:44px;" placeholder="I attest that...">I, Dr. J. Reyes, MD, attest that I personally evaluated this patient and that the documentation above accurately represents the encounter.</textarea>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /doc-content -->
+      </div><!-- /templatePanel -->
+
+      <!-- DOSESPOT TAB -->
+      <div id="dosespotPanel" style="display:none; flex:1; flex-direction:column;">
+        <div class="ds-header">
+          <div class="ds-title"><i class="ti ti-pill" style="color:#0F6E56;"></i> DoseSpot e-Prescribe</div>
+          <div style="font-size:10px;color:var(--color-text-secondary);">
+            Provider: Dr. J. Reyes, MD · DEA: Verified · State: TX Active
+          </div>
+        </div>
+        <div class="ds-iframe-placeholder">
+          <i class="ti ti-pill"></i>
+          <p>DoseSpot e-prescribing loads here as an embedded iframe within the consultation workspace.</p>
+          <p style="font-size:10px;margin-top:6px;color:#B4B2A9;">Access gated: user right ✓ · state license ✓ · DEA ✓</p>
+          <button class="sf-btn sf-btn-primary" style="margin-top:10px;font-size:11px;">
+            <i class="ti ti-external-link"></i> Launch DoseSpot
+          </button>
+        </div>
+      </div>
+
+      <!-- ORDERS TAB -->
+      <div id="ordersPanel" style="display:none; flex-direction:column; flex:1; overflow-y:auto;">
+        <div style="padding:10px 12px; background:var(--color-background-secondary); border-bottom:0.5px solid var(--color-border-tertiary); font-size:10px; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.06em; font-weight:600;">Active orders for this encounter</div>
+
+        <div class="order-item">
+          <div class="order-icon rx"><i class="ti ti-pill"></i></div>
+          <div class="order-info">
+            <div class="order-name">Semaglutide 0.5mg/week</div>
+            <div class="order-detail">Qty: 4 · Refills: 11 · CVS #2210 Dallas TX · DoseSpot</div>
+          </div>
+          <span class="order-status b-teal">Active</span>
+        </div>
+        <div class="order-item">
+          <div class="order-icon lab"><i class="ti ti-flask"></i></div>
+          <div class="order-info">
+            <div class="order-name">Complete Blood Count (CBC)</div>
+            <div class="order-detail">Ordered 05/20/2026 · Quest Diagnostics · Results pending</div>
+          </div>
+          <span class="order-status b-amber">Pending</span>
+        </div>
+        <div style="padding:12px 12px 6px; border-top:0.5px solid var(--color-border-tertiary); margin-top:auto;">
+          <button class="sf-btn" style="width:100%;justify-content:center;"><i class="ti ti-plus"></i> New order</button>
+        </div>
+      </div>
+
+      <!-- FOOTER: SIGN & CLOSE -->
+      <div class="doc-footer" id="docFooter">
+        <span class="footer-hint"><i class="ti ti-alert-circle" style="color:#DC2626;"></i> <span class="required-count" id="reqCount">2</span> required fields empty</span>
+        <div style="display:flex;gap:6px;">
+          <button class="sf-btn" style="font-size:11px;"><i class="ti ti-notes"></i> Add addendum</button>
+          <button class="sf-btn sf-btn-danger" onclick="openModal('signModal')"><i class="ti ti-writing-sign"></i> Sign &amp; close</button>
+        </div>
+      </div>
+
+    </div><!-- /right-col -->
+  </div><!-- /main-body -->
+
+  <!-- ── REASSIGN MODAL ─────────────────────────────── -->
+  <div class="modal-wrap" id="reassignModal">
+    <div class="modal">
+      <div class="modal-title">Reassign Consultation <button class="modal-close" onclick="closeModal('reassignModal')"><i class="ti ti-x"></i></button></div>
+      <div class="modal-subtitle">CST-2026-10841 · Sarah Martinez · Video consult</div>
+      <div class="modal-field">
+        <div class="modal-lbl">Reassign to</div>
+        <select class="modal-select">
+          <option>Dr. A. Chen, MD (Weight Loss)</option>
+          <option>Dr. M. Okafor, MD (Weight Loss)</option>
+          <option>NP K. Singh (Weight Loss)</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-lbl">Reason for reassignment <span style="color:#DC2626;">*</span></div>
+        <textarea class="modal-ta" placeholder="Document reason for reassignment..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="sf-btn" onclick="closeModal('reassignModal')">Cancel</button>
+        <button class="sf-btn sf-btn-purple" onclick="closeModal('reassignModal')"><i class="ti ti-user-check"></i> Confirm reassign</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ESCALATE MODAL ─────────────────────────────── -->
+  <div class="modal-wrap" id="escalateModal">
+    <div class="modal">
+      <div class="modal-title">Escalate Consultation <button class="modal-close" onclick="closeModal('escalateModal')"><i class="ti ti-x"></i></button></div>
+      <div class="modal-subtitle">CST-2026-10841 · Sarah Martinez</div>
+      <div class="modal-field">
+        <div class="modal-lbl">Escalate to</div>
+        <select class="modal-select">
+          <option>Urgent queue (MD / DO)</option>
+          <option>Supervising physician on-call</option>
+          <option>RN triage queue</option>
+          <option>Care team coordinator</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <div class="modal-lbl">Escalation reason <span style="color:#DC2626;">*</span></div>
+        <textarea class="modal-ta" placeholder="Document clinical reason for escalation..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="sf-btn" onclick="closeModal('escalateModal')">Cancel</button>
+        <button class="sf-btn sf-btn-warn" onclick="closeModal('escalateModal')"><i class="ti ti-flag"></i> Confirm escalation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SIGN & CLOSE MODAL ─────────────────────────── -->
+  <div class="modal-wrap" id="signModal">
+    <div class="modal">
+      <div class="modal-title">Sign &amp; Close Chart <button class="modal-close" onclick="closeModal('signModal')"><i class="ti ti-x"></i></button></div>
+      <div class="modal-subtitle">Review checklist before closing CST-2026-10841</div>
+      <div class="sign-checklist">
+        <div class="check-row"><i class="ti ti-circle-check check-icon pass"></i> Chief complaint — complete</div>
+        <div class="check-row"><i class="ti ti-circle-check check-icon pass"></i> Assessment &amp; impression — complete</div>
+        <div class="check-row"><i class="ti ti-circle-check check-icon pass"></i> Treatment plan — complete</div>
+        <div class="check-row"><i class="ti ti-circle-x check-icon warn"></i> HPI — field empty (required)</div>
+        <div class="check-row"><i class="ti ti-circle-x check-icon warn"></i> Provider attestation — field empty (required)</div>
+        <div class="check-row"><i class="ti ti-circle-check check-icon pass"></i> ICD-10 codes — 4 codes assigned</div>
+        <div class="check-row"><i class="ti ti-circle-check check-icon pass"></i> AI suggestions reviewed</div>
+      </div>
+      <div style="background:#FFF9F9;border:1px solid #F09595;border-radius:6px;padding:9px 12px;font-size:11px;color:#7F1D1D;margin-top:4px;">
+        <i class="ti ti-alert-triangle"></i> 2 required fields must be completed before signing. Chart cannot be closed with empty required fields.
+      </div>
+      <div class="modal-footer">
+        <button class="sf-btn" onclick="closeModal('signModal')">Return to chart</button>
+        <button class="sf-btn" style="opacity:0.45;cursor:not-allowed;" disabled><i class="ti ti-writing-sign"></i> Sign &amp; close (blocked)</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /portal -->
+
+<script>
+/* ── ACCORDION ─────────────────────────────────────────── */
+function toggleAccordion(hdr) {
+  const body = hdr.nextElementSibling;
+  const icon = hdr.querySelector('.accordion-icon');
+  body.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+function toggleSection(hdr) {
+  const body = hdr.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+/* ── LEFT PANEL COLLAPSE ───────────────────────────────── */
+function toggleChart() {
+  const col = document.getElementById('leftCol');
+  const icon = document.getElementById('collapseIcon');
+  const lbl  = document.getElementById('collapseLbl');
+  const content = document.getElementById('leftContent');
+  col.classList.toggle('collapsed');
+  if (col.classList.contains('collapsed')) {
+    icon.className = 'ti ti-layout-sidebar-left-expand';
+    lbl.style.display = 'none';
+    content.style.display = 'none';
+  } else {
+    icon.className = 'ti ti-layout-sidebar-left-collapse';
+    lbl.style.display = '';
+    content.style.display = '';
+  }
+}
+
+/* ── VIDEO CONTROLS ────────────────────────────────────── */
+let muted = true, camOn = true;
+function toggleMute() {
+  muted = !muted;
+  const btn = document.getElementById('muteBtn');
+  if (muted) {
+    btn.classList.add('muted');
+    btn.innerHTML = '<i class="ti ti-microphone-off"></i>';
+    btn.nextElementSibling.textContent = 'Muted';
+  } else {
+    btn.classList.remove('muted');
+    btn.innerHTML = '<i class="ti ti-microphone"></i>';
+    btn.nextElementSibling.textContent = 'Live';
+  }
+}
+function toggleCam() {
+  camOn = !camOn;
+  const btn = document.getElementById('camBtn');
+  if (camOn) {
+    btn.innerHTML = '<i class="ti ti-video"></i>';
+    btn.nextElementSibling.textContent = 'Camera on';
+  } else {
+    btn.innerHTML = '<i class="ti ti-video-off"></i>';
+    btn.nextElementSibling.textContent = 'Camera off';
+  }
+}
+
+/* ── SESSION TIMER ─────────────────────────────────────── */
+let sessionSecs = 12 * 60 + 38;
+setInterval(() => {
+  sessionSecs++;
+  const m = String(Math.floor(sessionSecs/60)).padStart(2,'0');
+  const s = String(sessionSecs%60).padStart(2,'0');
+  document.getElementById('sessionTimer').textContent = `00:${m}:${s}`;
+}, 1000);
+
+/* ── SLA COUNTDOWN ─────────────────────────────────────── */
+let slaSecs = 14 * 60 + 22;
+setInterval(() => {
+  if (slaSecs > 0) slaSecs--;
+  const m = Math.floor(slaSecs/60);
+  const s = String(slaSecs%60).padStart(2,'0');
+  const t = `${m}:${s}`;
+  document.getElementById('slaTimer').textContent = t;
+  document.getElementById('slaBannerTimer').textContent = t;
+  if (slaSecs <= 0) {
+    document.getElementById('slaTimer').className = 'stat-chip-val red';
+    document.getElementById('slaBadge').className = 'badge b-red';
+    document.getElementById('slaBadge').innerHTML = '<i class="ti ti-alarm"></i> SLA breached';
+  }
+}, 1000);
+
+/* ── MODAL ─────────────────────────────────────────────── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+/* ── TABS ──────────────────────────────────────────────── */
+function switchTab(tab, el) {
+  document.querySelectorAll('.doc-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('templatePanel').style.display  = tab === 'template'  ? 'flex' : 'none';
+  document.getElementById('dosespotPanel').style.display  = tab === 'dosespot'  ? 'flex' : 'none';
+  document.getElementById('ordersPanel').style.display    = tab === 'orders'    ? 'flex' : 'none';
+  document.getElementById('templatePanel').style.flexDirection = 'column';
+  document.getElementById('docFooter').style.display = (tab === 'template') ? 'flex' : 'none';
+}
+
+/* ── AI DRAFT ──────────────────────────────────────────── */
+function acceptDraft(fieldId, draftId) {
+  const text = document.getElementById('hpiDraftText').textContent.trim();
+  document.getElementById(fieldId).value = text;
+  document.getElementById(draftId).style.display = 'none';
+  updateReqCount();
+}
+function rejectDraft(draftId) {
+  document.getElementById(draftId).style.display = 'none';
+}
+
+/* ── AI TOGGLE ─────────────────────────────────────────── */
+function toggleAI(cb) {
+  document.getElementById('aiSummaryText').style.display  = cb.checked ? '' : 'none';
+  document.querySelector('.ai-draft-block').style.display = cb.checked ? '' : 'none';
+}
+
+/* ── AI SUMMARY EXPAND ─────────────────────────────────── */
+function toggleAISummary(el) {
+  const text = document.getElementById('aiSummaryText');
+  const chevron = document.getElementById('aiChevron');
+  text.classList.toggle('open');
+  if (text.classList.contains('open')) {
+    el.innerHTML = '<i class="ti ti-chevron-up" id="aiChevron"></i> Hide summary';
+    chevron && (chevron.className = 'ti ti-chevron-up');
+  } else {
+    el.innerHTML = '<i class="ti ti-chevron-down" id="aiChevron"></i> Show summary';
+  }
+}
+
+/* ── REQUIRED FIELD COUNT ──────────────────────────────── */
+function updateReqCount() {
+  const tas = document.querySelectorAll('.field-ta[placeholder]');
+  let empty = 0;
+  tas.forEach(ta => { if (!ta.value.trim()) empty++; });
+  const hpiDraft = document.getElementById('hpiAIDraft');
+  const hpiEmpty = !document.getElementById('hpiDraft').value.trim() && (!hpiDraft || hpiDraft.style.display !== 'none');
+  document.getElementById('reqCount').textContent = hpiEmpty ? empty : Math.max(0, empty - 1);
+}
+
+/* ── ICD CHIP REMOVE ───────────────────────────────────── */
+function removeChip(el) {
+  el.closest('.icd-chip').remove();
+}
+
+/* ── AUTOSAVE SIMULATION ───────────────────────────────── */
+let saveTimeout;
+document.addEventListener('input', () => {
+  clearTimeout(saveTimeout);
+  const lbl = document.querySelector('.autosave-lbl');
+  lbl.innerHTML = '<div class="save-dot" style="background:#F59E0B;"></div> Saving…';
+  saveTimeout = setTimeout(() => {
+    lbl.innerHTML = '<div class="save-dot"></div> Saved just now';
+  }, 1200);
+});
+</script>
+</body>
+</html>

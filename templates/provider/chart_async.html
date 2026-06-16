@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Async Consultation — Marcus Johnson{% endblock %}
+{% block head %}
+<style>
+.async-topbar { position:fixed;top:60px;left:0;right:0;height:52px;background:#fff;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;padding:0 24px;gap:12px;z-index:100; }
+.async-topbar a { font-size:13px;color:#6B21A8;text-decoration:none;font-weight:600; }
+.page-wrap { margin-top:112px;padding:24px; }
+.card { background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:16px; }
+.tabs { display:flex;gap:0;border-bottom:1px solid #E5E0D8;margin-bottom:20px; }
+.tab-btn { padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:#6B7280;border-bottom:2px solid transparent; }
+.tab-btn.active { color:#6B21A8;border-bottom-color:#6B21A8; }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+.qa-pair { padding:14px 0;border-bottom:1px solid #E5E0D8; }
+.qa-pair:last-child { border-bottom:none; }
+.qa-q { font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px; }
+.qa-a { font-size:14px;color:#111827; }
+.stepper { display:flex;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:0; }
+.step-item { display:flex;align-items:center;gap:8px; }
+.step-dot { width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0; }
+.step-dot.done { background:#22C55E;color:#fff; }
+.step-dot.active { background:#6B21A8;color:#fff; }
+.step-dot.pending { background:#F3F4F6;color:#9CA3AF; }
+.step-label { font-size:12px;font-weight:600; }
+.step-label.done { color:#22C55E; }
+.step-label.active { color:#6B21A8; }
+.step-label.pending { color:#9CA3AF; }
+.step-connector { flex:1;min-width:20px;height:2px;background:#E5E0D8;margin:0 8px; }
+.step-connector.done { background:#22C55E; }
+table { width:100%;border-collapse:collapse;font-size:13px; }
+th { padding:9px 12px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;background:#F2EDE4;border-bottom:1px solid #E5E0D8; }
+td { padding:10px 12px;border-bottom:1px solid #E5E0D8;color:#374151; }
+tr:last-child td { border-bottom:none; }
+.badge-green { background:#D1FAE5;color:#065F46;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;display:inline-block; }
+.form-group { margin-bottom:16px; }
+.form-label { display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px; }
+.form-input { width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none; }
+.form-input:focus { border-color:#6B21A8; }
+.form-select { width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;background:#fff; }
+.form-textarea { width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;resize:vertical; }
+.bottom-bar { position:fixed;bottom:0;left:0;right:0;height:64px;background:#fff;border-top:1px solid #E5E0D8;display:flex;align-items:center;padding:0 32px;gap:12px;z-index:100; }
+.btn { padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:6px; }
+.btn-primary { background:#6B21A8;color:#fff; }
+.btn-primary:hover { background:#5B1898; }
+.btn-outline { background:#fff;border:1px solid #E5E0D8;color:#374151; }
+.btn-outline:hover { background:#FAF7F2; }
+.success-banner { display:none;position:fixed;top:120px;left:50%;transform:translateX(-50%);background:#ECFDF5;border:1px solid #6EE7B7;color:#065F46;font-size:13px;font-weight:600;padding:12px 24px;border-radius:10px;z-index:200;box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+.success-banner.show { display:block; }
+.rx-grid { display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px; }
+@media(max-width:800px){.rx-grid{grid-template-columns:1fr 1fr;}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="async-topbar">
+  <a href="/provider/chart/1">← Back to Chart</a>
+  <span style="color:#D1D5DB;margin:0 4px">|</span>
+  <span style="font-size:13px;font-weight:600;color:#374151;">Async Consultation — Marcus Johnson · CST-2026-10849 · Testosterone</span>
+</div>
+
+<div class="success-banner" id="successBanner">
+  ✅ Response sent to Marcus Johnson. Consult stage updated.
+</div>
+
+<div class="page-wrap" style="padding-bottom:80px;">
+
+  <!-- Stage Tracker -->
+  <div class="card">
+    <div style="font-size:12px;font-weight:600;color:#6B7280;margin-bottom:12px;">ASYNC CONSULT STAGES</div>
+    <div class="stepper">
+      <div class="step-item"><div class="step-dot done">✓</div><div class="step-label done">Questionnaire Sent</div></div>
+      <div class="step-connector done"></div>
+      <div class="step-item"><div class="step-dot done">✓</div><div class="step-label done">Awaiting Patient Response</div></div>
+      <div class="step-connector done"></div>
+      <div class="step-item"><div class="step-dot active" id="dot3">3</div><div class="step-label active" id="lbl3">Response Received — Under Review</div></div>
+      <div class="step-connector" id="conn3"></div>
+      <div class="step-item"><div class="step-dot pending" id="dot4">4</div><div class="step-label pending" id="lbl4">Provider Response</div></div>
+      <div class="step-connector"></div>
+      <div class="step-item"><div class="step-dot pending">5</div><div class="step-label pending">Chart Close</div></div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="card">
+    <div class="tabs" id="asyncTabs">
+      <button class="tab-btn active" onclick="switchTab(0)">Patient Intake</button>
+      <button class="tab-btn" onclick="switchTab(1)">Lab Results</button>
+      <button class="tab-btn" onclick="switchTab(2)">Provider Response</button>
+    </div>
+
+    <!-- TAB 1: Patient Intake -->
+    <div class="tab-panel active" id="asyncPanel0">
+      <div class="qa-pair"><div class="qa-q">What is your primary concern today?</div><div class="qa-a">I've been experiencing fatigue and low energy for the past 3 months.</div></div>
+      <div class="qa-pair"><div class="qa-q">Are you currently taking any medications?</div><div class="qa-a">No current medications prior to starting testosterone therapy.</div></div>
+      <div class="qa-pair"><div class="qa-q">Do you have any relevant medical history?</div><div class="qa-a">No significant history. Annual physicals are normal.</div></div>
+      <div class="qa-pair"><div class="qa-q">Current symptoms (check all that apply):</div><div class="qa-a">Fatigue ✅ &nbsp;|&nbsp; Low libido ✅ &nbsp;|&nbsp; Mood changes ✅ &nbsp;|&nbsp; Sleep issues ✅</div></div>
+      <div class="qa-pair"><div class="qa-q">How would you rate your symptoms on a scale of 1–10?</div><div class="qa-a">7 — significantly impacting daily life</div></div>
+      <div class="qa-pair"><div class="qa-q">Any recent changes in lifestyle, diet, or stress levels?</div><div class="qa-a">Started a new high-stress role at work 4 months ago.</div></div>
+    </div>
+
+    <!-- TAB 2: Lab Results -->
+    <div class="tab-panel" id="asyncPanel1">
+      <div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Collected: Jun 8, 2026 &nbsp;·&nbsp; Lab: Quest Diagnostics</div>
+      <table>
+        <thead><tr><th>Test</th><th>Result</th><th>Reference Range</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Testosterone Total</td><td style="font-weight:600">485 ng/dL</td><td>300–1000</td><td><span class="badge-green">✅ Normal</span></td></tr>
+          <tr><td>Free Testosterone</td><td style="font-weight:600">12.4 pg/mL</td><td>9.0–30.0</td><td><span class="badge-green">✅ Normal</span></td></tr>
+          <tr><td>LH</td><td style="font-weight:600">4.2 mIU/mL</td><td>1.7–8.6</td><td><span class="badge-green">✅ Normal</span></td></tr>
+          <tr><td>FSH</td><td style="font-weight:600">3.1 mIU/mL</td><td>1.5–12.4</td><td><span class="badge-green">✅ Normal</span></td></tr>
+          <tr><td>Hematocrit</td><td style="font-weight:600">44.2%</td><td>38.3–48.6</td><td><span class="badge-green">✅ Normal</span></td></tr>
+          <tr><td>PSA</td><td style="font-weight:600">0.8 ng/mL</td><td>0.0–4.0</td><td><span class="badge-green">✅ Normal</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TAB 3: Provider Response -->
+    <div class="tab-panel" id="asyncPanel2">
+      <div class="form-group">
+        <label class="form-label">Clinical Assessment &amp; Response</label>
+        <textarea class="form-textarea" rows="12" placeholder="Enter your clinical assessment and response to the patient..." style="min-height:400px;"></textarea>
+      </div>
+
+      <div class="card" style="background:#FAF7F2;border-color:#E5E0D8;margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Prescription / Treatment Plan</div>
+        <div class="rx-grid">
+          <div class="form-group"><label class="form-label">Medication</label><input class="form-input" value="Testosterone Cypionate"></div>
+          <div class="form-group"><label class="form-label">Dosage</label><input class="form-input" value="200mg/2mL"></div>
+          <div class="form-group"><label class="form-label">Frequency</label><input class="form-input" value="Weekly injection"></div>
+          <div class="form-group"><label class="form-label">Refills</label><input class="form-input" value="3"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Notes (optional)</label><textarea class="form-textarea" rows="2" placeholder="Additional prescription notes..."></textarea></div>
+      </div>
+
+      <div class="card" style="background:#FAF7F2;border-color:#E5E0D8;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Follow-up</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:480px;">
+          <div class="form-group">
+            <label class="form-label">Recommended Follow-up</label>
+            <select class="form-select">
+              <option>In 30 days</option><option>In 60 days</option><option>In 90 days</option><option>As needed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Follow-up Type</label>
+            <select class="form-select">
+              <option>Video</option><option>Phone</option><option>Async</option><option>Lab only</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bottom-bar">
+  <button class="btn btn-outline">Save Draft</button>
+  <div style="flex:1"></div>
+  <button class="btn btn-outline">Request Lab Work</button>
+  <button class="btn btn-primary" onclick="sendToPatient()">Send to Patient →</button>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function switchTab(idx) {
+  document.querySelectorAll('#asyncTabs .tab-btn').forEach((b,i) => b.classList.toggle('active', i === idx));
+  for (let i = 0; i < 3; i++) {
+    const p = document.getElementById('asyncPanel' + i);
+    if (p) p.classList.toggle('active', i === idx);
+  }
+}
+
+function sendToPatient() {
+  // Advance stage
+  document.getElementById('dot3').className = 'step-dot done';
+  document.getElementById('dot3').textContent = '✓';
+  document.getElementById('lbl3').className = 'step-label done';
+  document.getElementById('conn3').className = 'step-connector done';
+  document.getElementById('dot4').className = 'step-dot active';
+  document.getElementById('lbl4').className = 'step-label active';
+  // Show banner
+  const banner = document.getElementById('successBanner');
+  banner.classList.add('show');
+  setTimeout(() => banner.classList.remove('show'), 4000);
+  // Switch to intake tab
+  switchTab(0);
+}
+</script>
+{% endraw %}
+{% endblock %}

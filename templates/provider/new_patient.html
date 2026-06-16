@@ -1,0 +1,1044 @@
+{% extends "base.html" %}
+{% block title %}New Patient Intake — Provider Portal{% endblock %}
+{% block head %}
+<style>
+.sidebar {
+  position: fixed; top: 60px; left: 0; width: 48px; height: calc(100vh - 60px);
+  background: #F2EDE4; display: flex; flex-direction: column;
+  align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
+  transition: width 0.22s ease; overflow: hidden;
+}
+.sidebar.expanded { width: 200px !important; }
+.sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
+.sidebar-logo svg { width: 32px; height: 32px; }
+.sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
+.sib-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+  color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+  transition: background .15s, color .15s; position: relative; white-space: nowrap;
+}
+.sib-item:hover { background: rgba(107,33,168,0.08); }
+.sib-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+.sib-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+.sib-badge { position: absolute; top: 6px; right: 8px; background: #EF4444; color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px; padding: 1px 5px; min-width: 16px; text-align: center; }
+.sib-label { display: none; font-size: 12px; font-weight: 500; color: #6B7280; }
+.sidebar.expanded .sib-label { display: inline; }
+.sidebar.expanded .sib-item { flex-direction: row !important; justify-content: flex-start !important; padding: 9px 14px !important; gap: 12px !important; font-size: 0 !important; }
+.sidebar.expanded .sib-item.active .sib-label { color: #6B21A8; }
+.sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+.sib-avatar { width: 32px; height: 32px; border-radius: 50%; background: #00A67E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+.sib-toggle { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #E5E0D8; background: #F2EDE4; cursor: pointer; color: #6B7280; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+.sib-toggle svg { width: 14px; height: 14px; }
+* { box-sizing:border-box; }
+.np-shell { margin-top:60px;display:flex;min-height:calc(100vh - 60px); }
+/* Breadcrumb */
+.np-breadcrumb { position:fixed;top:60px;left:0;right:0;height:48px;background:#fff;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;padding:0 24px;gap:8px;font-size:13px;color:#6B7280;z-index:100; }
+.np-breadcrumb a { color:#6B7280;text-decoration:none; }
+.np-breadcrumb a:hover { color:#111827; }
+.np-breadcrumb .sep { color:#D1D5DB; }
+/* Left step nav */
+.np-step-nav { width:240px;background:#F2EDE4;min-height:calc(100vh - 108px);position:fixed;top:108px;left:0;bottom:0;overflow-y:auto;padding:16px 0;z-index:90; }
+.np-step-item { display:flex;align-items:center;gap:10px;padding:10px 14px 10px 18px;cursor:pointer;border-left:3px solid transparent; }
+.np-step-item:hover { background:rgba(107,33,168,0.06); }
+.np-step-item.active { background:rgba(107,33,168,0.12);border-left-color:#6B21A8; }
+.np-step-item.done { }
+.np-step-num { width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:rgba(107,33,168,0.12);color:#6B7280; }
+.np-step-item.active .np-step-num { background:#6B21A8;color:#fff; }
+.np-step-item.done .np-step-num { background:#22C55E;color:#fff; }
+.np-step-name { font-size:13px;color:#6B7280; }
+.np-step-item.active .np-step-name { color:#6B21A8;font-weight:600; }
+.np-step-item.done .np-step-name { color:#374151; }
+/* Content */
+.np-content { margin-left:240px;margin-top:108px;flex:1;padding:14px 24px;padding-bottom:80px;background:#FAF7F2; }
+.step-panel { display:none; }
+.step-panel.active { display:block; }
+.step-heading { font-size:18px;font-weight:700;color:#111827;margin-bottom:3px; }
+.step-sub { font-size:13px;color:#6B7280;margin-bottom:14px; }
+.form-group { margin-bottom:12px; }
+.form-label { display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px; }
+.req { color:#EF4444; }
+.form-input { width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;color:#111827; }
+.form-input:focus { border-color:#6B21A8;box-shadow:0 0 0 2px rgba(107,33,168,0.1); }
+.form-select { width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:#111827; }
+.form-textarea { width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:vertical;min-height:80px; }
+.form-textarea:focus { border-color:#6B21A8; }
+.form-grid { display:grid;gap:16px; }
+.form-grid-2 { grid-template-columns:1fr 1fr; }
+.form-grid-3 { grid-template-columns:1fr 1fr 1fr; }
+.form-grid-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+.radio-group { display:flex;flex-wrap:wrap;gap:10px;margin-top:4px; }
+.radio-opt { display:flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid #E5E0D8;border-radius:8px;cursor:pointer;font-size:13px;background:#fff;user-select:none; }
+.radio-opt input { accent-color:#6B21A8; }
+.radio-opt:has(input:checked) { border-color:#6B21A8;background:#F5F0FA; }
+.check-opt { display:flex;align-items:center;gap:7px;padding:8px 14px;border:1px solid #E5E0D8;border-radius:8px;cursor:pointer;font-size:13px;background:#fff;user-select:none; }
+.check-opt input { accent-color:#6B21A8; }
+.check-opt:has(input:checked) { border-color:#6B21A8;background:#F5F0FA; }
+.check-group { display:flex;flex-wrap:wrap;gap:10px;margin-top:4px; }
+.card { background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:16px; }
+.product-card { background:#F5F0FA;border:1px solid #C4B5FD;border-radius:10px;padding:16px 20px;font-size:13px;color:#6B21A8;margin-top:12px;display:none; }
+.product-card.show { display:block; }
+.tag { display:inline-flex;align-items:center;gap:6px;background:#EDE9FE;color:#5B21B6;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;margin:3px; }
+.tag button { background:none;border:none;cursor:pointer;color:#7C3AED;font-size:14px;line-height:1;padding:0; }
+.tag-area { padding:8px;border:1px solid #E5E0D8;border-radius:8px;background:#fff;min-height:40px;display:flex;flex-wrap:wrap;align-items:center; }
+.tag-field { border:none;outline:none;font-size:12px;min-width:120px;padding:3px; }
+.consult-card { border:2px solid #E5E0D8;border-radius:10px;padding:18px;cursor:pointer;background:#fff;transition:border-color 0.15s;margin-bottom:12px; }
+.consult-card:hover { border-color:#C4B5FD; }
+.consult-card:has(input:checked) { border-color:#6B21A8;background:#F5F0FA; }
+.consult-card-header { display:flex;align-items:flex-start;gap:12px; }
+.consult-card-title { font-size:15px;font-weight:700;color:#111827; }
+.consult-card-sub { font-size:13px;color:#6B7280;margin-top:3px; }
+.consult-card-body { display:none;margin-top:14px;padding-top:14px;border-top:1px solid #E5E0D8; }
+.consult-card:has(input:checked) .consult-card-body { display:block; }
+.range-wrap { display:flex;align-items:center;gap:12px; }
+.range-wrap input[type=range] { flex:1;accent-color:#6B21A8; }
+.range-val { font-size:13px;font-weight:700;color:#6B21A8;min-width:24px; }
+.bottom-bar { position:fixed;bottom:0;left:240px;right:0;height:64px;background:#fff;border-top:1px solid #E5E0D8;display:flex;align-items:center;padding:0 32px;gap:12px;z-index:150; }
+.btn { padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;text-decoration:none; }
+.btn-primary { background:#6B21A8;color:#fff; }
+.btn-primary:hover { background:#5B1898; }
+.btn-outline { background:#fff;border:1px solid #E5E0D8;color:#374151; }
+.btn-outline:hover { background:#FAF7F2; }
+.step-counter { flex:1;display:flex;flex-direction:column;align-items:center;gap:5px; }
+.step-counter-label { font-size:12px;color:#6B7280; }
+.progress-bar-wrap { width:200px;height:6px;background:#E5E0D8;border-radius:3px; }
+.progress-bar-fill { height:6px;background:#6B21A8;border-radius:3px;transition:width 0.3s; }
+.success-screen { display:none;padding:40px;text-align:center; }
+.success-screen.show { display:block; }
+.success-screen .icon { font-size:48px;margin-bottom:16px; }
+.success-screen h2 { font-size:22px;font-weight:700;color:#111827;margin-bottom:8px; }
+.success-screen p { font-size:14px;color:#6B7280;margin-bottom:20px; }
+/* Patient type selection */
+.np-type-select { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 200px);padding:40px; }
+.np-type-title { font-size:22px;font-weight:700;color:#111827;margin-bottom:8px;text-align:center; }
+.np-type-sub { font-size:14px;color:#6B7280;margin-bottom:32px;text-align:center; }
+.np-type-cards { display:flex;gap:20px;flex-wrap:wrap;justify-content:center; }
+.np-type-card { border:2px solid #E5E0D8;border-radius:12px;padding:24px 28px;cursor:pointer;background:#fff;transition:border-color 0.15s,box-shadow 0.15s;width:260px; }
+.np-type-card:hover { border-color:#6B21A8;box-shadow:0 4px 12px rgba(107,33,168,0.12); }
+.np-type-card h3 { font-size:16px;font-weight:700;color:#111827;margin-bottom:6px; }
+.np-type-card p { font-size:13px;color:#6B7280;line-height:1.5; }
+.np-type-card .np-type-icon { font-size:28px;margin-bottom:12px; }
+/* Consult type toggle pills */
+.ct-toggle { display:flex;gap:0;border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;width:fit-content; }
+.ct-btn { padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#fff;color:#374151;transition:background 0.12s,color 0.12s; }
+.ct-btn:not(:last-child) { border-right:1px solid #E5E0D8; }
+.ct-btn.active { background:#6B21A8;color:#fff; }
+.ct-btn:hover:not(.active) { background:#FAF7F2; }
+/* Request consult row */
+.rc-row { display:flex;gap:16px;margin-bottom:20px;align-items:flex-start; }
+.rc-btn-main { flex:1;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid #6B21A8;background:#F5F0FA;color:#6B21A8;transition:background 0.12s;text-align:center; }
+.rc-btn-main:hover { background:#EDE9FE; }
+.rc-btn-queue { flex:1;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:#22C55E;color:#fff;transition:background 0.12s;text-align:center; }
+.rc-btn-queue:hover { background:#16A34A; }
+.rc-calendar { display:none;background:#FAF7F2;border:1px solid #E5E0D8;border-radius:8px;padding:16px;margin-top:-8px;margin-bottom:16px; }
+.rc-calendar.show { display:block; }
+.rc-async-msg { display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:14px 16px;font-size:13px;color:#92400E;margin-bottom:16px; }
+.rc-async-msg.show { display:block; }
+.rc-queue-confirm { display:none;background:#D1FAE5;border:1px solid #A7F3D0;border-radius:8px;padding:14px 16px;font-size:13px;color:#065F46;margin-bottom:16px; }
+.rc-queue-confirm.show { display:block; }
+/* Step 1 two-state */
+.s1-divider { display:flex;align-items:center;gap:12px;margin:20px 0;color:#9CA3AF;font-size:12px; }
+.s1-divider::before,.s1-divider::after { content:'';flex:1;border-top:1px solid #E5E0D8; }
+.s1-state-b { display:none; }
+.s1-state-b.show { display:block; }
+.s1-continue-btn { max-width:420px;width:100%;padding:11px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;background:#6B21A8;color:#fff;display:none;margin-top:12px; }
+.s1-continue-btn.show { display:block; }
+/* Condensed demographics */
+.demo-3col { display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px; }
+.demo-2col { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.addr-toggle { font-size:12px;color:#6B21A8;font-weight:600;cursor:pointer;background:none;border:none;padding:0;margin-top:6px;display:block; }
+.addr-fields { display:none;margin-top:8px; }
+.addr-fields.show { display:block; }
+/* Accordion for intake Q */
+.np-acc { border:1px solid #E5E0D8;border-radius:8px;margin-bottom:8px;overflow:hidden; }
+.np-acc-hd { display:flex;align-items:center;padding:11px 14px;cursor:pointer;background:#F9F5FF;user-select:none; }
+.np-acc-title { font-size:13px;font-weight:700;color:#111827;flex:1; }
+.np-acc-badge { font-size:11px;font-weight:700;background:#EDE9FE;color:#5B21B6;padding:1px 7px;border-radius:8px;margin-right:8px; }
+.np-acc-chev { color:#9CA3AF;font-size:12px; }
+.np-acc-body { display:none;padding:14px;border-top:1px solid #E5E0D8; }
+.np-acc-body.open { display:block; }
+.np-q { margin-bottom:14px; }
+.np-q:last-child { margin-bottom:0; }
+.np-q-label { font-size:12px;font-weight:600;color:#374151;margin-bottom:5px;display:block; }
+.intake-placeholder { padding:36px;text-align:center;color:#9CA3AF;font-size:14px;border:2px dashed #E5E0D8;border-radius:8px;margin-top:16px; }
+/* Radio card consult type */
+.consult-type-grid { display:flex;flex-direction:column;gap:12px;max-width:580px; }
+/* Priority radio */
+.priority-opts { display:flex;gap:10px; }
+.priority-opt { flex:1;padding:10px 14px;border:1.5px solid #E5E0D8;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:13px;background:#fff; }
+.priority-opt:has(input:checked) { border-color:#6B21A8;background:#F5F0FA; }
+.priority-opt input { accent-color:#6B21A8; }
+/* SLA badge */
+.sla-badge { display:inline-flex;align-items:center;gap:6px;background:#FFFBEB;border:1px solid #FDE68A;color:#92400E;font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;margin-bottom:14px; }
+/* Time slots */
+.time-slots { display:flex;flex-wrap:wrap;gap:6px;margin-top:6px; }
+.ts-opt { padding:7px 13px;border:1.5px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;background:#fff;display:flex;align-items:center;gap:5px; }
+.ts-opt input { accent-color:#6B21A8; }
+.ts-opt:has(input:checked) { border-color:#6B21A8;background:#F5F0FA;color:#6B21A8;font-weight:600; }
+/* Insurance pills */
+.ins-pills { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px; }
+.ins-pill { padding:7px 16px;border:1.5px solid #E5E0D8;border-radius:20px;cursor:pointer;font-size:13px;font-weight:500;background:#fff;display:flex;align-items:center;gap:5px; }
+.ins-pill input { accent-color:#6B21A8; }
+.ins-pill:has(input:checked) { border-color:#6B21A8;background:#F5F0FA;color:#6B21A8;font-weight:700; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar" id="npSidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="sidebar-nav">
+    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="sib-label">Dashboard</span></div>
+    <div class="sib-item" title="Queue" onclick="window.location.href='/provider/queue'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span class="sib-label">Queue</span></div>
+    <div class="sib-item" title="Schedule" onclick="window.location.href='/provider/schedule'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sib-label">Schedule</span></div>
+    <div class="sib-item" title="Messages" onclick="window.location.href='/provider/messages'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="sib-label">Messages</span></div>
+    <div class="sib-item" title="Alerts" onclick="window.location.href='/provider/notifications'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="sib-label">Alerts</span></div>
+    <div class="sib-item" title="Settings" onclick="window.location.href='/provider/settings'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sib-label">Settings</span></div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sib-avatar">SL</div>
+    <button class="sib-toggle" onclick="toggleNpSidebar()" id="npToggleBtn" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+  </div>
+</nav>
+
+<div class="np-shell" style="margin-left: 48px;">
+  <!-- Patient type selection (pre-step) -->
+  <div class="np-type-select" id="npTypeSelect">
+    <div class="np-type-title">Who are you adding?</div>
+    <div class="np-type-sub">Choose the patient's status to set up the correct flow.</div>
+    <div class="np-type-cards">
+      <div class="np-type-card" onclick="selectPatientType('existing')">
+        <div class="np-type-icon">👤</div>
+        <h3>Existing Patient — New Consult</h3>
+        <p>Patient already has an Everlywell account. Start a new consult using their existing profile.</p>
+        <p style="font-size:11px;color:#9CA3AF;margin-top:8px;font-weight:600;">Best for: MD, DO, NP</p>
+      </div>
+      <div class="np-type-card" onclick="selectPatientType('new')">
+        <div class="np-type-icon">➕</div>
+        <h3>New Patient Registration</h3>
+        <p>Register a new patient on the platform. Captures contact, insurance, and billing information.</p>
+        <p style="font-size:11px;color:#9CA3AF;margin-top:8px;font-weight:600;">Best for: MA, Care Team, Scheduler</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breadcrumb -->
+  <div class="np-breadcrumb" id="npBreadcrumb" style="display:none">
+    <a href="/provider/">Provider Dashboard</a><span class="sep">›</span>
+    <a href="/provider/queue">Queue</a><span class="sep">›</span>
+    <span style="color:#111827;font-weight:500;">New Patient Intake</span>
+  </div>
+
+  <!-- Step Nav -->
+  <div class="np-step-nav" id="npStepNav" style="display:none">
+    <div class="np-step-item active" onclick="goStep(1)" id="np_sni1"><div class="np-step-num">1</div><div class="np-step-name">Demographics</div></div>
+    <div class="np-step-item" onclick="goStep(2)" id="np_sni2"><div class="np-step-num">2</div><div class="np-step-name">Health Profile</div></div>
+    <div class="np-step-item" onclick="goStep(3)" id="np_sni3"><div class="np-step-num">3</div><div class="np-step-name">Care Product</div></div>
+    <div class="np-step-item" onclick="goStep(4)" id="np_sni4"><div class="np-step-num">4</div><div class="np-step-name">Intake Questionnaire</div></div>
+    <div class="np-step-item" onclick="goStep(5)" id="np_sni5"><div class="np-step-num">5</div><div class="np-step-name">Request Consult</div></div>
+  </div>
+
+  <!-- Content -->
+  <div class="np-content" style="display:none">
+
+    <!-- STEP: Search & Select Patient (existing patient path) -->
+    <div class="step-panel" id="np_step_search">
+      <!-- State A: Search -->
+      <div id="s1StateA">
+        <div class="step-heading">Step 1 — Find Patient</div>
+        <div class="step-sub">Search for an existing patient, or register a new one below.</div>
+        <div class="form-group" style="max-width:440px;">
+          <label class="form-label">Patient Name or ID</label>
+          <input class="form-input" id="ptSearchInput" placeholder="Type to search..." oninput="searchPatients(this.value)">
+        </div>
+        <div id="ptSearchResults" style="max-width:440px;margin-top:4px;"></div>
+        <div id="ptSelectedCard" style="display:none;background:#F5F0FA;border:1.5px solid #C4B5FD;border-radius:10px;padding:16px 18px;margin-top:12px;font-size:13px;max-width:440px;">
+          <div style="font-weight:700;color:#6B21A8;margin-bottom:5px;">Selected Patient</div>
+          <div id="ptSelectedName" style="font-size:15px;font-weight:700;color:#111827;"></div>
+          <div id="ptSelectedMeta" style="color:#6B7280;margin-top:3px;"></div>
+          <button onclick="clearPatientSelection()" style="margin-top:8px;font-size:12px;color:#6B7280;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;">Clear selection</button>
+        </div>
+        <button class="s1-continue-btn" id="s1ContinueBtn" onclick="npNextStep()">Continue with this patient →</button>
+        <div class="s1-divider" style="max-width:440px;">or</div>
+        <button onclick="showStateB()" style="color:#6B21A8;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;padding:0;">+ Create New Patient →</button>
+      </div>
+      <!-- State B: Condensed demographics -->
+      <div id="s1StateB" class="s1-state-b">
+        <div class="step-heading">New Patient — Demographics</div>
+        <div class="step-sub">Enter basic information. <button onclick="showStateA()" style="color:#6B21A8;font-size:13px;font-weight:600;background:none;border:none;cursor:pointer;padding:0;text-decoration:underline;">← Back to search</button></div>
+        <div class="demo-2col" style="margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">First Name <span class="req">*</span></label><input class="form-input" placeholder="First name"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Last Name <span class="req">*</span></label><input class="form-input" placeholder="Last name"></div>
+        </div>
+        <div class="demo-3col" style="margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Sex <span class="req">*</span></label><select class="form-select"><option value="">—</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">State <span class="req">*</span></label><select class="form-select"><option value="">— State —</option><option>TX</option><option>CA</option><option>FL</option><option>NY</option><option>WA</option><option>IL</option><option>CO</option><option>AZ</option><option>GA</option><option>NC</option></select></div>
+        </div>
+        <div class="demo-2col" style="margin-bottom:6px;">
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Phone <span class="req">*</span></label><input type="tel" class="form-input" placeholder="(555) 000-0000"></div>
+          <div class="form-group" style="margin-bottom:0;"><label class="form-label">Email <span class="req">*</span></label><input type="email" class="form-input" placeholder="patient@email.com"></div>
+        </div>
+        <button class="addr-toggle" onclick="toggleAddr('s1Addr',this)">+ Add Address (optional)</button>
+        <div class="addr-fields" id="s1Addr">
+          <div class="form-group"><label class="form-label">Street Address</label><input class="form-input" placeholder="123 Main St"></div>
+          <div class="demo-3col">
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">State</label><input class="form-input" placeholder="TX"></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">ZIP</label><input class="form-input" placeholder="78701"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 1: Demographics -->
+    <div class="step-panel active" id="np_step1">
+      <div class="step-heading">Step 1 — Demographics</div>
+      <div class="step-sub">Enter patient information to create their record.</div>
+
+      <div class="form-grid form-grid-2">
+        <div class="form-group"><label class="form-label">First Name <span class="req">*</span></label><input class="form-input" placeholder="First name"></div>
+        <div class="form-group"><label class="form-label">Last Name <span class="req">*</span></label><input class="form-input" placeholder="Last name"></div>
+        <div class="form-group"><label class="form-label">Date of Birth <span class="req">*</span></label><input type="date" class="form-input"></div>
+        <div class="form-group">
+          <label class="form-label">Sex <span class="req">*</span></label>
+          <div class="radio-group" style="margin-top:4px;">
+            <label class="radio-opt"><input type="radio" name="sex" value="Male"> Male</label>
+            <label class="radio-opt"><input type="radio" name="sex" value="Female"> Female</label>
+            <label class="radio-opt"><input type="radio" name="sex" value="Other"> Other</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">State of Residence <span class="req">*</span></label>
+          <select class="form-select" id="stateSelect">
+            <option value="">— Select state —</option>
+            <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option><option>Washington D.C.</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Phone <span class="req">*</span></label><input type="tel" class="form-input" placeholder="(555) 000-0000"></div>
+        <div class="form-group"><label class="form-label">Email <span class="req">*</span></label><input type="email" class="form-input" placeholder="patient@email.com"></div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Address (optional)</div>
+        <div class="form-group"><label class="form-label">Street Address</label><input class="form-input" placeholder="123 Main St"></div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+          <div class="form-group"><label class="form-label">State</label><input class="form-input" placeholder="TX"></div>
+          <div class="form-group"><label class="form-label">ZIP</label><input class="form-input" placeholder="78701"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Insurance / Payment</div>
+        <div class="form-group">
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="coverage" value="Insurance" onchange="toggleInsurance()"> Insurance</label>
+            <label class="radio-opt"><input type="radio" name="coverage" value="Self-Pay" checked onchange="toggleInsurance()"> Self-Pay</label>
+            <label class="radio-opt"><input type="radio" name="coverage" value="Subscription" onchange="toggleInsurance()"> Subscription</label>
+          </div>
+        </div>
+        <div id="insuranceFields" style="display:none">
+          <div class="form-grid form-grid-2">
+            <div class="form-group"><label class="form-label">Plan Name</label><input class="form-input" placeholder="e.g. Blue Cross Blue Shield"></div>
+            <div class="form-group"><label class="form-label">Member ID</label><input class="form-input" placeholder="Member ID"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Health Profile -->
+    <div class="step-panel" id="np_step2">
+      <div class="step-heading">Step 2 — Health Profile</div>
+      <div class="step-sub">Record the patient's current health information.</div>
+
+      <div class="form-group">
+        <label class="form-label">Current Medications</label>
+        <div class="tag-area" id="medTags">
+          <input type="text" class="tag-field" placeholder="Type medication and press Enter..." onkeydown="addTag(event,this,'medTags')">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Allergies</label>
+        <label class="check-opt" style="margin-bottom:8px;display:inline-flex;"><input type="checkbox" id="nkdaCheck" onchange="toggleNKDA()"> NKDA (No Known Drug Allergies)</label>
+        <div class="tag-area" id="allergyTags">
+          <input type="text" class="tag-field" id="allergyInput" placeholder="Type allergy and press Enter..." onkeydown="addTag(event,this,'allergyTags')">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Medical Conditions</label>
+        <div class="tag-area" id="condTags">
+          <input type="text" class="tag-field" placeholder="Type condition and press Enter..." onkeydown="addTag(event,this,'condTags')">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Surgical History (optional)</label>
+        <textarea class="form-textarea" placeholder="Describe any prior surgeries..."></textarea>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Measurements</div>
+        <div class="form-grid form-grid-4">
+          <div class="form-group"><label class="form-label">Height (ft)</label><input type="number" class="form-input" placeholder="5"></div>
+          <div class="form-group"><label class="form-label">Height (in)</label><input type="number" class="form-input" placeholder="10"></div>
+          <div class="form-group"><label class="form-label">Weight (lbs)</label><input type="number" class="form-input" placeholder="185"></div>
+          <div class="form-group"><label class="form-label">Blood Pressure (opt.)</label><input class="form-input" placeholder="120/80"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Care Product -->
+    <div class="step-panel" id="np_step3">
+      <div class="step-heading">Step 3 — Care Product</div>
+      <div class="step-sub">Select the care product this patient is enrolling in.</div>
+
+      <div class="form-group">
+        <label class="form-label">Care Product <span class="req">*</span></label>
+        <select class="form-select" id="careProductSelect" onchange="showProductCard()" style="max-width:360px;">
+          <option value="">— Select a care product —</option>
+          <option value="Testosterone">Testosterone</option>
+          <option value="Weight Management">Weight Management</option>
+          <option value="Skincare">Skincare</option>
+          <option value="ED Treatment">ED Treatment</option>
+          <option value="Women's Health">Women's Health</option>
+          <option value="Hair Loss">Hair Loss</option>
+          <option value="Mental Health">Mental Health</option>
+          <option value="A1C Management">A1C Management</option>
+        </select>
+      </div>
+      <div class="product-card" id="productCard">
+        <strong id="productCardTitle">Testosterone Program</strong><br>
+        <span id="productCardBody">Available in 48 states. Requires lab results. MD/NP consult. Async + Video + Phone.</span>
+      </div>
+    </div>
+
+    <!-- STEP 4: Intake Questionnaire -->
+    <div class="step-panel" id="np_step4">
+      <div class="step-heading">Step 4 — Intake Questionnaire</div>
+      <div class="step-sub">Complete the intake questionnaire for this patient's care product.</div>
+
+      <div class="form-group">
+        <label class="form-label">1. What is your primary concern?</label>
+        <textarea class="form-textarea" placeholder="Describe the patient's primary concern..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">2. Current symptoms (check all that apply)</label>
+        <div class="check-group">
+          <label class="check-opt"><input type="checkbox"> Fatigue</label>
+          <label class="check-opt"><input type="checkbox"> Low libido</label>
+          <label class="check-opt"><input type="checkbox"> Mood changes</label>
+          <label class="check-opt"><input type="checkbox"> Sleep issues</label>
+          <label class="check-opt"><input type="checkbox"> Weight gain</label>
+          <label class="check-opt"><input type="checkbox"> Other</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">3. Rate symptoms severity (1–10)</label>
+        <div class="range-wrap">
+          <input type="range" min="1" max="10" value="5" oninput="document.getElementById('rangeVal').textContent=this.value">
+          <span class="range-val" id="rangeVal">5</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;margin-top:2px;"><span>1 — Minimal</span><span>10 — Severe</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">4. Current medications</label>
+        <textarea class="form-textarea" placeholder="Pre-filled from health profile..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">5. Any relevant medical history?</label>
+        <textarea class="form-textarea" placeholder="Describe any relevant history..."></textarea>
+      </div>
+    </div>
+
+    <!-- STEP: Care Product + Intake Q&A (combined) -->
+    <div class="step-panel" id="np_step_cp_qa">
+      <div class="step-heading">Step 2 — Care Product &amp; Intake</div>
+      <div class="step-sub">Select a care product. The intake questionnaire will load below.</div>
+      <div class="form-group">
+        <label class="form-label">Care Product <span class="req">*</span></label>
+        <select class="form-select" id="cpqaCareProductSelect" onchange="showIntakeQ()" style="max-width:380px;">
+          <option value="">— Select a care product —</option>
+          <option value="Testosterone">Testosterone</option>
+          <option value="Weight Management">Weight Management</option>
+          <option value="Skincare">Skincare</option>
+          <option value="ED Treatment">ED Treatment</option>
+          <option value="Women's Health">Women's Health</option>
+          <option value="Hair Loss">Hair Loss</option>
+          <option value="Mental Health">Mental Health</option>
+          <option value="A1C Management">A1C Management</option>
+        </select>
+      </div>
+      <div class="product-card" id="cpqaProductCard">
+        <strong id="cpqaProductTitle"></strong><br><span id="cpqaProductBody"></span>
+      </div>
+      <!-- Intake Q area -->
+      <div id="intakeQArea" style="display:none;margin-top:20px;">
+        <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:12px;">Intake Questionnaire</div>
+        <!-- Testosterone: 18 questions in 4 accordion sections -->
+        <div id="intakeTestosterone" style="display:none;">
+          <div class="np-acc">
+            <div class="np-acc-hd" onclick="npToggleAcc(this)">
+              <span class="np-acc-title">Medical History</span>
+              <span class="np-acc-badge">5 questions</span>
+              <span class="np-acc-chev">▸</span>
+            </div>
+            <div class="np-acc-body open">
+              <div class="np-q"><label class="np-q-label">1. Do you have any diagnosed medical conditions?</label><textarea class="form-textarea" rows="2" placeholder="List any conditions..."></textarea></div>
+              <div class="np-q"><label class="np-q-label">2. Are you currently taking any medications?</label><textarea class="form-textarea" rows="2" placeholder="List current medications and dosages..."></textarea></div>
+              <div class="np-q"><label class="np-q-label">3. Have you ever been diagnosed with prostate or breast cancer?</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="np_q3"> Yes</label><label class="radio-opt"><input type="radio" name="np_q3" checked> No</label></div></div>
+              <div class="np-q"><label class="np-q-label">4. Do you have a history of cardiovascular disease or heart conditions?</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="np_q4"> Yes</label><label class="radio-opt"><input type="radio" name="np_q4" checked> No</label></div></div>
+              <div class="np-q"><label class="np-q-label">5. Any history of blood clots, stroke, or DVT?</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="np_q5"> Yes</label><label class="radio-opt"><input type="radio" name="np_q5" checked> No</label></div></div>
+            </div>
+          </div>
+          <div class="np-acc">
+            <div class="np-acc-hd" onclick="npToggleAcc(this)">
+              <span class="np-acc-title">Symptoms &amp; Concerns</span>
+              <span class="np-acc-badge">5 questions</span>
+              <span class="np-acc-chev">▸</span>
+            </div>
+            <div class="np-acc-body">
+              <div class="np-q"><label class="np-q-label">6. Rate your current fatigue level (1 = none, 10 = severe)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+              <div class="np-q"><label class="np-q-label">7. Rate your libido / sex drive (1 = very low, 10 = normal)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+              <div class="np-q"><label class="np-q-label">8. Rate your mood and emotional wellbeing (1 = very low, 10 = excellent)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+              <div class="np-q"><label class="np-q-label">9. Rate your overall energy level (1 = very low, 10 = high)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+              <div class="np-q"><label class="np-q-label">10. Describe your primary concern in your own words</label><textarea class="form-textarea" rows="3" placeholder="What is bringing you in today?"></textarea></div>
+            </div>
+          </div>
+          <div class="np-acc">
+            <div class="np-acc-hd" onclick="npToggleAcc(this)">
+              <span class="np-acc-title">Lifestyle &amp; Habits</span>
+              <span class="np-acc-badge">4 questions</span>
+              <span class="np-acc-chev">▸</span>
+            </div>
+            <div class="np-acc-body">
+              <div class="np-q"><label class="np-q-label">11. How many days per week do you exercise?</label><select class="form-select"><option>0 — Sedentary</option><option>1–2 days</option><option>3–4 days</option><option>5+ days</option></select></div>
+              <div class="np-q"><label class="np-q-label">12. Briefly describe your typical diet</label><textarea class="form-textarea" rows="2" placeholder="e.g. Low carb, Mediterranean, no specific diet..."></textarea></div>
+              <div class="np-q"><label class="np-q-label">13. Average nightly sleep duration</label><select class="form-select"><option>Less than 5 hours</option><option>5–6 hours</option><option>6–7 hours</option><option selected>7–8 hours</option><option>More than 8 hours</option></select></div>
+              <div class="np-q"><label class="np-q-label">14. Do you currently smoke or use tobacco products?</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="np_q14"> Yes</label><label class="radio-opt"><input type="radio" name="np_q14" checked> No</label></div></div>
+            </div>
+          </div>
+          <div class="np-acc">
+            <div class="np-acc-hd" onclick="npToggleAcc(this)">
+              <span class="np-acc-title">Prior Treatment &amp; Labs</span>
+              <span class="np-acc-badge">4 questions</span>
+              <span class="np-acc-chev">▸</span>
+            </div>
+            <div class="np-acc-body">
+              <div class="np-q"><label class="np-q-label">15. Have you ever received testosterone therapy before?</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="np_q15"> Yes</label><label class="radio-opt"><input type="radio" name="np_q15" checked> No</label></div></div>
+              <div class="np-q"><label class="np-q-label">16. If yes, what type of therapy? (injections, gel, pellets, etc.)</label><input class="form-input" placeholder="Describe prior therapy or leave blank"></div>
+              <div class="np-q"><label class="np-q-label">17. Most recent PSA level, if known</label><input class="form-input" placeholder="e.g. 1.2 ng/mL, or Unknown"></div>
+              <div class="np-q"><label class="np-q-label">18. Any known allergies to medications?</label><input class="form-input" placeholder="List allergies or NKDA"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Weight Management: condensed form -->
+        <div id="intakeWeightManagement" style="display:none;">
+          <div class="np-q"><label class="np-q-label">1. What is your primary weight management concern?</label><textarea class="form-textarea" rows="3" placeholder="Describe your main goals and concerns..."></textarea></div>
+          <div class="np-q"><label class="np-q-label">2. Current symptoms (check all that apply)</label><div class="check-group"><label class="check-opt"><input type="checkbox"> Fatigue</label><label class="check-opt"><input type="checkbox"> Joint pain</label><label class="check-opt"><input type="checkbox"> Sleep issues</label><label class="check-opt"><input type="checkbox"> High blood pressure</label><label class="check-opt"><input type="checkbox"> High cholesterol</label><label class="check-opt"><input type="checkbox"> Blood sugar concerns</label><label class="check-opt"><input type="checkbox"> Shortness of breath</label></div></div>
+          <div class="np-q"><label class="np-q-label">3. Rate symptom severity (1 = minimal, 10 = severe)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+          <div class="np-q"><label class="np-q-label">4. Describe previous weight loss attempts</label><textarea class="form-textarea" rows="2" placeholder="e.g. Diets tried, medications, surgery..."></textarea></div>
+        </div>
+        <!-- Generic fallback -->
+        <div id="intakeGeneric" style="display:none;">
+          <div class="np-q"><label class="np-q-label">1. What is the patient's primary concern?</label><textarea class="form-textarea" rows="3" placeholder="Describe the primary concern..."></textarea></div>
+          <div class="np-q"><label class="np-q-label">2. Current symptoms (check all that apply)</label><div class="check-group"><label class="check-opt"><input type="checkbox"> Fatigue</label><label class="check-opt"><input type="checkbox"> Pain or discomfort</label><label class="check-opt"><input type="checkbox"> Mood changes</label><label class="check-opt"><input type="checkbox"> Sleep issues</label><label class="check-opt"><input type="checkbox"> Other</label></div></div>
+          <div class="np-q"><label class="np-q-label">3. Rate symptom severity (1 = minimal, 10 = severe)</label><div class="range-wrap"><input type="range" min="1" max="10" value="5" oninput="this.nextElementSibling.textContent=this.value"><span class="range-val">5</span></div></div>
+          <div class="np-q"><label class="np-q-label">4. Current medications</label><textarea class="form-textarea" rows="2" placeholder="Pre-filled from health profile..."></textarea></div>
+          <div class="np-q"><label class="np-q-label">5. Relevant medical history</label><textarea class="form-textarea" rows="2" placeholder="Describe any relevant history..."></textarea></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: Request Consult -->
+    <div class="step-panel" id="np_step5">
+      <div class="step-heading">Step 3 — Request Consult</div>
+      <div class="step-sub">Choose how this patient's consult should be handled.</div>
+
+      <div class="consult-type-grid">
+        <!-- Phone Card -->
+        <label class="consult-card">
+          <div class="consult-card-header">
+            <input type="radio" name="consultType" value="Phone" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
+            <div>
+              <div class="consult-card-title">📞 Phone Consultation</div>
+              <div class="consult-card-sub">Scheduled voice call. Provider calls patient at selected time.</div>
+            </div>
+          </div>
+          <div class="consult-card-body">
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Date <span class="req">*</span></label><input type="date" class="form-input" style="max-width:200px;" id="phoneDateInput" onchange="showTimeSlots('phone',this.value)"></div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Available Time Slots</label>
+              <div id="phoneSlotsPlaceholder" style="font-style:italic;color:#9CA3AF;font-size:13px;padding:10px 0;">Select a date above to see available slots</div>
+              <div class="time-slots" id="phoneSlotsGrid" style="display:none;">
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 8:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 8:30 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 9:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 9:30 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 10:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 11:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 2:00 PM</label>
+                <label class="ts-opt"><input type="radio" name="tsPhone"> 3:30 PM</label>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Duration</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="durPhone" checked> 30 min</label><label class="radio-opt"><input type="radio" name="durPhone"> 60 min</label></div></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Provider</label><select class="form-select" style="max-width:300px;"><option>Dr. Sarah Lee, MD (Assigned)</option><option>Maria Rodriguez, NP</option><option>Next Available</option></select></div>
+          </div>
+        </label>
+        <!-- Video Card -->
+        <label class="consult-card">
+          <div class="consult-card-header">
+            <input type="radio" name="consultType" value="Video" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
+            <div>
+              <div class="consult-card-title">🎥 Video Consultation</div>
+              <div class="consult-card-sub">Scheduled video call via secure telehealth link.</div>
+            </div>
+          </div>
+          <div class="consult-card-body">
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Date <span class="req">*</span></label><input type="date" class="form-input" style="max-width:200px;" id="videoDateInput" onchange="showTimeSlots('video',this.value)"></div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Available Time Slots</label>
+              <div id="videoSlotsPlaceholder" style="font-style:italic;color:#9CA3AF;font-size:13px;padding:10px 0;">Select a date above to see available slots</div>
+              <div class="time-slots" id="videoSlotsGrid" style="display:none;">
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 8:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 9:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 10:30 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 11:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 1:00 PM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 2:30 PM</label>
+                <label class="ts-opt"><input type="radio" name="tsVideo"> 4:00 PM</label>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Duration</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="durVideo" checked> 30 min</label><label class="radio-opt"><input type="radio" name="durVideo"> 60 min</label></div></div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Provider</label><select class="form-select" style="max-width:300px;"><option>Dr. Sarah Lee, MD (Assigned)</option><option>Maria Rodriguez, NP</option><option>Next Available</option></select></div>
+          </div>
+        </label>
+        <!-- Async Card -->
+        <label class="consult-card">
+          <div class="consult-card-header">
+            <input type="radio" name="consultType" value="Async" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
+            <div>
+              <div class="consult-card-title">✉ Async Message Consult</div>
+              <div class="consult-card-sub">No scheduling required. Provider responds within SLA window.</div>
+            </div>
+          </div>
+          <div class="consult-card-body">
+            <div class="sla-badge">⏱ 24h SLA — Standard Response Window</div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Priority</label>
+              <div class="priority-opts">
+                <label class="priority-opt"><input type="radio" name="asyncPriority" checked> Standard</label>
+                <label class="priority-opt"><input type="radio" name="asyncPriority"> Urgent — Expedite</label>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Routing Note (optional)</label><textarea class="form-textarea" rows="2" placeholder="Add context for the reviewing provider..."></textarea></div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Queue confirm (hidden until submit) -->
+      <div class="rc-queue-confirm" id="rcQueueConfirm" style="margin-top:16px;"></div>
+    </div>
+
+    <!-- NEW PATIENT STEP: Contact & Insurance -->
+    <div class="step-panel" id="np_step_ins">
+      <div class="step-heading">Contact &amp; Insurance</div>
+      <div class="step-sub">Select coverage type and enter insurance details.</div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Insurance Coverage</div>
+        <div class="ins-pills" id="insPills">
+          <label class="ins-pill"><input type="radio" name="coverageNew" value="Insurance" checked onchange="toggleInsuranceFields()"> Insurance</label>
+          <label class="ins-pill"><input type="radio" name="coverageNew" value="Self-Pay" onchange="toggleInsuranceFields()"> Self-Pay</label>
+          <label class="ins-pill"><input type="radio" name="coverageNew" value="Subscription" onchange="toggleInsuranceFields()"> Subscription</label>
+        </div>
+        <div id="insFields">
+          <div class="form-grid form-grid-2" style="margin-top:10px;">
+            <div class="form-group"><label class="form-label">Insurance Carrier <span class="req">*</span></label><input class="form-input" placeholder="e.g. Blue Cross Blue Shield"></div>
+            <div class="form-group"><label class="form-label">Member ID <span class="req">*</span></label><input class="form-input" placeholder="Member ID"></div>
+            <div class="form-group"><label class="form-label">Group Number</label><input class="form-input" placeholder="Group number"></div>
+            <div class="form-group"><label class="form-label">Plan Type</label><select class="form-select"><option>PPO</option><option>HMO</option><option>EPO</option><option>POS</option><option>HDHP</option></select></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div style="font-size:14px;font-weight:700;color:#111827;">Billing Address</div>
+          <button class="addr-toggle" onclick="toggleAddr('insAddrFields',this)" style="margin-top:0;">+ Add billing address (optional)</button>
+        </div>
+        <div class="addr-fields" id="insAddrFields">
+          <div class="form-group" style="margin-top:10px;"><label class="form-label">Street Address</label><input class="form-input" placeholder="123 Main St"></div>
+          <div class="form-grid form-grid-3">
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+            <div class="form-group"><label class="form-label">State</label><input class="form-input" placeholder="TX"></div>
+            <div class="form-group"><label class="form-label">ZIP</label><input class="form-input" placeholder="78701"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW PATIENT STEP: Billing -->
+    <div class="step-panel" id="np_step_bill">
+      <div class="step-heading">Billing</div>
+      <div class="step-sub">Payment method on file. Collected at checkout.</div>
+      <div class="card" style="text-align:center;padding:32px;">
+        <div style="font-size:32px;margin-bottom:12px;">💳</div>
+        <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:8px;">Payment Collected at Checkout</div>
+        <div style="font-size:13px;color:#6B7280;max-width:380px;margin:0 auto;">For demo purposes, payment method collection is handled at the patient checkout step. No billing details are required here.</div>
+      </div>
+    </div>
+
+  </div><!-- /np-content -->
+</div><!-- /np-shell -->
+
+<!-- Bottom Bar -->
+<div class="bottom-bar" id="npBottomBar" style="display:none">
+  <button class="btn btn-outline" id="np_btnBack" onclick="npPrevStep()" style="display:none">← Back</button>
+  <div class="step-counter">
+    <div class="step-counter-label" id="np_stepLabel">Step 1 of 5</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="np_progressBar" style="width:20%"></div></div>
+  </div>
+  <button class="btn btn-primary" id="np_btnContinue" onclick="npNextStep()">Save &amp; Continue →</button>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+let npCurrent = 1;
+const npCompleted = new Set();
+let npPath = 'existing'; // 'existing' or 'new'
+let npSteps = []; // ordered step IDs for current path
+
+function selectPatientType(type) {
+  npPath = type;
+  document.getElementById('npTypeSelect').style.display = 'none';
+  document.getElementById('npBreadcrumb').style.display = '';
+  document.getElementById('npStepNav').style.display = '';
+  document.querySelector('.np-content').style.display = '';
+  document.getElementById('npBottomBar').style.display = '';
+
+  if (type === 'existing') {
+    npSteps = ['np_step_search','np_step_cp_qa','np_step5'];
+    renderStepNav(['Search & Select Patient','Care Product + Intake Q&A','Request Consult']);
+  } else {
+    npSteps = ['np_step1','np_step_ins','np_step_bill','np_step2','np_step_cp_qa','np_step5'];
+    renderStepNav(['Demographics','Contact & Insurance','Billing','Health Profile','Care Product + Intake Q&A','Request Consult']);
+  }
+  npCurrent = 0;
+  npNextStep();
+}
+
+function renderStepNav(labels) {
+  const nav = document.getElementById('npStepNav');
+  nav.innerHTML = '';
+  labels.forEach((label, i) => {
+    const div = document.createElement('div');
+    div.className = 'np-step-item' + (i === 0 ? ' active' : '');
+    div.id = 'np_sni' + (i+1);
+    div.onclick = () => goStep(i+1);
+    div.innerHTML = '<div class="np-step-num">' + (i+1) + '</div><div class="np-step-name">' + label + '</div>';
+    nav.appendChild(div);
+  });
+}
+
+function goStep(n) {
+  // Clear ALL panels first (handles any stray active classes from HTML)
+  document.querySelectorAll('.step-panel').forEach(function(el) { el.classList.remove('active'); });
+
+  npCurrent = n;
+  const total = npSteps.length;
+
+  // Show target step
+  const newStepEl = document.getElementById(npSteps[n - 1]);
+  if (newStepEl) newStepEl.classList.add('active');
+
+  // Update nav
+  for (let i = 1; i <= total; i++) {
+    const el = document.getElementById('np_sni' + i);
+    if (!el) continue;
+    el.classList.remove('active', 'done');
+    const num = el.querySelector('.np-step-num');
+    if (npCompleted.has(i)) { el.classList.add('done'); if (num) num.textContent = '✓'; }
+    else { if (num) num.textContent = i; }
+  }
+  const activeNavEl = document.getElementById('np_sni' + n);
+  if (activeNavEl) activeNavEl.classList.add('active');
+
+  document.getElementById('np_stepLabel').textContent = 'Step ' + n + ' of ' + total;
+  document.getElementById('np_progressBar').style.width = ((n / total) * 100) + '%';
+  document.getElementById('np_btnBack').style.display = n > 1 ? '' : 'none';
+  document.getElementById('np_btnContinue').textContent = n === total ? 'Submit Request →' : 'Save & Continue →';
+}
+
+function npNextStep() {
+  const total = npSteps.length || 5;
+  if (npCurrent === total) { submitNP(); return; }
+  npCompleted.add(npCurrent);
+  goStep(npCurrent + 1);
+}
+
+function npPrevStep() { if (npCurrent > 1) goStep(npCurrent - 1); }
+
+function submitNP() {
+  var ct = document.querySelector('input[name="consultType"]:checked');
+  var confirm = document.getElementById('rcQueueConfirm');
+  if (ct && ct.value === 'Async') {
+    if (confirm) { confirm.classList.add('show'); confirm.innerHTML = '✅ <strong>Consult submitted to async queue.</strong> Provider will respond within the 24h SLA window. You may close this flow.'; }
+    document.getElementById('np_btnContinue').textContent = 'Done →';
+  } else if (ct) {
+    var panel = document.getElementById('np_step5');
+    panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>' + ct.value + ' Appointment Scheduled</h2><p>Appointment confirmed. Patient will receive a confirmation notification.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+    document.getElementById('np_btnContinue').style.display = 'none';
+    document.getElementById('np_btnBack').style.display = 'none';
+  } else {
+    if (confirm) { confirm.classList.add('show'); confirm.innerHTML = '✅ <strong>Patient added to queue.</strong> Estimated wait: ~45 minutes.'; }
+    document.getElementById('np_btnContinue').textContent = 'Done →';
+  }
+}
+
+// Insurance toggle
+function toggleInsurance() {
+  const val = document.querySelector('input[name="coverage"]:checked');
+  document.getElementById('insuranceFields').style.display = (val && val.value === 'Insurance') ? '' : 'none';
+}
+
+// Tag input
+function addTag(e, input, containerId) {
+  if (e.key === 'Enter' && input.value.trim()) {
+    e.preventDefault();
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.innerHTML = input.value.trim() + ' <button onclick="this.parentElement.remove()">×</button>';
+    document.getElementById(containerId).insertBefore(tag, input);
+    input.value = '';
+  }
+}
+
+function toggleNKDA() {
+  const checked = document.getElementById('nkdaCheck').checked;
+  const input = document.getElementById('allergyInput');
+  if (checked) {
+    const tag = document.createElement('span');
+    tag.className = 'tag'; tag.id = 'nkdaTag';
+    tag.innerHTML = 'NKDA <button onclick="document.getElementById(\'nkdaCheck\').checked=false;this.parentElement.remove()">×</button>';
+    document.getElementById('allergyTags').insertBefore(tag, input);
+    input.disabled = true;
+  } else {
+    const t = document.getElementById('nkdaTag');
+    if (t) t.remove();
+    input.disabled = false;
+  }
+}
+
+// Product card
+const PRODUCT_INFO = {
+  'Testosterone': 'Available in 48 states. Requires lab results. MD/NP consult. Async + Video + Phone.',
+  'Weight Management': 'Available in all 50 states. Lab results optional. MD/NP consult. All consult types.',
+  'Skincare': 'Available in 45 states. No lab requirements. NP/MD consult. Async preferred.',
+  'ED Treatment': 'Available in 49 states. No lab requirements. MD/NP consult. Async.',
+  "Women's Health": 'Available in all 50 states. Labs may be required. MD/NP/GC consult. All types.',
+  'Hair Loss': 'Available in all 50 states. No lab requirements. MD/NP consult. Async.',
+  'Mental Health': 'Available in 38 states. No lab requirements. MD/NP consult. Video preferred.',
+  'A1C Management': 'Available in all 50 states. Lab results required. MD/NP consult. Async + Video.',
+};
+function showProductCard() {
+  const val = document.getElementById('careProductSelect').value;
+  const card = document.getElementById('productCard');
+  if (val && PRODUCT_INFO[val]) {
+    document.getElementById('productCardTitle').textContent = val + ' Program';
+    document.getElementById('productCardBody').textContent = PRODUCT_INFO[val];
+    card.classList.add('show');
+  } else { card.classList.remove('show'); }
+}
+
+// Consult type + Step 5 functions
+let scheduleOpen = false;
+
+function selectCT(type, btn) {
+  document.getElementById('ctSelected').value = type;
+  document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const asyncMsg = document.getElementById('rcAsyncMsg');
+  const sendQBtn = document.getElementById('rcSendQBtn');
+  const calendar = document.getElementById('rcCalendar');
+  if (type === 'Async') {
+    asyncMsg.classList.add('show');
+    sendQBtn.style.display = '';
+    calendar.classList.remove('show');
+    scheduleOpen = false;
+  } else {
+    asyncMsg.classList.remove('show');
+    sendQBtn.style.display = 'none';
+    if (scheduleOpen) calendar.classList.add('show');
+  }
+}
+
+function toggleSchedule() {
+  const ct = document.getElementById('ctSelected').value;
+  if (ct === 'Async') {
+    document.getElementById('rcAsyncMsg').classList.add('show');
+    return;
+  }
+  scheduleOpen = !scheduleOpen;
+  const cal = document.getElementById('rcCalendar');
+  if (scheduleOpen) cal.classList.add('show'); else cal.classList.remove('show');
+}
+
+function submitQueue() {
+  document.getElementById('rcQueueConfirm').classList.add('show');
+  document.getElementById('rcActionRow').style.display = 'none';
+  document.getElementById('rcCalendar').classList.remove('show');
+  document.getElementById('np_btnContinue').textContent = 'Done →';
+}
+
+function submitSchedule() {
+  const date = document.getElementById('rcDate').value || 'selected date';
+  const time = document.getElementById('rcTime').value;
+  const panel = document.getElementById('np_step5');
+  panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>Appointment Scheduled</h2><p>Appointment confirmed for ' + date + ' at ' + time + '. Patient will receive confirmation.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+  document.getElementById('np_btnContinue').style.display = 'none';
+  document.getElementById('np_btnBack').style.display = 'none';
+}
+
+function submitAsync() {
+  const panel = document.getElementById('np_step5');
+  panel.innerHTML = '<div class="success-screen show"><div class="icon">✉</div><h2>Questionnaire Sent</h2><p>Intake questionnaire sent to patient email. Their submission will appear in your queue once completed.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+  document.getElementById('np_btnContinue').style.display = 'none';
+  document.getElementById('np_btnBack').style.display = 'none';
+}
+
+// Patient search (demo patients)
+var DEMO_PATIENTS = [
+  { name: 'Marcus Johnson', id: 'P-00112', meta: 'DOB: Apr 12, 1985 · TX · Testosterone' },
+  { name: 'Emily Chen', id: 'P-00089', meta: 'DOB: Jul 22, 1990 · CA · Weight Management' },
+  { name: 'Robert Kim', id: 'P-00201', meta: 'DOB: Mar 5, 1978 · NY · BRCA Counseling' },
+];
+var selectedPatient = null;
+
+function searchPatients(q) {
+  var results = document.getElementById('ptSearchResults');
+  if (!q.trim()) { results.innerHTML = ''; return; }
+  var matches = DEMO_PATIENTS.filter(function(p) { return p.name.toLowerCase().includes(q.toLowerCase()) || p.id.toLowerCase().includes(q.toLowerCase()); });
+  if (!matches.length) { results.innerHTML = '<div style="font-size:13px;color:#9CA3AF;padding:8px 0;">No patients found.</div>'; return; }
+  results.innerHTML = '';
+  matches.forEach(function(p) {
+    var div = document.createElement('div');
+    div.style.cssText = 'padding:10px 14px;border:1px solid #E5E0D8;border-radius:8px;margin-bottom:6px;cursor:pointer;background:#fff;font-size:13px;';
+    div.innerHTML = '<div style="font-weight:700;color:#111827;">' + p.name + ' <span style="font-size:11px;color:#9CA3AF;font-weight:400;">' + p.id + '</span></div><div style="font-size:12px;color:#6B7280;margin-top:2px;">' + p.meta + '</div>';
+    div.onmouseover = function() { this.style.borderColor = '#C4B5FD'; this.style.background = '#FAF7F2'; };
+    div.onmouseout = function() { this.style.borderColor = '#E5E0D8'; this.style.background = '#fff'; };
+    div.onclick = function() { selectPatient(p); };
+    results.appendChild(div);
+  });
+}
+
+function selectPatient(p) {
+  selectedPatient = p;
+  document.getElementById('ptSearchInput').value = p.name;
+  document.getElementById('ptSearchResults').innerHTML = '';
+  document.getElementById('ptSelectedCard').style.display = '';
+  document.getElementById('ptSelectedName').textContent = p.name + ' — ' + p.id;
+  document.getElementById('ptSelectedMeta').textContent = p.meta;
+  var btn = document.getElementById('s1ContinueBtn');
+  if (btn) btn.classList.add('show');
+}
+
+function clearPatientSelection() {
+  selectedPatient = null;
+  document.getElementById('ptSearchInput').value = '';
+  document.getElementById('ptSelectedCard').style.display = 'none';
+  var btn = document.getElementById('s1ContinueBtn');
+  if (btn) btn.classList.remove('show');
+}
+
+function showCPQACard() {
+  var val = document.getElementById('cpqaCareProductSelect').value;
+  var card = document.getElementById('cpqaProductCard');
+  if (val && PRODUCT_INFO[val]) {
+    document.getElementById('cpqaProductTitle').textContent = val + ' Program';
+    document.getElementById('cpqaProductBody').textContent = PRODUCT_INFO[val];
+    card.classList.add('show');
+  } else { card.classList.remove('show'); }
+}
+
+// Dynamic intake questionnaire
+function showIntakeQ() {
+  showCPQACard();
+  var val = document.getElementById('cpqaCareProductSelect').value;
+  var area = document.getElementById('intakeQArea');
+  var testosterone = document.getElementById('intakeTestosterone');
+  var weightMgmt = document.getElementById('intakeWeightManagement');
+  var generic = document.getElementById('intakeGeneric');
+  if (!val) { area.style.display = 'none'; return; }
+  area.style.display = '';
+  testosterone.style.display = (val === 'Testosterone') ? '' : 'none';
+  weightMgmt.style.display = (val === 'Weight Management') ? '' : 'none';
+  generic.style.display = (val !== 'Testosterone' && val !== 'Weight Management') ? '' : 'none';
+}
+
+// Accordion for intake sections
+function npToggleAcc(hd) {
+  var body = hd.nextElementSibling;
+  var chev = hd.querySelector('.np-acc-chev');
+  var isOpen = body.classList.toggle('open');
+  if (chev) chev.textContent = isOpen ? '▾' : '▸';
+}
+
+// State A / State B for Step 1 search
+function showStateB() {
+  document.getElementById('s1StateA').style.display = 'none';
+  document.getElementById('s1StateB').classList.add('show');
+}
+function showStateA() {
+  document.getElementById('s1StateA').style.display = '';
+  document.getElementById('s1StateB').classList.remove('show');
+}
+
+// Address collapse toggle
+function toggleAddr(id, btn) {
+  var fields = document.getElementById(id);
+  if (!fields) return;
+  var show = fields.classList.toggle('show');
+  btn.textContent = show ? '− Hide address' : '+ Add Address (optional)';
+}
+
+// Consult type CTA update
+function updateConsultCTA() {
+  var val = document.querySelector('input[name="consultType"]:checked');
+  var btn = document.getElementById('np_btnContinue');
+  if (!btn || !val) return;
+  if (val.value === 'Async') {
+    btn.textContent = 'Submit to Queue →';
+  } else {
+    btn.textContent = 'Schedule & Submit Request →';
+  }
+}
+
+// Insurance fields toggle for new patient path
+function toggleInsuranceFields() {
+  var val = document.querySelector('input[name="coverageNew"]:checked');
+  var fields = document.getElementById('insFields');
+  if (fields) fields.style.display = (val && val.value === 'Insurance') ? '' : 'none';
+}
+
+function toggleNpSidebar() {
+  var s = document.getElementById('npSidebar');
+  var t = document.getElementById('npToggleBtn');
+  if (s) s.classList.toggle('expanded');
+  if (t) { var exp = s&&s.classList.contains('expanded'); t.innerHTML = exp ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'; }
+}
+
+// Fix 15: show time slots after date is selected
+function showTimeSlots(type, dateVal) {
+  var grid = document.getElementById(type + 'SlotsGrid');
+  var placeholder = document.getElementById(type + 'SlotsPlaceholder');
+  if (!grid || !placeholder) return;
+  if (dateVal) {
+    grid.style.display = 'flex';
+    grid.style.opacity = '0';
+    grid.style.transition = 'opacity 0.3s ease';
+    placeholder.style.display = 'none';
+    setTimeout(function() { grid.style.opacity = '1'; }, 10);
+  } else {
+    grid.style.display = 'none';
+    placeholder.style.display = 'block';
+  }
+}
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Enrollment{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <div>
+      <div class="page-header__module">M03 — Patient Portal</div>
+      <h1>Patient Enrollment</h1>
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div style="max-width:680px;margin:0 auto;">
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">1 — Select Care Product</div>
+      <select style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;">
+        <option>Testosterone Management</option>
+        <option>A1C Management</option>
+        <option>Annual Wellness Visit</option>
+      </select>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">2 — Personal Information</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">First Name</label><input type="text" value="Jamie" style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;"></div>
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Last Name</label><input type="text" value="Rivera" style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;"></div>
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">Date of Birth</label><input type="date" value="1990-03-14" style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;"></div>
+        <div><label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:4px;">State</label><input type="text" value="Texas" style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;"></div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:16px;">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">🪪 Identity Verification — IAL2 Required</div>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:14px;">Required before receiving a prescription. Takes ~2 minutes. Powered by Vouched.</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F9FAFB;border-radius:8px;">
+          <span style="font-size:20px;">📸</span>
+          <div><div style="font-size:13px;font-weight:600;color:#374151;">Step 1 — Government ID Scan</div><div style="font-size:12px;color:#6B7280;">Driver's license or passport</div></div>
+          <span style="margin-left:auto;font-size:11px;background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:600;">✅ Verified</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F9FAFB;border-radius:8px;">
+          <span style="font-size:20px;">🤳</span>
+          <div><div style="font-size:13px;font-weight:600;color:#374151;">Step 2 — Selfie Liveness Check</div><div style="font-size:12px;color:#6B7280;">Live selfie matched to ID photo</div></div>
+          <span style="margin-left:auto;font-size:11px;background:#DCFCE7;color:#166534;padding:2px 8px;border-radius:10px;font-weight:600;">✅ Verified</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:8px;font-size:12px;color:#065F46;font-weight:600;">✅ Identity verified via Vouched (IAL2) — Jun 16, 2026 10:42 AM</div>
+      <div style="margin-top:6px;font-size:11px;color:#9CA3AF;">IAL2 compliant · Results retained per HIPAA retention policy</div>
+    </div>
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:20px;margin-bottom:24px;">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">4 — Consent &amp; Submit</div>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;cursor:pointer;">
+        <input type="checkbox" checked style="margin-top:2px;accent-color:#6B21A8;">
+        <span style="font-size:13px;color:#374151;">I agree to the Telehealth Consent and Terms of Service</span>
+      </label>
+      <button onclick="alert('Enrollment submitted! Your care team will review within 24 hours.')" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:12px 32px;font-size:14px;font-weight:700;cursor:pointer;width:100%;">Complete Enrollment →</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

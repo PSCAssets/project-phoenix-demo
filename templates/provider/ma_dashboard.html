@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+{% block title %}MA Dashboard{% endblock %}
+{% block head %}
+<style>
+:root {
+  --ew-green: #00A67E;
+  --ew-green-dark: #007A5C;
+  --ew-green-light: #E1F5EE;
+  --navy: #6B21A8;
+  --amber: #D97706;
+  --amber-light: #FEF3C7;
+  --blue: #5B1898;
+  --blue-light: #EFF6FF;
+  --red: #DC2626;
+  --red-light: #FEF2F2;
+  --purple: #7C3AED;
+  --bg: #FAF7F2;
+  --white: #FFFFFF;
+  --border: #E5E0D8;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; }
+
+.sidebar {
+  position: fixed; top: 0; left: 0; width: 64px; height: 100vh;
+  background: #F2EDE4; display: flex; flex-direction: column; align-items: center;
+  padding-top: 16px; z-index: 100;
+}
+.sidebar-logo {
+  width: 36px; height: 36px; background: var(--ew-green); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 14px; margin-bottom: 24px;
+}
+.sidebar-icon {
+  width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center;
+  justify-content: center; color: #6B7280; margin-bottom: 4px;
+  cursor: pointer; font-size: 18px; transition: background 0.15s;
+}
+.sidebar-icon:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
+.sidebar-icon.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+.sidebar-footer {
+  margin-top: auto; padding-bottom: 16px; text-align: center;
+  color: #6B7280; font-size: 9px; line-height: 1.5;
+}
+
+.topbar {
+  position: fixed; top: 0; left: 64px; right: 0; height: 56px;
+  background: #6B21A8; display: flex; align-items: center;
+  padding: 0 24px; z-index: 99; border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.topbar-title { color: white; font-weight: 600; font-size: 16px; }
+.topbar-subtitle { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
+.topbar-user {
+  margin-left: auto; display: flex; align-items: center; gap: 10px;
+  color: rgba(255,255,255,0.8); font-size: 13px;
+}
+.avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--purple); display: flex; align-items: center;
+  justify-content: center; color: white; font-weight: 600; font-size: 12px;
+}
+
+.main { margin-left: 64px; margin-top: 56px; padding: 24px; min-height: calc(100vh - 56px); }
+
+.stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--white); border-radius: 12px; border: 1px solid var(--border);
+  padding: 20px; position: relative; overflow: hidden;
+}
+.stat-card .accent {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px;
+}
+.stat-card .label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 8px; padding-left: 12px; }
+.stat-card .value { font-size: 32px; font-weight: 700; padding-left: 12px; line-height: 1; }
+.stat-card .sub { font-size: 11px; color: #9CA3AF; margin-top: 4px; padding-left: 12px; }
+.green-accent { background: var(--ew-green); }
+.amber-accent { background: var(--amber); }
+.blue-accent { background: var(--blue); }
+
+.widget {
+  background: var(--white); border-radius: 12px; border: 1px solid var(--border);
+  margin-bottom: 24px; overflow: hidden;
+}
+.widget-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+}
+.widget-title { font-size: 15px; font-weight: 600; color: #111827; }
+.badge {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px;
+}
+.badge-green { background: var(--ew-green-light); color: var(--ew-green-dark); }
+.badge-amber { background: var(--amber-light); color: #92400E; }
+.badge-blue { background: var(--blue-light); color: #1D4ED8; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  padding: 10px 12px; text-align: left; font-size: 11px; font-weight: 600;
+  color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em;
+  background: #F2EDE4; border-bottom: 1px solid var(--border); white-space: nowrap;
+  cursor: pointer; user-select: none;
+}
+thead th:hover { background: #F2EDE4; }
+thead th .sort-arrow { margin-left: 4px; color: #D1D5DB; }
+tbody tr { border-bottom: 1px solid var(--border); background: var(--white); }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #FAF7F2; }
+tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
+
+.pri-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 22px; border-radius: 4px; font-size: 11px; font-weight: 700;
+}
+.pri-1 { background: #FEE2E2; color: #991B1B; }
+.pri-2 { background: #FEF3C7; color: #92400E; }
+.pri-3 { background: #F3F4F6; color: #374151; }
+
+.cat-tag {
+  display: inline-flex; align-items: center; padding: 2px 8px;
+  border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap;
+}
+.cat-intake { background: var(--ew-green-light); color: var(--ew-green-dark); }
+.cat-pa { background: var(--amber-light); color: #92400E; }
+.cat-reminder { background: var(--blue-light); color: #1D4ED8; }
+.cat-doc { background: #F1F5F9; color: #64748B; }
+
+.urgency-tag {
+  display: inline-flex; align-items: center; padding: 2px 8px;
+  border-radius: 4px; font-size: 11px; font-weight: 600;
+}
+.urgency-critical { background: #FEE2E2; color: #991B1B; }
+.urgency-high { background: #FEF3C7; color: #92400E; }
+.urgency-normal { background: #F3F4F6; color: #374151; }
+
+.action-btn {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;
+  border: none; cursor: pointer; white-space: nowrap;
+}
+.btn-green { background: var(--ew-green-light); color: var(--ew-green-dark); }
+.btn-amber { background: var(--amber-light); color: #92400E; }
+.btn-blue { background: var(--blue-light); color: #1D4ED8; }
+.btn-gray { background: #F1F5F9; color: #475569; }
+.btn-red { background: #FEE2E2; color: #991B1B; }
+
+.messages-list { list-style: none; }
+.msg-item {
+  padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex;
+  gap: 12px; align-items: flex-start; cursor: pointer;
+}
+.msg-item:last-child { border-bottom: none; }
+.msg-item.unread { background: #FAFBFF; }
+.msg-item:hover { background: #FAF7F2; }
+.msg-avatar {
+  width: 36px; height: 36px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-weight: 600; font-size: 12px;
+  flex-shrink: 0; color: white;
+}
+.msg-avatar-md { background: var(--ew-green); }
+.msg-avatar-rn { background: #059669; }
+.msg-avatar-sup { background: #6D28D9; }
+.msg-body { flex: 1; min-width: 0; }
+.msg-header { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+.msg-sender { font-size: 13px; font-weight: 600; color: #111827; }
+.role-chip {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px;
+}
+.chip-md { background: var(--ew-green-light); color: var(--ew-green-dark); }
+.chip-rn { background: var(--ew-green-light); color: var(--ew-green-dark); }
+.chip-sup { background: #EDE9FE; color: #5B21B6; }
+.msg-time { font-size: 11px; color: #9CA3AF; margin-left: auto; }
+.msg-text { font-size: 13px; color: #374151; line-height: 1.45; }
+.msg-text .consult-ref { color: #6B21A8; font-weight: 500; }
+.unread-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #6B21A8;
+  flex-shrink: 0; margin-top: 6px;
+}
+.read-spacer { width: 8px; flex-shrink: 0; }
+
+.header-subtitle { font-size: 12px; color: #6B7280; margin-left: auto; }
+
+.widget-header-user {
+  display: flex; align-items: center; gap: 8px; margin-left: auto;
+}
+.widget-header-user .avatar { width: 28px; height: 28px; font-size: 11px; }
+
+.sidebar { display: flex; flex-direction: column; align-items: center; padding: 16px 0 12px; }
+.sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+.nav-item { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: background 0.15s, color 0.15s; text-decoration: none; position: relative; }
+.nav-item:hover { background: rgba(107,33,168,0.08); color: #6B7280; }
+.nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+.nav-item .tooltip { display: none; position: absolute; left: 52px; background: #6B21A8; color: #fff; font-size: 11px; white-space: nowrap; padding: 4px 8px; border-radius: 4px; pointer-events: none; }
+.nav-item:hover .tooltip { display: block; }
+
+/* demo-nav-offset */
+.sidebar { top: 60px !important; height: calc(100vh - 60px) !important; }
+.topbar { top: 60px !important; }
+.main { margin-top: 56px !important; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar" aria-label="Main navigation">
+  <div class="sidebar-logo" title="Everlywell">EW</div>
+  <div class="sidebar-nav">
+    <a class="nav-item active" href="/provider/ma" aria-label="My Dashboard"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="tooltip">My Dashboard</span></a>
+    <a class="nav-item" href="/provider/queue" aria-label="Master Queue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg><span class="tooltip">Master Queue</span></a>
+    <a class="nav-item" href="/provider/schedule" aria-label="Schedule"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="tooltip">Schedule</span></a>
+    <a class="nav-item" href="/provider/messages" aria-label="Messages"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="tooltip">Messages</span></a>
+    <a class="nav-item" href="/provider/notifications" aria-label="Alerts"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="tooltip">Alerts</span></a>
+    <a class="nav-item" href="/provider/settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span class="tooltip">Settings</span></a>
+  </div>
+</nav>
+
+<header class="topbar">
+  <div>
+    <div class="topbar-title">My Dashboard</div>
+    <div class="topbar-subtitle">Medical Assistant · Clinical Operations</div>
+  </div>
+  <div class="topbar-user">
+    <span>Michael Torres, MA</span>
+    <div class="avatar">MT</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="accent green-accent"></div>
+      <div class="label">My Active Intakes</div>
+      <div class="value" style="color: var(--ew-green);">14</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent amber-accent"></div>
+      <div class="label">PA Submissions</div>
+      <div class="value" style="color: var(--amber);">6</div>
+      <div class="sub">pending review</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent blue-accent"></div>
+      <div class="label">Patient Reminders</div>
+      <div class="value" style="color: var(--blue);">9</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent green-accent"></div>
+      <div class="label">Avg Completion Time</div>
+      <div class="value" style="color: var(--ew-green);">18m</div>
+    </div>
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title">My Patient Activity</div>
+      <span class="badge badge-green">5 items</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Pri <span class="sort-arrow">&#8597;</span></th>
+          <th>Patient <span class="sort-arrow">&#8597;</span></th>
+          <th>Consult ID <span class="sort-arrow">&#8597;</span></th>
+          <th>Category <span class="sort-arrow">&#8597;</span></th>
+          <th>Type <span class="sort-arrow">&#8597;</span></th>
+          <th>Care Product <span class="sort-arrow">&#8597;</span></th>
+          <th>Stage</th>
+          <th>Urgency <span class="sort-arrow">&#8597;</span></th>
+          <th>Wait <span class="sort-arrow">&#8597;</span></th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="pri-badge pri-1">P1</span></td>
+          <td style="font-weight:600;">B.T.</td>
+          <td style="color:#6B7280;font-family:monospace;font-size:12px;">CST-2026-10855</td>
+          <td><span class="cat-tag cat-pa">Prior Auth</span></td>
+          <td style="color:#6B7280;">PA</td>
+          <td>Testosterone</td>
+          <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Intake review</span></td>
+          <td><span class="urgency-tag urgency-high">HIGH</span></td>
+          <td style="color:#6B7280;">48m</td>
+          <td><button class="action-btn btn-amber">Submit PA</button></td>
+        </tr>
+        <tr>
+          <td><span class="pri-badge pri-2">P2</span></td>
+          <td style="font-weight:600;">N.W.</td>
+          <td style="color:#6B7280;font-family:monospace;font-size:12px;">CST-2026-10871</td>
+          <td><span class="cat-tag cat-reminder">Reminder</span></td>
+          <td style="color:#6B7280;">Outreach</td>
+          <td>Thyroid</td>
+          <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Intake review</span></td>
+          <td><span class="urgency-tag urgency-normal">NORMAL</span></td>
+          <td style="color:#6B7280;">11m</td>
+          <td><button class="action-btn btn-blue">Send Reminder</button></td>
+        </tr>
+        <tr>
+          <td><span class="pri-badge pri-1">P1</span></td>
+          <td style="font-weight:600;">F.A.</td>
+          <td style="color:#6B7280;font-family:monospace;font-size:12px;">CST-2026-10858</td>
+          <td><span class="cat-tag cat-pa">Prior Auth</span></td>
+          <td style="color:#6B7280;">PA</td>
+          <td>Semaglutide</td>
+          <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Intake review</span></td>
+          <td><span class="urgency-tag urgency-critical">CRITICAL</span></td>
+          <td style="color:#DC2626;font-weight:700;">67m</td>
+          <td><button class="action-btn btn-red">Resubmit PA</button></td>
+        </tr>
+        <tr>
+          <td><span class="pri-badge pri-3">P3</span></td>
+          <td style="font-weight:600;">H.C.</td>
+          <td style="color:#6B7280;font-family:monospace;font-size:12px;">CST-2026-10864</td>
+          <td><span class="cat-tag cat-doc">Doc Collection</span></td>
+          <td style="color:#6B7280;">Document</td>
+          <td>Women's Health</td>
+          <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Pre-visit prep</span></td>
+          <td><span class="urgency-tag urgency-normal">NORMAL</span></td>
+          <td style="color:#6B7280;">34m</td>
+          <td><button class="action-btn btn-gray">Request Docs</button></td>
+        </tr>
+        <tr>
+          <td><span class="pri-badge pri-2">P2</span></td>
+          <td style="font-weight:600;">S.R.</td>
+          <td style="color:#6B7280;font-family:monospace;font-size:12px;">CST-2026-10875</td>
+          <td><span class="cat-tag cat-reminder">Reminder</span></td>
+          <td style="color:#6B7280;">Outreach</td>
+          <td>Men's Health</td>
+          <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Intake review</span></td>
+          <td><span class="urgency-tag urgency-normal">NORMAL</span></td>
+          <td style="color:#6B7280;">8m</td>
+          <td><button class="action-btn btn-blue">Send Reminder</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title">Internal Messages</div>
+      <span class="badge badge-blue">3 unread</span>
+      <span class="header-subtitle">All staff → Michael Torres, MA</span>
+      <div class="widget-header-user">
+        <div class="avatar" style="width:28px;height:28px;font-size:11px;">MT</div>
+      </div>
+    </div>
+    <ul class="messages-list">
+      <li class="msg-item unread">
+        <div class="unread-dot"></div>
+        <div class="msg-avatar msg-avatar-md">DC</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-sender">Dr. Chen</span>
+            <span class="role-chip chip-md">MD</span>
+            <span class="msg-time">9m ago</span>
+          </div>
+          <div class="msg-text">F.A. PA for semaglutide was denied again — please resubmit with updated clinical notes. <span class="consult-ref">CST-2026-10858</span></div>
+        </div>
+      </li>
+      <li class="msg-item unread">
+        <div class="unread-dot"></div>
+        <div class="msg-avatar msg-avatar-rn">SK</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-sender">Sarah K.</span>
+            <span class="role-chip chip-rn">RN</span>
+            <span class="msg-time">25m ago</span>
+          </div>
+          <div class="msg-text">B.T. needs PA for testosterone submitted ASAP — patient is waiting on treatment. <span class="consult-ref">CST-2026-10855</span></div>
+        </div>
+      </li>
+      <li class="msg-item unread">
+        <div class="unread-dot"></div>
+        <div class="msg-avatar msg-avatar-md">DP</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-sender">Dr. Patel</span>
+            <span class="role-chip chip-md">MD</span>
+            <span class="msg-time">38m ago</span>
+          </div>
+          <div class="msg-text">K.L. intake still incomplete — missing current medications list. <span class="consult-ref">CST-2026-10862</span></div>
+        </div>
+      </li>
+      <li class="msg-item">
+        <div class="read-spacer"></div>
+        <div class="msg-avatar msg-avatar-sup">SV</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-sender">Supervisor</span>
+            <span class="role-chip chip-sup">MA Supervisor</span>
+            <span class="msg-time">1h ago</span>
+          </div>
+          <div class="msg-text">Reminder: PA submission deadline for Q2 is EOD Friday.</div>
+        </div>
+      </li>
+      <li class="msg-item">
+        <div class="read-spacer"></div>
+        <div class="msg-avatar msg-avatar-md">DK</div>
+        <div class="msg-body">
+          <div class="msg-header">
+            <span class="msg-sender">Dr. Kim</span>
+            <span class="role-chip chip-md">MD</span>
+            <span class="msg-time">2h ago</span>
+          </div>
+          <div class="msg-text">H.C. labs uploaded — please collect signed consent before scheduling consult. <span class="consult-ref">CST-2026-10864</span></div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+</main>
+{% endblock %}

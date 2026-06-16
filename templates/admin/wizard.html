@@ -1,0 +1,1476 @@
+{% extends "base.html" %}
+{% block title %}New Care Product — Setup Wizard{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; flex-direction: column; height: 100vh; overflow: hidden; font-size: 14px; color: #111827; }
+.main-content { flex: 1; overflow: hidden; min-height: 0; }
+
+/* ── ADMIN SIDENAV ── */
+.sidenav { width: 240px; background: #1D4ED8; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 200; }
+.nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+.nav-logo-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+.nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+.sn-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; text-decoration: none; position: relative; }
+.sn-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sn-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+.sn-item.active::before { content:''; position:absolute; left:0; top:50%; transform:translateY(-50%); width:3px; height:20px; background:#7C3AED; border-radius:0 2px 2px 0; margin-left:8px; }
+.sn-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.sn-badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+.nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+/* ── WIZARD SHELL ── */
+.wiz-shell { margin-left: 240px; flex: 1; display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+
+/* Breadcrumb bar */
+.wiz-breadcrumb { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 24px; height: 48px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: #6B7280; flex-shrink: 0; z-index: 100; }
+.wiz-breadcrumb a { color: #6B7280; text-decoration: none; }
+.wiz-breadcrumb a:hover { color: #111827; }
+.wiz-breadcrumb .sep { color: #D1D5DB; }
+.wiz-breadcrumb .cur { color: #111827; font-weight: 500; }
+.draft-pill { margin-left: auto; background: #F2EDE4; color: #6B7280; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; border: 1px solid #E5E0D8; }
+
+/* Body row: step nav + content */
+.wiz-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+/* Step nav panel */
+.step-nav { width: 280px; flex-shrink: 0; background: #1D4ED8; overflow-y: auto; padding: 16px 0; }
+.step-group-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); padding: 14px 20px 6px; }
+.step-nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 20px; cursor: pointer; border-left: 3px solid transparent; position: relative; }
+.step-nav-item:hover { background: rgba(255,255,255,0.05); }
+.step-nav-item.active { background: rgba(29,78,216,0.15); border-left-color: #1D4ED8; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.5); }
+.step-nav-item.active .step-num { background: #1D4ED8; color: #fff; }
+.step-nav-item.done .step-num { background: #22C55E; color: #fff; }
+.step-name { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.3; }
+.step-nav-item.active .step-name { color: #fff; font-weight: 600; }
+.step-nav-item.done .step-name { color: rgba(255,255,255,0.7); }
+
+/* Main content area */
+.wiz-content { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: #F2EDE4; }
+.wiz-panels { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 32px 40px; }
+.step-panel { display: none; }
+.step-panel.active { display: block; }
+.step-heading { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.step-sub { font-size: 13px; color: #6B7280; margin-bottom: 24px; line-height: 1.5; }
+
+/* Form elements */
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-size: 12px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.form-label .req { color: #EF4444; }
+.form-input { width: 100%; border: 1px solid #E5E0D8; border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: inherit; color: #111827; outline: none; }
+.form-input:focus { border-color: #1D4ED8; box-shadow: 0 0 0 2px rgba(29,78,216,0.15); }
+.form-textarea { width: 100%; border: 1px solid #E5E0D8; border-radius: 8px; padding: 9px 12px; font-size: 13px; font-family: inherit; color: #111827; outline: none; resize: vertical; min-height: 72px; }
+.char-count { font-size: 11px; color: #9CA3AF; text-align: right; margin-top: 3px; }
+.radio-group, .check-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.radio-opt, .check-opt { display: flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid #E5E0D8; border-radius: 8px; cursor: pointer; font-size: 13px; background: #fff; user-select: none; }
+.radio-opt input, .check-opt input { accent-color: #1D4ED8; }
+.radio-opt:has(input:checked), .check-opt:has(input:checked) { border-color: #1D4ED8; background: #EFF6FF; }
+.toggle-row { display: flex; align-items: center; gap: 12px; }
+.toggle { position: relative; width: 40px; height: 22px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; inset: 0; background: #D1D5DB; border-radius: 11px; cursor: pointer; transition: background 0.2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+.toggle input:checked + .toggle-slider { background: #1D4ED8; }
+.toggle input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle-label { font-size: 13px; color: #374151; }
+
+/* Tables */
+.wiz-table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.wiz-table th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F9FAFB; border-bottom: 1px solid #E5E0D8; }
+.wiz-table td { padding: 11px 14px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+.wiz-table tr:last-child td { border-bottom: none; }
+.wiz-table input[type="text"], .wiz-table input[type="number"] { border: 1px solid #E5E0D8; border-radius: 6px; padding: 5px 8px; font-size: 12px; width: 100%; }
+.wiz-table select { border: 1px solid #E5E0D8; border-radius: 6px; padding: 5px 8px; font-size: 12px; }
+
+/* Card widget */
+.form-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+.form-card-title { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 14px; }
+
+/* Workflow flow diagram */
+.flow-diagram { display: flex; align-items: center; gap: 0; margin: 16px 0; flex-wrap: wrap; }
+.flow-stage { background: #fff; border: 2px solid #E5E0D8; border-radius: 8px; padding: 10px 16px; font-size: 12px; font-weight: 600; color: #374151; text-align: center; min-width: 110px; }
+.flow-stage.conditional { border-style: dashed; border-color: #9CA3AF; color: #6B7280; }
+.flow-arrow { color: #9CA3AF; font-size: 18px; margin: 0 6px; }
+.flow-note { font-size: 11px; color: #9CA3AF; margin-top: 8px; }
+
+/* State grid */
+.state-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; margin: 12px 0; }
+.state-cb { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.state-cb input { accent-color: #1D4ED8; width: 15px; height: 15px; }
+.state-cb label { font-size: 10px; font-weight: 600; color: #374151; cursor: pointer; }
+.state-btns { display: flex; gap: 8px; margin-bottom: 10px; }
+.btn-sm { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #E5E0D8; background: #fff; color: #374151; }
+.btn-sm:hover { background: #FAF7F2; }
+
+/* Tag input */
+.tag-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1px solid #E5E0D8; border-radius: 8px; background: #fff; min-height: 40px; align-items: center; }
+.tag { background: #EDE9FE; color: #5B21B6; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+.tag button { background: none; border: none; cursor: pointer; color: #7C3AED; font-size: 14px; line-height: 1; padding: 0; }
+.tag-input-field { border: none; outline: none; font-size: 12px; min-width: 120px; }
+
+/* Duration pill buttons */
+.dur-pill-group { display: flex; gap: 6px; }
+.dur-pill { display: inline-flex; cursor: pointer; }
+.dur-pill input { display: none; }
+.dur-pill span { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #D1D5DB; background: #fff; color: #374151; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.dur-pill input:checked + span { background: #1D4ED8; color: #fff; border-color: #1D4ED8; }
+
+/* Feature flags table */
+.flag-row-locked { opacity: 0.45; pointer-events: none; }
+.flag-badge { font-size: 10px; font-weight: 700; background: #FEF3C7; color: #92400E; padding: 2px 7px; border-radius: 10px; margin-left: 6px; }
+
+/* Review step */
+.review-section { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; margin-bottom: 10px; overflow: hidden; width: 100%; max-width: 100%; box-sizing: border-box; }
+.review-section-hd { padding: 13px 18px; display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+.review-step-num { width: 24px; height: 24px; border-radius: 50%; background: #22C55E; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.review-step-name { font-size: 14px; font-weight: 600; color: #111827; flex: 1; }
+.review-edit { font-size: 12px; font-weight: 600; color: #1D4ED8; text-decoration: none; cursor: pointer; }
+.review-chevron { color: #9CA3AF; transition: transform 0.2s; }
+.review-section.open .review-chevron { transform: rotate(180deg); }
+.review-body { display: none; padding: 12px 18px 16px; border-top: 1px solid #E5E0D8; }
+.review-section.open .review-body { display: block; }
+.review-row { display: flex; gap: 12px; font-size: 13px; padding: 4px 0; }
+.review-key { width: 180px; color: #6B7280; flex-shrink: 0; }
+.review-val { color: #111827; font-weight: 500; }
+
+/* Submit block */
+.submit-block { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; padding: 24px; margin-top: 24px; text-align: center; }
+.submit-status { font-size: 13px; color: #6B7280; margin-bottom: 16px; }
+.submit-status strong { color: #111827; }
+.submit-actions { display: flex; justify-content: center; gap: 12px; }
+.btn-draft { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 10px 22px; font-size: 14px; font-weight: 600; cursor: pointer; color: #374151; }
+.btn-submit { background: #7C3AED; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-size: 14px; font-weight: 700; cursor: pointer; }
+.btn-submit:hover { background: #6D28D9; }
+.submit-note { font-size: 12px; color: #9CA3AF; margin-top: 12px; }
+
+/* Bottom action bar */
+.wiz-bottom { position: sticky; bottom: 0; left: 0; right: 0; width: 100%; height: 64px; background: #fff; border-top: 1px solid #E5E0D8; display: flex; align-items: center; padding: 0 32px; gap: 16px; z-index: 150; flex-shrink: 0; }
+.wiz-bottom .save-exit { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; }
+.wiz-bottom .save-exit:hover { background: #FAF7F2; }
+.step-counter { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.step-counter-label { font-size: 12px; color: #6B7280; }
+.progress-bar-wrap { width: 240px; height: 6px; background: #E5E0D8; border-radius: 3px; }
+.progress-bar-fill { height: 6px; background: #1D4ED8; border-radius: 3px; transition: width 0.3s; }
+.wiz-nav-btns { display: flex; gap: 8px; }
+.btn-back { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; }
+.btn-back:hover { background: #F9FAFB; }
+.btn-continue { background: #1D4ED8; color: #fff; border: none; border-radius: 8px; padding: 8px 22px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-continue:hover { background: #1A44C0; }
+.btn-continue:disabled { opacity: 0.5; cursor: default; }
+
+/* Intake Questionnaire question cards */
+.iq-card { display:flex; align-items:flex-start; gap:10px; background:#fff; border:1px solid #E5E0D8; border-radius:8px; padding:10px 14px; margin-bottom:7px; }
+.iq-drag { color:#CBD5E1; font-size:17px; cursor:grab; line-height:1.2; flex-shrink:0; padding-top:1px; user-select:none; }
+.iq-num { font-size:12px; font-weight:700; color:#9CA3AF; flex-shrink:0; min-width:22px; padding-top:2px; }
+.iq-body { flex:1; }
+.iq-q { font-size:13px; font-weight:500; color:#111827; line-height:1.4; margin-bottom:6px; }
+.iq-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; display:inline-block; }
+.iq-hint { font-size:10px; color:#9CA3AF; margin-left:6px; }
+.iq-ss { background:#EDE9FE; color:#5B21B6; }
+.iq-ms { background:#DBEAFE; color:#1E40AF; }
+.iq-txt { background:#F3F4F6; color:#6B7280; }
+.iq-num-t { background:#D1FAE5; color:#065F46; }
+.iq-date { background:#FEF3C7; color:#92400E; }
+.iq-yn { background:#FCE7F3; color:#9D174D; }
+</style>
+{% endblock %}
+{% block content %}
+
+<!-- Admin Sidenav -->
+<aside class="sidenav">
+  <a href="/" class="nav-logo" style="text-decoration:none;display:block;"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></a>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding:8px 0;flex:1;">
+    <a href="/admin/" class="sn-item"><span class="sn-icon">📊</span> Dashboard</a>
+    <a href="/admin/care-products" class="sn-item active"><span class="sn-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="sn-item"><span class="sn-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/providers" class="sn-item"><span class="sn-icon">👩‍⚕️</span> Providers</a>
+    <a href="/admin/patients" class="sn-item"><span class="sn-icon">👥</span> Patients</a>
+    <a href="/admin/reports" class="sn-item"><span class="sn-icon">📈</span> Reports</a>
+    <a href="/admin/settings" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="sn-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="sn-icon">←</span> Switch User</a></div>
+</aside>
+
+<!-- Wizard Shell -->
+<div class="wiz-shell">
+
+  <!-- Body -->
+  <div class="wiz-body">
+
+    <!-- Step Nav Panel -->
+    <div class="step-nav" id="stepNav">
+      <div class="step-group-label">Client</div>
+      <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
+      <div class="step-group-label">Foundation</div>
+      <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
+      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">2</div><div class="step-name">Provider Type</div></div>
+      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">3</div><div class="step-name">State Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">4</div><div class="step-name">Age &amp; Guardian Rules</div></div>
+      <div class="step-group-label">Clinical Setup</div>
+      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">5</div><div class="step-name">Appointment Duration</div></div>
+      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">6</div><div class="step-name">Consult Payment Tiers</div></div>
+      <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">7</div><div class="step-name">Health Profile Requirements</div></div>
+      <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">8</div><div class="step-name">Intake Questionnaire</div></div>
+      <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">10</div><div class="step-name">Documentation Template</div></div>
+      <div class="step-group-label">Workflow &amp; SLA</div>
+      <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">9</div><div class="step-name">Workflow Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">10</div><div class="step-name">SLA Configuration</div></div>
+      <div class="step-group-label">Configuration</div>
+      <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">11</div><div class="step-name">Lab Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(14)" id="sni14"><div class="step-num">12</div><div class="step-name">Cancellation Policy</div></div>
+      <div class="step-nav-item" onclick="goToStep(15)" id="sni15"><div class="step-num">13</div><div class="step-name">Documents &amp; Consent</div></div>
+      <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">14</div><div class="step-name">Notification Templates</div></div>
+      <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">15</div><div class="step-name">Patient Onboarding</div></div>
+      <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">16</div><div class="step-name">Linked Consultations</div></div>
+      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">17</div><div class="step-name">Feature Flags</div></div>
+      <div class="step-group-label">Review</div>
+      <div class="step-nav-item" onclick="goToStep(20)" id="sni20"><div class="step-num">18</div><div class="step-name">Review &amp; Submit</div></div>
+    </div>
+
+    <!-- Step Content Panels -->
+    <div class="wiz-content">
+      <div class="wiz-breadcrumb">
+        <a href="/admin/">Admin</a><span class="sep">›</span>
+        <a href="/admin/care-products">Care Products</a><span class="sep">›</span>
+        <span class="cur" id="wizBreadcrumbCur">New Care Product</span>
+        <span class="draft-pill">Draft — Auto-saved</span>
+      </div>
+      <div class="wiz-panels">
+
+      <!-- STEP 1: Select Client -->
+      <div class="step-panel active" id="step1">
+        <div class="step-heading">Step 1 — Select Client</div>
+        <div class="step-sub">All care products must be associated with a client. Select the client this care product will be built for.</div>
+        <div class="form-group" style="max-width:480px;">
+          <label class="form-label">Client <span class="req">*</span></label>
+          <select class="form-input" id="s0_client" onchange="onClientSelect(this)">
+            <option value="">— Select a client —</option>
+            {% for c in clients %}
+            <option value="{{ c[0] }}" {{ 'selected' if c[1] == 'Humana' else '' }}>{{ c[1] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div id="s0_client_card" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:16px 20px;max-width:480px;margin-top:4px;">
+          <div style="font-size:11px;font-weight:600;color:#065F46;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Selected Client</div>
+          <div id="s0_client_name" style="font-size:16px;font-weight:700;color:#111827;"></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Basic Info -->
+      <div class="step-panel" id="step2">
+        <div class="step-heading">Step 2 — Basic Info</div>
+        <div class="step-sub">Define the core identity of this care product.</div>
+        <div class="form-group">
+          <label class="form-label">Product Name <span class="req">*</span></label>
+          <input type="text" class="form-input" id="s1_name" value="A1C Management" placeholder="e.g. Testosterone Replacement Therapy">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Display Name <span class="req">*</span><span style="font-weight:400;color:#9CA3AF"> — patient-facing</span></label>
+          <input type="text" class="form-input" id="s1_display" value="A1C Care" placeholder="Patient-facing name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Care Type <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="careType" value="Chronic Care" checked> Chronic Care</label>
+            <label class="radio-opt"><input type="radio" name="careType" value="Acute Care"> Acute Care</label>
+            <label class="radio-opt"><input type="radio" name="careType" value="Preventive"> Preventive</label>
+            <label class="radio-opt"><input type="radio" name="careType" value="Specialty"> Specialty</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Consult Types <span class="req">*</span></label>
+          <div class="check-group">
+            <label class="check-opt"><input type="checkbox" id="ct_async" checked> Async</label>
+            <label class="check-opt"><input type="checkbox" id="ct_video"> Video</label>
+            <label class="check-opt"><input type="checkbox" id="ct_phone" checked> Phone</label>
+            <label class="check-opt"><input type="checkbox" id="ct_lab"> Lab Review</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Description <span style="font-weight:400;color:#9CA3AF">(160 char max)</span></label>
+          <textarea class="form-textarea" id="s1_desc" maxlength="160" oninput="document.getElementById('s1_desc_count').textContent=this.value.length+'/160'" placeholder="Patient-facing summary of this care product"></textarea>
+          <div class="char-count" id="s1_desc_count">0/160</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Internal Notes <span style="font-weight:400;color:#9CA3AF">(optional)</span></label>
+          <textarea class="form-textarea" id="s1_notes" placeholder="Internal team notes — not shown to patients"></textarea>
+        </div>
+      </div>
+
+      <!-- STEP 2: Provider Type -->
+      <div class="step-panel" id="step3">
+        <div class="step-heading">Step 3 — Provider Type</div>
+        <div class="step-sub">Define which provider credential types are eligible to deliver this care product.</div>
+        <div class="form-group">
+          <label class="form-label">Eligible Provider Types <span class="req">*</span></label>
+          <div class="check-group">
+            <label class="check-opt"><input type="checkbox" id="pt_md" checked> MD/DO</label>
+            <label class="check-opt"><input type="checkbox" id="pt_np" checked> NP</label>
+            <label class="check-opt"><input type="checkbox" id="pt_pa"> PA</label>
+            <label class="check-opt"><input type="checkbox" id="pt_gc"> Genetic Counselor (GC)</label>
+            <label class="check-opt"><input type="checkbox" id="pt_rn"> RN</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Supervision Required</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s2_supervision"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Supervising Physician required per NP/PA</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Max Providers Per State <span style="font-weight:400;color:#9CA3AF">(optional)</span></label>
+          <input type="number" class="form-input" id="s2_max" placeholder="No limit" style="max-width:180px">
+        </div>
+      </div>
+
+      <!-- STEP 3: State Configuration -->
+      <div class="step-panel" id="step4">
+        <div class="step-heading">Step 4 — State Configuration</div>
+        <div class="step-sub">Select which states this care product is available in. Consult type overrides per state are available after initial activation.</div>
+        <div class="state-btns">
+          <button class="btn-sm" onclick="setAllStates(true)">Select All</button>
+          <button class="btn-sm" onclick="setAllStates(false)">Clear All</button>
+        </div>
+        <div class="state-grid" id="stateGrid"></div>
+        <p style="font-size:12px;color:#9CA3AF;margin-top:12px;">* Consult type overrides per state available after initial activation.</p>
+      </div>
+
+      <!-- STEP 4: Age & Guardian Rules -->
+      <div class="step-panel" id="step5">
+        <div class="step-heading">Step 5 — Age &amp; Guardian Rules</div>
+        <div class="step-sub">Set patient age eligibility requirements for this care product.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:440px;">
+          <div class="form-group">
+            <label class="form-label">Minimum Patient Age <span class="req">*</span></label>
+            <input type="number" class="form-input" id="s4_min" value="18" min="0" max="120">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Maximum Patient Age <span style="font-weight:400;color:#9CA3AF">(optional)</span></label>
+            <input type="number" class="form-input" id="s4_max" placeholder="No limit" min="0" max="120">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Guardian Consent Required</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s4_guardian"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Guardian consent required for patients under 18</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Minor Enrollment</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s4_minor"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Allow enrollment for patients under 18</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5: Appointment Duration -->
+      <div class="step-panel" id="step6">
+        <div class="step-heading">Step 6 — Appointment Duration</div>
+        <div class="step-sub">Set appointment slot durations for each scheduled consult type. Initial and follow-up visits can have different lengths.</div>
+        <div style="overflow:hidden;border:1px solid #E5E7EB;border-radius:10px;background:#fff;margin-bottom:14px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr style="background:#F3F4F6;">
+                <th style="width:160px;padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Consult Type</th>
+                <th style="width:200px;padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Visit Type</th>
+                <th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;font-weight:600;">Phone</td>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;">Initial Consultation</td>
+                <td style="padding:11px 14px;border-bottom:1px solid #E5E7EB;">
+                  <div class="dur-pill-group">
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_initial" value="15"><span>15 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_initial" value="30" checked><span>30 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_initial" value="45"><span>45 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_initial" value="60"><span>60 min</span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;font-weight:600;">Phone</td>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;">Follow-up</td>
+                <td style="padding:11px 14px;border-bottom:1px solid #E5E7EB;">
+                  <div class="dur-pill-group">
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_followup" value="15" checked><span>15 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_followup" value="30"><span>30 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_followup" value="45"><span>45 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_phone_followup" value="60"><span>60 min</span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;font-weight:600;">Video</td>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E7EB;">Initial Consultation</td>
+                <td style="padding:11px 14px;border-bottom:1px solid #E5E7EB;">
+                  <div class="dur-pill-group">
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_initial" value="15"><span>15 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_initial" value="30"><span>30 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_initial" value="45" checked><span>45 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_initial" value="60"><span>60 min</span></label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;font-weight:600;">Video</td>
+                <td style="padding:11px 14px;font-size:13px;color:#374151;">Follow-up</td>
+                <td style="padding:11px 14px;">
+                  <div class="dur-pill-group">
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_followup" value="15"><span>15 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_followup" value="30" checked><span>30 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_followup" value="45"><span>45 min</span></label>
+                    <label class="dur-pill"><input type="checkbox" name="dur_video_followup" value="60"><span>60 min</span></label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:12px;color:#6B7280;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:8px;padding:10px 14px;">Async consultations do not require an appointment duration — they are queue-based.</p>
+      </div>
+
+      <!-- STEP 6: Consult Classification & Billing Tiers -->
+      <div class="step-panel" id="step7">
+        <div class="step-heading">Step 7 — Consult Classification &amp; Billing Tiers</div>
+        <div class="step-sub">Consultation rates are managed in provider agreements and tracked externally. Configure consult tier categories here for reporting.</div>
+        <div class="form-group">
+          <label class="form-label">Billing Model</label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="payModel" value="visit" checked> Visit Type Model</label>
+            <label class="radio-opt"><input type="radio" name="payModel" value="flat"> Flat Rate</label>
+            <label class="radio-opt"><input type="radio" name="payModel" value="sub"> Subscription</label>
+          </div>
+        </div>
+        <div style="margin-top:20px">
+          <table class="wiz-table">
+            <thead><tr><th>Type</th><th>Default Consult Tier</th><th>Insurance Eligible</th></tr></thead>
+            <tbody>
+              <tr><td>Initial Consultation</td><td><select><option>Moderate</option><option>Simple</option><option>Complex</option><option>Extended</option></select></td><td><select><option>Yes</option><option>No</option></select></td></tr>
+              <tr><td>Follow-up Consultation</td><td><select><option>Simple</option><option>Moderate</option><option>Complex</option><option>Extended</option></select></td><td><select><option>Yes</option><option>No</option></select></td></tr>
+              <tr><td>Refill Request</td><td><select><option>Simple</option><option>Moderate</option><option>Complex</option><option>Extended</option></select></td><td><select><option>No</option><option>Yes</option></select></td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:10px"><a href="#" style="font-size:13px;color:#1D4ED8;font-weight:600;text-decoration:none;">+ Add tier</a></div>
+        </div>
+      </div>
+
+      <!-- STEP 7: Health Profile Requirements -->
+      <div class="step-panel" id="step8">
+        <div class="step-heading">Step 8 — Health Profile Requirements</div>
+        <div class="step-sub">Configure which health profile sections patients must complete for this care product.</div>
+        <table class="wiz-table">
+          <thead><tr><th>Section</th><th>Required</th><th>Optional</th><th>Hidden</th></tr></thead>
+          <tbody>
+            <tr><td>Current Medications</td><td><input type="radio" name="hp1" value="required" checked></td><td><input type="radio" name="hp1" value="optional"></td><td><input type="radio" name="hp1" value="hidden"></td></tr>
+            <tr><td>Allergies</td><td><input type="radio" name="hp2" value="required"></td><td><input type="radio" name="hp2" value="optional" checked></td><td><input type="radio" name="hp2" value="hidden"></td></tr>
+            <tr><td>Medical Conditions</td><td><input type="radio" name="hp3" value="required" checked></td><td><input type="radio" name="hp3" value="optional"></td><td><input type="radio" name="hp3" value="hidden"></td></tr>
+            <tr><td>Surgical History</td><td><input type="radio" name="hp4" value="required"></td><td><input type="radio" name="hp4" value="optional" checked></td><td><input type="radio" name="hp4" value="hidden"></td></tr>
+            <tr><td>Family History</td><td><input type="radio" name="hp5" value="required"></td><td><input type="radio" name="hp5" value="optional"></td><td><input type="radio" name="hp5" value="hidden" checked></td></tr>
+            <tr><td>Measurements (Height/Weight)</td><td><input type="radio" name="hp6" value="required" checked></td><td><input type="radio" name="hp6" value="optional"></td><td><input type="radio" name="hp6" value="hidden"></td></tr>
+            <tr><td>Blood Pressure</td><td><input type="radio" name="hp7" value="required"></td><td><input type="radio" name="hp7" value="optional" checked></td><td><input type="radio" name="hp7" value="hidden"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STEP 8: Intake Questionnaire -->
+      <div class="step-panel" id="step9">
+        <div class="step-heading">Step 9 — Intake Questionnaire</div>
+        <div class="step-sub">Configure the intake questionnaire patients complete when enrolling in this care product.</div>
+        <div class="form-group">
+          <div class="radio-group" style="flex-direction:column;gap:8px;">
+            <label class="radio-opt"><input type="radio" name="iqMode" value="library" onchange="toggleIQLibrary()"> Select from Library</label>
+            <label class="radio-opt"><input type="radio" name="iqMode" value="build" checked onchange="toggleIQLibrary()"> Build New</label>
+            <label class="radio-opt"><input type="radio" name="iqMode" value="none" onchange="toggleIQLibrary()"> No Intake Required</label>
+          </div>
+        </div>
+        <div id="iq_library" style="display:none;">
+          <div class="form-group">
+            <label class="form-label">Select Questionnaire</label>
+            <select class="form-input" id="iq_select" style="max-width:420px" onchange="updateIQPreview()">
+              <option value="a1c25">A1C Management Intake v1.0 (Active · 25 questions)</option>
+              <option value="derm32">Dermatology Intake v3.2 (Active · 24 questions)</option>
+              <option value="derm31">Dermatology Intake v3.1 (Archived)</option>
+              <option value="gen20">General Health Intake v2.0 (Active · 18 questions)</option>
+              <option value="test41">Testosterone Intake v4.1 (Active · 31 questions)</option>
+            </select>
+          </div>
+          <div id="iq_preview" style="display:flex;align-items:center;gap:12px;background:#EDE9FE;border:1px solid #DDD6FE;border-radius:8px;padding:12px 16px;font-size:13px;color:#5B21B6;max-width:500px;">
+            <span>📋</span>
+            <span id="iq_preview_text">Dermatology Intake v3.2 — 24 questions · Last updated Mar 2026</span>
+            <a href="#" style="margin-left:auto;font-size:12px;font-weight:600;color:#7C3AED;text-decoration:none;">Preview →</a>
+          </div>
+        </div>
+        <div id="iq_build">
+          <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">25 questions pre-loaded for A1C Management. Drag handles shown for demo — reordering is available in production.</div>
+          <div style="max-height:420px;overflow-y:scroll;border:1px solid #E5E0D8;border-radius:10px;padding:12px 14px;background:#FAF7F2;">
+
+            <!-- Section: Diabetes History -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:4px 0 8px;">Diabetes History</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">1.</span><div class="iq-body"><div class="iq-q">Have you been diagnosed with Type 1 or Type 2 diabetes?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">2.</span><div class="iq-body"><div class="iq-q">How long have you had diabetes?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">3.</span><div class="iq-body"><div class="iq-q">When was your most recent HbA1c test?</div><span class="iq-badge iq-date">Date</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">4.</span><div class="iq-body"><div class="iq-q">What was your most recent HbA1c result?</div><span class="iq-badge iq-num-t">Number</span><span class="iq-hint">e.g. 7.4</span></div></div>
+
+            <!-- Section: Medications -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:12px 0 8px;">Medications</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">5.</span><div class="iq-body"><div class="iq-q">Are you currently taking any diabetes medications?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">6.</span><div class="iq-body"><div class="iq-q">If yes, which diabetes medications are you taking?</div><span class="iq-badge iq-ms">Multi Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">7.</span><div class="iq-body"><div class="iq-q">Are you taking any other prescription medications?</div><span class="iq-badge iq-yn">Yes / No</span><span class="iq-badge iq-txt" style="margin-left:4px;">+ Text</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">8.</span><div class="iq-body"><div class="iq-q">Do you take any vitamins, supplements, or over-the-counter medications?</div><span class="iq-badge iq-txt">Text</span></div></div>
+
+            <!-- Section: Clinical Measurements -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:12px 0 8px;">Clinical Measurements</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">9.</span><div class="iq-body"><div class="iq-q">What is your most recent blood pressure reading?</div><span class="iq-badge iq-txt">Text</span><span class="iq-hint">e.g. 128/82</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">10.</span><div class="iq-body"><div class="iq-q">What is your current weight?</div><span class="iq-badge iq-num-t">Number</span><span class="iq-hint">lbs</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">11.</span><div class="iq-body"><div class="iq-q">What is your current height?</div><span class="iq-badge iq-num-t">Number</span><span class="iq-hint">inches</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">12.</span><div class="iq-body"><div class="iq-q">Have you had a cholesterol/lipid panel in the past 12 months?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">13.</span><div class="iq-body"><div class="iq-q">If yes, what was your LDL result?</div><span class="iq-badge iq-num-t">Number</span><span class="iq-hint">mg/dL</span></div></div>
+
+            <!-- Section: Complications & Monitoring -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:12px 0 8px;">Complications &amp; Monitoring</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">14.</span><div class="iq-body"><div class="iq-q">Do you monitor your blood sugar at home?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">15.</span><div class="iq-body"><div class="iq-q">If yes, what is your typical fasting blood sugar range?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">16.</span><div class="iq-body"><div class="iq-q">Have you had any hypoglycemia (low blood sugar) episodes in the past 3 months?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">17.</span><div class="iq-body"><div class="iq-q">Do you have any diabetes-related complications?</div><span class="iq-badge iq-ms">Multi Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">18.</span><div class="iq-body"><div class="iq-q">Have you seen an eye doctor (ophthalmologist) in the past 12 months?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+
+            <!-- Section: Lifestyle -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:12px 0 8px;">Lifestyle</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">19.</span><div class="iq-body"><div class="iq-q">Do you currently smoke or use tobacco products?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">20.</span><div class="iq-body"><div class="iq-q">How would you describe your physical activity level?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">21.</span><div class="iq-body"><div class="iq-q">Are you following any specific diet?</div><span class="iq-badge iq-ss">Single Select</span></div></div>
+
+            <!-- Section: Reason for Visit -->
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;padding:12px 0 8px;">Reason for Visit</div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">22.</span><div class="iq-body"><div class="iq-q">What is your primary reason for this consultation?</div><span class="iq-badge iq-txt">Text</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">23.</span><div class="iq-body"><div class="iq-q">Have you been hospitalized for diabetes-related issues in the past 12 months?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card"><span class="iq-drag">⠿</span><span class="iq-num">24.</span><div class="iq-body"><div class="iq-q">Do you have a primary care physician currently managing your diabetes?</div><span class="iq-badge iq-yn">Yes / No</span></div></div>
+            <div class="iq-card" style="margin-bottom:0;"><span class="iq-drag">⠿</span><span class="iq-num">25.</span><div class="iq-body"><div class="iq-q">Is there anything else you would like the provider to know?</div><span class="iq-badge iq-txt">Text</span></div></div>
+
+          </div><!-- /scrollable list -->
+        </div><!-- /iq_build -->
+      </div>
+
+      <!-- STEP 10: Documentation Template -->
+      <div class="step-panel" id="step10">
+        <div class="step-heading">Step 10 — Documentation Template</div>
+        <div class="step-sub">Select the provider documentation template for this care product.</div>
+        <div id="docTplBanner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400E;margin-bottom:14px;">&#10022; Template auto-suggested based on care product name. Confirm or change below.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+          <label id="docTplCard1" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+            <input type="radio" name="docTemplate" value="a1c_em" onchange="selectDocTpl(1)" style="position:absolute;top:12px;right:12px;accent-color:#6B21A8;width:16px;height:16px;">
+            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+              <span style="font-size:13px;font-weight:700;color:#111827;">A1C E&amp;M Template</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#EDE9FE;color:#6B21A8;flex-shrink:0;">HEDIS</span>
+            </div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Chronic disease management — diabetes, glycemic control, HEDIS CDC measures</div>
+            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; HPI &middot; ROS &middot; Vitals &middot; Labs &middot; Assessment &middot; Plan &middot; HEDIS CDC (7) &middot; MDM/Billing</div>
+          </label>
+          <label id="docTplCard2" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+            <input type="radio" name="docTemplate" value="awv" onchange="selectDocTpl(2)" style="position:absolute;top:12px;right:12px;accent-color:#065F46;width:16px;height:16px;">
+            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+              <span style="font-size:13px;font-weight:700;color:#111827;">Annual Wellness Visit Template</span>
+              <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#D1FAE5;color:#065F46;flex-shrink:0;">HEDIS</span>
+            </div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Preventive care — EverlyCare Wellness, HEDIS gap closure, PRAPARE screener</div>
+            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; Medication Reconciliation &middot; Katz ADL &middot; PRAPARE &middot; Assessment &middot; HEDIS Gap Closure (11) &middot; Plan/Orders &middot; MDM/Billing</div>
+          </label>
+          <label id="docTplCard3" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+            <input type="radio" name="docTemplate" value="soap" onchange="selectDocTpl(3)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
+            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+              <span style="font-size:13px;font-weight:700;color:#111827;">Standard SOAP Note</span>
+            </div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.4;">General purpose — Subjective, Objective, Assessment, Plan</div>
+            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Subjective &middot; Objective &middot; Assessment &middot; Plan</div>
+          </label>
+          <label id="docTplCard4" style="display:flex;flex-direction:column;gap:8px;background:#EFF6FF;border:2px solid #1D4ED8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+            <input type="radio" name="docTemplate" value="none" checked onchange="selectDocTpl(4)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
+            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+              <span style="font-size:13px;font-weight:700;color:#111827;">No Template</span>
+            </div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Documentation not required for this care product</div>
+            <div style="font-size:11px;color:#9CA3AF;font-style:italic;margin-top:2px;">Providers will not see a Documentation tab for this care product</div>
+          </label>
+        </div>
+        <div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;">
+          <div onclick="toggleDocTplPreview()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;background:#fff;user-select:none;">
+            <span style="font-size:13px;font-weight:600;color:#374151;flex:1;">Preview full template structure</span>
+            <span id="docTplChev" style="color:#9CA3AF;font-size:13px;transition:transform 0.2s;">&#9660;</span>
+          </div>
+          <div id="docTplPreviewBody" style="display:none;border-top:1px solid #E5E0D8;background:#FAFAFA;">
+            <div id="docTplPreviewContent" style="padding:12px 16px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 9: Workflow Configuration -->
+      <div class="step-panel" id="step11">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <div class="step-heading">Step 11 — Workflow Configuration</div>
+            <div class="step-sub" style="margin-bottom:0;">Define the clinical workflow stages for this care product.</div>
+          </div>
+          <button id="s9SimBtn" onclick="toggleSimulation()" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:4px;">▶ Simulate</button>
+        </div>
+
+        <!-- MODE SELECTOR -->
+        <div style="display:flex;gap:12px;margin-bottom:20px;">
+          <label id="modeCardTemplate" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #1D4ED8;background:#EFF6FF;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="wfMode" value="template" checked onchange="setWfMode('template')">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#1D4ED8;">Use template</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px;">Choose from pre-built clinical workflow templates</div>
+            </div>
+          </label>
+          <label id="modeCardCustom" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #E5E0D8;background:#fff;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="wfMode" value="custom" onchange="setWfMode('custom')">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#374151;">Custom workflow</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px;">Build a workflow from scratch (Phase 2)</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- TEMPLATE MODE -->
+        <div id="s9TemplateMode">
+          <!-- Template selector + description -->
+          <div style="margin-bottom:16px;">
+            <label class="form-label">Workflow Template</label>
+            <select id="s9TemplateSelect" class="form-input" style="max-width:440px;" onchange="updateWfTemplate(this.value)">
+              <option value="standard_async_v2">Standard async workflow v2</option>
+              <option value="standard_phone_video">Standard phone / video</option>
+              <option value="lab_required_async">Lab-required async</option>
+              <option value="genetic_counseling_specialty">Genetic counseling / specialty</option>
+            </select>
+          </div>
+          <div id="s9TemplateDesc" style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:3px;" id="s9TplApplicable"></div>
+            <div style="font-size:12px;color:#6B7280;" id="s9TplDesc"></div>
+          </div>
+
+          <!-- Visual pipeline -->
+          <div style="overflow-x:auto;margin-bottom:14px;padding-bottom:4px;">
+            <div id="s9Pipeline" style="display:flex;align-items:center;gap:0;padding:8px 4px;min-width:max-content;"></div>
+          </div>
+
+          <!-- Stage settings panel -->
+          <div id="s9StagePanel" style="display:none;background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:16px;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-size:13px;font-weight:700;color:#111827;" id="s9PanelTitle">Stage Settings</div>
+              <button onclick="closeStagePanel()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;line-height:1;">×</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="s9PanelGrid"></div>
+          </div>
+
+          <!-- Simulation panel -->
+          <div id="s9SimPanel" style="display:none;background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:16px;margin-bottom:14px;">
+            <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">Workflow simulation — Patient: Marcus Johnson · CST-2026-10849 · Testosterone Care</div>
+            <div id="s9SimStages" style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;"></div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button id="s9AdvanceBtn" onclick="advanceSimulation()" style="background:#1D4ED8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;">Complete stage &amp; advance →</button>
+              <button onclick="resetSimulation()" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;">↺ Reset</button>
+              <div style="margin-left:auto;font-size:12px;color:#6B7280;" id="s9SimQueueLabel"></div>
+            </div>
+            <div id="s9SimComplete" style="display:none;margin-top:12px;background:#D1FAE5;border:1px solid #6EE7B7;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:#065F46;"></div>
+          </div>
+
+          <!-- Scalability callout -->
+          <div id="s9ScaleCallout" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;">
+            <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px;">ℹ WHY THIS MATTERS</div>
+            <div style="font-size:12px;color:#374151;" id="s9ScaleText"></div>
+          </div>
+        </div>
+
+        <!-- CUSTOM MODE MESSAGE -->
+        <div id="s9CustomMode" style="display:none;background:#FFF8EE;border:1px solid #FDE68A;border-radius:10px;padding:16px;font-size:13px;color:#92400E;">
+          Custom workflow builder available in Phase 2 — use a template for now.
+        </div>
+
+        <!-- Hidden field for form submission -->
+        <input type="hidden" id="s9SelectedTemplate" name="wf_template" value="standard_async_v2">
+      </div>
+
+      <!-- STEP 10: SLA Configuration -->
+      <div class="step-panel" id="step12">
+        <div class="step-heading">Step 12 — SLA Configuration</div>
+        <div class="step-sub">Set response time commitments and escalation rules for each workflow stage.</div>
+        <table class="wiz-table">
+          <thead><tr><th>Workflow Stage</th><th>SLA Time Limit</th><th>Warning At</th><th>Escalation Action</th></tr></thead>
+          <tbody>
+            <tr><td>Patient Submits → Provider Review</td><td><input type="text" value="4 hours" style="width:90px"></td><td><input type="text" value="3 hours" style="width:90px"></td><td><input type="text" value="Alert + Re-assign" style="width:160px"></td></tr>
+            <tr><td>Provider Review → Response</td><td><input type="text" value="24 hours" style="width:90px"></td><td><input type="text" value="20 hours" style="width:90px"></td><td><input type="text" value="Alert Provider + Flag" style="width:160px"></td></tr>
+            <tr><td>Lab Review</td><td><input type="text" value="48 hours" style="width:90px"></td><td><input type="text" value="36 hours" style="width:90px"></td><td><input type="text" value="Alert Care Team" style="width:160px"></td></tr>
+            <tr><td>Provider Response → Chart Close</td><td><input type="text" value="2 hours" style="width:90px"></td><td><input type="text" value="90 min" style="width:90px"></td><td><input type="text" value="Auto-remind" style="width:160px"></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STEP 11: Lab Configuration -->
+      <div class="step-panel" id="step13">
+        <div class="step-heading">Step 13 — Lab Configuration</div>
+        <div class="step-sub">Define lab requirements for patient enrollment and consult eligibility.</div>
+        <div class="form-group">
+          <label class="form-label">Lab Requirement</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s11_req" checked onchange="toggleLabConfig()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Patients must submit lab results before consult proceeds</span>
+          </div>
+        </div>
+        <div id="lab_config">
+          <div class="form-group">
+            <label class="form-label">Accepted Lab Types</label>
+            <div class="check-group">
+              <label class="check-opt"><input type="checkbox" checked> Quest Diagnostics</label>
+              <label class="check-opt"><input type="checkbox" checked> LabCorp</label>
+              <label class="check-opt"><input type="checkbox" checked> Patient-uploaded PDF</label>
+              <label class="check-opt"><input type="checkbox" checked> At-home kit</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Result Validity Window</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" class="form-input" value="90" style="max-width:80px">
+              <span style="font-size:13px;color:#6B7280">days</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Required Tests</label>
+            <div class="tag-list" id="tagList">
+              <span class="tag">Testosterone Total <button onclick="removeTag(this)">×</button></span>
+              <span class="tag">Testosterone Free <button onclick="removeTag(this)">×</button></span>
+              <input type="text" class="tag-input-field" placeholder="+ Add test" onkeydown="addTag(event,this)">
+            </div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Press Enter to add a test</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 12: Cancellation Policy -->
+      <div class="step-panel" id="step14">
+        <div class="step-heading">Step 14 — Cancellation Policy</div>
+        <div class="step-sub">Define the cancellation and no-show rules for appointments in this care product.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:520px;">
+          <div class="form-group">
+            <label class="form-label">No-Charge Cancellation Window</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" class="form-input" value="24" style="max-width:70px">
+              <span style="font-size:13px;color:#6B7280">hours before appointment</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Late Cancellation Fee</label>
+            <input type="text" class="form-input" value="$25">
+          </div>
+          <div class="form-group">
+            <label class="form-label">No-Show Fee</label>
+            <input type="text" class="form-input" value="$50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rescheduling Limit</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="number" class="form-input" value="3" style="max-width:70px">
+              <span style="font-size:13px;color:#6B7280">times per consult</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Show Policy to Patient at Booking</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s12_show" checked><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Display cancellation policy during appointment booking</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 13: Documents & Consent -->
+      <div class="step-panel" id="step15">
+        <div class="step-heading">Step 15 — Documents &amp; Consent</div>
+        <div class="step-sub">Assign required consent documents and define when they are presented to the patient.</div>
+        <table class="wiz-table">
+          <thead><tr><th>Document</th><th>Presentation Point</th><th>Required</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Informed Consent — Dermatology</td>
+              <td><select><option>Account Creation</option><option>Program Enrollment</option><option>Pre-Consult</option><option>Post-Consult</option></select></td>
+              <td><span style="color:#22C55E;font-weight:700;">✓ Required</span></td>
+              <td><a href="#" style="color:#EF4444;font-size:12px;font-weight:600;text-decoration:none;">Remove</a></td>
+            </tr>
+            <tr>
+              <td>Telehealth Consent</td>
+              <td><select><option>Account Creation</option><option>Program Enrollment</option><option>Pre-Consult</option><option>Post-Consult</option></select></td>
+              <td><span style="color:#22C55E;font-weight:700;">✓ Required</span></td>
+              <td><a href="#" style="color:#EF4444;font-size:12px;font-weight:600;text-decoration:none;">Remove</a></td>
+            </tr>
+            <tr>
+              <td>Privacy Notice (HIPAA)</td>
+              <td><select><option>Account Creation</option><option>Program Enrollment</option><option>Pre-Consult</option><option>Post-Consult</option></select></td>
+              <td><span style="color:#22C55E;font-weight:700;">✓ Required</span></td>
+              <td><a href="#" style="color:#EF4444;font-size:12px;font-weight:600;text-decoration:none;">Remove</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px"><a href="#" style="font-size:13px;color:#1D4ED8;font-weight:600;text-decoration:none;">+ Add Document</a></div>
+      </div>
+
+      <!-- STEP 14: Notification Templates -->
+      <div class="step-panel" id="step16">
+        <div class="step-heading">Step 16 — Notification Templates</div>
+        <div class="step-sub">Configure automated patient and provider notifications for key workflow events.</div>
+        <table class="wiz-table">
+          <thead><tr><th>Event</th><th>Channels</th><th>Template Preview</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr><td>Consult Submitted</td><td>Email + SMS</td><td style="font-size:12px;color:#6B7280">"Your consult request was received…"</td><td><span style="color:#22C55E;font-size:12px;font-weight:700;">Active</span></td><td><a href="#" style="color:#3B82F6;font-size:12px;font-weight:600;text-decoration:none;">Edit</a></td></tr>
+            <tr><td>Provider Responded</td><td>Email + Push</td><td style="font-size:12px;color:#6B7280">"Your provider has responded…"</td><td><span style="color:#22C55E;font-size:12px;font-weight:700;">Active</span></td><td><a href="#" style="color:#3B82F6;font-size:12px;font-weight:600;text-decoration:none;">Edit</a></td></tr>
+            <tr><td>Lab Results Ready</td><td>Email + SMS</td><td style="font-size:12px;color:#6B7280">"Your lab results are ready…"</td><td><span style="color:#22C55E;font-size:12px;font-weight:700;">Active</span></td><td><a href="#" style="color:#3B82F6;font-size:12px;font-weight:600;text-decoration:none;">Edit</a></td></tr>
+            <tr><td>Appointment Reminder</td><td>Email + SMS</td><td style="font-size:12px;color:#6B7280">"Reminder: your appointment is tomorrow…"</td><td><span style="color:#22C55E;font-size:12px;font-weight:700;">Active</span></td><td><a href="#" style="color:#3B82F6;font-size:12px;font-weight:600;text-decoration:none;">Edit</a></td></tr>
+            <tr><td>SLA Breach (internal)</td><td>Platform Alert</td><td style="font-size:12px;color:#6B7280">"SLA breach alert: [patient]…"</td><td><span style="color:#22C55E;font-size:12px;font-weight:700;">Active</span></td><td><a href="#" style="color:#3B82F6;font-size:12px;font-weight:600;text-decoration:none;">Edit</a></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:10px 14px;font-size:12px;color:#6B7280;">
+          Templates support merge tags: <code style="background:#F3F4F6;padding:1px 5px;border-radius:4px;">{{patient_name}}</code> <code style="background:#F3F4F6;padding:1px 5px;border-radius:4px;">{{care_product}}</code> <code style="background:#F3F4F6;padding:1px 5px;border-radius:4px;">{{appointment_time}}</code>
+        </div>
+      </div>
+
+      <!-- STEP 15: Patient Onboarding -->
+      <div class="step-panel" id="step17">
+        <div class="step-heading">Step 17 — Patient Onboarding</div>
+        <div class="step-sub">Define the Getting Started checklist shown to patients after enrollment. All required steps must be complete before a consult can be submitted.</div>
+        <div class="form-card">
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
+              <span style="font-size:13px;font-weight:700;color:#6B7280;width:24px;text-align:center;">1</span>
+              <span style="flex:1;font-size:13px;font-weight:500;">Complete Health Profile</span>
+              <span style="font-size:11px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;">Required</span>
+              <span style="color:#9CA3AF;cursor:pointer;font-size:18px;line-height:1;">↕</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
+              <span style="font-size:13px;font-weight:700;color:#6B7280;width:24px;text-align:center;">2</span>
+              <span style="flex:1;font-size:13px;font-weight:500;">Submit Intake Questionnaire</span>
+              <span style="font-size:11px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;">Required</span>
+              <span style="color:#9CA3AF;cursor:pointer;font-size:18px;line-height:1;">↕</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
+              <span style="font-size:13px;font-weight:700;color:#6B7280;width:24px;text-align:center;">3</span>
+              <span style="flex:1;font-size:13px;font-weight:500;">Upload Lab Results</span>
+              <span style="font-size:11px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;">Required</span>
+              <span style="color:#9CA3AF;cursor:pointer;font-size:18px;line-height:1;">↕</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
+              <span style="font-size:13px;font-weight:700;color:#6B7280;width:24px;text-align:center;">4</span>
+              <span style="flex:1;font-size:13px;font-weight:500;">Review &amp; Sign Consent Documents</span>
+              <span style="font-size:11px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;">Required</span>
+              <span style="color:#9CA3AF;cursor:pointer;font-size:18px;line-height:1;">↕</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
+              <span style="font-size:13px;font-weight:700;color:#6B7280;width:24px;text-align:center;">5</span>
+              <span style="flex:1;font-size:13px;font-weight:500;">Schedule Consultation</span>
+              <label class="toggle" style="flex-shrink:0"><input type="checkbox"><span class="toggle-slider"></span></label>
+              <span style="font-size:11px;font-weight:700;background:#F3F4F6;color:#6B7280;padding:2px 8px;border-radius:10px;">Optional</span>
+              <span style="color:#9CA3AF;cursor:pointer;font-size:18px;line-height:1;">↕</span>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:#6B7280;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;">⚠ Consult submission is blocked until all <strong>Required</strong> steps are complete.</p>
+      </div>
+
+      <!-- STEP 16: Linked Consultations -->
+      <div class="step-panel" id="step18">
+        <div class="step-heading">Step 18 — Linked Consultations</div>
+        <div class="step-sub">Configure episode linking to track longitudinal patient care history within this product.</div>
+        <div class="form-group">
+          <label class="form-label">Enable Episode Reference ID</label>
+          <div class="toggle-row">
+            <label class="toggle"><input type="checkbox" id="s16_episode" checked onchange="toggleEpisode()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Group consultations under a shared Episode Reference ID</span>
+          </div>
+        </div>
+        <div id="episode_config">
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px 16px;font-size:13px;color:#1E40AF;margin-bottom:16px;line-height:1.6;">
+            All consultations for this care product will be grouped under an Episode Reference ID. This allows providers to view the full longitudinal history of a patient's care within this product.
+          </div>
+          <div class="form-group">
+            <label class="form-label">Episode ID Format</label>
+            <select class="form-input" style="max-width:320px">
+              <option>Auto-generated (recommended)</option>
+              <option>Manual entry</option>
+              <option>Linked to Athena encounter</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 17: Feature Flags -->
+      <div class="step-panel" id="step19">
+        <div class="step-heading">Step 19 — Feature Flags</div>
+        <div class="step-sub">Enable or disable platform features for this care product.</div>
+        <table class="wiz-table">
+          <thead><tr><th>Feature</th><th>Enabled</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>Patient Messaging</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Allow patients to message the care team</td></tr>
+            <tr><td>Lab Order Integration</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Enable in-platform lab ordering</td></tr>
+            <tr><td>Prescription Routing</td><td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Route prescriptions via integrated pharmacy</td></tr>
+            <tr><td>Video Consult Recording</td><td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Record video consults with patient consent</td></tr>
+            <tr><td>Patient-Facing SLA Display</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Show patients estimated response time</td></tr>
+            <tr><td>Linked Appointments</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Allow follow-up appointments to link to initial consult</td></tr>
+            <tr class="flag-row-locked"><td>Prior Authorization (V2) <span class="flag-badge">V2 — Coming Soon</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Prior auth management — not yet available</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- STEP 18: Review & Submit -->
+      <div class="step-panel" id="step20">
+        <div class="step-heading">Step 20 — Review &amp; Submit</div>
+        <div class="step-sub">Review your complete care product configuration before submitting for compliance approval.</div>
+
+        <div id="reviewSections"></div>
+
+        <div class="submit-block">
+          <div class="submit-status">Status: <strong>Draft — Ready to submit for review</strong></div>
+          <div class="submit-actions">
+            <button class="btn-draft">Save as Draft</button>
+            <button class="btn-submit">Submit for Review →</button>
+          </div>
+          <div class="submit-note">Submitting for review notifies your compliance team. The care product will not go live until approved.</div>
+        </div>
+      </div>
+
+      </div><!-- /wiz-panels -->
+      <div class="wiz-bottom">
+        <button class="save-exit" onclick="window.location.href='/admin/care-products'">Save &amp; Exit</button>
+        <div class="step-counter">
+          <div class="step-counter-label" id="stepCounterLabel">Step 1 of 19</div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:5.3%"></div></div>
+        </div>
+        <div class="wiz-nav-btns">
+          <button class="btn-back" id="btnBack" onclick="prevStep()" style="display:none">← Back</button>
+          <button class="btn-continue" id="btnContinue" onclick="nextStep()" disabled>Save &amp; Continue →</button>
+        </div>
+      </div>
+    </div><!-- /wiz-content -->
+  </div><!-- /wiz-body -->
+
+</div><!-- /wiz-shell -->
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+const TOTAL = 20;
+let currentStep = 1;
+const completed = new Set();
+let selectedClientName = '';
+let selectedClientId = '';
+
+const STEP_NAMES = [
+  '', 'Select Client', 'Basic Info', 'Provider Type', 'State Configuration', 'Age & Guardian Rules',
+  'Appointment Duration', 'Consult Payment Tiers', 'Health Profile Requirements',
+  'Intake Questionnaire', 'Documentation Template', 'Workflow Configuration', 'SLA Configuration',
+  'Lab Configuration', 'Cancellation Policy', 'Documents & Consent',
+  'Notification Templates', 'Patient Onboarding', 'Linked Consultations',
+  'Feature Flags', 'Review & Submit'
+];
+
+function goToStep(n) {
+  // Hide current
+  document.getElementById('step' + currentStep).classList.remove('active');
+  document.getElementById('sni' + currentStep).classList.remove('active');
+  // Show new
+  currentStep = n;
+  document.getElementById('step' + n).classList.add('active');
+  // Update left nav
+  for (let i = 1; i <= TOTAL; i++) {
+    const el = document.getElementById('sni' + i);
+    el.classList.remove('active');
+    const num = el.querySelector('.step-num');
+    if (completed.has(i)) {
+      el.classList.add('done');
+      num.textContent = '✓';
+    } else {
+      el.classList.remove('done');
+      num.textContent = i;
+    }
+  }
+  document.getElementById('sni' + n).classList.add('active');
+  // Smooth-scroll sidebar so active step stays centered
+  document.getElementById('sni' + n).scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Bottom bar
+  document.getElementById('stepCounterLabel').textContent = 'Step ' + n + ' of ' + TOTAL;
+  document.getElementById('progressBar').style.width = ((n / TOTAL) * 100) + '%';
+  document.getElementById('btnBack').style.display = n > 1 ? '' : 'none';
+  document.getElementById('btnContinue').textContent = n === TOTAL ? 'Submit for Review →' : 'Save & Continue →';
+  // Scroll content to top
+  document.querySelector('.wiz-panels').scrollTop = 0;
+  document.getElementById('btnContinue').disabled = (n === 1 && !selectedClientId);
+  // If step 19, build review
+  if (n === 20) buildReview();
+  if (n === 10) checkDocTplAutoSelect();
+}
+
+function nextStep() {
+  completed.add(currentStep);
+  if (currentStep < TOTAL) goToStep(currentStep + 1);
+}
+
+function prevStep() {
+  if (currentStep > 1) goToStep(currentStep - 1);
+}
+
+function onClientSelect(sel) {
+  var val = sel.value;
+  var name = val ? sel.options[sel.selectedIndex].text : '';
+  selectedClientId = val;
+  selectedClientName = name;
+  document.getElementById('s0_client_card').style.display = val ? '' : 'none';
+  if (val) document.getElementById('s0_client_name').textContent = name;
+  document.getElementById('btnContinue').disabled = !val;
+  var bc = document.getElementById('wizBreadcrumbCur');
+  if (bc) bc.textContent = name ? 'New Care Product — ' + name : 'New Care Product';
+}
+
+// State grid
+const STATES = ['AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','DC'];
+const grid = document.getElementById('stateGrid');
+STATES.forEach(s => {
+  const d = document.createElement('div'); d.className = 'state-cb';
+  const id = 'st_' + s;
+  d.innerHTML = '<input type="checkbox" id="' + id + '" checked><label for="' + id + '">' + s + '</label>';
+  grid.appendChild(d);
+});
+function setAllStates(v) { STATES.forEach(s => document.getElementById('st_' + s).checked = v); }
+
+// IQ library toggle
+function toggleIQLibrary() {
+  const v = document.querySelector('input[name="iqMode"]:checked').value;
+  document.getElementById('iq_library').style.display = v === 'library' ? '' : 'none';
+  document.getElementById('iq_build').style.display = v === 'build' ? '' : 'none';
+}
+function updateIQPreview() {
+  const map = {
+    derm32: 'Dermatology Intake v3.2 — 24 questions · Last updated Mar 2026',
+    derm31: 'Dermatology Intake v3.1 — Archived',
+    gen20:  'General Health Intake v2.0 — 18 questions · Last updated Jan 2026',
+    test41: 'Testosterone Intake v4.1 — 31 questions · Last updated Apr 2026',
+  };
+  const v = document.getElementById('iq_select').value;
+  document.getElementById('iq_preview_text').textContent = map[v] || '';
+}
+
+// Lab config toggle
+function toggleLabConfig() {
+  document.getElementById('lab_config').style.display = document.getElementById('s11_req').checked ? '' : 'none';
+}
+
+// Episode toggle
+function toggleEpisode() {
+  document.getElementById('episode_config').style.display = document.getElementById('s16_episode').checked ? '' : 'none';
+}
+
+// Tag input
+function removeTag(btn) { btn.parentElement.remove(); }
+function addTag(e, input) {
+  if (e.key === 'Enter' && input.value.trim()) {
+    e.preventDefault();
+    const tag = document.createElement('span'); tag.className = 'tag';
+    tag.innerHTML = input.value.trim() + ' <button onclick="removeTag(this)">×</button>';
+    input.parentElement.insertBefore(tag, input);
+    input.value = '';
+  }
+}
+
+// Review builder
+function buildReview() {
+  const container = document.getElementById('reviewSections');
+  container.innerHTML = '';
+  const summaries = [
+    { n:1,  name:'Select Client', rows:[
+      ['Client', selectedClientName || '—'],
+    ]},
+    { n:2,  name:'Basic Info', rows:[
+      ['Product Name', document.getElementById('s1_name').value || '—'],
+      ['Display Name', document.getElementById('s1_display').value || '—'],
+      ['Care Type', (document.querySelector('input[name="careType"]:checked') || {value:'—'}).value],
+      ['Consult Types', ['Async','Video','Phone','Lab Review'].filter((_,i)=>[document.getElementById('ct_async'),document.getElementById('ct_video'),document.getElementById('ct_phone'),document.getElementById('ct_lab')][i].checked).join(', ') || '—'],
+    ]},
+    { n:3,  name:'Provider Type', rows:[
+      ['Eligible Types', ['MD/DO','NP','PA','GC','RN'].filter((_,i)=>[document.getElementById('pt_md'),document.getElementById('pt_np'),document.getElementById('pt_pa'),document.getElementById('pt_gc'),document.getElementById('pt_rn')][i].checked).join(', ') || '—'],
+      ['Supervision Required', document.getElementById('s2_supervision').checked ? 'Yes' : 'No'],
+    ]},
+    { n:4,  name:'State Configuration', rows:[
+      ['States Selected', STATES.filter(s=>document.getElementById('st_'+s).checked).length + ' / ' + STATES.length],
+    ]},
+    { n:5,  name:'Age & Guardian Rules', rows:[
+      ['Min Age', document.getElementById('s4_min').value],
+      ['Max Age', document.getElementById('s4_max').value || 'None'],
+      ['Guardian Consent', document.getElementById('s4_guardian').checked ? 'Yes' : 'No'],
+      ['Minor Enrollment', document.getElementById('s4_minor').checked ? 'Yes' : 'No'],
+    ]},
+    { n:6,  name:'Appointment Duration', rows:[
+      ['Phone — Initial', ((document.querySelector('input[name="dur_phone_initial"]:checked') || {value:'30'}).value) + ' min'],
+      ['Phone — Follow-up', ((document.querySelector('input[name="dur_phone_followup"]:checked') || {value:'15'}).value) + ' min'],
+      ['Video — Initial', ((document.querySelector('input[name="dur_video_initial"]:checked') || {value:'45'}).value) + ' min'],
+      ['Video — Follow-up', ((document.querySelector('input[name="dur_video_followup"]:checked') || {value:'30'}).value) + ' min'],
+    ]},
+    { n:7,  name:'Consult Payment Tiers', rows:[
+      ['Model', ((document.querySelector('input[name="payModel"]:checked') || {value:'visit'}).value)],
+      ['Initial Consult', '$85 provider / $149 patient'],
+      ['Follow-up', '$55 provider / $89 patient'],
+      ['Refill', '$35 provider / $49 patient'],
+    ]},
+    { n:8,  name:'Health Profile Requirements', rows:[
+      ['Current Medications', 'Required'],
+      ['Allergies', 'Optional'],
+      ['Medical Conditions', 'Required'],
+      ['Measurements', 'Required'],
+    ]},
+    { n:9,  name:'Intake Questionnaire', rows:[
+      ['Mode', (document.querySelector('input[name="iqMode"]:checked') || {value:'library'}).value],
+      ['Questionnaire', document.getElementById('iq_preview_text') ? document.getElementById('iq_preview_text').textContent.split('·')[0].trim() : '—'],
+    ]},
+    { n:10, name:'Documentation Template', rows:[
+      ['Template', docTplLabels[docTplSelected] || 'No Template'],
+    ]},
+    { n:11,  name:'Workflow Configuration', rows:[['Template', 'Standard Async Workflow v2']]},
+    { n:12, name:'SLA Configuration', rows:[
+      ['Patient → Provider Review', '4 hrs / warn 3 hrs'],
+      ['Provider Review → Response', '24 hrs / warn 20 hrs'],
+      ['Lab Review', '48 hrs / warn 36 hrs'],
+      ['Response → Chart Close', '2 hrs / warn 90 min'],
+    ]},
+    { n:13, name:'Lab Configuration', rows:[
+      ['Lab Required', document.getElementById('s11_req').checked ? 'Yes' : 'No'],
+      ['Accepted Types', 'Quest, LabCorp, PDF, At-home'],
+      ['Validity Window', '90 days'],
+    ]},
+    { n:14, name:'Cancellation Policy', rows:[
+      ['No-Charge Window', '24 hours'],
+      ['Late Cancel Fee', '$25'],
+      ['No-Show Fee', '$50'],
+      ['Reschedule Limit', '3 times per consult'],
+    ]},
+    { n:15, name:'Documents & Consent', rows:[
+      ['Documents', '3 required (Informed Consent, Telehealth, HIPAA)'],
+    ]},
+    { n:16, name:'Notification Templates', rows:[
+      ['Events', '5 configured (all Active)'],
+    ]},
+    { n:17, name:'Patient Onboarding', rows:[
+      ['Steps', '5 steps (4 required, 1 optional)'],
+    ]},
+    { n:18, name:'Linked Consultations', rows:[
+      ['Episode Reference ID', document.getElementById('s16_episode').checked ? 'Enabled' : 'Disabled'],
+      ['Format', 'Auto-generated'],
+    ]},
+    { n:19, name:'Feature Flags', rows:[
+      ['Enabled', 'Patient Messaging, Lab Order Integration, Patient SLA Display, Linked Appointments'],
+      ['Disabled', 'Prescription Routing, Video Recording, Prior Auth V2'],
+    ]},
+  ];
+
+  summaries.forEach((s, idx) => {
+    const open = idx === 0 || idx === 2; // Steps 1 and 3 expanded
+    const sec = document.createElement('div');
+    sec.className = 'review-section' + (open ? ' open' : '');
+    sec.innerHTML = `
+      <div class="review-section-hd" onclick="this.parentElement.classList.toggle('open')">
+        <div class="review-step-num">${s.n}</div>
+        <div class="review-step-name">${s.name}</div>
+        <span class="review-edit" onclick="event.stopPropagation();goToStep(${s.n})">Edit</span>
+        <span class="review-chevron">▾</span>
+      </div>
+      <div class="review-body">
+        ${s.rows.map(r=>`<div class="review-row"><span class="review-key">${r[0]}</span><span class="review-val">${r[1]}</span></div>`).join('')}
+      </div>`;
+    container.appendChild(sec);
+  });
+}
+
+// Init
+goToStep(1);
+// Auto-trigger pre-selected client (Humana)
+(function() { var sel = document.getElementById('s0_client'); if (sel && sel.value) onClientSelect(sel); })();
+
+// ─── Step 9: Workflow Configuration ───
+const WF_STAGE_CATALOG = {
+  'SYS-01': { id:'SYS-01', name:'Intake received', type:'system', role:'System', queue:null, sla:null, trigger:'Patient submits consult intake form', conditional:false },
+  'SYS-03': { id:'SYS-03', name:'Awaiting lab results', type:'system_wait', role:'System (wait)', queue:null, sla:null, trigger:'Lab results received via integration upload', conditional:true, condition:'Blocking wait — chart paused and removed from all queues. SLA clock paused. Resumes automatically when lab results are received.' },
+  'SYS-06': { id:'SYS-06', name:'Results released', type:'system', role:'System', queue:null, sla:null, trigger:'Results released to patient portal', conditional:false },
+  'SYS-07': { id:'SYS-07', name:'Consult closed', type:'system', role:'System', queue:null, sla:null, trigger:'All required fields signed and closed', conditional:false },
+  'HUM-01': { id:'HUM-01', name:'Intake review', type:'human', role:'MA', queue:'ma_queue', sla:4, trigger:'MA marks intake complete and confirms patient eligibility', conditional:false },
+  'HUM-02': { id:'HUM-02', name:'Clinical review', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider reviews chart and begins clinical response', conditional:false },
+  'HUM-03': { id:'HUM-03', name:'Lab review', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider reviews and annotates lab results', conditional:true, condition:'Triggered when lab results required but not yet reviewed by provider' },
+  'HUM-03b': { id:'HUM-03b', name:'Lab ordered', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider creates lab requisition', conditional:false },
+  'HUM-04': { id:'HUM-04', name:'Treatment plan', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'SOAP note drafted with Rx or clinical recommendation', conditional:false },
+  'HUM-04gc': { id:'HUM-04gc', name:'Counseling plan', type:'human', role:'GC', queue:'provider_queue', sla:24, trigger:'Counseling summary and recommendations finalized', conditional:false },
+  'HUM-05': { id:'HUM-05', name:'Chart close', type:'human', role:'MD / NP', queue:'provider_queue', sla:4, trigger:'Provider signs SOAP note', conditional:false },
+  'HUM-05gc': { id:'HUM-05gc', name:'Chart close (GC)', type:'human', role:'GC', queue:'provider_queue', sla:4, trigger:'GC signs and closes chart', conditional:false },
+  'HUM-07': { id:'HUM-07', name:'QA review', type:'human', role:'GC / Supervisor', queue:'provider_queue', sla:24, trigger:'Second reviewer approves clinical content before chart close', conditional:false },
+  'HUM-08': { id:'HUM-08', name:'Pre-visit prep', type:'human', role:'MA', queue:'ma_queue', sla:2, trigger:'Chart prepped and patient confirmed for upcoming visit', conditional:false },
+  'HUM-09': { id:'HUM-09', name:'Consult in progress', type:'human', role:'MD / NP', queue:'provider_queue', sla:null, trigger:'Call or video session completed and documented', conditional:false },
+  'HUM-11': { id:'HUM-11', name:'Results review', type:'human', role:'MD / NP', queue:'provider_queue', sla:48, trigger:'Provider reviews and annotates results in chart', conditional:false },
+  'HUM-12': { id:'HUM-12', name:'Appointment booked', type:'human', role:'Scheduler', queue:'scheduler_queue', sla:48, trigger:'Appointment confirmed on calendar by scheduler', conditional:false },
+};
+
+const WF_TEMPLATES = {
+  standard_async_v2: { name:'Standard async workflow v2', applicable:'Weight management, testosterone care, skincare, ED, thyroid — most async products', description:'Patient submits intake → MA intake review → provider clinical review → optional lab review → treatment plan → chart close.', stages:['SYS-01','HUM-01','HUM-02','HUM-03','HUM-04','HUM-05'], scale:'This async template supports unlimited concurrent consults — providers see only their assigned charts, queued by SLA urgency. The conditional lab review stage automatically pauses and resumes the SLA clock without manual intervention.' },
+  standard_phone_video: { name:'Standard phone / video', applicable:'Weight management (phone/video), testosterone (phone), A1C treat, ED (video)', description:'Scheduler books appointment → MA preps chart → provider conducts live consult → SOAP note → chart close.', stages:['HUM-12','HUM-08','HUM-09','HUM-04','HUM-05'], scale:'Appointment-based workflows are coordinated through the scheduler queue, then flow into the provider queue after the visit. SLA tracking begins at appointment booking and pauses during the live session.' },
+  lab_required_async: { name:'Lab-required async', applicable:'BRCA counseling, hereditary cancer panel, carrier screening, STI treatment', description:'Patient submits → MA review → provider orders lab → system wait for results → results review → results released → chart close.', stages:['SYS-01','HUM-01','HUM-03b','SYS-03','HUM-11','SYS-06','HUM-05'], scale:'The blocking wait stage (SYS-03) removes the chart from all queues and pauses SLA. This prevents provider burnout from charts that cannot progress. The chart auto-reappears in the queue when lab results are received via integration.' },
+  genetic_counseling_specialty: { name:'Genetic counseling / specialty', applicable:'BRCA counseling with GC, carrier screening with counseling, rare disease specialty', description:'Patient submits → MA intake review → GC clinical review → QA approval (two-eye check) → counseling plan → chart close.', stages:['SYS-01','HUM-01','HUM-02','HUM-07','HUM-04gc','HUM-05gc'], scale:'Genetic counseling workflows require a two-eye QA check before plan delivery. The QA stage routes to a GC supervisor queue, ensuring all genetic findings are reviewed by a second licensed counselor before patient disclosure.' },
+};
+
+function s9StageColor(s) {
+  if (s.type === 'system' || s.type === 'system_wait') return '#64748B';
+  if (s.role === 'MA') return '#D97706';
+  if (s.role === 'Scheduler') return '#0D7490';
+  if (s.role === 'GC' || s.role === 'GC / Supervisor') return '#7C3AED';
+  return '#1D4ED8';
+}
+
+var s9ActiveStage = null, s9SimIndex = 0, s9SimRunning = false, s9CurrentTemplate = 'standard_async_v2';
+
+function setWfMode(mode) {
+  var tCard = document.getElementById('modeCardTemplate'), cCard = document.getElementById('modeCardCustom');
+  var tMode = document.getElementById('s9TemplateMode'), cMode = document.getElementById('s9CustomMode');
+  if (mode === 'template') {
+    tCard.style.border = '2px solid #1D4ED8'; tCard.style.background = '#EFF6FF';
+    cCard.style.border = '2px solid #E5E0D8'; cCard.style.background = '#fff';
+    tMode.style.display = ''; cMode.style.display = 'none';
+  } else {
+    cCard.style.border = '2px solid #1D4ED8'; cCard.style.background = '#EFF6FF';
+    tCard.style.border = '2px solid #E5E0D8'; tCard.style.background = '#fff';
+    tMode.style.display = 'none'; cMode.style.display = '';
+  }
+}
+
+function updateWfTemplate(key) {
+  s9CurrentTemplate = key;
+  var tpl = WF_TEMPLATES[key]; if (!tpl) return;
+  document.getElementById('s9TplApplicable').textContent = 'Applicable: ' + tpl.applicable;
+  document.getElementById('s9TplDesc').textContent = tpl.description;
+  document.getElementById('s9ScaleText').textContent = tpl.scale;
+  document.getElementById('s9SelectedTemplate').value = key;
+  s9RenderPipeline(tpl.stages);
+  closeStagePanel();
+  if (s9SimRunning) { s9SimRunning = false; document.getElementById('s9SimPanel').style.display = 'none'; document.getElementById('s9ScaleCallout').style.display = ''; document.getElementById('s9SimBtn').textContent = '▶ Simulate'; document.getElementById('s9SimBtn').style.background = '#059669'; }
+}
+
+function s9RenderPipeline(stageIds) {
+  var container = document.getElementById('s9Pipeline'); container.innerHTML = '';
+  stageIds.forEach(function(sid, i) {
+    var s = WF_STAGE_CATALOG[sid]; if (!s) return;
+    var color = s9StageColor(s);
+    var box = document.createElement('div');
+    box.id = 's9stage_' + sid; box.dataset.sid = sid;
+    box.style.cssText = 'width:88px;min-height:100px;background:' + color + ';border-radius:8px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;border:' + (s.conditional ? '2px dashed rgba(255,255,255,0.55)' : '2px solid transparent') + ';gap:4px;flex-shrink:0;';
+    box.innerHTML = '<div style="font-size:11px;font-weight:600;color:#fff;text-align:center;line-height:1.3;min-height:30px;">' + s.name + '</div>' +
+      '<div style="flex:1;"></div>' +
+      '<div style="font-size:9px;font-weight:700;background:rgba(255,255,255,0.22);color:#fff;padding:2px 7px;border-radius:9px;text-align:center;">' + s.role + '</div>' +
+      (s.sla ? '<div style="font-size:9px;color:rgba(255,255,255,0.8);margin-top:2px;">' + s.sla + 'h SLA</div>' : '') +
+      (s.conditional ? '<div style="font-size:9px;font-style:italic;color:rgba(255,255,255,0.75);">conditional</div>' : '');
+    box.addEventListener('click', function() { selectStage(sid); });
+    container.appendChild(box);
+    if (i < stageIds.length - 1) {
+      var arrow = document.createElement('div');
+      arrow.style.cssText = 'font-size:18px;color:#9CA3AF;padding:0 4px;align-self:center;flex-shrink:0;';
+      arrow.textContent = '→'; container.appendChild(arrow);
+    }
+  });
+}
+
+function selectStage(sid) {
+  if (s9ActiveStage) { var prev = document.getElementById('s9stage_' + s9ActiveStage); if (prev) prev.style.outline = 'none'; }
+  s9ActiveStage = sid;
+  var box = document.getElementById('s9stage_' + sid); if (box) box.style.outline = '3px solid #F59E0B';
+  var s = WF_STAGE_CATALOG[sid]; if (!s) return;
+  var color = s9StageColor(s);
+  document.getElementById('s9StagePanel').style.display = '';
+  document.getElementById('s9PanelTitle').textContent = s.id + ' — ' + s.name;
+  var roleOptions = ['MD / NP','MA','GC','GC / Supervisor','Scheduler','System','RN'];
+  document.getElementById('s9PanelGrid').innerHTML =
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Stage ID</div><div style="font-family:monospace;font-size:13px;color:#111827;">' + s.id + '</div></div>' +
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Stage Type</div><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:' + color + ';color:#fff;">' + s.type + '</span></div>' +
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Assigned Role</div><select style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;">' + roleOptions.map(function(r){ return '<option' + (r===s.role?' selected':'') + '>' + r + '</option>'; }).join('') + '</select></div>' +
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Routes to Queue</div><div style="font-size:12px;color:#374151;font-family:monospace;">' + (s.queue || 'N/A') + '</div></div>' +
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">SLA Timer (hours)</div><input type="number" value="' + (s.sla || '') + '" placeholder="None" style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;"></div>' +
+    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Notify on Stage Start</div><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox"' + (s.type==='human'?' checked':'') + '><span style="font-size:12px;">Send notification</span></label></div>' +
+    '<div style="grid-column:1/-1;"><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Completion Trigger</div><div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:6px;padding:8px 10px;font-size:12px;color:#374151;">' + s.trigger + '</div></div>' +
+    (s.conditional ? '<div style="grid-column:1/-1;"><div style="font-size:11px;font-weight:600;color:#D97706;margin-bottom:4px;">⚠ Conditional Logic</div><div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:6px;padding:8px 10px;font-size:12px;color:#92400E;">' + (s.condition || '') + '</div></div>' : '');
+}
+
+function closeStagePanel() {
+  if (s9ActiveStage) { var prev = document.getElementById('s9stage_' + s9ActiveStage); if (prev) prev.style.outline = 'none'; s9ActiveStage = null; }
+  document.getElementById('s9StagePanel').style.display = 'none';
+}
+
+function toggleSimulation() {
+  s9SimRunning = !s9SimRunning;
+  var btn = document.getElementById('s9SimBtn');
+  if (s9SimRunning) {
+    btn.textContent = '◼ Stop'; btn.style.background = '#6B7280';
+    document.getElementById('s9SimPanel').style.display = '';
+    document.getElementById('s9ScaleCallout').style.display = 'none';
+    resetSimulation();
+  } else {
+    btn.textContent = '▶ Simulate'; btn.style.background = '#059669';
+    document.getElementById('s9SimPanel').style.display = 'none';
+    document.getElementById('s9ScaleCallout').style.display = '';
+  }
+}
+
+function resetSimulation() {
+  s9SimIndex = 0;
+  document.getElementById('s9SimComplete').style.display = 'none';
+  var advBtn = document.getElementById('s9AdvanceBtn');
+  advBtn.textContent = 'Complete stage & advance →'; advBtn.disabled = false; advBtn.style.background = '#1D4ED8';
+  s9RenderSimStages();
+}
+
+function s9RenderSimStages() {
+  var tpl = WF_TEMPLATES[s9CurrentTemplate]; if (!tpl) return;
+  var container = document.getElementById('s9SimStages'); container.innerHTML = '';
+  tpl.stages.forEach(function(sid, i) {
+    var s = WF_STAGE_CATALOG[sid]; if (!s) return;
+    var isComplete = i < s9SimIndex, isActive = i === s9SimIndex, isPending = i > s9SimIndex;
+    var color = s9StageColor(s);
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;opacity:' + (isPending?'0.4':'1') + ';' + (isActive?'background:#EFF6FF;':'');
+    row.innerHTML =
+      '<div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:' + (isComplete?'#1A1D23':isActive?'#1D4ED8':'#E5E7EB') + ';font-size:11px;font-weight:700;flex-shrink:0;">' +
+        (isComplete?'<span style="color:#fff;">✓</span>':isActive?'<span style="color:#fff;">'+(i+1)+'</span>':'<span style="color:#9CA3AF;">○</span>') +
+      '</div>' +
+      '<div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#111827;">' + s.name + (isActive?' <span style="font-size:10px;background:#1D4ED8;color:#fff;padding:1px 7px;border-radius:8px;font-weight:700;">active</span>':'') + '</div><div style="font-size:11px;color:#6B7280;">' + s.role + (s.queue?' · '+s.queue:'') + (s.sla?' · '+s.sla+'h SLA':'') + '</div></div>';
+    container.appendChild(row);
+  });
+  if (s9SimIndex < tpl.stages.length) {
+    var cur = WF_STAGE_CATALOG[tpl.stages[s9SimIndex]];
+    document.getElementById('s9SimQueueLabel').textContent = cur ? 'Currently in: ' + (cur.queue || 'N/A') : '';
+  }
+}
+
+function advanceSimulation() {
+  var tpl = WF_TEMPLATES[s9CurrentTemplate]; if (!tpl) return;
+  if (s9SimIndex < tpl.stages.length - 1) {
+    s9SimIndex++; s9RenderSimStages();
+  } else {
+    s9SimIndex = tpl.stages.length; s9RenderSimStages();
+    var advBtn = document.getElementById('s9AdvanceBtn');
+    advBtn.textContent = 'Workflow complete ✓'; advBtn.disabled = true; advBtn.style.background = '#22C55E';
+    document.getElementById('s9SimQueueLabel').textContent = '';
+    var cd = document.getElementById('s9SimComplete'); cd.style.display = '';
+    cd.textContent = 'All ' + tpl.stages.length + ' stages completed. Chart would be closed and consult marked complete.';
+  }
+}
+
+
+// Step 10: Documentation Template
+var docTplSelected = 4;
+var docTplLabels = ['', 'A1C E&M Template', 'Annual Wellness Visit Template', 'Standard SOAP Note', 'No Template'];
+var DOC_TPL_COLORS = ['', '#6B21A8', '#065F46', '#1D4ED8', '#1D4ED8'];
+var DOC_TPL_BG = ['', '#FAF5FF', '#F0FDF4', '#EFF6FF', '#EFF6FF'];
+
+function selectDocTpl(n) {
+  docTplSelected = n;
+  for (var i = 1; i <= 4; i++) {
+    var card = document.getElementById('docTplCard' + i);
+    if (!card) continue;
+    card.style.borderColor = (i === n) ? DOC_TPL_COLORS[i] : '#E5E0D8';
+    card.style.background = (i === n) ? DOC_TPL_BG[i] : '#fff';
+  }
+  var pb = document.getElementById('docTplPreviewBody');
+  if (pb && pb.style.display !== 'none') updateDocTplPreview();
+}
+
+function checkDocTplAutoSelect() {
+  var name = (document.getElementById('s1_name') ? document.getElementById('s1_name').value : '').toLowerCase();
+  var banner = document.getElementById('docTplBanner');
+  if (!banner) return;
+  if (name.indexOf('a1c') !== -1 || name.indexOf('diabetes') !== -1 || name.indexOf('glycemic') !== -1) {
+    var r = document.querySelector('input[name="docTemplate"][value="a1c_em"]');
+    if (r) r.checked = true;
+    selectDocTpl(1);
+    banner.style.display = '';
+  } else if (name.indexOf('wellness') !== -1 || name.indexOf('awv') !== -1 || name.indexOf('annual') !== -1) {
+    var r = document.querySelector('input[name="docTemplate"][value="awv"]');
+    if (r) r.checked = true;
+    selectDocTpl(2);
+    banner.style.display = '';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+var DOC_TPL_SECTIONS = {
+  1: [
+    {num:1, name:'Chief Complaint', desc:'Primary reason for visit, free text'},
+    {num:2, name:'HPI', desc:'Structured narrative with glucose control status, adherence, and hypoglycemia fields'},
+    {num:3, name:'Review of Systems', desc:'System-by-system checkboxes (8 systems)'},
+    {num:4, name:'Vitals', desc:'BP, HR, weight, height, BMI with automated flag logic'},
+    {num:5, name:'Lab Results', desc:'Structured table: HbA1c, glucose, LDL, eGFR, urine microalbumin, cholesterol'},
+    {num:6, name:'Physical Exam', desc:'Body system findings, foot exam, monofilament'},
+    {num:7, name:'Assessment / Diagnoses', desc:'ICD-10 code entry with status badges'},
+    {num:8, name:'Plan', desc:'Medication, labs, referrals, education, follow-up'},
+    {num:9, name:'HEDIS CDC Measures', desc:'7-measure checklist: HbA1c tested, HbA1c &lt;8%, BP &lt;140/90, nephropathy screen, retinal exam, statin therapy, tobacco use'},
+    {num:10, name:'MDM / Billing', desc:'Complexity selector + CPT/telehealth billing codes'},
+  ],
+  2: [
+    {num:1, name:'Chief Complaint', desc:'Annual wellness visit reason'},
+    {num:2, name:'Medication Reconciliation', desc:'Active med list review and attestation (COA measure)'},
+    {num:3, name:'Functional Assessment / Katz ADL', desc:'6-item ADL scale, score auto-calculated (COA measure)'},
+    {num:4, name:'Vitals', desc:'BP with CBP measure flag logic'},
+    {num:5, name:'Review of Systems', desc:'System-by-system'},
+    {num:6, name:'PRAPARE Social Needs Screener', desc:'5-domain screener: food, housing, transportation, safety, financial (SNS-E measure)'},
+    {num:7, name:'Assessment / Diagnoses', desc:'ICD-10 code entry'},
+    {num:8, name:'HEDIS Gap Closure Actions', desc:'11-measure panel: BCS, COA, COL, CBP, EED, GSD, KED, OMW, OSW, SPC, SNS-E with eligibility logic and N/A handling'},
+    {num:9, name:'Plan / Orders / Referrals', desc:'Auto-summarized from HEDIS section actions'},
+    {num:10, name:'MDM / Billing', desc:'Complexity selector + AWV billing codes (G0438/G0439)'},
+  ],
+  3: [
+    {num:1, name:'Subjective', desc:'Patient-reported symptoms, history, and chief complaint'},
+    {num:2, name:'Objective', desc:'Measurable clinical findings: vitals, exam, labs'},
+    {num:3, name:'Assessment', desc:'Clinical diagnosis and differential'},
+    {num:4, name:'Plan', desc:'Treatment, orders, referrals, and follow-up'},
+  ],
+};
+
+function updateDocTplPreview() {
+  var el = document.getElementById('docTplPreviewContent');
+  if (!el) return;
+  var secs = DOC_TPL_SECTIONS[docTplSelected];
+  if (!secs) {
+    el.innerHTML = '<div style="font-size:12px;color:#9CA3AF;font-style:italic;padding:8px 0;">No documentation template selected.</div>';
+    return;
+  }
+  el.innerHTML = secs.map(function(s) {
+    return '<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #F3F4F6;">' +
+      '<div style="font-size:12px;font-weight:700;color:#6B21A8;width:20px;flex-shrink:0;text-align:right;">' + s.num + '</div>' +
+      '<div style="flex:1;"><span style="font-size:12px;font-weight:600;color:#111827;">' + s.name + '</span>' +
+      '<span style="font-size:12px;color:#6B7280;"> — ' + s.desc + '</span></div></div>';
+  }).join('');
+}
+
+function toggleDocTplPreview() {
+  var body = document.getElementById('docTplPreviewBody');
+  var chev = document.getElementById('docTplChev');
+  if (!body || !chev) return;
+  var open = body.style.display === 'none';
+  body.style.display = open ? '' : 'none';
+  chev.style.transform = open ? 'rotate(180deg)' : '';
+  if (open) updateDocTplPreview();
+}
+
+updateWfTemplate('standard_async_v2');
+</script>
+{% endraw %}
+{% endblock %}

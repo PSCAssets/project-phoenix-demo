@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% block title %}Pharmacy Fulfillment | Project Phoenix{% endblock %}
+{% block head %}
+<style>
+  :root { --ew-green: #00A67E; --sidebar-w: 64px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; background: #FAF7F2; display: flex; height: 100vh; overflow: hidden; }
+  .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: #F2EDE4; display: flex; flex-direction: column; align-items: center; padding: 12px 0; z-index: 100; height: 100vh; }
+  .sidebar-logo { margin-bottom: 24px; padding: 8px; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer; color: #6B7280; font-size: 9px; font-weight: 500; text-align: center; transition: background .15s, color .15s; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(107,33,168,0.08); color: #6B7280; }
+  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+  .nav-item svg { width: 18px; height: 18px; }
+  .sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .provider-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--ew-green); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; cursor: pointer; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { background: #1E293B; color: #fff; padding: 0 20px; height: 52px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .topbar-title { font-size: 15px; font-weight: 700; color: #fff; flex: 1; }
+  .body-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .widget-header { padding: 14px 18px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; }
+  .widget-title { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; white-space: nowrap; }
+  tbody td { padding: 12px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #FAF7F2; }
+  .pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; display: inline-block; }
+  .demo-nav-offset .sidebar { top: 60px !important; height: calc(100vh - 60px) !important; }
+  .demo-nav-offset .main { position: fixed !important; top: 60px !important; left: 64px !important; right: 0 !important; bottom: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+  .sidebar { top: 60px !important; height: calc(100vh - 60px) !important; }
+  .main { position: fixed !important; top: 60px !important; left: 64px !important; right: 0 !important; bottom: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+</style>
+{% endblock %}
+{% block content %}
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="16" fill="#00A67E"/>
+      <path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-item" title="Provider Dashboard" onclick="window.location.href='/provider/'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" title="Patient Queue" onclick="window.location.href='/provider/queue'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Queue
+    </div>
+    <div class="nav-item active" title="Pharmacy Fulfillment">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V8l-5-5H9z"/><path d="M9 3v5h10M12 12v6M9 15h6"/></svg>
+      Pharmacy
+    </div>
+    <div class="nav-item" title="Messages" onclick="window.location.href='/provider/messages'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      Messages
+    </div>
+    <div class="nav-item" title="Settings" onclick="window.location.href='/provider/settings'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <div class="provider-avatar" title="Dr. Sarah Lee">SL</div>
+    <div style="font-size:9px;color:#6B7280;text-align:center">Dr. Lee</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">💊 Pharmacy Fulfillment</div>
+    <span style="font-size:12px;color:#94A3B8;">GoGoMeds Integration · Dr. Sarah Lee</span>
+  </div>
+  <div class="body-scroll">
+
+    <!-- GoGoMeds Fulfillment Queue -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">GoGoMeds — Pending Fulfillment</div>
+        <span style="font-size:11px;font-weight:600;background:#FEF3C7;color:#92400E;padding:3px 10px;border-radius:12px;">4 awaiting signature</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Rx ID</th>
+            <th>Patient</th>
+            <th>Medication</th>
+            <th>Sig</th>
+            <th>Days Supply</th>
+            <th>Pharmacy State</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4821</td>
+            <td style="font-weight:600;">Marcus Johnson</td>
+            <td>Testosterone Cypionate 200mg/mL</td>
+            <td style="font-size:12px;">0.5 mL IM q2w</td>
+            <td>90</td>
+            <td>Texas</td>
+            <td><span class="pill" style="background:#FEF3C7;color:#92400E;">Awaiting Signature</span></td>
+            <td><button onclick="alert('Rx RX-2026-4821 signed and transmitted to GoGoMeds')" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Send</button></td>
+          </tr>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4822</td>
+            <td style="font-weight:600;">Angela Rivera</td>
+            <td>Metformin 1000mg tablet</td>
+            <td style="font-size:12px;">1 tab PO BID with meals</td>
+            <td>90</td>
+            <td>Florida</td>
+            <td><span class="pill" style="background:#FEF3C7;color:#92400E;">Awaiting Signature</span></td>
+            <td><button onclick="alert('Rx RX-2026-4822 signed and transmitted to GoGoMeds')" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Send</button></td>
+          </tr>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4823</td>
+            <td style="font-weight:600;">David Kim</td>
+            <td>Semaglutide 2.4mg/mL injection</td>
+            <td style="font-size:12px;">0.25 mg SC weekly × 4 weeks</td>
+            <td>30</td>
+            <td>California</td>
+            <td><span class="pill" style="background:#FEF3C7;color:#92400E;">Awaiting Signature</span></td>
+            <td><button onclick="alert('Rx RX-2026-4823 signed and transmitted to GoGoMeds')" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Send</button></td>
+          </tr>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4819</td>
+            <td style="font-weight:600;">Sarah Brown</td>
+            <td>Levothyroxine 50mcg tablet</td>
+            <td style="font-size:12px;">1 tab PO qAM, 30 min before food</td>
+            <td>90</td>
+            <td>New York</td>
+            <td><span class="pill" style="background:#D1FAE5;color:#065F46;">Transmitted</span></td>
+            <td><span style="font-size:12px;color:#6B7280;">Sent Jun 15</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Local Pharmacy Network -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">🏪 Local Pharmacy Network — Recent Activity</div>
+        <button onclick="alert('Opening pharmacy search...')" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:6px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;">Search Pharmacies</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Rx ID</th>
+            <th>Patient</th>
+            <th>Medication</th>
+            <th>Pharmacy</th>
+            <th>Sent</th>
+            <th>Fulfillment Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4810</td>
+            <td style="font-weight:600;">James Wilson</td>
+            <td>Sildenafil 50mg tablet</td>
+            <td>CVS Pharmacy — Austin, TX</td>
+            <td style="color:#6B7280;">Jun 14</td>
+            <td><span class="pill" style="background:#D1FAE5;color:#065F46;">Ready for Pickup</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4801</td>
+            <td style="font-weight:600;">Lisa Martinez</td>
+            <td>Clomiphene 50mg tablet</td>
+            <td>Walgreens — Houston, TX</td>
+            <td style="color:#6B7280;">Jun 12</td>
+            <td><span class="pill" style="background:#D1FAE5;color:#065F46;">Picked Up</span></td>
+          </tr>
+          <tr>
+            <td style="font-size:11px;color:#6B7280;font-weight:600;">RX-2026-4798</td>
+            <td style="font-weight:600;">Kevin Park</td>
+            <td>Finasteride 1mg tablet</td>
+            <td>Costco Pharmacy — Dallas, TX</td>
+            <td style="color:#6B7280;">Jun 10</td>
+            <td><span class="pill" style="background:#FEE2E2;color:#991B1B;">Insurance Rejected</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Fulfillment Event Log -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">📜 Fulfillment Event Log</div>
+        <span style="font-size:12px;color:#6B7280;">Last 24 hours</span>
+      </div>
+      <div style="padding:4px 0;">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 18px;border-bottom:1px solid #F2EDE4;">
+          <span style="font-size:11px;color:#9CA3AF;white-space:nowrap;padding-top:1px;">10:18 AM</span>
+          <div><span style="font-size:11px;font-weight:600;background:#DBEAFE;color:#1E40AF;padding:2px 7px;border-radius:10px;margin-right:6px;">TX</span>Rx RX-2026-4821 signed by Dr. Sarah Lee · GoGoMeds handoff initiated</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 18px;border-bottom:1px solid #F2EDE4;">
+          <span style="font-size:11px;color:#9CA3AF;white-space:nowrap;padding-top:1px;">9:44 AM</span>
+          <div><span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:10px;margin-right:6px;">OK</span>GoGoMeds confirmed receipt of RX-2026-4819 · shipping within 24h</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 18px;border-bottom:1px solid #F2EDE4;">
+          <span style="font-size:11px;color:#9CA3AF;white-space:nowrap;padding-top:1px;">8:31 AM</span>
+          <div><span style="font-size:11px;font-weight:600;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:10px;margin-right:6px;">ERR</span>RX-2026-4798 rejected by insurance — PA required for Finasteride &gt;90-day supply</div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 18px;">
+          <span style="font-size:11px;color:#9CA3AF;white-space:nowrap;padding-top:1px;">Yesterday</span>
+          <div><span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:10px;margin-right:6px;">OK</span>RX-2026-4810 ready for pickup at CVS Austin — patient SMS sent</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

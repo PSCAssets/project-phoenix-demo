@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M03 UC1 — Account Creation to Intake</title>
+<style>
+  :root {
+    --navy: #002855; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4; --green-xlight: #E8F5F0;
+    --white: #FFFFFF; --bg: #F4F8F6; --border: #D4E4DC;
+    --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
+    --amber: #D97706; --amber-bg: #FFFBEB;
+    --red: #DC2626; --red-bg: #FEF2F2;
+    --blue: #2563EB; --blue-bg: #EFF6FF;
+    --purple: #7C3AED; --purple-bg: #EDE9FE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); min-height: 100vh; }
+
+  /* PAGE HEADER */
+  .page-header { background: var(--navy); padding: 24px 40px; display: flex; align-items: flex-start; justify-content: space-between; }
+  .header-left { }
+  .header-eyebrow { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 6px; }
+  .header-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .header-sub { font-size: 13px; color: rgba(255,255,255,0.55); max-width: 600px; line-height: 1.5; }
+  .header-meta { display: flex; gap: 16px; margin-top: 14px; }
+  .meta-chip { background: rgba(255,255,255,0.1); border-radius: 6px; padding: 4px 12px; font-size: 11px; color: rgba(255,255,255,0.7); }
+  .header-link { font-size: 12px; color: var(--green); font-weight: 600; text-decoration: none; background: rgba(62,129,104,0.15); border: 1px solid rgba(62,129,104,0.3); border-radius: 6px; padding: 6px 14px; align-self: center; }
+  .header-link:hover { background: rgba(62,129,104,0.25); }
+
+  /* LEGEND */
+  .legend { background: var(--white); border-bottom: 1px solid var(--border); padding: 12px 40px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .legend-title { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--gray); }
+  .legend-box { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+
+  /* MAIN CONTENT */
+  .diagram-page { padding: 32px 40px 48px; max-width: 1300px; margin: 0 auto; }
+
+  /* SWIMLANE */
+  .swimlane-container { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--white); }
+  .swimlane { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+  .swimlane:last-child { border-right: none; }
+  .swimlane-header { padding: 14px 14px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; text-align: center; flex-shrink: 0; }
+  .swimlane-header.patient { background: var(--navy); color: #fff; }
+  .swimlane-header.system { background: var(--green); color: #fff; }
+  .swimlane-header.admin { background: #475569; color: #fff; }
+  .swimlane-header.provider { background: #1A3A5C; color: #fff; }
+  .swimlane-body { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); }
+  .swimlane-body.system { background: var(--green-xlight); }
+  .swimlane-body.admin { background: #F8FAFC; }
+  .swimlane-body.provider { background: var(--navy-light, #EEF4FB); }
+
+  /* FLOW NODES */
+  .node {
+    border-radius: 10px; padding: 10px 12px; font-size: 12px; line-height: 1.4;
+    position: relative; cursor: default; border: 1.5px solid transparent;
+    transition: box-shadow 0.15s;
+  }
+  .node:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
+  .node-label { font-weight: 700; color: var(--text); margin-bottom: 3px; font-size: 12px; }
+  .node-desc { font-size: 11px; color: var(--gray); line-height: 1.4; }
+  .node-step { font-size: 10px; font-weight: 700; color: var(--white); background: var(--navy); border-radius: 10px; padding: 1px 6px; display: inline-block; margin-bottom: 4px; }
+
+  /* Node Types */
+  .node.action { background: var(--white); border-color: var(--border); }
+  .node.action.patient-node { border-left: 3px solid var(--navy); }
+  .node.action.system-node { border-left: 3px solid var(--green); }
+  .node.action.admin-node { border-left: 3px solid #475569; }
+  .node.action.provider-node { border-left: 3px solid var(--blue); }
+  .node.decision { background: var(--amber-bg); border-color: #FDE68A; border-left: 3px solid var(--amber); }
+  .node.milestone { background: var(--green-light); border-color: var(--green-dark); border-left: 3px solid var(--green-dark); }
+  .node.gate { background: var(--red-bg); border-color: #FCA5A5; border-left: 3px solid var(--red); }
+  .node.legal { background: var(--purple-bg); border-color: #C4B5FD; border-left: 3px solid var(--purple); }
+  .node.auto { background: #F0F9FF; border-color: #BAE6FD; border-left: 3px solid var(--blue); }
+
+  /* ARROWS */
+  .arrow { display: flex; align-items: center; justify-content: center; height: 22px; color: var(--gray); font-size: 18px; flex-shrink: 0; }
+  .arrow-label { font-size: 10px; color: var(--gray); text-align: center; margin-top: -8px; margin-bottom: 2px; }
+
+  /* PHASE DIVIDERS */
+  .phase-divider { background: var(--navy); color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 8px 40px; display: flex; align-items: center; gap: 10px; margin: 0 0 0 0; }
+  .phase-num { background: var(--green); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+  /* CONNECTOR LINES (cross-lane) */
+  .cross-connector { background: var(--white); border: 1px dashed var(--border); border-radius: 8px; padding: 6px 12px; font-size: 11px; color: var(--gray); text-align: center; margin: 0 -1px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+  /* NOTES */
+  .note-box { background: #FFFDE7; border: 1px solid #F9A825; border-radius: 8px; padding: 8px 12px; font-size: 11px; color: #6D4C41; line-height: 1.5; margin-top: 4px; }
+  .note-box strong { color: #5D4037; }
+
+  /* FLOW OVERVIEW */
+  .flow-overview { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+  .overview-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .flow-steps { display: flex; align-items: center; gap: 0; overflow-x: auto; }
+  .flow-step { display: flex; flex-direction: column; align-items: center; min-width: 110px; }
+  .flow-step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .flow-step-label { font-size: 10px; font-weight: 600; color: var(--text); text-align: center; margin-top: 6px; line-height: 1.3; }
+  .flow-step-sub { font-size: 9px; color: var(--gray); text-align: center; margin-top: 2px; }
+  .flow-arrow-line { width: 40px; height: 2px; background: var(--border); flex-shrink: 0; position: relative; margin-bottom: 24px; }
+  .flow-arrow-line::after { content: '▶'; position: absolute; right: -6px; top: -8px; font-size: 10px; color: var(--border); }
+
+  /* SECTION LABEL */
+  .section-block { margin-bottom: 28px; }
+  .section-label { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label-num { width: 24px; height: 24px; border-radius: 50%; background: var(--navy); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* VERTICAL FLOW */
+  .vflow { display: flex; flex-direction: column; gap: 0; }
+  .vflow-row { display: flex; gap: 0; align-items: stretch; }
+  .vflow-cell { flex: 1; padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--border); }
+  .vflow-cell:last-child { border-right: none; }
+  .vflow-row.phase-header { background: #F8FAFC; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .vflow-row.phase-header .vflow-cell { padding: 6px 10px; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-left">
+    <div class="header-eyebrow">Project Phoenix · M03 Patient Portal · UC1</div>
+    <div class="header-title">Account Creation → Intake Completion</div>
+    <div class="header-sub">The full patient onboarding journey from initial account creation through identity verification, legal acknowledgements, health profile completion, and intake submission — ending with a consultation ready for provider review.</div>
+    <div class="header-meta">
+      <span class="meta-chip">Version 1.0</span>
+      <span class="meta-chip">May 2026</span>
+      <span class="meta-chip">Patient Portal (M03)</span>
+      <span class="meta-chip">Intake Process (M07)</span>
+    </div>
+  </div>
+  <a href="M03_UC2_Initiating_a_Consult_v1.html" class="header-link">→ UC2: Initiating a Consult</a>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span class="legend-title">Legend</span>
+  <div class="legend-item"><div class="legend-box" style="background:var(--white);border:1.5px solid var(--border);border-left:3px solid var(--navy);"></div> Patient Action</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--white);border:1.5px solid var(--border);border-left:3px solid var(--green);"></div> System Action (Auto)</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--purple-bg);border:1.5px solid #C4B5FD;border-left:3px solid var(--purple);"></div> Legal / Compliance</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--amber-bg);border:1.5px solid #FDE68A;border-left:3px solid var(--amber);"></div> Decision / Branch</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--green-light);border:1.5px solid var(--green-dark);border-left:3px solid var(--green-dark);"></div> Milestone</div>
+  <div class="legend-item"><div class="legend-box" style="background:var(--red-bg);border:1.5px solid #FCA5A5;border-left:3px solid var(--red);"></div> Block / Error</div>
+</div>
+
+<div class="diagram-page">
+
+  <!-- FLOW OVERVIEW -->
+  <div class="flow-overview">
+    <div class="overview-title">📋 Journey Overview — 8 Phases</div>
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--navy);">1</div>
+        <div class="flow-step-label">Account Creation</div>
+        <div class="flow-step-sub">Identity + credentials</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:#1A3A5C;">2</div>
+        <div class="flow-step-label">2FA Verification</div>
+        <div class="flow-step-sub">Email or SMS OTP</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--purple);">3</div>
+        <div class="flow-step-label">Legal Acknowledgements</div>
+        <div class="flow-step-sub">ToS, HIPAA, Consent</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--green);">4</div>
+        <div class="flow-step-label">Care Program Selection</div>
+        <div class="flow-step-sub">Enrollment check</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--amber);">5</div>
+        <div class="flow-step-label">Age / Guardian Check</div>
+        <div class="flow-step-sub">Minor rules apply</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--blue);">6</div>
+        <div class="flow-step-label">Health Profile</div>
+        <div class="flow-step-sub">Required sections</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:#0891B2;">7</div>
+        <div class="flow-step-label">Intake Questionnaire</div>
+        <div class="flow-step-sub">Program-specific Qs</div>
+      </div>
+      <div class="flow-arrow-line"></div>
+      <div class="flow-step">
+        <div class="flow-step-circle" style="background:var(--green-dark);">8</div>
+        <div class="flow-step-label">Consult Queue</div>
+        <div class="flow-step-sub">Provider assigns</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SWIMLANE DIAGRAM -->
+  <div class="swimlane-container">
+
+    <!-- PATIENT LANE -->
+    <div class="swimlane">
+      <div class="swimlane-header patient">👤 Patient</div>
+      <div class="swimlane-body">
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 1</div>
+          <div class="node-label">Visits Everlywell or receives invite link</div>
+          <div class="node-desc">Arrives at account creation page via web, email invite, or referral.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 2</div>
+          <div class="node-label">Enters identity fields</div>
+          <div class="node-desc">Legal first/last name, DOB, sex assigned at birth, address, phone, email, emergency contact.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 3</div>
+          <div class="node-label">Creates password</div>
+          <div class="node-desc">Sets secure password meeting complexity requirements.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 4</div>
+          <div class="node-label">Selects 2FA channel</div>
+          <div class="node-desc">Chooses email or SMS for one-time passcode delivery.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 5</div>
+          <div class="node-label">Enters 6-digit OTP</div>
+          <div class="node-desc">Receives and enters OTP within 10-minute expiry window.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node milestone">
+          <div class="node-label">✅ Account Created &amp; Verified</div>
+          <div class="node-desc">Patient now has an authenticated portal account.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node legal">
+          <div class="node-step">Step 6</div>
+          <div class="node-label">Reviews &amp; acknowledges legal documents</div>
+          <div class="node-desc">Terms of Service, Privacy Policy / HIPAA NPP, Telehealth Consent (state-specific). Must acknowledge all before accessing care features.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node decision">
+          <div class="node-label">🔀 Age check at account creation — is patient under 18?</div>
+          <div class="node-desc"><strong>Path 1 — Product-first entry (arrived from website with care product selected):</strong> System validates DOB against that product's self-consent config. If self-consent eligible → minor creates independent account and proceeds. If not eligible → guardian flow initiated.<br><br><strong>Path 2 — Direct entry (no care product context):</strong> System detects age under 18 from DOB and displays a prompt: "You appear to be under 18. Please select a care program that allows independent access for your age, or have your guardian set up your account." Patient must choose a path — cannot proceed without selecting one. No minor account created without either a guardian association or a verified self-consent eligible product.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node gate">
+          <div class="node-label">Guardian Flow (standard path for minors)</div>
+          <div class="node-desc">Guardian creates their OWN account first, then adds the minor as a dependent from Account Settings. This follows the industry-standard model (Epic MyChart, One Medical). Guardian is the account initiator — minor is never the initiating party. Once linked, guardian manages the minor's portal including security settings. Guardian receives account switcher to toggle between their own care and the dependent's care view.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 7</div>
+          <div class="node-label">Enters the portal for the first time</div>
+          <div class="node-desc">Full portal access granted immediately. Getting Started checklist appears on dashboard. For guardian-managed accounts: guardian logs in with their own credentials and switches to the minor's care view.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 8</div>
+          <div class="node-label">Selects or is enrolled in care program</div>
+          <div class="node-desc">Chooses a care program or is auto-enrolled via referral. For minors: care product age rules validated at enrollment. If program allows self-consent for minor's age range, minor proceeds independently. Otherwise guardian manages enrollment.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node decision">
+          <div class="node-label">🔀 Minor self-consent check at enrollment</div>
+          <div class="node-desc">Does this care product allow self-consent for the patient's age range? If yes (e.g., STI testing allows 14+) → minor proceeds independently for this product. If no → guardian manages enrollment, intake, and health profile until minor turns 18 or reaches care product self-consent age, at which point they receive an invitation to create their own independent account.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node legal">
+          <div class="node-step">Step 9</div>
+          <div class="node-label">Signs program-specific informed consent</div>
+          <div class="node-desc">Separate consent document per enrolled care program. Required before intake begins.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 10</div>
+          <div class="node-label">Sets notification preferences</div>
+          <div class="node-desc">Prompted to configure email and/or SMS notifications. Editable later in Account Settings.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 11</div>
+          <div class="node-label">Completes required Health Profile sections</div>
+          <div class="node-desc">Required sections driven by care product config (e.g., A1C requires Medications, Allergies, Conditions, Measurements). Optional sections accessible but not required.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action patient-node">
+          <div class="node-step">Step 12</div>
+          <div class="node-label">Completes intake questionnaire</div>
+          <div class="node-desc">Program-specific questions configured per care product in Admin Portal. Covers clinical history, symptoms, goals.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node decision">
+          <div class="node-label">🔀 Lab test required for this program?</div>
+          <div class="node-desc">If yes: patient receives lab order and collection instructions via portal + notification. If no: intake complete, consult routed directly.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node milestone">
+          <div class="node-label">✅ Intake Complete — Awaiting Provider</div>
+          <div class="node-desc">Consult enters provider queue. Patient sees "Pending Review" status on dashboard.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SYSTEM LANE -->
+    <div class="swimlane">
+      <div class="swimlane-header system">⚙️ System (Auto)</div>
+      <div class="swimlane-body system">
+
+        <div class="node auto">
+          <div class="node-label">Validates required identity fields</div>
+          <div class="node-desc">Checks all required fields populated. Validates email format, DOB format, address fields.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Generates 6-digit OTP</div>
+          <div class="node-desc">Dispatches OTP via selected channel (email or SMS). OTP expires in 10 minutes.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node decision">
+          <div class="node-label">🔀 OTP valid?</div>
+          <div class="node-desc">If invalid or expired: resend available after 60-second cooldown. Max 3 attempts before lockout.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Creates patient account record</div>
+          <div class="node-desc">Stores identity, credentials, 2FA config. Assigns unique patient ID. Logs account creation event.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Serves legal documents (versioned)</div>
+          <div class="node-desc">Retrieves current versions of ToS, HIPAA NPP, Telehealth Consent for patient's state. Records acknowledgement with version, timestamp, patient ID.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Loads care product configuration</div>
+          <div class="node-desc">Reads visit types, required health profile sections, intake questions, lab requirements, SLA rules for selected program and patient's state.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Evaluates age at DOB entry — triggers appropriate path</div>
+          <div class="node-desc">System detects patient age in real time from DOB field. If under 18 AND a care product is known (product-first entry): validates against that product's self-consent config immediately. If under 18 AND no product context (direct entry): displays the two-path prompt — patient cannot proceed without selecting "Browse Eligible Programs" or "Have My Guardian Set Up My Account." No minor account created without guardian association or verified self-consent product.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Serves program-specific informed consent</div>
+          <div class="node-desc">Generates consent document for enrolled program. Records acknowledgement.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Generates Getting Started checklist</div>
+          <div class="node-desc">Populates checklist steps based on care product required fields and intake requirements. Tracks completion in real time.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Validates health profile completeness</div>
+          <div class="node-desc">Checks required sections against care product config. Blocks intake submission if required sections incomplete. Displays prompts for missing fields.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Validates intake questionnaire</div>
+          <div class="node-desc">Checks all required questions answered. Validates response formats. Detects clinical flags (e.g., high-risk responses that require escalation).</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node decision">
+          <div class="node-label">🔀 Lab required?</div>
+          <div class="node-desc">If yes: creates lab order in Phoenix, syncs to Athena, sends collection instructions via portal + Notification Engine. If no: routes to queue directly.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node auto">
+          <div class="node-label">Routes consult to provider queue</div>
+          <div class="node-desc">SLA Engine assigns priority and routes to appropriate provider queue. Patient receives "Intake complete — pending review" notification.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node milestone">
+          <div class="node-label">✅ Consult in Provider Queue</div>
+          <div class="node-desc">SLA clock starts. Provider assigned per queue rules. See UC2 for provider response flow.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ADMIN / CONFIG LANE -->
+    <div class="swimlane">
+      <div class="swimlane-header admin">🔧 Admin Portal Config</div>
+      <div class="swimlane-body admin">
+
+        <div style="height:200px;"></div>
+
+        <div class="node action admin-node">
+          <div class="node-label">Care product configuration drives the journey</div>
+          <div class="node-desc">Admin Portal pre-configures all rules that shape the patient journey for each care product.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Visit types by state</div>
+          <div class="node-desc">Which consult types (async, video, telephonic) are available per care product and patient state.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Required health profile sections</div>
+          <div class="node-desc">Which health profile sections are required vs. optional for each care product.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Intake questionnaire content</div>
+          <div class="node-desc">Program-specific questions, branching logic, required vs. optional questions.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Minor age rules</div>
+          <div class="node-desc">Minimum patient age, guardian required flag, self-consent age range (e.g., STI testing at 14+).</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Lab requirements</div>
+          <div class="node-desc">Whether a lab order is required before provider review, and result release mode (auto vs. provider-reviewed).</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ SLA rules</div>
+          <div class="node-desc">Response time targets, escalation triggers, and priority assignment rules for the provider queue.</div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="node action admin-node">
+          <div class="node-label">✦ Notification channel rules</div>
+          <div class="node-desc">Which notification channels (email, SMS) are permitted per client configuration.</div>
+        </div>
+
+        <div style="height: 80px;"></div>
+
+        <div class="note-box">
+          <strong>⚠️ Open Item:</strong> The full care product + state + client configuration matrix must be defined in a cross-functional working session (Justin, Kyro, Clinical, Engineering, Legal) before appointment scheduling and state-specific rules can be built.
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NOTES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+    <div class="note-box" style="background:var(--blue-bg);border-color:#93C5FD;">
+      <strong>🔗 Related Modules:</strong> This flow touches M03 (Patient Portal), M07 (Intake Process), M04 (Admin Portal config), M06 (SLA Engine), M08 (Notification Engine), M10 (Athena lab order sync), and M12 (Audit Log).
+    </div>
+    <div class="note-box">
+      <strong>📋 Guardian Flow (Industry Standard — Epic/One Medical model):</strong> Guardian creates their OWN account first, then adds the minor as a dependent. Minor is never the account initiator in the standard flow. Two entry paths exist for minors: (1) Product-first: minor arrives with a care product selected — self-consent validated at account creation. (2) Direct entry: system detects minor age and shows a prompt — "Browse Eligible Programs" or "Have My Guardian Set Up My Account." No minor account is created without either a guardian association or a verified self-consent eligible product. When minor turns 18 (or reaches care product self-consent age), they receive an invitation to create their own independent account and guardian access is revoked upon activation.
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:32px;font-size:11px;color:var(--gray);">
+    Project Phoenix · M03 Patient Portal · UC1 Account Creation to Intake · v1.0 · May 2026 · Everlywell Telehealth Platform Rebuild
+  </div>
+
+</div>
+</body>
+</html>

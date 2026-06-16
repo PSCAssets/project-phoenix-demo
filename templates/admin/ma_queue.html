@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}MA Queue{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .filter-bar { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap; }
+  .filter-select { border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #374151; background: #fff; outline: none; cursor: pointer; }
+  .btn-clear { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #6B7280; cursor: pointer; font-weight: 500; }
+  .btn-clear:hover { background: #F9FAFB; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+  .widget-header { padding: 16px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 12px; }
+  .widget-title { font-size: 15px; font-weight: 700; color: #111827; }
+  .badge-count { background: #EF4444; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; white-space: nowrap; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #FAF7F2; }
+  .priority-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-red    { background: #EF4444; }
+  .dot-amber  { background: #F59E0B; }
+  .dot-green  { background: #10B981; }
+  .action-link { color: #7C3AED; font-size: 12px; font-weight: 600; text-decoration: none; }
+  .action-link:hover { text-decoration: underline; }
+  .action-assign { color: #D97706; font-size: 12px; font-weight: 600; text-decoration: none; }
+  .action-assign:hover { text-decoration: underline; }
+  .unassigned { color: #9CA3AF; font-style: italic; }
+</style>
+{% endblock %}
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding: 8px 0; flex: 1;">
+    <a href="/admin/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">👩‍⚕️</span> Providers</a>
+    <a href="/admin/patients" class="nav-item"><span class="nav-icon">👥</span> Patients</a>
+    <a href="/admin/ma-queue" class="nav-item active"><span class="nav-icon">📋</span> MA Queue <span class="nav-badge">7</span></a>
+    <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="/admin/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">MA Queue</div>
+    <span style="font-size:13px;color:#6B7280;">Chris Navarro · Platform Admin</span>
+  </div>
+  <div class="content">
+    <div class="filter-bar">
+      <select class="filter-select">
+        <option>All Care Products</option>
+        <option>Testosterone</option>
+        <option>Women's Health</option>
+        <option>ED Treatment</option>
+        <option>Weight Management</option>
+        <option>Skincare</option>
+        <option>A1C Management</option>
+      </select>
+      <select class="filter-select">
+        <option>All Task Types</option>
+        <option>Lab Review Needed</option>
+        <option>Intake Incomplete</option>
+        <option>Document Missing</option>
+        <option>Lab Upload Needed</option>
+        <option>Refill Request</option>
+        <option>New Patient Setup</option>
+        <option>Questionnaire Review</option>
+      </select>
+      <select class="filter-select">
+        <option>All Assigned</option>
+        <option>Michael Torres</option>
+        <option>Unassigned</option>
+      </select>
+      <button class="btn-clear">Clear Filters</button>
+    </div>
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">MA Queue</span>
+        <span class="badge-count">7 items</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Priority</th>
+            <th>Patient</th>
+            <th>Care Product</th>
+            <th>Task Type</th>
+            <th>Age</th>
+            <th>Assigned To</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="priority-dot dot-red"></span></td>
+            <td style="font-weight:600">Marcus Johnson · TX</td>
+            <td>Testosterone</td>
+            <td>Lab Review Needed</td>
+            <td>2h 14m</td>
+            <td>Michael Torres</td>
+            <td><a href="#" class="action-link">View</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-red"></span></td>
+            <td style="font-weight:600">Patricia Walsh · FL</td>
+            <td>Women's Health</td>
+            <td>Intake Incomplete</td>
+            <td>3h 02m</td>
+            <td><span class="unassigned">Unassigned</span></td>
+            <td><a href="#" class="action-assign">Assign</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-amber"></span></td>
+            <td style="font-weight:600">David Kim · NY</td>
+            <td>ED Treatment</td>
+            <td>Document Missing</td>
+            <td>45m</td>
+            <td>Michael Torres</td>
+            <td><a href="#" class="action-link">View</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-amber"></span></td>
+            <td style="font-weight:600">Susan Park · CA</td>
+            <td>Weight Management</td>
+            <td>Lab Upload Needed</td>
+            <td>1h 12m</td>
+            <td><span class="unassigned">Unassigned</span></td>
+            <td><a href="#" class="action-assign">Assign</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-green"></span></td>
+            <td style="font-weight:600">James Carter · OH</td>
+            <td>Testosterone</td>
+            <td>Refill Request</td>
+            <td>8m</td>
+            <td>Michael Torres</td>
+            <td><a href="#" class="action-link">View</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-green"></span></td>
+            <td style="font-weight:600">Ana Rivera · TX</td>
+            <td>Skincare</td>
+            <td>New Patient Setup</td>
+            <td>15m</td>
+            <td><span class="unassigned">Unassigned</span></td>
+            <td><a href="#" class="action-assign">Assign</a></td>
+          </tr>
+          <tr>
+            <td><span class="priority-dot dot-green"></span></td>
+            <td style="font-weight:600">Owen Taylor · OH</td>
+            <td>A1C Management</td>
+            <td>Questionnaire Review</td>
+            <td>22m</td>
+            <td><span class="unassigned">Unassigned</span></td>
+            <td><a href="#" class="action-assign">Assign</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M03 UC2 — Sync Video Consultation Workflow</title>
+<style>
+  :root {
+    --navy:#002855;--green:#3E8168;--green-dark:#2D5F4E;--green-light:#F0FDF4;--green-xlight:#E8F5F0;
+    --white:#FFFFFF;--bg:#F4F8F6;--border:#D4E4DC;
+    --gray:#64748B;--gray-light:#F1F5F9;--text:#1E293B;
+    --amber:#D97706;--amber-bg:#FFFBEB;
+    --red:#DC2626;--red-bg:#FEF2F2;
+    --blue:#2563EB;--blue-bg:#EFF6FF;
+    --purple:#7C3AED;--purple-bg:#EDE9FE;
+    --teal:#0891B2;--teal-bg:#F0F9FF;
+    --video-bg:#0A1628;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;}
+  .page-header{background:var(--navy);padding:24px 40px;display:flex;align-items:flex-start;justify-content:space-between;}
+  .eyebrow{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+  .header-title{font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;}
+  .header-sub{font-size:13px;color:rgba(255,255,255,.55);max-width:680px;line-height:1.5;}
+  .header-meta{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .meta-chip{background:rgba(255,255,255,.1);border-radius:6px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.7);}
+  .nav-links{display:flex;flex-direction:column;gap:8px;align-self:center;}
+  .nav-link{font-size:12px;color:var(--green);font-weight:600;text-decoration:none;background:rgba(62,129,104,.15);border:1px solid rgba(62,129,104,.3);border-radius:6px;padding:6px 14px;text-align:center;white-space:nowrap;}
+  .legend{background:var(--white);border-bottom:1px solid var(--border);padding:12px 40px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .legend-title{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-right:4px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);}
+  .l-box{width:28px;height:10px;border-radius:3px;}
+  .page{padding:32px 40px 48px;max-width:1280px;margin:0 auto;}
+  .flow-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .flow-num{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .two-paths{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:28px;}
+  .path-card{border-radius:14px;overflow:hidden;border:1px solid var(--border);}
+  .path-header{padding:14px 18px;display:flex;align-items:center;gap:10px;}
+  .path-header.scheduled{background:var(--blue-bg);border-bottom:2px solid #BFDBFE;}
+  .path-header.realtime{background:var(--teal-bg);border-bottom:2px solid #BAE6FD;}
+  .path-icon{font-size:22px;}
+  .path-title{font-size:15px;font-weight:700;}
+  .path-title.scheduled{color:var(--blue);}
+  .path-title.realtime{color:var(--teal);}
+  .path-sub{font-size:11px;color:var(--gray);margin-top:2px;}
+  .path-body{background:var(--white);}
+  .p-step{display:flex;gap:0;border-bottom:1px solid var(--gray-light);}
+  .p-step:last-child{border-bottom:none;}
+  .p-step-lane{flex:1;padding:10px 12px;border-right:1px solid var(--gray-light);font-size:11px;}
+  .p-step-lane:last-child{border-right:none;}
+  .p-lane-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gray);margin-bottom:4px;}
+  .p-step-text{font-size:12px;color:var(--text);line-height:1.4;font-weight:600;}
+  .p-step-sub{font-size:11px;color:var(--gray);margin-top:2px;line-height:1.3;}
+  .p-notif{font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;display:inline-flex;align-items:center;gap:3px;margin-top:4px;}
+  .p-notif.amber{background:var(--amber-bg);color:var(--amber);}
+  .p-notif.m06{background:var(--purple-bg);color:var(--purple);}
+  .p-notif.blue{background:var(--blue-bg);color:var(--blue);}
+  .p-notif.teal{background:var(--teal-bg);color:var(--teal);}
+  .p-notif.green{background:var(--green-light);color:var(--green-dark);}
+  .note-box{border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;margin-bottom:16px;}
+  .note-box.amber{background:var(--amber-bg);border:1px solid #FDE68A;color:#92400E;}
+  .note-box.purple{background:var(--purple-bg);border:1px solid #C4B5FD;color:#5B21B6;}
+  .note-box.blue{background:var(--blue-bg);border:1px solid #BFDBFE;color:#1D4ED8;}
+  .note-box.green{background:var(--green-light);border:1px solid var(--green-dark);color:var(--green-dark);}
+  .shared-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:20px;}
+  .shared-title{font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+  .shared-steps{display:flex;flex-direction:column;gap:8px;}
+  .s-step{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-light);}
+  .s-step:last-child{border-bottom:none;}
+  .s-num{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .s-text{font-size:12px;color:var(--text);line-height:1.4;font-weight:600;}
+  .s-sub{font-size:11px;color:var(--gray);margin-top:2px;}
+
+  /* VIDEO SETUP CALLOUT */
+  .setup-callout{background:var(--blue-bg);border:1px solid #BFDBFE;border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;gap:14px;}
+  .setup-icon{font-size:28px;flex-shrink:0;}
+  .setup-title{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px;}
+  .setup-desc{font-size:12px;color:#1D4ED8;line-height:1.5;}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">Project Phoenix · M03 Patient Portal · UC2 — Consult Workflows</div>
+    <div class="header-title">📹 Sync Video Consultation Workflow</div>
+    <div class="header-sub">Two paths: Scheduled (patient picks time slot with pre-visit setup check) and Real-Time (patient joins Master Queue for immediate provider pickup). Includes outbound notification automation and M06 workflow engine triggers.</div>
+    <div class="header-meta">
+      <span class="meta-chip">Version 1.0</span>
+      <span class="meta-chip">June 2026</span>
+      <span class="meta-chip">M03 Patient Portal</span>
+      <span class="meta-chip">M06 SLA & Workflow Engine</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="M03_UC2_Async_Consult_v1.html" class="nav-link">← Async Workflow</a>
+    <a href="M03_UC2_Sync_Telephonic_v1.html" class="nav-link">← Telephonic Workflow</a>
+  </div>
+</div>
+
+<div class="legend">
+  <span class="legend-title">Legend</span>
+  <div class="legend-item"><div class="l-box" style="background:var(--navy);"></div> Patient Action</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--green);"></div> System (Auto)</div>
+  <div class="legend-item"><div class="l-box" style="background:#1A3A5C;"></div> Provider Action</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--amber);"></div> Notification / Automation</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--purple);"></div> M06 SLA / Workflow Engine</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--blue);"></div> Video-Specific Step</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--teal);"></div> Real-Time Queue Event</div>
+</div>
+
+<div class="page">
+
+  <div class="note-box green">
+    ✅ <strong>Video availability</strong> is configured per care product and state in Admin Portal (M04). Some states require video for the initial visit. Configuration matrix must be defined in the cross-functional working session.
+  </div>
+
+  <!-- VIDEO SETUP CALLOUT - unique to video -->
+  <div class="setup-callout">
+    <div class="setup-icon">📹</div>
+    <div>
+      <div class="setup-title">Video-Only: Pre-Visit Setup Check</div>
+      <div class="setup-desc">Video consultations require a camera and microphone setup check before the patient can join. The setup check is accessible from the appointment card in the patient portal. Patient is prompted to run the check in the 1-hour reminder notification. If setup fails, patient is directed to troubleshooting steps and care team contact. Setup check tool: TBD (open question — determine if built-in portal feature or third-party tool e.g., Twilio pre-flight).</div>
+    </div>
+  </div>
+
+  <!-- TWO PATHS -->
+  <div class="flow-title"><span class="flow-num">A</span> Two Entry Paths — Patient Chooses at Initiation</div>
+
+  <div class="two-paths">
+
+    <!-- SCHEDULED -->
+    <div class="path-card">
+      <div class="path-header scheduled">
+        <div class="path-icon">📅</div>
+        <div>
+          <div class="path-title scheduled">Path 1 — Scheduled</div>
+          <div class="path-sub">Patient picks date + time slot. Full pre-visit notification flow.</div>
+        </div>
+      </div>
+      <div class="path-body">
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;">
+            <div class="p-lane-label">Step</div>
+            <div class="p-step-text" style="color:var(--gray);">1</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Selects "Schedule Video Visit" from dashboard</div>
+            <div class="p-step-sub">Only shown if video enabled for program + state</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Loads provider calendar availability</div>
+            <div class="p-step-sub">Fetches open video slots for licensed providers in program</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">2</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Selects date and time slot. Reviews and confirms.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System + M06</div>
+            <div class="p-step-text">Appointment confirmed. Reminder automation scheduled.</div>
+            <span class="p-notif amber">📬 Immediate confirmation to patient + provider</span>
+            <span class="p-notif m06">🔷 M06: schedules 24hr + 1hr reminders</span>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">3</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Receives 24-hour reminder</div>
+            <div class="p-step-sub">"Your video visit with [Provider] is tomorrow at [time]. Make sure your camera and microphone are ready."</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">M06 Automation</div>
+            <span class="p-notif m06">🔷 24-hour automated reminder fires</span>
+            <div class="p-step-sub" style="margin-top:6px;">Includes appointment details and a link to run the camera/mic setup check in advance.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">4</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Receives 1-hour reminder with setup check prompt</div>
+            <div class="p-step-sub">"Your video visit starts in 1 hour. Run your camera and mic check now to be ready." Link to setup check included.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">M06 Automation</div>
+            <span class="p-notif m06">🔷 1-hour reminder fires</span>
+            <span class="p-notif blue">📹 Setup check link included</span>
+            <div class="p-step-sub" style="margin-top:4px;">Patient should run setup check before appointment time.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">5</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Runs camera/microphone setup check</div>
+            <div class="p-step-sub">Accessible from appointment card "Test Setup" button. Tests camera, microphone, and connection. Shows pass/fail with troubleshooting if needed.</div>
+            <span class="p-notif blue">📹 Video-only step</span>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Setup check validates camera, mic, browser compatibility</div>
+            <div class="p-step-sub">Pass: patient sees green confirmation. Fail: troubleshooting steps and care team contact info shown.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">6</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Joins video session at appointment time</div>
+            <div class="p-step-sub">Clicks "Join" from appointment card in portal. Enters waiting room. Provider admits when ready.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Waiting room active. Provider admits patient.</div>
+            <div class="p-step-sub">HIPAA-compliant encrypted video session starts. Session timer begins.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">7</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Provider + Patient</div>
+            <div class="p-step-text">Live video consultation conducted</div>
+            <div class="p-step-sub">Provider uses provider portal side panel for chart access, notes, and patient info. Patient sees My Questions and Visit Summary tabs.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Provider</div>
+            <div class="p-step-text">Ends session. Documents notes and publishes visit summary.</div>
+            <span class="p-notif amber">📬 Visit summary ready notification</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- REAL-TIME -->
+    <div class="path-card">
+      <div class="path-header realtime">
+        <div class="path-icon">⚡</div>
+        <div>
+          <div class="path-title realtime">Path 2 — Real-Time (Queue-Based)</div>
+          <div class="path-sub">Patient joins Master Queue. Provider admits to video when ready.</div>
+        </div>
+      </div>
+      <div class="path-body">
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;">
+            <div class="p-lane-label">Step</div>
+            <div class="p-step-text" style="color:var(--gray);">1</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Selects "Start Video Now" from dashboard</div>
+            <div class="p-step-sub">Only shown if real-time video enabled for program + state. Patient sees estimated context (no defined wait time V1.0).</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Validates real-time video enabled for program + state</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">2</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Runs camera/mic setup check before joining queue</div>
+            <div class="p-step-sub">Required before entering queue — ensures patient is video-ready when provider selects them. Setup check must pass before queue entry confirmed.</div>
+            <span class="p-notif blue">📹 Video setup required before queue entry</span>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Setup check validates before confirming queue entry</div>
+            <div class="p-step-sub">Fail: patient shown troubleshooting steps. Cannot join queue until setup passes.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">3</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Placed in Master Patient Queue</div>
+            <div class="p-step-sub">Dashboard shows "In Queue" status. Patient should remain available with camera and mic ready.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System + M06</div>
+            <div class="p-step-text">Queue entry created. Visible to assigned providers.</div>
+            <span class="p-notif m06">🔷 M06: SLA clock starts at queue entry</span>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">4</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Provider</div>
+            <div class="p-step-text">Selects patient from Master Queue for video consult</div>
+            <div class="p-step-sub">Provider views queue filtered to assigned programs and states. Selects patient and initiates video session.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System + M06</div>
+            <div class="p-step-text">Provider selection triggers immediate patient alert</div>
+            <span class="p-notif teal">⚡ Real-time alert to patient</span>
+            <div class="p-step-sub" style="margin-top:4px;">M06 Workflow Engine sends: "A provider has selected your consultation. Join the video session now — your provider is ready." Notification with direct Join link.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">5</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Patient</div>
+            <div class="p-step-text">Receives notification and joins video session immediately</div>
+            <div class="p-step-sub">Dashboard status changes from "In Queue" to "Join Now." Patient clicks Join link from notification or dashboard. Enters waiting room.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">M06 Automation</div>
+            <span class="p-notif m06">🔷 M06: patient join window timer starts</span>
+            <div class="p-step-sub" style="margin-top:4px;">If patient does not join within configurable window (e.g., 5 minutes), provider is notified and M06 flags for review. Patient receives a follow-up notification.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">6</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Provider</div>
+            <div class="p-step-text">Admits patient from waiting room. Video session starts.</div>
+            <div class="p-step-sub">HIPAA-compliant encrypted video. Provider portal shows patient chart in side panel.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">System</div>
+            <div class="p-step-text">Session active. Status → In Progress. Queue item removed.</div>
+          </div>
+        </div>
+
+        <div class="p-step">
+          <div class="p-step-lane" style="flex:0.5;background:#F8FAFC;"><div class="p-step-text" style="color:var(--gray);">7</div></div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Provider + Patient</div>
+            <div class="p-step-text">Live video consultation conducted. Provider ends session and documents.</div>
+          </div>
+          <div class="p-step-lane" style="flex:1;">
+            <div class="p-lane-label">Notification</div>
+            <span class="p-notif amber">📬 Visit summary ready notification to patient</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SHARED POST-CONSULT -->
+  <div class="flow-title"><span class="flow-num">B</span> Post-Consultation — Shared for Both Paths</div>
+  <div class="shared-section">
+    <div class="shared-title">After the video session ends — both paths converge</div>
+    <div class="shared-steps">
+      <div class="s-step">
+        <div class="s-num" style="background:var(--navy);">1</div>
+        <div>
+          <div class="s-text">Provider documents and publishes visit summary to patient portal</div>
+          <div class="s-sub">Clinical notes, treatment plan, any orders placed. Visit summary published triggers patient notification.</div>
+        </div>
+      </div>
+      <div class="s-step">
+        <div class="s-num" style="background:var(--amber);">2</div>
+        <div>
+          <div class="s-text">📬 Patient notified: "Your visit summary from [Provider] is now available in your portal."</div>
+          <div class="s-sub">Sent via in-app + email/SMS per preferences.</div>
+        </div>
+      </div>
+      <div class="s-step">
+        <div class="s-num" style="background:var(--green);">3</div>
+        <div>
+          <div class="s-text">Patient reviews visit summary. Can send follow-up message referencing the visit.</div>
+        </div>
+      </div>
+      <div class="s-step">
+        <div class="s-num" style="background:var(--purple);">4</div>
+        <div>
+          <div class="s-text">🔷 M06: SLA clock stopped. Session duration logged for billing (M11) and reporting.</div>
+          <div class="s-sub">Activity logged to audit trail (M12). Consult moves to History.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+    <div class="note-box purple">🔷 <strong>M06 Workflow Engine items for video:</strong> Scheduled reminder automation (24hr + 1hr with setup check link), real-time queue SLA clock, provider selection → patient immediate alert, patient join window timer, post-session SLA stop. All must be captured in M06 BRD.</div>
+    <div class="note-box blue">📹 <strong>Video setup check (open item):</strong> Determine whether the camera/microphone setup check is a built-in portal feature or a third-party tool (e.g., Twilio pre-flight check). Required before scheduling and before joining real-time queue. Engineering to confirm approach.</div>
+    <div class="note-box amber">⚠️ <strong>Real-time path key difference from telephonic:</strong> Video real-time requires setup check BEFORE queue entry (not after provider selection) — because video cannot start if patient setup fails. Telephonic real-time setup is just phone number confirmation.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:28px;font-size:11px;color:var(--gray);">Project Phoenix · M03 Patient Portal · UC2 Sync Video Workflow · v1.0 · June 2026 · Everlywell Telehealth Platform Rebuild</div>
+</div>
+</body>
+</html>

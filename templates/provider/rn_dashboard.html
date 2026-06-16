@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block title %}RN Dashboard — James Thompson | Project Phoenix{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+
+/* demo-nav-offset */
+.rn-shell { margin-top: 60px; display: flex; height: calc(100vh - 60px); overflow: hidden; }
+.rn-topbar { display: flex; width: 100%; }
+
+/* Sidebar */
+.rn-sidebar { width: 48px; background: #F2EDE4; border-right: 1px solid #E5E0D8; display: flex; flex-direction: column; align-items: center; padding: 12px 0; flex-shrink: 0; gap: 4px; }
+.rn-logo { width: 32px; height: 32px; background: #6B21A8; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 16px; }
+.rn-nav { display: flex; flex-direction: column; gap: 2px; width: 100%; padding: 0 4px; }
+.nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 4px; border-radius: 8px; color: #6B7280; text-decoration: none; font-size: 10px; gap: 3px; cursor: pointer; transition: background 0.15s, color 0.15s; position: relative; }
+.nav-item:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
+.nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+.nav-label { font-size: 9px; font-weight: 600; text-align: center; line-height: 1.1; }
+
+/* Main area */
+.rn-main { flex: 1; overflow-y: auto; padding: 0; display: flex; flex-direction: column; }
+.rn-dash-topbar { background: #6B21A8; color: #fff; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
+.rn-provider-name { font-size: 16px; font-weight: 700; }
+.rn-provider-role { font-size: 12px; color: rgba(255,255,255,0.75); margin-top: 2px; }
+.rn-topbar-right { font-size: 12px; color: rgba(255,255,255,0.75); }
+.rn-date-time { font-size: 12px; }
+
+/* Stats */
+.rn-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 20px 0; }
+.rn-stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; padding: 14px 16px; }
+.rn-stat-label { font-size: 11px; color: #6B7280; font-weight: 500; margin-bottom: 4px; }
+.rn-stat-value { font-size: 26px; font-weight: 800; color: #1F2937; }
+.rn-stat-sub { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
+
+/* Widgets */
+.rn-widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; margin: 16px 20px 0; }
+.rn-widget-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #F2EDE4; }
+.rn-widget-title { font-size: 13px; font-weight: 700; color: #1F2937; flex: 1; }
+.rn-widget-count { font-size: 11px; font-weight: 600; background: #F2EDE4; color: #6B7280; border-radius: 20px; padding: 2px 10px; }
+.rn-widget-body { padding: 0; }
+
+/* Table */
+.rn-table { width: 100%; border-collapse: collapse; }
+.rn-table thead th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; }
+.rn-table tbody td { padding: 11px 12px; font-size: 13px; color: #374151; border-bottom: 1px solid #F2EDE4; background: #fff; }
+.rn-table tbody tr:last-child td { border-bottom: none; }
+.rn-table tbody tr:hover td { background: #FAF7F2; }
+.rn-patient-name { font-weight: 600; color: #1F2937; }
+.rn-time { color: #9CA3AF; font-size: 12px; }
+
+/* Category badges */
+.rn-cat-badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.cat-lab { background: #DBEAFE; color: #1D4ED8; }
+.cat-followup { background: #F3F4F6; color: #374151; }
+.cat-intake { background: #EDE9FE; color: #5B21B6; }
+.cat-refill { background: #D1FAE5; color: #065F46; }
+
+/* Urgency */
+.rn-urgency { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.rn-urgency.overdue { color: #DC2626; }
+.rn-urgency.approaching { color: #F59E0B; }
+.rn-urgency.on-track { color: #059669; }
+
+/* Action buttons */
+.rn-action-btn { display: inline-block; padding: 5px 12px; background: #6B21A8; color: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.rn-action-btn:hover { background: #5B1898; }
+
+/* Messages */
+.rn-msg-row { display: flex; align-items: flex-start; gap: 10px; padding: 12px 16px; border-bottom: 1px solid #F2EDE4; }
+.rn-msg-row:last-child { border-bottom: none; }
+.rn-msg-row.unread { background: #FAF7F2; }
+.rn-msg-avatar { width: 30px; height: 30px; border-radius: 50%; background: #6B21A8; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.rn-msg-content { flex: 1; }
+.rn-msg-sender { font-size: 12px; font-weight: 700; color: #1F2937; margin-bottom: 3px; }
+.rn-msg-text { font-size: 12px; color: #6B7280; line-height: 1.4; }
+.rn-msg-time { font-size: 11px; color: #9CA3AF; white-space: nowrap; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="rn-shell">
+  <!-- Topbar -->
+  <div class="rn-topbar">
+    <div class="rn-sidebar" id="rnSidebar">
+      <div class="rn-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <nav class="rn-nav">
+        <a class="nav-item active" href="/provider/rn" title="My Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span class="nav-label">My Dashboard</span>
+        </a>
+        <a class="nav-item" href="/provider/queue" title="Master Queue">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span class="nav-label">Master Queue</span>
+        </a>
+        <a class="nav-item" href="/provider/schedule" title="Schedule">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="nav-label">Schedule</span>
+        </a>
+        <a class="nav-item" href="/provider/messages" title="Messages">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-label">Messages</span>
+        </a>
+        <a class="nav-item" href="/provider/notifications" title="Alerts">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="nav-label">Alerts</span>
+        </a>
+        <a class="nav-item" href="/provider/settings" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <div class="rn-main" id="rnMain">
+      <!-- Top dashboard bar -->
+      <div class="rn-dash-topbar">
+        <div>
+          <div class="rn-provider-name">{{ session.get('display_name', 'Jennifer Martinez, RN') }}</div>
+          <div class="rn-provider-role">Registered Nurse · Clinical Support</div>
+        </div>
+        <div class="rn-topbar-right">
+          <span class="rn-date-time" id="rnDateTime">Fri Jun 13, 2026 · 9:15 AM</span>
+        </div>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="rn-stats">
+        <div class="rn-stat-card">
+          <div class="rn-stat-label">My Assigned Patients</div>
+          <div class="rn-stat-value">8</div>
+          <div class="rn-stat-sub">Active this week</div>
+        </div>
+        <div class="rn-stat-card">
+          <div class="rn-stat-label">Pending Actions</div>
+          <div class="rn-stat-value" style="color:#F59E0B;">3</div>
+          <div class="rn-stat-sub">Require attention</div>
+        </div>
+        <div class="rn-stat-card">
+          <div class="rn-stat-label">Messages</div>
+          <div class="rn-stat-value">2</div>
+          <div class="rn-stat-sub">Unread</div>
+        </div>
+        <div class="rn-stat-card">
+          <div class="rn-stat-label">Overdue</div>
+          <div class="rn-stat-value" style="color:#DC2626;">1</div>
+          <div class="rn-stat-sub">Needs escalation</div>
+        </div>
+      </div>
+
+      <!-- My Patient Activity table -->
+      <div class="rn-widget">
+        <div class="rn-widget-header">
+          <span class="rn-widget-title">My Patient Activity</span>
+          <span class="rn-widget-count">4 patients</span>
+        </div>
+        <div class="rn-widget-body">
+          <table class="rn-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Care Product</th>
+                <th>Category</th>
+                <th>Urgency</th>
+                <th>Last Update</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><span class="rn-patient-name">Emma Johnson</span></td>
+                <td>Weight Management</td>
+                <td><span class="rn-cat-badge cat-lab">Lab Review</span></td>
+                <td><span class="rn-urgency overdue">&#x1F534; Overdue</span></td>
+                <td class="rn-time">2h ago</td>
+                <td><a href="/provider/chart/1" class="rn-action-btn" onclick="event.stopPropagation()">Review Labs</a></td>
+              </tr>
+              <tr onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><span class="rn-patient-name">Michael Chen</span></td>
+                <td>Testosterone</td>
+                <td><span class="rn-cat-badge cat-followup">Follow-up</span></td>
+                <td><span class="rn-urgency approaching">&#x1F7E1; Approaching</span></td>
+                <td class="rn-time">4h ago</td>
+                <td><a href="/provider/messages" class="rn-action-btn" onclick="event.stopPropagation()">Send Message</a></td>
+              </tr>
+              <tr onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><span class="rn-patient-name">Sarah Martinez</span></td>
+                <td>BRCA Counseling</td>
+                <td><span class="rn-cat-badge cat-intake">Intake Review</span></td>
+                <td><span class="rn-urgency on-track">&#x1F7E2; On Track</span></td>
+                <td class="rn-time">1h ago</td>
+                <td><a href="/provider/chart/2" class="rn-action-btn" onclick="event.stopPropagation()">Open Chart</a></td>
+              </tr>
+              <tr onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+                <td><span class="rn-patient-name">David Kim</span></td>
+                <td>GLP-1</td>
+                <td><span class="rn-cat-badge cat-refill">Refill</span></td>
+                <td><span class="rn-urgency on-track">&#x1F7E2; On Track</span></td>
+                <td class="rn-time">30m ago</td>
+                <td><a href="/provider/chart/3" class="rn-action-btn" onclick="event.stopPropagation()">Open Chart</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Internal Messages -->
+      <div class="rn-widget" style="margin-top:16px;">
+        <div class="rn-widget-header">
+          <span class="rn-widget-title">Staff Messages</span>
+          <span class="rn-widget-count">2 unread</span>
+        </div>
+        <div class="rn-widget-body" style="padding:0;">
+          <div class="rn-msg-row unread">
+            <div class="rn-msg-avatar">SL</div>
+            <div class="rn-msg-content">
+              <div class="rn-msg-sender">Dr. Sarah Lee, MD</div>
+              <div class="rn-msg-text">Emma Johnson lab results reviewed — please follow up on dosing adjustment</div>
+            </div>
+            <div class="rn-msg-time">45m ago</div>
+          </div>
+          <div class="rn-msg-row unread">
+            <div class="rn-msg-avatar" style="background:#2D5C2E;">MR</div>
+            <div class="rn-msg-content">
+              <div class="rn-msg-sender">Dr. Maria Rodriguez, NP</div>
+              <div class="rn-msg-text">New patient intake complete for David Kim — please schedule follow-up appointment</div>
+            </div>
+            <div class="rn-msg-time">2h ago</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /rn-main -->
+  </div><!-- /rn-topbar -->
+</div><!-- /rn-shell -->
+{% endblock %}
+{% block scripts %}{% raw %}<script>/* RN dashboard loaded */</script>{% endraw %}{% endblock %}

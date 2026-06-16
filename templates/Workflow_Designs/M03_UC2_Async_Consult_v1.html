@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M03 UC2 — Async Consultation Workflow</title>
+<style>
+  :root {
+    --navy:#002855; --green:#3E8168; --green-dark:#2D5F4E; --green-light:#F0FDF4; --green-xlight:#E8F5F0;
+    --white:#FFFFFF; --bg:#F4F8F6; --border:#D4E4DC;
+    --gray:#64748B; --gray-light:#F1F5F9; --text:#1E293B;
+    --amber:#D97706; --amber-bg:#FFFBEB;
+    --red:#DC2626; --red-bg:#FEF2F2;
+    --blue:#2563EB; --blue-bg:#EFF6FF;
+    --teal:#0891B2; --teal-bg:#F0F9FF;
+    --purple:#7C3AED; --purple-bg:#EDE9FE;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);min-height:100vh;}
+
+  .page-header{background:var(--navy);padding:24px 40px;display:flex;align-items:flex-start;justify-content:space-between;}
+  .eyebrow{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+  .header-title{font-size:26px;font-weight:700;color:#fff;margin-bottom:4px;}
+  .header-sub{font-size:13px;color:rgba(255,255,255,.55);max-width:680px;line-height:1.5;}
+  .header-meta{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+  .meta-chip{background:rgba(255,255,255,.1);border-radius:6px;padding:4px 12px;font-size:11px;color:rgba(255,255,255,.7);}
+  .nav-links{display:flex;flex-direction:column;gap:8px;align-self:center;}
+  .nav-link{font-size:12px;color:var(--green);font-weight:600;text-decoration:none;background:rgba(62,129,104,.15);border:1px solid rgba(62,129,104,.3);border-radius:6px;padding:6px 14px;text-align:center;white-space:nowrap;}
+
+  .legend{background:var(--white);border-bottom:1px solid var(--border);padding:12px 40px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+  .legend-title{font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.08em;margin-right:4px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);}
+  .l-box{width:28px;height:10px;border-radius:3px;}
+
+  .page{padding:32px 40px 48px;max-width:1200px;margin:0 auto;}
+
+  /* FLOW CARDS */
+  .flow-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .flow-num{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+  /* SWIMLANE */
+  .swimlane{display:flex;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--white);margin-bottom:28px;}
+  .lane{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);}
+  .lane:last-child{border-right:none;}
+  .lane-hdr{padding:12px 14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;text-align:center;}
+  .lane-hdr.patient{background:var(--navy);color:#fff;}
+  .lane-hdr.system{background:var(--green);color:#fff;}
+  .lane-hdr.provider{background:#1A3A5C;color:#fff;}
+  .lane-hdr.notif{background:var(--amber);color:#fff;}
+  .lane-body{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg);}
+  .lane-body.system-bg{background:var(--green-xlight);}
+  .lane-body.provider-bg{background:#EEF4FB;}
+  .lane-body.notif-bg{background:var(--amber-bg);}
+
+  /* NODES */
+  .node{border-radius:10px;padding:10px 12px;font-size:12px;line-height:1.4;border:1.5px solid transparent;}
+  .node-step{font-size:10px;font-weight:700;color:#fff;background:var(--navy);border-radius:10px;padding:1px 6px;display:inline-block;margin-bottom:4px;}
+  .node-label{font-weight:700;color:var(--text);margin-bottom:3px;}
+  .node-desc{font-size:11px;color:var(--gray);line-height:1.4;}
+  .node.action{background:var(--white);border-color:var(--border);}
+  .node.action.patient-n{border-left:3px solid var(--navy);}
+  .node.action.system-n{border-left:3px solid var(--green);}
+  .node.action.provider-n{border-left:3px solid var(--blue);}
+  .node.action.notif-n{border-left:3px solid var(--amber);}
+  .node.decision{background:var(--amber-bg);border-color:#FDE68A;border-left:3px solid var(--amber);}
+  .node.milestone{background:var(--green-light);border-color:var(--green-dark);border-left:3px solid var(--green-dark);}
+  .node.gate{background:var(--red-bg);border-color:#FCA5A5;border-left:3px solid var(--red);}
+  .node.m06{background:var(--purple-bg);border-color:#C4B5FD;border-left:3px solid var(--purple);}
+  .arrow{display:flex;align-items:center;justify-content:center;height:20px;color:var(--gray);font-size:18px;flex-shrink:0;}
+  .spacer{height:16px;}
+  .spacer-lg{height:40px;}
+
+  .note-box{border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;margin-bottom:16px;}
+  .note-box.amber{background:var(--amber-bg);border:1px solid #FDE68A;color:#92400E;}
+  .note-box.purple{background:var(--purple-bg);border:1px solid #C4B5FD;color:#5B21B6;}
+  .note-box.blue{background:var(--blue-bg);border:1px solid #BFDBFE;color:#1D4ED8;}
+  .note-box.green{background:var(--green-light);border:1px solid var(--green-dark);color:var(--green-dark);}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div>
+    <div class="eyebrow">Project Phoenix · M03 Patient Portal · UC2 — Consult Workflows</div>
+    <div class="header-title">💬 Async Consultation Workflow</div>
+    <div class="header-sub">The complete asynchronous consultation flow — from patient questionnaire submission through provider queue routing, clinical response, and patient notification. No scheduling required.</div>
+    <div class="header-meta">
+      <span class="meta-chip">Version 1.0</span>
+      <span class="meta-chip">June 2026</span>
+      <span class="meta-chip">M03 Patient Portal</span>
+      <span class="meta-chip">M05 Async Consultation</span>
+      <span class="meta-chip">M06 SLA & Workflow Engine</span>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="M03_UC2_Sync_Telephonic_v1.html" class="nav-link">→ Telephonic Workflow</a>
+    <a href="M03_UC2_Sync_Video_v1.html" class="nav-link">→ Video Workflow</a>
+  </div>
+</div>
+
+<div class="legend">
+  <span class="legend-title">Legend</span>
+  <div class="legend-item"><div class="l-box" style="background:var(--navy);"></div> Patient Action</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--green);"></div> System (Auto)</div>
+  <div class="legend-item"><div class="l-box" style="background:#1A3A5C;"></div> Provider Action</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--amber);"></div> Notification / Automation</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--purple);"></div> M06 SLA / Workflow Engine</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--green-dark);border:1px solid var(--green-dark);"></div> Milestone</div>
+  <div class="legend-item"><div class="l-box" style="background:var(--red-bg);border:1px solid #FCA5A5;"></div> Escalation / Alert</div>
+</div>
+
+<div class="page">
+
+  <div class="note-box green">
+    ✅ <strong>Async is the primary care model.</strong> No scheduling required — patients submit when ready, providers respond from the Master Patient Queue. Care product + state configuration in Admin Portal (M04) determines whether async is available for each program.
+  </div>
+
+  <div class="note-box amber">
+    ⚠️ <strong>Async response SLA:</strong> Not defined in V1.0. Response time is tracked via operational reporting. SLA values will be defined in V2.0 based on data collected in V1.0. SLA Engine (M06) will enforce SLA rules once defined.
+  </div>
+
+  <!-- MAIN ASYNC FLOW -->
+  <div class="flow-title"><span class="flow-num">A</span> Async Consultation — Full Flow</div>
+
+  <div class="swimlane">
+
+    <!-- PATIENT -->
+    <div class="lane">
+      <div class="lane-hdr patient">👤 Patient</div>
+      <div class="lane-body">
+        <div class="node action patient-n">
+          <div class="node-step">Step 1</div>
+          <div class="node-label">Logs into patient portal</div>
+          <div class="node-desc">2FA verified. Dashboard shows program status and available consult options for enrolled programs.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action patient-n">
+          <div class="node-step">Step 2</div>
+          <div class="node-label">Selects care program and initiates async consult</div>
+          <div class="node-desc">Clicks "Start Async Consultation" from dashboard program card or Appointments section. Multi-program patients select program first.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action patient-n">
+          <div class="node-step">Step 3</div>
+          <div class="node-label">Completes structured clinical questionnaire</div>
+          <div class="node-desc">Fills in program-specific intake questions: symptoms, medications, goals, changes since last consult. Progress saved automatically. Can save and return later.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action patient-n">
+          <div class="node-step">Step 4</div>
+          <div class="node-label">Reviews and submits consult</div>
+          <div class="node-desc">Reviews answers before submitting. Confirmation screen shown on submit. Portal status updates to "Pending Review."</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node milestone">
+          <div class="node-label">✅ Consult Submitted</div>
+          <div class="node-desc">Patient sees "Pending Review" status in Consultations section. Values hidden if lab result release mode is provider-reviewed.</div>
+        </div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="node action patient-n">
+          <div class="node-step">Step 8</div>
+          <div class="node-label">Receives response-ready notification</div>
+          <div class="node-desc">Notification received via in-app, email, or SMS per patient preferences. "Your provider has responded to your consultation."</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action patient-n">
+          <div class="node-step">Step 9</div>
+          <div class="node-label">Views provider clinical response</div>
+          <div class="node-desc">Opens structured response: Clinical Assessment, Treatment Plan, individual recommendation items (medication, diet, lab orders, follow-up), and provider note.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node decision">
+          <div class="node-label">🔀 Does patient need follow-up?</div>
+          <div class="node-desc">If yes: sends a follow-up message via Messages section referencing the consult. If no: consult marked Complete. Dashboard updates.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node milestone">
+          <div class="node-label">✅ Consult Complete</div>
+          <div class="node-desc">Moves to History. Activity logged. Next check-in is notification-prompted (system sends reminder) or patient-initiated anytime from dashboard.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEM -->
+    <div class="lane">
+      <div class="lane-hdr system">⚙️ System (Auto)</div>
+      <div class="lane-body system-bg">
+        <div class="node action system-n">
+          <div class="node-label">Loads care product questionnaire</div>
+          <div class="node-desc">Retrieves program-specific intake questionnaire from Admin Portal config. Applies branching logic. Pre-fills known values from patient health profile.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action system-n">
+          <div class="node-label">Auto-saves progress</div>
+          <div class="node-desc">Saves patient answers in real time. Patient can leave and return without losing work. Draft state maintained until submission.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action system-n">
+          <div class="node-label">Validates questionnaire on submit</div>
+          <div class="node-desc">Checks all required questions answered. Validates response formats. Detects clinical flags (high-risk responses). Creates consult record with unique consult ID.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node m06">
+          <div class="node-label">🔷 M06 SLA Engine — Priority Assignment</div>
+          <div class="node-desc">SLA Engine evaluates consult against program rules. Assigns P1–P4 priority. Routes to Master Patient Queue filtered by provider state and program assignments. SLA clock starts.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action system-n">
+          <div class="node-label">Consult appears in Master Patient Queue</div>
+          <div class="node-desc">Visible to providers assigned to this program and state. Provider pulls consult from queue — not auto-assigned. Queue shows priority badge, wait time, patient program.</div>
+        </div>
+        <div class="spacer-lg"></div>
+        <div class="node action system-n">
+          <div class="node-label">Response published to patient portal</div>
+          <div class="node-desc">Provider response made visible in patient Consultations section. Consult status updates from "Pending Review" to "Response Ready."</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node m06">
+          <div class="node-label">🔷 M06 — SLA Clock Stops</div>
+          <div class="node-desc">SLA timer stopped on provider response. Elapsed response time recorded for operational reporting. V2.0: SLA compliance evaluated against defined targets.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action system-n">
+          <div class="node-label">Consult status updated to Complete</div>
+          <div class="node-desc">On patient review and optional follow-up. Activity logged to patient Activity History and Audit Log (M12).</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="node m06">
+          <div class="node-label">🔷 M06 — Next Check-in Notification Trigger</div>
+          <div class="node-desc">Based on care product config, SLA/Workflow Engine sends a proactive notification to patient when the next check-in is due: "It's time for your [Program] check-in. Start your consultation when ready." Patient can also initiate anytime from dashboard.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROVIDER -->
+    <div class="lane">
+      <div class="lane-hdr provider">🩺 Provider</div>
+      <div class="lane-body provider-bg">
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="node action provider-n">
+          <div class="node-step">Step 5</div>
+          <div class="node-label">Sees consult in Master Patient Queue</div>
+          <div class="node-desc">Consult appears in provider's filtered queue view. Provider sees only patients in their assigned states and programs. Priority badge, wait time, and program shown.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action provider-n">
+          <div class="node-step">Step 6</div>
+          <div class="node-label">Selects and opens patient chart</div>
+          <div class="node-desc">Provider pulls consult from queue and opens patient chart. Reviews: health profile, medication list, prior consult history, and submitted questionnaire responses.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node decision">
+          <div class="node-label">🔀 Clinical flags in questionnaire?</div>
+          <div class="node-desc">If adverse effect or urgent clinical concern identified: escalates to P0/P1 and notifies RN queue. If standard: continues with normal response workflow.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action provider-n">
+          <div class="node-step">Step 7</div>
+          <div class="node-label">Writes clinical response and treatment plan</div>
+          <div class="node-desc">Documents: clinical assessment, treatment recommendations (medication, diet, lifestyle), lab orders if needed, next check-in timeline. Adds optional personal note to patient.</div>
+        </div>
+        <div class="arrow">↓</div>
+        <div class="node action provider-n">
+          <div class="node-label">Publishes response to patient portal</div>
+          <div class="node-desc">Submits response. System publishes to patient portal and triggers patient notification. Consult moves to Completed in provider queue.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="lane">
+      <div class="lane-hdr notif">🔔 Notifications & Automation</div>
+      <div class="lane-body notif-bg">
+        <div class="node action notif-n">
+          <div class="node-label">📬 Submission confirmation to patient</div>
+          <div class="node-desc">Immediate: "Your consultation has been submitted. Your provider will review and respond." Sent via in-app + email/SMS per preferences.</div>
+        </div>
+        <div class="spacer"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer"></div>
+        <div class="node m06">
+          <div class="node-label">🔷 M06 — SLA Threshold Reminders</div>
+          <div class="node-desc"><strong>At 75% of SLA window:</strong> Reminder notification to provider — "Pending response: [Patient Name] — [Program]." Queue item highlighted.<br><br><strong>At SLA breach:</strong> Escalation alert to admin. Queue item flagged as Breached. Admin can reassign to available provider.</div>
+        </div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="node action notif-n">
+          <div class="node-label">📬 Response-ready notification to patient</div>
+          <div class="node-desc">Immediate on provider publish: "Your provider has responded to your [Program] consultation. View your response in the portal." Sent via in-app + email/SMS.</div>
+        </div>
+        <div class="spacer-lg"></div>
+        <div class="spacer-lg"></div>
+        <div class="node m06">
+          <div class="node-label">🔷 M06 — Next Check-in Trigger</div>
+          <div class="node-desc">Based on care product configuration: system sends proactive notification when next check-in is due. "It's time for your [Program] check-in. Tap to start your consultation." Timing configured per product.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NOTES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="note-box purple">🔷 <strong>M06 SLA & Workflow Engine items flagged above</strong> are automation requirements for the upcoming M06 build: priority assignment at submission, SLA clock start/stop, 75% threshold reminders, breach escalation, and next check-in notification triggers. These must be captured in M06 BRD.</div>
+    <div class="note-box blue">🔗 <strong>Related:</strong> Async questionnaire content lives in M04 Admin Portal (Intake Configuration). Lab orders placed in response flow through M10 (Athena sync). Notifications delivered by M08 (Notification Engine). Full audit trail in M12.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:28px;font-size:11px;color:var(--gray);">Project Phoenix · M03 Patient Portal · UC2 Async Consultation Workflow · v1.0 · June 2026 · Everlywell Telehealth Platform Rebuild</div>
+</div>
+</body>
+</html>

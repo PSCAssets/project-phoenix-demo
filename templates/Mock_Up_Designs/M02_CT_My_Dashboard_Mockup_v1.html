@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M02 CT My Dashboard</title>
+<style>
+  :root {
+    --ew-green: #00A67E; --ew-green-dark: #007A5C; --ew-green-light: #E1F5EE;
+    --navy: #0C2340; --amber: #D97706; --amber-light: #FEF3C7;
+    --blue: #2563EB; --blue-light: #EFF6FF; --red: #DC2626; --red-light: #FEF2F2;
+    --purple: #7C3AED; --bg: #F0F2F5; --white: #FFFFFF;
+    --border: #E5E7EB; --teal: #0891B2; --teal-light: #E0F2FE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar {
+    width: 64px; background: var(--navy); display: flex; flex-direction: column;
+    align-items: center; padding: 0; flex-shrink: 0; height: 100vh; overflow: hidden;
+  }
+  .sidebar-logo {
+    width: 64px; height: 56px; display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo svg { width: 28px; height: 28px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0; }
+  .nav-item {
+    width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; color: rgba(255,255,255,0.5);
+    font-size: 20px; transition: background 0.15s;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-item.active { background: var(--ew-green); color: #fff; }
+  .sidebar-footer {
+    padding: 12px 0 16px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .sidebar-footer span { font-size: 9px; color: rgba(255,255,255,0.35); line-height: 1.4; text-align: center; }
+
+  .main-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    height: 56px; background: var(--navy); display: flex; align-items: center;
+    padding: 0 20px; flex-shrink: 0; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .topbar-title { color: #fff; font-size: 15px; font-weight: 500; }
+  .topbar-sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
+  .topbar-spacer { flex: 1; }
+  .topbar-user { display: flex; align-items: center; gap: 8px; }
+  .topbar-user-name { color: rgba(255,255,255,0.8); font-size: 13px; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #fff; }
+  .avatar-teal { background: var(--teal); }
+  .avatar-green { background: var(--ew-green); }
+
+  .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; border-top: 3px solid var(--ew-green);
+  }
+  .stat-card.amber-top { border-top-color: var(--amber); }
+  .stat-card.blue-top { border-top-color: var(--blue); }
+  .stat-label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1; }
+  .stat-value.teal { color: var(--teal); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.blue { color: var(--blue); }
+  .stat-value.green { color: var(--ew-green); }
+  .stat-sub { font-size: 11px; color: #9CA3AF; margin-top: 4px; }
+
+  .widget { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .widget-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .widget-title { font-size: 14px; font-weight: 600; color: var(--navy); flex: 1; }
+  .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+  .badge-teal { background: var(--teal-light); color: #0E7490; }
+  .badge-amber { background: var(--amber-light); color: #92400E; }
+  .badge-blue { background: var(--blue-light); color: #1D4ED8; }
+  .badge-green { background: var(--ew-green-light); color: var(--ew-green-dark); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600;
+    color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em;
+    background: #F9FAFB; border-bottom: 1px solid var(--border);
+    cursor: pointer; white-space: nowrap; user-select: none;
+  }
+  th:hover { background: #F3F4F6; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; color: #374151; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+
+  .pri { font-weight: 700; font-size: 12px; width: 30px; text-align: center; }
+  .pri-1 { color: #DC2626; }
+  .pri-2 { color: var(--amber); }
+  .pri-3 { color: #6B7280; }
+
+  .cat-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .cat-gap { background: var(--amber-light); color: #92400E; }
+  .cat-appt { background: var(--blue-light); color: #1D4ED8; }
+  .cat-plan { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .cat-ref { background: #F5F3FF; color: #5B21B6; }
+
+  .urg-pill { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .urg-critical { background: var(--red-light); color: var(--red); }
+  .urg-high { background: #FFF7ED; color: #C2410C; }
+  .urg-normal { background: #F9FAFB; color: #6B7280; border: 1px solid var(--border); }
+
+  .wait { font-size: 12px; color: #6B7280; }
+  .wait.long { color: #DC2626; font-weight: 600; }
+  .wait.mid { color: var(--amber); }
+
+  .action-btn {
+    font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
+    border: 1px solid; cursor: pointer; white-space: nowrap;
+  }
+  .action-outreach { background: #FFF7ED; color: #C2410C; border-color: #FDBA74; }
+  .action-urgent { background: var(--red-light); color: var(--red); border-color: #FCA5A5; }
+  .action-schedule { background: var(--blue-light); color: #1D4ED8; border-color: #BFDBFE; }
+  .action-coordinate { background: #F5F3FF; color: #5B21B6; border-color: #DDD6FE; }
+  .action-review { background: var(--ew-green-light); color: var(--ew-green-dark); border-color: #6EE7B7; }
+  .action-update { background: var(--ew-green-light); color: var(--ew-green-dark); border-color: #6EE7B7; }
+
+  .patient-name { font-weight: 500; color: #111827; }
+  .patient-id { font-size: 11px; color: #9CA3AF; }
+
+  .messages-list { list-style: none; }
+  .msg-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .msg-item:last-child { border-bottom: none; }
+  .msg-item.unread { background: #FAFEFF; }
+  .msg-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .msg-body { flex: 1; }
+  .msg-header { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+  .msg-sender { font-size: 13px; font-weight: 600; color: #111827; }
+  .role-chip { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; }
+  .chip-md { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .chip-rn { background: var(--teal-light); color: #0E7490; }
+  .chip-ma { background: #F5F3FF; color: #5B21B6; }
+  .chip-supervisor { background: #e8ecf0; color: var(--navy); }
+  .msg-time { font-size: 11px; color: #9CA3AF; margin-left: auto; }
+  .msg-text { font-size: 13px; color: #374151; line-height: 1.45; }
+  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink: 0; margin-top: 4px; }
+  .msg-input-area { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; background: #FAFAFA; }
+  .msg-input { flex: 1; border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 13px; color: #374151; outline: none; background: var(--white); }
+  .msg-send { background: var(--ew-green); color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 500; cursor: pointer; }
+
+  .header-sub { font-size: 12px; color: #6B7280; font-weight: 400; margin-left: 4px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="13" stroke="#00A67E" stroke-width="2"/>
+      <path d="M8 14 C8 10, 20 10, 20 14 C20 18, 8 18, 8 14Z" fill="#00A67E"/>
+    </svg>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" title="My Dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    </div>
+    <div class="nav-item" title="Patient Queue">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="nav-item" title="Messages">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="nav-item" title="Referrals">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <div class="nav-item" title="Care Plans">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <span>M02</span>
+    <span>CC · v1</span>
+    <span>May 2026</span>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">My Dashboard</div>
+      <div class="topbar-sub">Care Coordinator · Patient Success</div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-user">
+      <span class="topbar-user-name">Jordan L., CC</span>
+      <div class="avatar avatar-teal">JL</div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Active Patients</div>
+        <div class="stat-value teal">21</div>
+      </div>
+      <div class="stat-card amber-top">
+        <div class="stat-label">Care Gaps Open</div>
+        <div class="stat-value amber">7</div>
+        <div class="stat-sub">needs outreach</div>
+      </div>
+      <div class="stat-card blue-top">
+        <div class="stat-label">Referrals Pending</div>
+        <div class="stat-value blue">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Outreach Time</div>
+        <div class="stat-value green">14m</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">My Queue</span>
+        <span class="badge badge-teal">7 cases</span>
+      </div>
+      <table id="queue-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('pri')">Pri ↕</th>
+            <th onclick="sortTable('patient')">Patient ↕</th>
+            <th>Patient ID</th>
+            <th onclick="sortTable('category')">Category ↕</th>
+            <th>Program</th>
+            <th onclick="sortTable('urgency')">Urgency ↕</th>
+            <th onclick="sortTable('wait')">Wait ↕</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="queue-body"></tbody>
+      </table>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">Internal Messages <span class="header-sub">All staff → Jordan L., CC</span></span>
+        <span class="badge badge-teal">3 unread</span>
+      </div>
+      <ul class="messages-list">
+        <li class="msg-item unread">
+          <div class="unread-dot"></div>
+          <div class="msg-avatar" style="background:#00A67E;">DC</div>
+          <div class="msg-body">
+            <div class="msg-header">
+              <span class="msg-sender">Dr. Chen</span>
+              <span class="role-chip chip-md">MD</span>
+              <span class="msg-time">7m ago</span>
+            </div>
+            <div class="msg-text">O.B. has missed 3 check-ins — please prioritize outreach today. #PT-00597</div>
+          </div>
+        </li>
+        <li class="msg-item unread">
+          <div class="unread-dot"></div>
+          <div class="msg-avatar" style="background:#0E7490;">SK</div>
+          <div class="msg-body">
+            <div class="msg-header">
+              <span class="msg-sender">Sarah K.</span>
+              <span class="role-chip chip-rn">RN</span>
+              <span class="msg-time">19m ago</span>
+            </div>
+            <div class="msg-text">V.S. referral to endocrinology approved — please coordinate scheduling. #PT-00589</div>
+          </div>
+        </li>
+        <li class="msg-item unread">
+          <div class="unread-dot"></div>
+          <div class="msg-avatar" style="background:#7C3AED;">AM</div>
+          <div class="msg-body">
+            <div class="msg-header">
+              <span class="msg-sender">Alex M.</span>
+              <span class="role-chip chip-ma">MA</span>
+              <span class="msg-time">33m ago</span>
+            </div>
+            <div class="msg-text">L.T. intake complete — ready for first consultation scheduling. #PT-00614</div>
+          </div>
+        </li>
+        <li class="msg-item">
+          <div style="width:8px;flex-shrink:0;"></div>
+          <div class="msg-avatar" style="background:#3B4A5C;">SU</div>
+          <div class="msg-body">
+            <div class="msg-header">
+              <span class="msg-sender">Supervisor</span>
+              <span class="role-chip chip-supervisor">CC Supervisor</span>
+              <span class="msg-time">2h ago</span>
+            </div>
+            <div class="msg-text">Q2 care gap closure rate target is 85%. We're at 71% — push outreach this week.</div>
+          </div>
+        </li>
+        <li class="msg-item">
+          <div style="width:8px;flex-shrink:0;"></div>
+          <div class="msg-avatar" style="background:#00A67E;">DP</div>
+          <div class="msg-body">
+            <div class="msg-header">
+              <span class="msg-sender">Dr. Patel</span>
+              <span class="role-chip chip-md">MD</span>
+              <span class="msg-time">3h ago</span>
+            </div>
+            <div class="msg-text">I.N. care plan updated with new A1C targets — please follow up in 2 weeks. #PT-00622</div>
+          </div>
+        </li>
+      </ul>
+      <div class="msg-input-area">
+        <div class="avatar avatar-teal" style="width:30px;height:30px;font-size:11px;flex-shrink:0;">JL</div>
+        <input class="msg-input" placeholder="Reply to team..." />
+        <button class="msg-send">Send</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const ROWS = [
+  { pri: 1, patient: "D.M.", id: "#PT-00601", catKey: "cat-gap", catLabel: "Care Gap", program: "GLP-1/Weight", urgency: "HIGH", urgKey: 2, wait: 52, actionLabel: "Outreach", actionClass: "action-outreach" },
+  { pri: 1, patient: "V.S.", id: "#PT-00589", catKey: "cat-ref", catLabel: "Referral", program: "Metabolic Health", urgency: "HIGH", urgKey: 2, wait: 38, actionLabel: "Coordinate", actionClass: "action-coordinate" },
+  { pri: 2, patient: "L.T.", id: "#PT-00614", catKey: "cat-appt", catLabel: "Appt Scheduling", program: "Thyroid", urgency: "NORMAL", urgKey: 1, wait: 21, actionLabel: "Schedule", actionClass: "action-schedule" },
+  { pri: 1, patient: "O.B.", id: "#PT-00597", catKey: "cat-gap", catLabel: "Care Gap", program: "Women's Health", urgency: "CRITICAL", urgKey: 3, wait: 74, actionLabel: "Urgent Outreach", actionClass: "action-urgent" },
+  { pri: 2, patient: "I.N.", id: "#PT-00622", catKey: "cat-plan", catLabel: "Care Plan", program: "Men's Health", urgency: "NORMAL", urgKey: 1, wait: 16, actionLabel: "Review Plan", actionClass: "action-review" },
+  { pri: 2, patient: "W.F.", id: "#PT-00608", catKey: "cat-appt", catLabel: "Appt Scheduling", program: "GLP-1/Weight", urgency: "NORMAL", urgKey: 1, wait: 29, actionLabel: "Schedule", actionClass: "action-schedule" },
+  { pri: 3, patient: "E.K.", id: "#PT-00631", catKey: "cat-plan", catLabel: "Care Plan", program: "Metabolic Health", urgency: "NORMAL", urgKey: 1, wait: 11, actionLabel: "Update Plan", actionClass: "action-update" }
+];
+
+let sortCol = null, sortDir = 1;
+
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+  renderRows();
+}
+
+function renderRows() {
+  const data = [...ROWS];
+  if (sortCol) {
+    const keyMap = { pri: r => r.pri, patient: r => r.patient, category: r => r.catLabel, urgency: r => r.urgKey, wait: r => r.wait };
+    data.sort((a, b) => {
+      const va = keyMap[sortCol](a), vb = keyMap[sortCol](b);
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir;
+    });
+  }
+  const urgClass = { CRITICAL: "urg-critical", HIGH: "urg-high", NORMAL: "urg-normal" };
+  const priClass = { 1: "pri-1", 2: "pri-2", 3: "pri-3" };
+  const waitClass = w => w >= 60 ? "wait long" : w >= 30 ? "wait mid" : "wait";
+  document.getElementById("queue-body").innerHTML = data.map(r => `
+    <tr>
+      <td><span class="pri ${priClass[r.pri]}">P${r.pri}</span></td>
+      <td><span class="patient-name">${r.patient}</span></td>
+      <td><span class="patient-id">${r.id}</span></td>
+      <td><span class="cat-pill ${r.catKey}">${r.catLabel}</span></td>
+      <td style="font-size:12px;color:#374151;">${r.program}</td>
+      <td><span class="urg-pill ${urgClass[r.urgency]}">${r.urgency}</span></td>
+      <td><span class="${waitClass(r.wait)}">${r.wait}m</span></td>
+      <td><button class="action-btn ${r.actionClass}">${r.actionLabel}</button></td>
+    </tr>`).join("");
+}
+
+renderRows();
+</script>
+</body>
+</html>

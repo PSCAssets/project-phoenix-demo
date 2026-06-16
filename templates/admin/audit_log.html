@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+{% block title %}Audit Log{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .filter-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-label { font-size: 12px; color: #6B7280; font-weight: 500; }
+  .filter-input { border: 1px solid #E5E0D8; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #374151; outline: none; background: #fff; }
+  .filter-input:focus { border-color: #7C3AED; }
+  .filter-select { border: 1px solid #E5E0D8; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #374151; outline: none; background: #fff; }
+  .filter-select:focus { border-color: #7C3AED; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; white-space: nowrap; }
+  tbody td { padding: 12px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(even) td { background: #FFFFFF; }
+  tbody tr:hover td { background: #FAF7F2; }
+  .ts { font-size: 12px; color: #6B7280; white-space: nowrap; }
+  .ip { font-family: 'SF Mono', 'Fira Mono', 'Cascadia Code', monospace; font-size: 12px; color: #6B7280; }
+  .action-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: inline-block; }
+  .act-login { background: #DBEAFE; color: #1D4ED8; }
+  .act-config { background: #FEF3C7; color: #92400E; }
+  .act-user { background: #EDE9FE; color: #5B21B6; }
+  .act-care { background: #D1FAE5; color: #065F46; }
+  .act-int { background: #E0E7FF; color: #3730A3; }
+  .act-system { background: #F3F4F6; color: #374151; }
+  .act-sla { background: #FEE2E2; color: #DC2626; }
+  .act-chart { background: #EDE9FE; color: #5B21B6; }
+  .act-status { background: #DBEAFE; color: #1D4ED8; }
+  .act-rx { background: #CCFBF1; color: #0F766E; }
+  .act-lab { background: #D1FAE5; color: #065F46; }
+  .details-cell { font-size: 12px; color: #6B7280; max-width: 180px; }
+  .btn-apply { background: #7C3AED; color: #fff; border: none; border-radius: 8px; padding: 7px 18px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .results-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 10px; }
+  .results-count { font-size: 13px; color: #6B7280; }
+  .export-link { font-size: 13px; font-weight: 600; color: #7C3AED; text-decoration: none; }
+  .export-link:hover { text-decoration: underline; }
+  .patient-cell { display: flex; align-items: center; gap: 8px; }
+  .pt-initials { width: 28px; height: 28px; border-radius: 50%; background: #EDE9FE; color: #5B21B6; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pt-id { font-size: 12px; color: #6B7280; }
+  .filter-search { border: 1px solid #E5E0D8; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #374151; outline: none; background: #fff; min-width: 200px; }
+  .filter-search:focus { border-color: #7C3AED; }
+</style>
+{% endblock %}
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding: 8px 0; flex: 1;">
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/users" class="nav-item"><span class="nav-icon">👥</span> User Management</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
+    <a href="/admin/integrations" class="nav-item"><span class="nav-icon">🔌</span> Integrations</a>
+    <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Config</a>
+    <a href="/admin/notifications" class="nav-item"><span class="nav-icon">🔔</span> Notification Templates</a>
+    <a href="/admin/audit-log" class="nav-item active"><span class="nav-icon">📋</span> Audit Log</a>
+    <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Audit Log</div>
+  </div>
+  <div class="content">
+    <div class="filter-bar">
+      <span class="filter-label">From</span>
+      <input class="filter-input" type="date" value="2026-06-01" />
+      <span class="filter-label">To</span>
+      <input class="filter-input" type="date" value="2026-06-13" />
+      <select class="filter-select">
+        <option>All Users</option>
+        <option>Chris Navarro</option>
+        <option>David Nguyen</option>
+        <option>Sarah Lee, MD</option>
+        <option>Carlos Rivera, MA</option>
+        <option>Maria Rodriguez, NP</option>
+        <option>James Thompson, RN</option>
+      </select>
+      <select class="filter-select">
+        <option>All Actions</option>
+        <option>Login</option>
+        <option>SLA Breach</option>
+        <option>Chart Accessed</option>
+        <option>Status Change</option>
+        <option>Config Change</option>
+        <option>Prescription</option>
+        <option>Lab Result Released</option>
+        <option>Consult Assigned</option>
+      </select>
+      <input class="filter-search" type="text" placeholder="Search patient or consult ID..." />
+      <button class="btn-apply" onclick="alert('Filters applied — demo placeholder.')">Apply Filters</button>
+    </div>
+    <div class="results-bar">
+      <span class="results-count">Showing 847 entries</span>
+      <a href="#" class="export-link" onclick="alert('CSV export — demo placeholder.'); return false;">&#8595; Export CSV</a>
+    </div>
+    <div class="widget">
+      <table>
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Patient / Consult</th>
+            <th>Details</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:44 AM</td>
+            <td style="font-weight:600">Sarah Lee, MD</td>
+            <td><span class="action-tag act-sla">SLA BREACH</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">TC</div><div><div style="font-size:13px;font-weight:600;">Thomas Chen</div><div class="pt-id">C-20260613-009</div></div></div></td>
+            <td class="details-cell">Consult exceeded 2h SLA threshold</td>
+            <td class="ip">192.168.1.12</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:38 AM</td>
+            <td style="font-weight:600">Chris Navarro</td>
+            <td><span class="action-tag act-login">LOGIN</span></td>
+            <td><div class="pt-id">Admin Portal</div></td>
+            <td class="details-cell">Successful login via SSO</td>
+            <td class="ip">192.168.1.1</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:31 AM</td>
+            <td style="font-weight:600">David Nguyen</td>
+            <td><span class="action-tag act-status">CONSULT ASSIGNED</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">JR</div><div><div style="font-size:13px;font-weight:600;">Jamie Rivera</div><div class="pt-id">C-20260613-008</div></div></div></td>
+            <td class="details-cell">Assigned to Dr. Sarah Lee</td>
+            <td class="ip">192.168.1.45</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:28 AM</td>
+            <td style="font-weight:600">Sarah Lee, MD</td>
+            <td><span class="action-tag act-chart">CHART ACCESSED</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">MJ</div><div><div style="font-size:13px;font-weight:600;">Marcus Johnson</div><div class="pt-id">P-0042</div></div></div></td>
+            <td class="details-cell">Read chart + labs</td>
+            <td class="ip">192.168.1.12</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:15 AM</td>
+            <td style="font-weight:600">Carlos Rivera, MA</td>
+            <td><span class="action-tag act-user">CREATE PATIENT</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">LW</div><div><div style="font-size:13px;font-weight:600;">Laura Webb</div><div class="pt-id">P-0089</div></div></div></td>
+            <td class="details-cell">New enrollment — Testosterone</td>
+            <td class="ip">192.168.1.33</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:08 AM</td>
+            <td style="font-weight:600">Maria Rodriguez, NP</td>
+            <td><span class="action-tag act-lab">LAB RESULT RELEASED</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">JR</div><div><div style="font-size:13px;font-weight:600;">Jamie Rivera</div><div class="pt-id">P-0071</div></div></div></td>
+            <td class="details-cell">HbA1c results approved for release</td>
+            <td class="ip">192.168.1.14</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 09:02 AM</td>
+            <td style="font-weight:600">Chris Navarro</td>
+            <td><span class="action-tag act-config">CONFIG CHANGE</span></td>
+            <td><div class="pt-id">Weight Management SLA</div></td>
+            <td class="details-cell">Async SLA changed 48h → 24h</td>
+            <td class="ip">192.168.1.1</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 08:55 AM</td>
+            <td style="font-weight:600">Maria Rodriguez, NP</td>
+            <td><span class="action-tag act-rx">PRESCRIPTION</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">DK</div><div><div style="font-size:13px;font-weight:600;">David Kim</div><div class="pt-id">Rx-5541</div></div></div></td>
+            <td class="details-cell">Semaglutide 0.5mg — 30-day supply</td>
+            <td class="ip">192.168.1.14</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 08:44 AM</td>
+            <td style="font-weight:600">James Thompson, RN</td>
+            <td><span class="action-tag act-status">STATUS CHANGE</span></td>
+            <td><div class="patient-cell"><div class="pt-initials">AK</div><div><div style="font-size:13px;font-weight:600;">Alex Kim</div><div class="pt-id">C-20260613-003</div></div></div></td>
+            <td class="details-cell">Consult status: Pending → In Review</td>
+            <td class="ip">192.168.1.28</td>
+          </tr>
+          <tr>
+            <td class="ts">Jun 13, 2026 08:30 AM</td>
+            <td style="font-weight:600">Chris Navarro</td>
+            <td><span class="action-tag act-user">INVITE USER</span></td>
+            <td><div class="pt-id">david.nguyen@everlywell.com</div></td>
+            <td class="details-cell">Role: Scheduler</td>
+            <td class="ip">192.168.1.1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;margin-top:12px;">
+      <span style="font-size:13px;color:#6B7280;">Showing 1–10 of 847 entries</span>
+      <div style="display:flex;gap:6px;">
+        <button style="padding:6px 14px;background:#fff;border:1px solid #E5E0D8;border-radius:6px;font-size:13px;cursor:pointer;color:#6B7280;" disabled>&#8249; Prev</button>
+        <button style="padding:6px 12px;background:#7C3AED;border:none;border-radius:6px;font-size:13px;cursor:pointer;color:#fff;font-weight:600;">1</button>
+        <button style="padding:6px 12px;background:#fff;border:1px solid #E5E0D8;border-radius:6px;font-size:13px;cursor:pointer;color:#374151;" onclick="alert('Page 2 — demo placeholder.')">2</button>
+        <button style="padding:6px 12px;background:#fff;border:1px solid #E5E0D8;border-radius:6px;font-size:13px;cursor:pointer;color:#374151;" onclick="alert('Page 3 — demo placeholder.')">3</button>
+        <span style="padding:6px 8px;font-size:13px;color:#6B7280;">…</span>
+        <button style="padding:6px 12px;background:#fff;border:1px solid #E5E0D8;border-radius:6px;font-size:13px;cursor:pointer;color:#374151;" onclick="alert('Last page — demo placeholder.')">85</button>
+        <button style="padding:6px 14px;background:#fff;border:1px solid #E5E0D8;border-radius:6px;font-size:13px;cursor:pointer;color:#374151;font-weight:600;" onclick="alert('Next page — demo placeholder.')">Next &#8250;</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

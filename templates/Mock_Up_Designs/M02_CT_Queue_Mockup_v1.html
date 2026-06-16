@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M02 CT Queue</title>
+<style>
+  :root {
+    --ew-green: #00A67E; --ew-green-dark: #007A5C; --ew-green-light: #E1F5EE;
+    --navy: #0C2340; --amber: #D97706; --amber-light: #FEF3C7;
+    --blue: #2563EB; --blue-light: #EFF6FF; --red: #DC2626; --red-light: #FEF2F2;
+    --purple: #7C3AED; --bg: #F0F2F5; --white: #FFFFFF;
+    --border: #E5E7EB; --teal: #0891B2; --teal-light: #E0F2FE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; display: flex; height: 100vh; overflow: hidden; }
+
+  .sidebar {
+    width: 64px; background: var(--navy); display: flex; flex-direction: column;
+    align-items: center; flex-shrink: 0; height: 100vh; overflow: hidden;
+  }
+  .sidebar-logo {
+    width: 64px; height: 56px; display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar-logo svg { width: 28px; height: 28px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 0; }
+  .nav-item {
+    width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; color: rgba(255,255,255,0.5); font-size: 20px;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-item.active { background: var(--ew-green); color: #fff; }
+  .sidebar-footer { padding: 12px 0 16px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .sidebar-footer span { font-size: 9px; color: rgba(255,255,255,0.35); line-height: 1.4; text-align: center; }
+
+  .main-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  .topbar {
+    height: 56px; background: var(--navy); display: flex; align-items: center;
+    padding: 0 20px; flex-shrink: 0; gap: 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .topbar-title { color: #fff; font-size: 15px; font-weight: 500; }
+  .topbar-sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
+  .topbar-spacer { flex: 1; }
+  .team-badge { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85); font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; }
+  .live-dot { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.65); }
+  .live-dot::before { content:""; width: 8px; height: 8px; border-radius: 50%; background: #34D399; display: inline-block; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+
+  .content { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .stat-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; border-top: 3px solid var(--ew-green); }
+  .stat-card.amber-top { border-top-color: var(--amber); }
+  .stat-card.blue-top { border-top-color: var(--blue); }
+  .stat-label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .stat-value { font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1; }
+  .stat-value.green { color: var(--ew-green); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.blue { color: var(--blue); }
+
+  .widget { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+
+  .tabs { display: flex; border-bottom: 1px solid var(--border); background: #F9FAFB; gap: 0; }
+  .tab {
+    padding: 10px 16px; font-size: 13px; font-weight: 500; color: #6B7280;
+    cursor: pointer; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 6px;
+    white-space: nowrap;
+  }
+  .tab:hover { color: #374151; background: #F3F4F6; }
+  .tab.active { color: var(--navy); border-bottom-color: var(--ew-green); background: var(--white); }
+  .tab-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; }
+  .tab-badge-amber { background: var(--amber-light); color: #92400E; }
+  .tab-badge-blue { background: var(--blue-light); color: #1D4ED8; }
+  .tab-badge-purple { background: #EDE9FE; color: #5B21B6; }
+  .tab-badge-gray { background: #F3F4F6; color: #6B7280; }
+
+  .filter-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); background: #FAFAFA; flex-wrap: wrap; }
+  .filter-bar select, .filter-bar input {
+    border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px;
+    font-size: 12px; color: #374151; background: var(--white); outline: none;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { border-color: var(--ew-green); }
+  .filter-bar input { flex: 1; min-width: 140px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    padding: 9px 12px; text-align: left; font-size: 11px; font-weight: 600;
+    color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em;
+    background: #F9FAFB; border-bottom: 1px solid var(--border);
+    cursor: pointer; white-space: nowrap; user-select: none;
+  }
+  th:hover { background: #F3F4F6; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; color: #374151; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAFA; }
+
+  .pri { font-weight: 700; font-size: 12px; text-align: center; }
+  .pri-1 { color: #DC2626; }
+  .pri-2 { color: var(--amber); }
+  .pri-3 { color: #6B7280; }
+
+  .cat-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .cat-gap { background: var(--amber-light); color: #92400E; }
+  .cat-appt { background: var(--blue-light); color: #1D4ED8; }
+  .cat-plan { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .cat-ref { background: #EDE9FE; color: #5B21B6; }
+
+  .urg-pill { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .urg-critical { background: var(--red-light); color: var(--red); }
+  .urg-high { background: #FFF7ED; color: #C2410C; }
+  .urg-normal { background: #F9FAFB; color: #6B7280; border: 1px solid var(--border); }
+
+  .wait { font-size: 12px; color: #6B7280; }
+  .wait-long { color: #DC2626; font-weight: 600; }
+  .wait-mid { color: var(--amber); }
+
+  .cc-tag { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 8px; }
+  .cc-jl { background: var(--teal-light); color: #0E7490; }
+  .cc-mr { background: var(--blue-light); color: #1D4ED8; }
+  .cc-tc { background: var(--ew-green-light); color: var(--ew-green-dark); }
+  .cc-unassigned { background: #F3F4F6; color: #9CA3AF; border: 1px solid var(--border); }
+
+  .action-btn { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid; cursor: pointer; white-space: nowrap; }
+  .action-outreach { background: #FFF7ED; color: #C2410C; border-color: #FDBA74; }
+  .action-schedule { background: var(--blue-light); color: #1D4ED8; border-color: #BFDBFE; }
+  .action-coordinate { background: #EDE9FE; color: #5B21B6; border-color: #DDD6FE; }
+  .action-review { background: var(--ew-green-light); color: var(--ew-green-dark); border-color: #6EE7B7; }
+  .action-assign { background: #F9FAFB; color: #374151; border-color: var(--border); }
+
+  .patient-name { font-weight: 500; color: #111827; }
+  .patient-id { font-size: 11px; color: #9CA3AF; }
+
+  .empty-msg { text-align: center; padding: 32px; color: #9CA3AF; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 28 28" fill="none">
+      <circle cx="14" cy="14" r="13" stroke="#00A67E" stroke-width="2"/>
+      <path d="M8 14 C8 10, 20 10, 20 14 C20 18, 8 18, 8 14Z" fill="#00A67E"/>
+    </svg>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item" title="My Dashboard">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    </div>
+    <div class="nav-item active" title="CC Queue">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div class="nav-item" title="Messages">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div class="nav-item" title="Referrals">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    </div>
+    <div class="nav-item" title="Care Plans">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <span>M02</span>
+    <span>CC Queue</span>
+    <span>v1</span>
+    <span>May 2026</span>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <div>
+      <div class="topbar-title">Care Coordinator Queue</div>
+      <div class="topbar-sub">Care Coordinator · Shared Queue</div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <span class="team-badge">CC Team</span>
+    <span class="live-dot">LIVE</span>
+  </header>
+
+  <main class="content">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Queue</div>
+        <div class="stat-value green">24</div>
+      </div>
+      <div class="stat-card amber-top">
+        <div class="stat-label">Unassigned</div>
+        <div class="stat-value amber">7</div>
+      </div>
+      <div class="stat-card amber-top">
+        <div class="stat-label">Care Gaps</div>
+        <div class="stat-value amber">7</div>
+      </div>
+      <div class="stat-card blue-top">
+        <div class="stat-label">Referrals Pending</div>
+        <div class="stat-value blue">5</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="tabs" id="tabs">
+        <div class="tab active" data-tab="all">All <span class="tab-badge tab-badge-gray">24</span></div>
+        <div class="tab" data-tab="gap">Care Gap Outreach <span class="tab-badge tab-badge-amber">7</span></div>
+        <div class="tab" data-tab="appt">Appt Scheduling <span class="tab-badge tab-badge-blue">6</span></div>
+        <div class="tab" data-tab="plan">Care Plan Follow-up <span class="tab-badge tab-badge-gray">7</span></div>
+        <div class="tab" data-tab="ref">Referral Coordination <span class="tab-badge tab-badge-purple">4</span></div>
+      </div>
+
+      <div class="filter-bar">
+        <select id="filter-cat">
+          <option value="">All Categories</option>
+          <option value="gap">Care Gap</option>
+          <option value="appt">Appt Scheduling</option>
+          <option value="plan">Care Plan</option>
+          <option value="ref">Referral</option>
+        </select>
+        <select id="filter-urg">
+          <option value="">All Urgency</option>
+          <option value="CRITICAL">Critical</option>
+          <option value="HIGH">High</option>
+          <option value="NORMAL">Normal</option>
+        </select>
+        <select id="filter-cc">
+          <option value="">All Assigned CC</option>
+          <option value="JL">JL</option>
+          <option value="MR">MR</option>
+          <option value="TC">TC</option>
+          <option value="Unassigned">Unassigned</option>
+        </select>
+        <input type="text" id="filter-search" placeholder="Search patient, ID..." />
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th onclick="sortTable('pri')">Priority ↕</th>
+            <th onclick="sortTable('patient')">Patient ↕</th>
+            <th>Patient ID</th>
+            <th onclick="sortTable('catLabel')">Category ↕</th>
+            <th>Program</th>
+            <th onclick="sortTable('urgKey')">Urgency ↕</th>
+            <th onclick="sortTable('cc')">Assigned CC ↕</th>
+            <th onclick="sortTable('wait')">Wait Time ↕</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="queue-body"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+const DATA = [
+  { pri: 1, patient: "David M.",  id: "#PT-00601", catLabel: "Care Gap",        catKey: "gap",  program: "GLP-1/Weight",    urgency: "CRITICAL", urgKey: 3, cc: "Unassigned", wait: 95 },
+  { pri: 1, patient: "Victor S.", id: "#PT-00589", catLabel: "Referral",         catKey: "ref",  program: "Metabolic Health", urgency: "HIGH",     urgKey: 2, cc: "Unassigned", wait: 122 },
+  { pri: 1, patient: "Olivia B.", id: "#PT-00597", catLabel: "Care Gap",        catKey: "gap",  program: "Women's Health",   urgency: "HIGH",     urgKey: 2, cc: "JL",         wait: 78 },
+  { pri: 2, patient: "Laura T.",  id: "#PT-00614", catLabel: "Appt Scheduling", catKey: "appt", program: "Thyroid",          urgency: "NORMAL",   urgKey: 1, cc: "MR",         wait: 31 },
+  { pri: 2, patient: "Ivan N.",   id: "#PT-00622", catLabel: "Care Plan",       catKey: "plan", program: "Men's Health",     urgency: "NORMAL",   urgKey: 1, cc: "TC",         wait: 55 },
+  { pri: 2, patient: "Will F.",   id: "#PT-00608", catLabel: "Appt Scheduling", catKey: "appt", program: "GLP-1/Weight",    urgency: "NORMAL",   urgKey: 1, cc: "Unassigned", wait: 67 },
+  { pri: 2, patient: "Emma K.",   id: "#PT-00631", catLabel: "Care Plan",       catKey: "plan", program: "Metabolic Health", urgency: "NORMAL",   urgKey: 1, cc: "JL",         wait: 14 },
+  { pri: 3, patient: "Ryan H.",   id: "#PT-00644", catLabel: "Referral",        catKey: "ref",  program: "Thyroid",          urgency: "NORMAL",   urgKey: 1, cc: "MR",         wait: 42 },
+  { pri: 3, patient: "Priya C.",  id: "#PT-00652", catLabel: "Appt Scheduling", catKey: "appt", program: "Women's Health",   urgency: "NORMAL",   urgKey: 1, cc: "Unassigned", wait: 38 }
+];
+
+let activeTab = "all", sortCol = null, sortDir = 1;
+
+function sortTable(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = 1; }
+  renderRows();
+}
+
+function getActionBtn(row) {
+  const m = { gap: ["Outreach", "action-outreach"], ref: ["Coordinate", "action-coordinate"], appt: ["Schedule", "action-schedule"], plan: ["Review Plan", "action-review"] };
+  const [label, cls] = m[row.catKey] || ["Assign", "action-assign"];
+  return `<button class="action-btn ${cls}">${label}</button>`;
+}
+
+function renderRows() {
+  const search = document.getElementById("filter-search").value.toLowerCase();
+  const filterCat = document.getElementById("filter-cat").value;
+  const filterUrg = document.getElementById("filter-urg").value;
+  const filterCC = document.getElementById("filter-cc").value;
+
+  let data = DATA.filter(r => {
+    if (activeTab !== "all" && r.catKey !== activeTab) return false;
+    if (filterCat && r.catKey !== filterCat) return false;
+    if (filterUrg && r.urgency !== filterUrg) return false;
+    if (filterCC && r.cc !== filterCC) return false;
+    if (search && !r.patient.toLowerCase().includes(search) && !r.id.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if (sortCol) {
+    data.sort((a, b) => {
+      const va = a[sortCol], vb = b[sortCol];
+      return (va < vb ? -1 : va > vb ? 1 : 0) * sortDir;
+    });
+  }
+
+  const urgClass = { CRITICAL: "urg-critical", HIGH: "urg-high", NORMAL: "urg-normal" };
+  const priClass = { 1: "pri-1", 2: "pri-2", 3: "pri-3" };
+  const ccClass = { JL: "cc-jl", MR: "cc-mr", TC: "cc-tc", Unassigned: "cc-unassigned" };
+  const waitCls = w => w >= 90 ? "wait wait-long" : w >= 50 ? "wait wait-mid" : "wait";
+
+  const html = data.map(r => `
+    <tr>
+      <td><span class="pri ${priClass[r.pri]}">P${r.pri}</span></td>
+      <td><span class="patient-name">${r.patient}</span></td>
+      <td><span class="patient-id">${r.id}</span></td>
+      <td><span class="cat-pill cat-${r.catKey}">${r.catLabel}</span></td>
+      <td style="font-size:12px;color:#374151;">${r.program}</td>
+      <td><span class="urg-pill ${urgClass[r.urgency]}">${r.urgency}</span></td>
+      <td><span class="cc-tag ${ccClass[r.cc]}">${r.cc}</span></td>
+      <td><span class="${waitCls(r.wait)}">${r.wait}m</span></td>
+      <td>${getActionBtn(r)}</td>
+    </tr>`).join("");
+
+  document.getElementById("queue-body").innerHTML = html || `<tr><td colspan="9" class="empty-msg">No cases match current filters.</td></tr>`;
+}
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (!tab) return;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  tab.classList.add("active");
+  activeTab = tab.dataset.tab;
+  renderRows();
+});
+
+["filter-cat","filter-urg","filter-cc","filter-search"].forEach(id => {
+  document.getElementById(id).addEventListener("change", renderRows);
+  document.getElementById(id).addEventListener("input", renderRows);
+});
+
+renderRows();
+</script>
+</body>
+</html>

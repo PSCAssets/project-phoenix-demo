@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Consultation Workflow{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <div>
+      <div class="page-header__module">M02 — Provider Portal</div>
+      <h1>Consultation Workflow</h1>
+    </div>
+    <a href="{{ url_for('provider.dashboard') }}" class="btn btn-outline">← Dashboard</a>
+  </div>
+</div>
+<div class="container">
+  <p class="text-muted">Async consultation flow coming next — intake, triage, provider review, response delivery.</p>
+</div>
+{% endblock %}

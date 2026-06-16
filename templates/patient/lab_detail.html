@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Lab Detail — Everlywell{% endblock %}
+{% block head %}
+<style>
+  :root{--navy:#2D5C2E;--green:#3E8168;--green-dark:#2D5F4E;--bg:#FAF7F2;--border:#D4E4DC;--gray:#64748B;--text:#1E293B;--blue-bg:#F2EDE4;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);display:flex;min-height:100vh;}
+  .sidenav{width:240px;background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+  .nav-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .nav-logo-text{font-size:18px;font-weight:700;color:#fff;}
+  .nav-logo-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .nav-user{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .nav-user-name{font-size:13px;font-weight:600;color:#fff;}
+  .nav-user-prog{font-size:11px;color:rgba(255,255,255,0.5);}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:rgba(255,255,255,0.7);border-radius:6px;margin:1px 8px;position:relative;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-item.active{background:rgba(62,129,104,0.25);color:#fff;}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--green);border-radius:0 2px 2px 0;margin-left:8px;}
+  .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .nav-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1);}
+  .main{margin-left:240px;flex:1;min-height:100vh;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:50;}
+  .back-link{font-size:13px;font-weight:600;color:var(--green);text-decoration:none;display:flex;align-items:center;gap:6px;}
+  .back-link:hover{text-decoration:underline;}
+  .topbar-title{font-size:18px;font-weight:700;color:var(--navy);flex:1;}
+  .status-badge{font-size:12px;font-weight:700;padding:4px 12px;border-radius:12px;}
+  .sb-normal{background:#D1FAE5;color:#065F46;}
+  .sb-elevated{background:#FEF3C7;color:#D97706;}
+  .content{padding:24px 28px;max-width:860px;}
+  .lab-header{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:20px;}
+  .lab-header-row{display:flex;align-items:center;gap:16px;margin-bottom:12px;}
+  .lab-icon-lg{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .lab-title{font-size:20px;font-weight:800;color:var(--text);}
+  .lab-meta-row{display:flex;gap:24px;font-size:13px;color:var(--gray);}
+  .lab-meta-row span{display:flex;align-items:center;gap:5px;}
+  .results-widget{background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;}
+  .rw-hd{padding:12px 20px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:0.05em;}
+  .rt{width:100%;border-collapse:collapse;}
+  .rt th{padding:10px 20px;font-size:11px;font-weight:600;color:var(--gray);text-align:left;background:#FAF7F2;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.04em;}
+  .rt td{padding:13px 20px;font-size:13px;color:var(--text);border-bottom:1px solid #F5F0EA;vertical-align:middle;}
+  .rt tr:last-child td{border-bottom:none;}
+  .rt tr.elevated-row td{background:#FFFBEB;}
+  .rt tr.elevated-row td:first-child{border-left:3px solid #F59E0B;padding-left:17px;}
+  .r-ok{color:#065F46;font-weight:600;}
+  .r-elev{color:#D97706;font-weight:700;}
+  .r-val-elev{color:#D97706;font-weight:700;}
+  .note-card{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:16px 20px;margin-bottom:20px;}
+  .note-card-hd{font-size:13px;font-weight:700;color:#5B21B6;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .note-card-body{font-size:13px;color:#374151;line-height:1.6;}
+  .trend-card{background:#fff;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px;}
+  .trend-hd{font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;}
+  .trend-row{display:flex;gap:0;align-items:stretch;}
+  .trend-point{flex:1;text-align:center;padding:10px 8px;border-right:1px solid #F5F0EA;}
+  .trend-point:last-child{border-right:none;}
+  .trend-date{font-size:11px;color:var(--gray);margin-bottom:4px;}
+  .trend-val{font-size:15px;font-weight:700;}
+  .tv-ok{color:#065F46;}
+  .tv-elev{color:#D97706;}
+  .tv-cur{background:var(--bg);border-radius:8px;}
+  .warning-note{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 16px;font-size:13px;color:#92400E;display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;}
+</style>
+{% endblock %}
+{% block content %}
+  <aside class="sidenav">
+    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Patient Portal</div></div>
+    <div class="nav-user">
+      <div class="nav-avatar" style="background:#0EA5E9">JR</div>
+      <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
+    </div>
+    <nav style="padding:8px 0;flex:1;">
+      <a href="/patient/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="/patient/consultations" class="nav-item"><span class="nav-icon">💬</span> My Consultations</a>
+      <a href="/patient/appointments" class="nav-item"><span class="nav-icon">📅</span> Appointments</a>
+      <a href="/patient/messages" class="nav-item"><span class="nav-icon">✉️</span> Messages <span class="nav-badge">2</span></a>
+      <a href="/patient/labs" class="nav-item active"><span class="nav-icon">🧪</span> Lab Results</a>
+      <a href="/patient/health-profile" class="nav-item"><span class="nav-icon">👤</span> Health Profile</a>
+      <a href="/patient/documents" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+      <a href="/patient/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+  </aside>
+  <div class="main">
+
+{% if lab == 'testosterone' %}
+    <div class="topbar">
+      <a href="/patient/labs" class="back-link">&#8592; Lab Results</a>
+      <div class="topbar-title">Testosterone Panel</div>
+      <span class="status-badge sb-normal">&#10003; All Normal</span>
+    </div>
+    <div class="content">
+      <div class="lab-header">
+        <div class="lab-header-row">
+          <div class="lab-icon-lg" style="background:#F0FDF4">🧬</div>
+          <div>
+            <div class="lab-title">Testosterone Panel</div>
+          </div>
+        </div>
+        <div class="lab-meta-row">
+          <span>📅 Collected Jun 8, 2026</span>
+          <span>🏥 Quest Diagnostics</span>
+          <span>👩‍⚕️ Ordered by Dr. Sarah Lee, MD</span>
+          <span>💊 Testosterone Care Product</span>
+        </div>
+      </div>
+      <div class="results-widget">
+        <div class="rw-hd">Biomarker Results</div>
+        <table class="rt">
+          <thead><tr><th>Biomarker</th><th>Your Value</th><th>Reference Range</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Total Testosterone</td><td style="font-weight:700">485 ng/dL</td><td>300–1,000 ng/dL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>Free Testosterone</td><td style="font-weight:700">12.4 pg/mL</td><td>9.0–30.0 pg/mL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>LH (Luteinizing Hormone)</td><td style="font-weight:700">4.2 mIU/mL</td><td>1.7–8.6 mIU/mL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>FSH (Follicle-Stimulating Hormone)</td><td style="font-weight:700">3.1 mIU/mL</td><td>1.5–12.4 mIU/mL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>SHBG (Sex Hormone Binding Globulin)</td><td style="font-weight:700">22 nmol/L</td><td>10–57 nmol/L</td><td class="r-ok">&#10003; Normal</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-card">
+        <div class="note-card-hd">&#128203; Provider Note — Dr. Sarah Lee, MD</div>
+        <div class="note-card-body">Your testosterone levels are trending in a healthy direction. Total testosterone at 485 ng/dL is well within the optimal range for your treatment protocol. Continue with your current regimen and we will monitor again at your next scheduled check-in.</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-hd">Total Testosterone Trend (ng/dL)</div>
+        <div class="trend-row">
+          <div class="trend-point"><div class="trend-date">Mar 2026</div><div class="trend-val tv-ok">312</div></div>
+          <div class="trend-point"><div class="trend-date">Apr 2026</div><div class="trend-val tv-ok">401</div></div>
+          <div class="trend-point"><div class="trend-date">May 2026</div><div class="trend-val tv-ok">445</div></div>
+          <div class="trend-point tv-cur"><div class="trend-date">Jun 2026</div><div class="trend-val tv-ok">485 &#9650;</div></div>
+        </div>
+      </div>
+    </div>
+
+{% elif lab == 'hba1c' %}
+    <div class="topbar">
+      <a href="/patient/labs" class="back-link">&#8592; Lab Results</a>
+      <div class="topbar-title">HbA1c (Glycated Hemoglobin)</div>
+      <span class="status-badge sb-elevated">&#9888; Elevated</span>
+    </div>
+    <div class="content">
+      <div class="lab-header">
+        <div class="lab-header-row">
+          <div class="lab-icon-lg" style="background:#FEF3C7">🩸</div>
+          <div>
+            <div class="lab-title">HbA1c (Glycated Hemoglobin)</div>
+          </div>
+        </div>
+        <div class="lab-meta-row">
+          <span>📅 Collected Jun 8, 2026</span>
+          <span>🏥 Quest Diagnostics</span>
+          <span>👩‍⚕️ Ordered by Maria Rodriguez, NP</span>
+          <span>💊 Weight Management</span>
+        </div>
+      </div>
+      <div class="warning-note">
+        <span style="font-size:18px;">&#9888;</span>
+        <span>Your HbA1c is elevated at <strong>6.8%</strong>, which falls in the diabetes range (&#8805;6.5%). Your care team will review these results with you during your next consultation. Do not make changes to your medications without consulting your provider.</span>
+      </div>
+      <div class="results-widget">
+        <div class="rw-hd">Biomarker Results</div>
+        <table class="rt">
+          <thead><tr><th>Biomarker</th><th>Your Value</th><th>Reference Range</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr class="elevated-row"><td>HbA1c</td><td class="r-val-elev">6.8%</td><td>&lt;5.7% Normal &middot; 5.7–6.4% Prediabetes &middot; &#8805;6.5% Diabetes</td><td class="r-elev">&#9888; Elevated</td></tr>
+            <tr class="elevated-row"><td>eAG (Estimated Average Glucose)</td><td class="r-val-elev">148 mg/dL</td><td>&lt;126 mg/dL</td><td class="r-elev">&#9888; Elevated</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-card">
+        <div class="note-card-hd">&#128203; Provider Note — Maria Rodriguez, NP</div>
+        <div class="note-card-body">Your HbA1c result requires attention. I am scheduling a follow-up consultation to discuss your results in detail and review your weight management plan. In the meantime, please focus on dietary adjustments — particularly reducing refined carbohydrates and added sugars. If you have any urgent symptoms such as excessive thirst, frequent urination, or blurred vision, please contact us immediately.</div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-hd">HbA1c Trend (%)</div>
+        <div class="trend-row">
+          <div class="trend-point"><div class="trend-date">Dec 2025</div><div class="trend-val tv-ok">5.9</div></div>
+          <div class="trend-point"><div class="trend-date">Feb 2026</div><div class="trend-val tv-ok">6.1</div></div>
+          <div class="trend-point"><div class="trend-date">Apr 2026</div><div class="trend-val tv-ok">6.4</div></div>
+          <div class="trend-point tv-cur"><div class="trend-date">Jun 2026</div><div class="trend-val tv-elev">6.8 &#9650;</div></div>
+        </div>
+      </div>
+    </div>
+
+{% elif lab == 'metabolic' %}
+    <div class="topbar">
+      <a href="/patient/labs" class="back-link">&#8592; Lab Results</a>
+      <div class="topbar-title">Metabolic Panel</div>
+      <span class="status-badge sb-normal">&#10003; All Normal</span>
+    </div>
+    <div class="content">
+      <div class="lab-header">
+        <div class="lab-header-row">
+          <div class="lab-icon-lg" style="background:#F2EDE4">🩺</div>
+          <div>
+            <div class="lab-title">Metabolic Panel (CMP)</div>
+          </div>
+        </div>
+        <div class="lab-meta-row">
+          <span>📅 Collected Jun 8, 2026</span>
+          <span>🏥 Quest Diagnostics</span>
+          <span>👩‍⚕️ Ordered by Dr. Sarah Lee, MD</span>
+          <span>💊 Testosterone Care Product</span>
+        </div>
+      </div>
+      <div class="results-widget">
+        <div class="rw-hd">Biomarker Results</div>
+        <table class="rt">
+          <thead><tr><th>Biomarker</th><th>Your Value</th><th>Reference Range</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Glucose</td><td style="font-weight:700">94 mg/dL</td><td>70–100 mg/dL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>BUN (Blood Urea Nitrogen)</td><td style="font-weight:700">14 mg/dL</td><td>7–20 mg/dL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>Creatinine</td><td style="font-weight:700">0.9 mg/dL</td><td>0.7–1.2 mg/dL</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>eGFR</td><td style="font-weight:700">&gt;60 mL/min</td><td>&gt;60 mL/min</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>ALT (Alanine Aminotransferase)</td><td style="font-weight:700">22 U/L</td><td>7–40 U/L</td><td class="r-ok">&#10003; Normal</td></tr>
+            <tr><td>AST (Aspartate Aminotransferase)</td><td style="font-weight:700">19 U/L</td><td>10–40 U/L</td><td class="r-ok">&#10003; Normal</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="note-card">
+        <div class="note-card-hd">&#128203; Provider Note — Dr. Sarah Lee, MD</div>
+        <div class="note-card-body">Metabolic panel results look excellent. Kidney and liver function markers are all within normal limits. No changes to your current protocol are needed based on these results. We will repeat at your next scheduled check-in in 3 months.</div>
+      </div>
+    </div>
+
+{% else %}
+    <div class="topbar">
+      <a href="/patient/labs" class="back-link">&#8592; Lab Results</a>
+      <div class="topbar-title">Lab Detail</div>
+    </div>
+    <div class="content">
+      <p style="color:#6B7280;font-size:14px;padding:40px 0;">Lab result not found. <a href="/patient/labs" style="color:var(--green);font-weight:600;">Return to Lab Results</a></p>
+    </div>
+{% endif %}
+
+  </div>
+{% endblock %}

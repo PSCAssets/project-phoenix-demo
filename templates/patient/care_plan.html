@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Care Plan{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <div>
+      <div class="page-header__module">M03 — Patient Portal</div>
+      <h1>My Care Plan</h1>
+    </div>
+    <a href="{{ url_for('patient.dashboard') }}" class="btn btn-outline">← Dashboard</a>
+  </div>
+</div>
+<div class="container">
+  <p class="text-muted">Care plan coming next — goals, medications, labs, provider notes.</p>
+</div>
+{% endblock %}
