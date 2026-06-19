@@ -132,3 +132,10 @@ def audit_log():
 @bp.route("/coordinator")
 def coordinator():
     return render_template("admin/coordinator.html")
+
+
+# ── Members DB / Eligibility Admin ─────────────────────────────────────────
+
+@bp.route("/members-db")
+def members_db():
+    return render_template("admin/members_db.html")

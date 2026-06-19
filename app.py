@@ -19,6 +19,8 @@ ROLE_NAMES = {
     'care_team':   'Casey Torres',
     'patient':     'Marcus Johnson',
     'admin':       'Chris Navarro',
+    'qa_reviewer': 'Rachel Chen, QA Reviewer',
+    'gc_admin':    'Dana Cooper, GC Admin',
 }
 
 ROLE_DESTINATIONS = {
@@ -30,6 +32,8 @@ ROLE_DESTINATIONS = {
     'scheduler':   'scheduler.dashboard',
     'care_team':   'care_team.dashboard',
     'admin':       'admin.dashboard',
+    'qa_reviewer': 'provider.qa_reviewer_dashboard',
+    'gc_admin':    'provider.gc_admin_dashboard',
     'patient':     'patient.dashboard',
 }
 
@@ -71,6 +75,24 @@ def switch_user():
 def logout():
     session.clear()
     return redirect(url_for('index'))
+
+# Change 1 — PWN Health isolated patient portal
+@app.route('/pwn/login')
+def pwn_login():
+    return render_template('patient/login_pwn.html')
+
+@app.route('/pwn/portal')
+def pwn_portal():
+    return render_template('patient/portal_pwn.html')
+
+# Change 2 — Everlywell multi-program patient portal
+@app.route('/patient/login')
+def patient_login_page():
+    return render_template('patient/login.html')
+
+@app.route('/patient/portal')
+def patient_portal_page():
+    return render_template('patient/portal.html')
 
 # M02 — Provider Portal (includes async consultation workflow)
 app.register_blueprint(provider.bp, url_prefix="/provider")

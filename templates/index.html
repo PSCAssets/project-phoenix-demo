@@ -191,6 +191,39 @@
       <a href="{{ url_for('login', role='admin') }}" class="login-btn">Log in as Chris</a>
     </div>
 
+
+    <!-- Row 4: QA Reviewer, GC Administrator -->
+    <div class="user-card">
+      <div class="user-avatar" style="background:#B45309">RC</div>
+      <div class="user-name">Rachel Chen</div>
+      <div class="user-role">QA Reviewer<br>Provider Portal</div>
+      <a href="{{ url_for('login', role='qa_reviewer') }}" class="login-btn">Log in as Rachel</a>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar" style="background:#0E7490">DC</div>
+      <div class="user-name">Dana Cooper</div>
+      <div class="user-role">GC Administrator<br>Provider Portal</div>
+      <a href="{{ url_for('login', role='gc_admin') }}" class="login-btn">Log in as Dana</a>
+    </div>
+
+  </div>
+
+  <!-- Change 4: Patient Portal Demo Links -->
+  <div style="max-width:868px;width:100%;margin:0 auto 32px;background:#fff;border-radius:16px;padding:24px 28px;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1.5px solid #E5E0D8;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:14px;">Patient Portal Demos</div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:240px;background:#F0F6FF;border:1px solid #BFDBFE;border-radius:10px;padding:16px 18px;">
+        <div style="font-size:13px;font-weight:700;color:#0A2F5C;margin-bottom:4px;">&#9672; PWN Health Portal</div>
+        <div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Isolated partner experience &mdash; no Everlywell branding</div>
+        <a href="/pwn/login" style="display:inline-block;background:#0A2F5C;color:#fff;text-decoration:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;">PWN Health Portal (Isolated)</a>
+      </div>
+      <div style="flex:1;min-width:240px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:16px 18px;">
+        <div style="font-size:13px;font-weight:700;color:#6B21A8;margin-bottom:4px;">everlywell</div>
+        <div style="font-size:12px;color:#6B7280;margin-bottom:12px;">Multi-program portal with program switcher (3 programs)</div>
+        <a href="/patient/login" style="display:inline-block;background:#6B21A8;color:#fff;text-decoration:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;">Everlywell Portal (Multi-Program)</a>
+      </div>
+    </div>
   </div>
 
   <div class="login-footer">Demo environment — not for clinical use</div>

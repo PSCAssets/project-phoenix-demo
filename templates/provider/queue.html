@@ -207,6 +207,7 @@
   .icon-cell { width: 36px; text-align: center; padding: 9px 8px; }
   .patient-name { font-weight: 600; font-size: 13px; color: var(--text-primary); }
   .patient-dob { font-size: 11px; color: var(--text-secondary); font-weight: 400; margin-top: 1px; }
+  .patient-gender { background:#E5E7EB; color:#374151; font-size:10px; font-weight:600; padding:1px 6px; border-radius:8px; margin-left:4px; }
   .consult-id { font-size: 11px; color: var(--text-tertiary); font-family: 'SF Mono', 'Fira Code', monospace; }
 
   .type-pill {
@@ -507,7 +508,7 @@
 
         <tr class="sla-red" data-type="async" data-sla="overdue" data-assigned="unassigned" data-product="A1C Management" data-status="overdue">
           <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">M.J.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Marcus Johnson</a><div class="patient-dob">DOB: 04/12/1985 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">34y</td>
           <td class="consult-id">C-20260528-001</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -525,7 +526,7 @@
 
         <tr class="sla-red" data-type="lab" data-sla="overdue" data-assigned="unassigned" data-product="Thyroid Panel" data-status="overdue">
           <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=lab&amp;view_only=1">P.W.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=lab&amp;view_only=1">Patricia Wells</a><div class="patient-dob">DOB: 09/23/1962 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">52y</td>
           <td class="consult-id">C-20260528-002</td>
           <td><span class="type-pill t-lab">Lab</span></td>
@@ -543,7 +544,7 @@
 
         <tr class="sla-red in-progress-row" data-type="phone" data-sla="overdue" data-assigned="Dr. R. Patel" data-product="Weight Management" data-status="in-progress">
           <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=phone">D.K.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=phone">David Kim</a><div class="patient-dob">DOB: 07/07/1978 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">41y</td>
           <td class="consult-id">C-20260528-003</td>
           <td><span class="type-pill t-phone">Phone</span></td>
@@ -561,7 +562,7 @@
 
         <tr class="sla-orange" data-type="refill" data-sla="urgent" data-assigned="unassigned" data-product="STI Treatment" data-status="approaching">
           <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">R.L.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Rosa Lopez</a><div class="patient-dob">DOB: 11/30/1990 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">28y</td>
           <td class="consult-id">C-20260528-004</td>
           <td><span class="type-pill t-refill">Refill</span></td>
@@ -579,7 +580,7 @@
 
         <tr class="sla-orange in-progress-row" data-type="async" data-sla="urgent" data-assigned="Dr. S. Lee" data-product="ED Treatment" data-status="in-progress">
           <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=async">T.C.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async">Thomas Chen</a><div class="patient-dob">DOB: 03/15/1982 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">47y</td>
           <td class="consult-id">C-20260528-005</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -596,7 +597,7 @@
 
         <tr class="sla-orange" data-type="video" data-sla="urgent" data-assigned="unassigned" data-product="A1C Management" data-status="approaching">
           <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
-          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">A.N.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">Alicia Nash</a><div class="patient-dob">DOB: 06/01/1995 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">39y</td>
           <td class="consult-id">C-20260528-006</td>
           <td><span class="type-pill t-video">Video</span></td>
@@ -622,7 +623,7 @@
 
         <tr class="sla-yellow" data-type="async" data-sla="warning" data-assigned="unassigned" data-product="Thyroid Panel" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">B.M.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Brian Mitchell</a><div class="patient-dob">DOB: 08/19/1970 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">31y</td>
           <td class="consult-id">C-20260528-007</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -640,7 +641,7 @@
 
         <tr class="sla-yellow in-progress-row" data-type="lab" data-sla="warning" data-assigned="Dr. A. Okafor" data-product="STI Panel" data-status="in-progress">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=lab">J.R.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=lab">Jennifer Rivera</a><div class="patient-dob">DOB: 02/27/1988 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">45y</td>
           <td class="consult-id">C-20260528-008</td>
           <td><span class="type-pill t-lab">Lab</span></td>
@@ -657,7 +658,7 @@
 
         <tr class="sla-yellow" data-type="async" data-sla="warning" data-assigned="unassigned" data-product="Weight Management" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">E.V.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Elena Vasquez</a><div class="patient-dob">DOB: 05/14/1975 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">58y</td>
           <td class="consult-id">C-20260528-009</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -675,7 +676,7 @@
 
         <tr class="sla-yellow" data-type="refill" data-sla="warning" data-assigned="unassigned" data-product="A1C Management" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">M.G.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Michael Grant</a><div class="patient-dob">DOB: 12/03/1959 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">63y</td>
           <td class="consult-id">C-20260528-010</td>
           <td><span class="type-pill t-refill">Refill</span></td>
@@ -693,7 +694,7 @@
 
         <tr class="sla-ok" data-type="video" data-sla="ok" data-assigned="unassigned" data-product="Annual Wellness Visit" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1&amp;product=awv">D.R.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1&amp;product=awv">Diana Ross</a><div class="patient-dob">DOB: 01/22/1967 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">68y</td>
           <td class="consult-id">C-20260601-022</td>
           <td><span class="type-pill t-annual">Video</span></td>
@@ -719,7 +720,7 @@
 
         <tr class="sla-ok" data-type="async" data-sla="ok" data-assigned="unassigned" data-product="Weight Management" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">S.G.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Samuel Greene</a><div class="patient-dob">DOB: 10/08/1993 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">29y</td>
           <td class="consult-id">C-20260528-011</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -736,7 +737,7 @@
 
         <tr class="sla-ok in-progress-row" data-type="phone" data-sla="ok" data-assigned="Dr. S. Lee" data-product="A1C Management" data-status="in-progress">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=phone">O.T.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=phone">Olivia Torres</a><div class="patient-dob">DOB: 04/29/1980 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">36y</td>
           <td class="consult-id">C-20260528-012</td>
           <td><span class="type-pill t-phone">Phone</span></td>
@@ -753,7 +754,7 @@
 
         <tr class="sla-ok" data-type="async" data-sla="ok" data-assigned="unassigned" data-product="STI Treatment" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">C.D.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Carlos Diaz</a><div class="patient-dob">DOB: 07/17/1986 <span class="patient-gender">M</span></div></td>
           <td class="age-cell">44y</td>
           <td class="consult-id">C-20260528-013</td>
           <td><span class="type-pill t-async">Async</span></td>
@@ -770,7 +771,7 @@
 
         <tr class="sla-ok" data-type="video" data-sla="ok" data-assigned="unassigned" data-product="ED Treatment" data-status="unassigned">
           <td class="icon-cell"></td>
-          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">H.O.</a></td>
+          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">Hannah O'Brien</a><div class="patient-dob">DOB: 09/11/1972 <span class="patient-gender">F</span></div></td>
           <td class="age-cell">27y</td>
           <td class="consult-id">C-20260528-014</td>
           <td><span class="type-pill t-video">Video</span></td>
@@ -1082,6 +1083,25 @@ document.querySelectorAll('.take-btn').forEach(function(btn) {
     }, 300);
   });
 });
+
+(function() {
+  var clients = ['DXS','DXS','LabCorp','LabCorp'];
+  var defaultClient = 'Everlywell';
+  var styles = {
+    DXS:        'background:#EDE9FE;color:#6B21A8',
+    LabCorp:    'background:#DBEAFE;color:#1D4ED8',
+    Everlywell: 'background:#D1FAE5;color:#065F46'
+  };
+  var rows = document.querySelectorAll('#queueTableBody tr');
+  rows.forEach(function(row, i) {
+    var client = clients[i] !== undefined ? clients[i] : defaultClient;
+    var badge = document.createElement('span');
+    badge.style.cssText = styles[client] + ';font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;margin-left:7px;vertical-align:middle;display:inline-block;';
+    badge.textContent = client;
+    var link = row.querySelector('.patient-link');
+    if (link) link.insertAdjacentElement('afterend', badge);
+  });
+})();
 </script>
 {% endraw %}
 {% endblock %}

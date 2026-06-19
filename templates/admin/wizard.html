@@ -211,8 +211,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-group-label">Client</div>
       <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
       <div class="step-group-label">Foundation</div>
+      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">★</div><div class="step-name">Portal Branding</div></div>
+      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">&#9670;</div><div class="step-name">Ecosystem</div></div>
       <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
       <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">2</div><div class="step-name">Provider Type</div></div>
+      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">&#9670;</div><div class="step-name">Provider Eligibility</div></div>
       <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">3</div><div class="step-name">State Configuration</div></div>
       <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">4</div><div class="step-name">Age &amp; Guardian Rules</div></div>
       <div class="step-group-label">Clinical Setup</div>
@@ -223,6 +226,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">10</div><div class="step-name">Documentation Template</div></div>
       <div class="step-group-label">Workflow &amp; SLA</div>
       <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">9</div><div class="step-name">Workflow Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep('preconsult_chk')" id="sni_preconsult_chk"><div class="step-num">&#9670;</div><div class="step-name">Pre-Consult Checklist</div></div>
+      <div class="step-nav-item" onclick="goToStep('qa_stage')" id="sni_qa_stage"><div class="step-num">&#9670;</div><div class="step-name">QA Stage Setup</div></div>
       <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">10</div><div class="step-name">SLA Configuration</div></div>
       <div class="step-group-label">Configuration</div>
       <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">11</div><div class="step-name">Lab Configuration</div></div>
@@ -262,6 +267,137 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div id="s0_client_card" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:16px 20px;max-width:480px;margin-top:4px;">
           <div style="font-size:11px;font-weight:600;color:#065F46;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">Selected Client</div>
           <div id="s0_client_name" style="font-size:16px;font-weight:700;color:#111827;"></div>
+        </div>
+      </div>
+
+      <!-- STEP: Portal Branding -->
+      <div class="step-panel" id="step_branding">
+        <div class="step-heading">Portal Branding Configuration</div>
+        <div class="step-sub">Configure how patients experience this care product's portal. Controls branding at login and throughout their session.</div>
+
+        <div style="margin-bottom:24px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;">Branding Type</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div id="brandCard0" onclick="selectBrandCard(0)" style="flex:1;min-width:180px;border:2px solid #6B21A8;border-radius:10px;padding:16px;background:#F5F3FF;cursor:pointer;position:relative;">
+              <span id="brandBadge0" style="position:absolute;top:10px;right:10px;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">✓</span>
+              <div style="width:36px;height:36px;background:#6B21A8;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;margin-bottom:10px;">EW</div>
+              <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:4px;">Everlywell Branded</div>
+              <div style="font-size:12px;color:#6B7280;">Full Everlywell logo, colors, and navigation. Patient can access all Everlywell care products they are enrolled in.</div>
+            </div>
+            <div id="brandCard1" onclick="selectBrandCard(1)" style="flex:1;min-width:180px;border:1px solid #E5E7EB;border-radius:10px;padding:16px;background:#fff;cursor:pointer;position:relative;">
+              <span id="brandBadge1" style="display:none;position:absolute;top:10px;right:10px;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">✓</span>
+              <div style="width:36px;height:36px;background:#F3F4F6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;">⬆</div>
+              <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:4px;">Client Branded</div>
+              <div style="font-size:12px;color:#6B7280;">Display client's logo and colors. Patient sees only care products associated with this client.</div>
+            </div>
+            <div id="brandCard2" onclick="selectBrandCard(2)" style="flex:1;min-width:180px;border:1px solid #E5E7EB;border-radius:10px;padding:16px;background:#fff;cursor:pointer;position:relative;">
+              <span id="brandBadge2" style="display:none;position:absolute;top:10px;right:10px;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;">✓</span>
+              <div style="width:36px;height:36px;background:#F3F4F6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;">○</div>
+              <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:4px;">No Branding</div>
+              <div style="font-size:12px;color:#6B7280;">Neutral portal — no logo displayed. Patient sees only the care product name. For white-label and third-party network integrations.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Patient Sign-In Source URL</label>
+          <div style="font-size:12px;color:#6B7280;margin-bottom:6px;">The subdomain or landing page URL that routes patients to this branded experience at login.</div>
+          <input type="text" class="form-input" placeholder="e.g., quest.portal.everlywell.com or app.everlywell.com">
+          <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Leave blank to use the default Everlywell portal (app.everlywell.com)</div>
+        </div>
+
+        <div id="clientBrandFields" style="display:none;border:1px solid #E5E7EB;border-radius:10px;padding:16px;background:#FAFAFA;margin-top:8px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;">Client Branding</div>
+          <div class="form-group">
+            <label class="form-label">Upload Client Logo (PNG or SVG, max 2MB)</label>
+            <div style="border:2px dashed #D1D5DB;border-radius:8px;padding:24px;text-align:center;cursor:pointer;color:#9CA3AF;font-size:13px;" onclick="alert('File picker would open here')">
+              ⬆ Drag and drop logo file here, or <span style="color:#6B21A8;font-weight:600;">browse</span>
+            </div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+            <div>
+              <label class="form-label">Primary Brand Color</label>
+              <input type="color" value="#6B21A8" style="width:44px;height:36px;padding:2px;border:1px solid #E5E7EB;border-radius:6px;cursor:pointer;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Portal Name (shown to patients)</label>
+            <input type="text" class="form-input" placeholder="e.g., Quest Telehealth Portal">
+          </div>
+        </div>
+
+        <!-- Color Pickers + Live Preview -->
+        <div style="margin-top:20px;">
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;">Color Configuration</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:580px;margin-bottom:16px;">
+            <div>
+              <label class="form-label">Primary Color</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" id="brandPrimary" value="#0A2F5C" style="width:40px;height:36px;padding:2px;border:1px solid #E5E7EB;border-radius:6px;cursor:pointer;" oninput="updateBrandPreview()">
+                <input type="text" value="#0A2F5C" id="brandPrimaryHex" style="width:80px;border:1px solid #E5E7EB;border-radius:6px;padding:5px 8px;font-size:12px;font-family:monospace;" oninput="syncColorPicker('brandPrimary','brandPrimaryHex')">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Secondary Color</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" id="brandSecondary" value="#00BFB3" style="width:40px;height:36px;padding:2px;border:1px solid #E5E7EB;border-radius:6px;cursor:pointer;" oninput="updateBrandPreview()">
+                <input type="text" value="#00BFB3" id="brandSecondaryHex" style="width:80px;border:1px solid #E5E7EB;border-radius:6px;padding:5px 8px;font-size:12px;font-family:monospace;" oninput="syncColorPicker('brandSecondary','brandSecondaryHex')">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Header Background</label>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <input type="color" id="brandHeader" value="#0A2F5C" style="width:40px;height:36px;padding:2px;border:1px solid #E5E7EB;border-radius:6px;cursor:pointer;" oninput="updateBrandPreview()">
+                <input type="text" value="#0A2F5C" id="brandHeaderHex" style="width:80px;border:1px solid #E5E7EB;border-radius:6px;padding:5px 8px;font-size:12px;font-family:monospace;" oninput="syncColorPicker('brandHeader','brandHeaderHex')">
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:8px;">Live Preview</div>
+          <div style="border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;max-width:540px;">
+            <div id="previewHeader" style="background:#0A2F5C;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span id="previewIcon" style="color:#00BFB3;font-size:16px;">&#9672;</span>
+                <span style="font-weight:700;">PWN Health</span>
+              </div>
+              <span style="color:rgba(255,255,255,0.7);font-size:12px;">Patient Portal</span>
+              <span style="color:rgba(255,255,255,0.8);font-size:12px;">J. Adams &#8599;</span>
+            </div>
+          </div>
+          <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">Preview updates as you adjust colors above.</div>
+          <div style="margin-top:10px;background:#FEF3C7;border-radius:6px;padding:10px 12px;font-size:12px;color:#92400E;max-width:540px;">For Isolated Partner ecosystems, logo and primary color are required before this care product can be published.</div>
+        </div>
+      </div>
+
+
+      <!-- STEP: Ecosystem Classification -->
+      <div class="step-panel" id="step_ecosystem">
+        <div class="step-heading">Ecosystem Classification</div>
+        <div class="step-sub">Configure how this care product's patient portal is managed. This setting cannot be changed once patients are enrolled.</div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;max-width:560px;margin-bottom:20px;">
+
+          <div id="ecoCard0" onclick="selectEcoCard(0)" style="border:1px solid #E5E7EB;border-radius:8px;padding:16px;background:#fff;cursor:pointer;display:flex;align-items:flex-start;gap:14px;transition:border 0.15s;">
+            <div style="margin-top:2px;width:18px;height:18px;border:2px solid #D1D5DB;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;" id="ecoRadio0"></div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px;">Everlywell Platform</div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.5;">Patient portal is under the Everlywell umbrella. Patients can access multiple programs via the program switcher. Everlywell or client co-branding applies.</div>
+            </div>
+          </div>
+
+          <div id="ecoCard1" onclick="selectEcoCard(1)" style="border:2px solid #6B21A8;border-radius:8px;padding:16px;background:#FAFAF9;cursor:pointer;display:flex;align-items:flex-start;gap:14px;transition:border 0.15s;">
+            <div style="margin-top:2px;width:18px;height:18px;border:2px solid #6B21A8;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;" id="ecoRadio1">
+              <div style="width:8px;height:8px;background:#6B21A8;border-radius:50%;"></div>
+            </div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#374151;margin-bottom:4px;">Isolated Partner <span style="font-size:11px;background:#EDE9FE;color:#6B21A8;padding:2px 7px;border-radius:8px;font-weight:600;margin-left:6px;">Selected</span></div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.5;">Patient portal is completely isolated. Partner branding only — no Everlywell references. Patient data is hard-isolated from the Everlywell ecosystem. Required for white-label contracts.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:6px;padding:12px 14px;max-width:560px;font-size:12px;color:#92400E;line-height:1.5;">
+          <strong>&#9888; Important:</strong> This setting cannot be changed once the first patient account is created under this care product.
         </div>
       </div>
 
@@ -333,16 +469,456 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
 
+
+      <!-- STEP: Provider Eligibility -->
+      <div class="step-panel" id="step_eligibility">
+        <div class="step-heading">Provider Eligibility Configuration</div>
+        <div class="step-sub">Define which providers are eligible to deliver this care product and configure program-type-specific assignment rules.</div>
+
+        <div class="form-group" style="max-width:480px;">
+          <label class="form-label">Program Type <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="progType" value="commercial" checked onchange="onProgTypeChange(this.value)"> Commercial <span style="font-size:11px;color:#9CA3AF;">(default — all licensed providers eligible)</span></label>
+            <label class="radio-opt"><input type="radio" name="progType" value="medicare" onchange="onProgTypeChange(this.value)"> Medicare Program</label>
+            <label class="radio-opt"><input type="radio" name="progType" value="medicaid" onchange="onProgTypeChange(this.value)"> Medicaid Program</label>
+          </div>
+        </div>
+
+        <!-- Medicare/Medicaid assignment table (hidden for Commercial) -->
+        <div id="providerAssignmentSection" style="display:none;margin-bottom:24px;">
+          <div style="height:1px;background:#E5E7EB;margin:16px 0;"></div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:10px;" id="assignmentSectionLabel">Medicare Program — Provider Assignment</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:600;color:#374151;">Assigned Providers</div>
+            <button style="font-size:12px;font-weight:600;color:#6B21A8;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:5px 12px;cursor:pointer;">+ Add Provider</button>
+          </div>
+          <div style="border:1px solid #E5E7EB;border-radius:8px;overflow:hidden;">
+            <div style="padding:14px 16px;border-bottom:1px solid #E5E7EB;background:#FAFAFA;display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:3px;">Dr. Sarah Lee</div>
+                <div style="font-size:12px;color:#6B7280;margin-bottom:3px;">NPI: 1234567890</div>
+                <div style="font-size:12px;color:#6B7280;margin-bottom:5px;">Licensed States: CA, TX, FL, NY, CO</div>
+                <span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;">&#9679; Medicare Active &mdash; exp. 12/31/2027</span>
+              </div>
+              <button style="font-size:16px;color:#9CA3AF;background:none;border:none;cursor:pointer;padding:0 4px;" title="Remove">&times;</button>
+            </div>
+            <div style="padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between;">
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:3px;">Dr. Marcus Webb</div>
+                <div style="font-size:12px;color:#6B7280;margin-bottom:3px;">NPI: 0987654321</div>
+                <div style="font-size:12px;color:#6B7280;margin-bottom:5px;">Licensed States: CA, TX, AZ, NV</div>
+                <span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;">&#9679; Medicare Active &mdash; exp. 06/30/2027</span>
+              </div>
+              <button style="font-size:16px;color:#9CA3AF;background:none;border:none;cursor:pointer;padding:0 4px;" title="Remove">&times;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Exclusion list (shown only for Commercial) -->
+        <div id="exclusionSection">
+          <div style="height:1px;background:#E5E7EB;margin:16px 0;"></div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:10px;">Exclusion List</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;color:#374151;">Providers excluded from this care product</div>
+            <button style="font-size:12px;font-weight:600;color:#6B7280;background:#F3F4F6;border:1px solid #E5E7EB;border-radius:6px;padding:5px 12px;cursor:pointer;">+ Add Exclusion</button>
+          </div>
+          <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 16px;font-size:12px;color:#9CA3AF;font-style:italic;">
+            No exclusions. All licensed providers are eligible by default.
+          </div>
+        </div>
+      </div>
+
       <!-- STEP 3: State Configuration -->
       <div class="step-panel" id="step4">
         <div class="step-heading">Step 4 — State Configuration</div>
-        <div class="step-sub">Select which states this care product is available in. Consult type overrides per state are available after initial activation.</div>
-        <div class="state-btns">
-          <button class="btn-sm" onclick="setAllStates(true)">Select All</button>
-          <button class="btn-sm" onclick="setAllStates(false)">Clear All</button>
+        <div class="step-sub">Configure which consult modalities are allowed per state. Check each modality your care product supports in that state.</div>
+        <div style="display:flex;gap:20px;margin-bottom:10px;flex-wrap:wrap;">
+          <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">Per-column actions:</div>
+          <div><span style="font-size:12px;font-weight:600;color:#6B7280;">On-Demand:</span> <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-od',true);return false;">Select All</a> · <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-od',false);return false;">Clear All</a></div>
+          <div><span style="font-size:12px;font-weight:600;color:#6B7280;">Scheduled:</span> <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-sch',true);return false;">Select All</a> · <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-sch',false);return false;">Clear All</a></div>
+          <div><span style="font-size:12px;font-weight:600;color:#6B7280;">Async:</span> <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-asc',true);return false;">Select All</a> · <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-asc',false);return false;">Clear All</a></div>
+          <div><span style="font-size:12px;font-weight:600;color:#6B7280;">Initial Must Be Video:</span> <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-iv',true);return false;">Select All</a> · <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-iv',false);return false;">Clear All</a></div>
         </div>
-        <div class="state-grid" id="stateGrid"></div>
-        <p style="font-size:12px;color:#9CA3AF;margin-top:12px;">* Consult type overrides per state available after initial activation.</p>
+        <div style="max-height:420px;overflow-y:auto;border:1px solid #E5E7EB;border-radius:8px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead style="position:sticky;top:0;z-index:2;">
+              <tr style="background:#F9FAFB;">
+                <th style="width:180px;padding:9px 12px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">State</th>
+                <th style="width:110px;padding:9px 12px;text-align:center;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">On-Demand</th>
+                <th style="width:110px;padding:9px 12px;text-align:center;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Scheduled</th>
+                <th style="width:110px;padding:9px 12px;text-align:center;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Async</th>
+                <th style="width:110px;padding:9px 12px;text-align:center;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #E5E7EB;">Initial Visit Must Be Video</th>
+              </tr>
+            </thead>
+            <tbody id="stateMatrixBody">
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Alabama</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Alabama" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Alabama" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Alabama" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Alabama" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Alaska</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Alaska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Alaska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Alaska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Alaska" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Arizona</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Arizona" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Arizona" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Arizona" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Arizona" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Arkansas</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Arkansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Arkansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Arkansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Arkansas" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">California</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="California" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="California" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="California" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="California" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Colorado</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Colorado" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Colorado" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Colorado" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Colorado" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Connecticut</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Connecticut" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Connecticut" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Connecticut" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Connecticut" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Delaware</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Delaware" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Delaware" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Delaware" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Delaware" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Florida</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Florida" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Florida" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Florida" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Florida" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Georgia</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Georgia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Georgia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Georgia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Georgia" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Hawaii</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Hawaii" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Hawaii" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Hawaii" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Hawaii" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Idaho</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Idaho" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Idaho" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Idaho" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Idaho" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Illinois</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Illinois" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Illinois" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Illinois" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Illinois" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Indiana</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Indiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Indiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Indiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Indiana" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Iowa</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Iowa" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Iowa" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Iowa" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Iowa" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Kansas</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Kansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Kansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Kansas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Kansas" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Kentucky</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Kentucky" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Kentucky" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Kentucky" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Kentucky" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Louisiana</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Louisiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Louisiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Louisiana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Louisiana" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Maine</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Maine" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Maine" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Maine" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Maine" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Maryland</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Maryland" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Maryland" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Maryland" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Maryland" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Massachusetts</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Massachusetts" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Massachusetts" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Massachusetts" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Massachusetts" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Michigan</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Michigan" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Michigan" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Michigan" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Michigan" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Minnesota</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Minnesota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Minnesota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Minnesota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Minnesota" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Mississippi</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Mississippi" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Mississippi" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Mississippi" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Mississippi" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Missouri</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Missouri" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Missouri" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Missouri" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Missouri" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Montana</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Montana" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Montana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Montana" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Montana" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Nebraska</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Nebraska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Nebraska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Nebraska" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Nebraska" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Nevada</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Nevada" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Nevada" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Nevada" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Nevada" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">New Hampshire</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="New Hampshire" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="New Hampshire" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="New Hampshire" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="New Hampshire" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">New Jersey</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="New Jersey" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="New Jersey" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="New Jersey" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="New Jersey" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">New Mexico</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="New Mexico" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="New Mexico" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="New Mexico" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="New Mexico" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">New York</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="New York" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="New York" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="New York" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="New York" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">North Carolina</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="North Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="North Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="North Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="North Carolina" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">North Dakota</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="North Dakota" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="North Dakota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="North Dakota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="North Dakota" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Ohio</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Ohio" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Ohio" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Ohio" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Ohio" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Oklahoma</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Oklahoma" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Oklahoma" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Oklahoma" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Oklahoma" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Oregon</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Oregon" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Oregon" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Oregon" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Oregon" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Pennsylvania</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Pennsylvania" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Pennsylvania" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Pennsylvania" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Pennsylvania" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Rhode Island</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Rhode Island" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Rhode Island" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Rhode Island" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Rhode Island" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">South Carolina</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="South Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="South Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="South Carolina" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="South Carolina" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">South Dakota</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="South Dakota" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="South Dakota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="South Dakota" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="South Dakota" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Tennessee</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Tennessee" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Tennessee" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Tennessee" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Tennessee" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Texas</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Texas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Texas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Texas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Texas" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Utah</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Utah" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Utah" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Utah" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Utah" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Vermont</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Vermont" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Vermont" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Vermont" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Vermont" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Virginia</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Virginia" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Washington</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Washington" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Washington" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Washington" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Washington" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">West Virginia</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="West Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="West Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="West Virginia" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="West Virginia" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Wisconsin</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Wisconsin" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Wisconsin" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Wisconsin" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Wisconsin" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+              <tr>
+                <td style="padding:6px 12px;font-size:12px;color:#374151;">Wyoming</td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-od" data-state="Wyoming" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-sch" data-state="Wyoming" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-asc" data-state="Wyoming" checked style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+                <td style="padding:6px 12px;text-align:center;"><input type="checkbox" class="cb-iv" data-state="Wyoming" style="accent-color:#6B21A8;width:14px;height:14px;" onchange="updateSummary()"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="stateMatrixSummary" style="font-size:12px;color:#6B7280;margin-top:10px;font-style:italic;"></div>
+        <script>
+        function bulkCol(cls, val) {
+          document.querySelectorAll('#step4 .' + cls).forEach(function(cb){ cb.checked = val; });
+          updateSummary();
+        }
+        function updateSummary() {
+          var od  = document.querySelectorAll('#step4 .cb-od:checked').length;
+          var sch = document.querySelectorAll('#step4 .cb-sch:checked').length;
+          var asc = document.querySelectorAll('#step4 .cb-asc:checked').length;
+          document.getElementById('stateMatrixSummary').textContent =
+            od + ' of 50 states enabled for On-Demand · ' + sch + ' for Scheduled · ' + asc + ' for Async';
+        }
+        document.addEventListener('DOMContentLoaded', updateSummary);
+        </script>
       </div>
 
       <!-- STEP 4: Age & Guardian Rules -->
@@ -619,89 +1195,211 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 9: Workflow Configuration -->
       <div class="step-panel" id="step11">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
-          <div>
-            <div class="step-heading">Step 11 — Workflow Configuration</div>
-            <div class="step-sub" style="margin-bottom:0;">Define the clinical workflow stages for this care product.</div>
-          </div>
-          <button id="s9SimBtn" onclick="toggleSimulation()" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;margin-top:4px;">▶ Simulate</button>
-        </div>
+        <div class="step-heading">Step 11 — Workflow Configuration</div>
+        <div class="step-sub">Define the clinical workflow stages for this care product.</div>
 
-        <!-- MODE SELECTOR -->
+        <!-- Mode toggle cards -->
         <div style="display:flex;gap:12px;margin-bottom:20px;">
-          <label id="modeCardTemplate" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #1D4ED8;background:#EFF6FF;border-radius:10px;cursor:pointer;">
-            <input type="radio" name="wfMode" value="template" checked onchange="setWfMode('template')">
+          <label id="wfbModeCardTemplate" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #6B21A8;background:#F5F3FF;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="wfbMode" value="template" checked onchange="wfbSetMode('template')" style="accent-color:#6B21A8;">
             <div>
-              <div style="font-size:13px;font-weight:700;color:#1D4ED8;">Use template</div>
+              <div style="font-size:13px;font-weight:700;color:#6B21A8;">Use template</div>
               <div style="font-size:11px;color:#6B7280;margin-top:2px;">Choose from pre-built clinical workflow templates</div>
             </div>
           </label>
-          <label id="modeCardCustom" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #E5E0D8;background:#fff;border-radius:10px;cursor:pointer;">
-            <input type="radio" name="wfMode" value="custom" onchange="setWfMode('custom')">
+          <label id="wfbModeCardCustom" style="flex:1;display:flex;align-items:center;gap:10px;padding:14px 16px;border:2px solid #E5E0D8;background:#fff;border-radius:10px;cursor:pointer;">
+            <input type="radio" name="wfbMode" value="custom" onchange="wfbSetMode('custom')" style="accent-color:#6B21A8;">
             <div>
               <div style="font-size:13px;font-weight:700;color:#374151;">Custom workflow</div>
-              <div style="font-size:11px;color:#6B7280;margin-top:2px;">Build a workflow from scratch (Phase 2)</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px;">Build a workflow from scratch</div>
             </div>
           </label>
         </div>
 
-        <!-- TEMPLATE MODE -->
-        <div id="s9TemplateMode">
-          <!-- Template selector + description -->
-          <div style="margin-bottom:16px;">
-            <label class="form-label">Workflow Template</label>
-            <select id="s9TemplateSelect" class="form-input" style="max-width:440px;" onchange="updateWfTemplate(this.value)">
-              <option value="standard_async_v2">Standard async workflow v2</option>
-              <option value="standard_phone_video">Standard phone / video</option>
-              <option value="lab_required_async">Lab-required async</option>
-              <option value="genetic_counseling_specialty">Genetic counseling / specialty</option>
-            </select>
-          </div>
-          <div id="s9TemplateDesc" style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;margin-bottom:16px;">
-            <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:3px;" id="s9TplApplicable"></div>
-            <div style="font-size:12px;color:#6B7280;" id="s9TplDesc"></div>
+        <!-- Template picker row (template mode) -->
+        <div id="wfbTemplateRow" style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+          <select id="wfbTplSelect" style="flex:1;max-width:360px;border:1px solid #E5E0D8;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;color:#111827;outline:none;background:#fff;">
+            <option value="phone_video">Standard Phone / Video</option>
+            <option value="async_only">Async Only</option>
+            <option value="hybrid">Hybrid (Async + Sync)</option>
+            <option value="ccm">Chronic Care Management</option>
+          </select>
+          <button onclick="wfbLoadTemplate()" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Load Template &#8594;</button>
+        </div>
+
+        <!-- Custom mode note -->
+        <div id="wfbCustomNote" style="display:none;background:#FFF8EE;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;font-size:13px;color:#92400E;margin-bottom:20px;">
+          Add stages from the library on the left to build your custom workflow pipeline.
+        </div>
+
+        <!-- Two-column: Library (35%) + Builder (65%) -->
+        <div style="display:flex;gap:16px;margin-bottom:16px;align-items:flex-start;">
+
+          <!-- Left: Stage Library -->
+          <div style="width:35%;flex-shrink:0;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:8px;padding-left:2px;">Available Stages</div>
+            <div id="wfbLibrary" style="display:flex;flex-direction:column;gap:5px;max-height:520px;overflow-y:auto;padding-right:4px;"></div>
           </div>
 
-          <!-- Visual pipeline -->
-          <div style="overflow-x:auto;margin-bottom:14px;padding-bottom:4px;">
-            <div id="s9Pipeline" style="display:flex;align-items:center;gap:0;padding:8px 4px;min-width:max-content;"></div>
-          </div>
-
-          <!-- Stage settings panel -->
-          <div id="s9StagePanel" style="display:none;background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:16px;margin-bottom:14px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div style="font-size:13px;font-weight:700;color:#111827;" id="s9PanelTitle">Stage Settings</div>
-              <button onclick="closeStagePanel()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;line-height:1;">×</button>
+          <!-- Right: Workflow Builder -->
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;">Configured Workflow</div>
+              <span id="wfbStageCount" style="font-size:11px;font-weight:700;background:#EDE9FE;color:#6B21A8;padding:2px 8px;border-radius:10px;">0 stages</span>
+              <a onclick="wfbClearAll()" style="margin-left:auto;font-size:12px;font-weight:600;color:#EF4444;cursor:pointer;text-decoration:none;">Clear All</a>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="s9PanelGrid"></div>
-          </div>
-
-          <!-- Simulation panel -->
-          <div id="s9SimPanel" style="display:none;background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:16px;margin-bottom:14px;">
-            <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">Workflow simulation — Patient: Marcus Johnson · CST-2026-10849 · Testosterone Care</div>
-            <div id="s9SimStages" style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;"></div>
-            <div style="display:flex;align-items:center;gap:10px;">
-              <button id="s9AdvanceBtn" onclick="advanceSimulation()" style="background:#1D4ED8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;">Complete stage &amp; advance →</button>
-              <button onclick="resetSimulation()" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;">↺ Reset</button>
-              <div style="margin-left:auto;font-size:12px;color:#6B7280;" id="s9SimQueueLabel"></div>
-            </div>
-            <div id="s9SimComplete" style="display:none;margin-top:12px;background:#D1FAE5;border:1px solid #6EE7B7;border-radius:8px;padding:10px 14px;font-size:13px;font-weight:600;color:#065F46;"></div>
-          </div>
-
-          <!-- Scalability callout -->
-          <div id="s9ScaleCallout" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:14px 16px;">
-            <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px;">ℹ WHY THIS MATTERS</div>
-            <div style="font-size:12px;color:#374151;" id="s9ScaleText"></div>
+            <div id="wfbBuilder" style="min-height:120px;"></div>
           </div>
         </div>
 
-        <!-- CUSTOM MODE MESSAGE -->
-        <div id="s9CustomMode" style="display:none;background:#FFF8EE;border:1px solid #FDE68A;border-radius:10px;padding:16px;font-size:13px;color:#92400E;">
-          Custom workflow builder available in Phase 2 — use a template for now.
+        <!-- Summary bar -->
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px 16px;font-size:12px;color:#374151;margin-bottom:20px;">
+          Total stages: <strong id="wfbSumStages">0</strong> &nbsp;&middot;&nbsp;
+          Est. total SLA: <strong id="wfbSumSla">0h</strong> &nbsp;&middot;&nbsp;
+          Roles involved: <strong id="wfbSumRoles">&#8212;</strong>
         </div>
 
-        <!-- Hidden field for form submission -->
-        <input type="hidden" id="s9SelectedTemplate" name="wf_template" value="standard_async_v2">
+        <!-- Workflow Simulation -->
+        <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:16px;">
+          <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:12px;">Workflow Simulation &#8212; Patient: Marcus Johnson &middot; CST-2026-10849 &middot; Testosterone Care</div>
+          <div id="wfbSimTracker" style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;min-height:72px;"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <button id="wfbSimAdvBtn" onclick="wfbAdvanceSim()" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;">Complete stage &amp; advance &#8594;</button>
+            <button onclick="wfbResetSim()" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;">&#8634; Reset</button>
+          </div>
+          <div id="wfbSimDetail" style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:14px;font-size:12px;min-height:40px;"></div>
+        </div>
+
+        <input type="hidden" id="s9SelectedTemplate" name="wf_template" value="phone_video">
+      </div>
+
+
+      <!-- Pre-Consult Checklist (named step — sub-step of Workflow Configuration) -->
+      <div class="step-panel" id="step_preconsult_chk">
+        <div class="step-heading">Pre-Consult Checklist Configuration</div>
+        <div class="step-sub">Define mandatory pre-consult checklist items that care team members must complete before a consult enters the provider queue. Items are role-scoped and can be marked as required or advisory.</div>
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-card-title">Enable Pre-Consult Checklist</div>
+          <div class="toggle-row" style="margin-bottom:12px;">
+            <label class="toggle"><input type="checkbox" id="pcc_enabled" checked onchange="togglePcc()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Require checklist completion before consult advances to provider queue</span>
+          </div>
+        </div>
+        <div id="pcc_config">
+          <div class="form-card">
+            <div class="form-card-title">Checklist Items</div>
+            <table class="wiz-table">
+              <thead><tr><th>Checklist Item</th><th>Role</th><th>Requirement</th><th></th></tr></thead>
+              <tbody id="pccRows">
+                <tr>
+                  <td><input type="text" class="form-input" value="Patient identity confirmed" style="width:100%"></td>
+                  <td>
+                    <select class="form-input" style="width:100%">
+                      <option>MA</option><option>PSR</option><option>RN</option><option>GCA</option><option>Any</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="form-input" style="width:100%">
+                      <option selected>Required</option><option>Advisory</option>
+                    </select>
+                  </td>
+                  <td><button class="btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="form-input" value="Insurance eligibility verified" style="width:100%"></td>
+                  <td><select class="form-input" style="width:100%"><option>MA</option><option>PSR</option><option>RN</option><option>GCA</option><option selected>Any</option></select></td>
+                  <td><select class="form-input" style="width:100%"><option selected>Required</option><option>Advisory</option></select></td>
+                  <td><button class="btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="form-input" value="Consent forms signed" style="width:100%"></td>
+                  <td><select class="form-input" style="width:100%"><option>MA</option><option>PSR</option><option>RN</option><option selected>GCA</option><option>Any</option></select></td>
+                  <td><select class="form-input" style="width:100%"><option selected>Required</option><option>Advisory</option></select></td>
+                  <td><button class="btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                </tr>
+                <tr>
+                  <td><input type="text" class="form-input" value="Health profile complete" style="width:100%"></td>
+                  <td><select class="form-input" style="width:100%"><option>MA</option><option>PSR</option><option>RN</option><option>GCA</option><option selected>Any</option></select></td>
+                  <td><select class="form-input" style="width:100%"><option>Required</option><option selected>Advisory</option></select></td>
+                  <td><button class="btn-sm" onclick="this.closest('tr').remove()">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+            <button class="btn-sm" style="margin-top:10px;" onclick="addPccRow()">+ Add item</button>
+          </div>
+          <div class="form-card">
+            <div class="form-card-title">Blocking Behavior</div>
+            <div class="form-group">
+              <label class="form-label">When required items are incomplete</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="pcc_block" value="hard" checked> Hard block — consult cannot advance</label>
+                <label class="radio-opt"><input type="radio" name="pcc_block" value="warn"> Soft warning — supervisor override allowed</label>
+              </div>
+            </div>
+          </div>
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;font-size:12px;color:#065F46;">
+            <strong>M04-CHK-001</strong> — Pre-consult checklist completion will be tracked as a discrete workflow stage visible on the consult timeline.
+          </div>
+        </div>
+      </div>
+
+      <!-- QA Stage Setup (named step — sub-step of Workflow Configuration) -->
+      <div class="step-panel" id="step_qa_stage">
+        <div class="step-heading">QA Stage Setup</div>
+        <div class="step-sub">Configure quality assurance review requirements for this care product. When enabled, a QA Reviewer must approve each consult before it proceeds to chart close. Consults that fail QA route to the GC Administrator queue for resolution.</div>
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-card-title">Enable QA Review Stage</div>
+          <div class="toggle-row" style="margin-bottom:12px;">
+            <label class="toggle"><input type="checkbox" id="qa_enabled" checked onchange="toggleQa()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Require QA approval before chart close for this care product</span>
+          </div>
+        </div>
+        <div id="qa_config">
+          <div class="form-card">
+            <div class="form-card-title">QA Triggers — When is QA required?</div>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:12px;">Select the conditions that trigger mandatory QA review. At least one trigger is required when QA is enabled.</p>
+            <div class="check-group" style="flex-direction:column;gap:8px;">
+              <label class="check-opt"><input type="checkbox" checked> Minor patient (under 18)</label>
+              <label class="check-opt"><input type="checkbox" checked> Third-party order (order placed by someone other than patient)</label>
+              <label class="check-opt"><input type="checkbox" checked> POA / guardian documentation required</label>
+              <label class="check-opt"><input type="checkbox"> First consult for this care product (all patients)</label>
+              <label class="check-opt"><input type="checkbox"> Variant of uncertain significance (VUS) found in results</label>
+              <label class="check-opt"><input type="checkbox"> Provider flagged for clinical escalation</label>
+              <label class="check-opt"><input type="checkbox"> All consults (blanket QA)</label>
+            </div>
+          </div>
+          <div class="form-card">
+            <div class="form-card-title">QA Role Assignments</div>
+            <table class="wiz-table">
+              <thead><tr><th>Function</th><th>Assigned Role</th><th>SLA (hours)</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>QA Reviewer — approve / reject</td>
+                  <td><select class="form-input" style="width:100%"><option selected>QA Reviewer</option><option>GC Supervisor</option><option>Any Provider</option></select></td>
+                  <td><input type="number" class="form-input" value="24" style="width:70px;"></td>
+                </tr>
+                <tr>
+                  <td>QA Failure Resolution — GC Admin queue</td>
+                  <td><select class="form-input" style="width:100%"><option selected>GC Administrator</option><option>Program Manager</option></select></td>
+                  <td><input type="number" class="form-input" value="24" style="width:70px;"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="form-card">
+            <div class="form-card-title">Failure Routing</div>
+            <div class="form-group">
+              <label class="form-label">When a consult fails QA review</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="qa_fail" value="gc_admin" checked> Route to GC Administrator queue (override or return to GC)</label>
+                <label class="radio-opt"><input type="radio" name="qa_fail" value="provider"> Return directly to assigned GC for correction</label>
+              </div>
+            </div>
+          </div>
+          <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;font-size:12px;color:#065F46;">
+            <strong>M04-QA-001</strong> — QA stage is automatically inserted into the workflow between "Counseling Plan" and "Chart Close" when enabled. All QA decisions are audit-logged to the consult timeline.
+          </div>
+        </div>
       </div>
 
       <!-- STEP 10: SLA Configuration -->
@@ -890,25 +1588,98 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <!-- STEP 16: Linked Consultations -->
       <div class="step-panel" id="step18">
         <div class="step-heading">Step 18 — Linked Consultations</div>
-        <div class="step-sub">Configure episode linking to track longitudinal patient care history within this product.</div>
-        <div class="form-group">
-          <label class="form-label">Enable Episode Reference ID</label>
-          <div class="toggle-row">
+        <div class="step-sub">Configure how consultations link together for longitudinal care tracking — episode grouping, pre-test/post-test sequences, and research study enrollment.</div>
+
+        <!-- Episode Reference ID -->
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-card-title">Episode Reference ID</div>
+          <div class="toggle-row" style="margin-bottom:12px;">
             <label class="toggle"><input type="checkbox" id="s16_episode" checked onchange="toggleEpisode()"><span class="toggle-slider"></span></label>
             <span class="toggle-label">Group consultations under a shared Episode Reference ID</span>
           </div>
-        </div>
-        <div id="episode_config">
-          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px 16px;font-size:13px;color:#1E40AF;margin-bottom:16px;line-height:1.6;">
-            All consultations for this care product will be grouped under an Episode Reference ID. This allows providers to view the full longitudinal history of a patient's care within this product.
+          <div id="episode_config">
+            <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E40AF;margin-bottom:12px;line-height:1.6;">
+              All consultations for this care product will be grouped under an Episode Reference ID, allowing providers to view the full longitudinal care history.
+            </div>
+            <div class="form-group">
+              <label class="form-label">Episode ID Format</label>
+              <select class="form-input" style="max-width:320px">
+                <option>Auto-generated (recommended)</option>
+                <option>Manual entry</option>
+                <option>Linked to Athena encounter</option>
+              </select>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Episode ID Format</label>
-            <select class="form-input" style="max-width:320px">
-              <option>Auto-generated (recommended)</option>
-              <option>Manual entry</option>
-              <option>Linked to Athena encounter</option>
-            </select>
+        </div>
+
+        <!-- Consult Link Types -->
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-card-title">Consult Link Types</div>
+          <p style="font-size:12px;color:#6B7280;margin-bottom:14px;">Define the types of consult relationships allowed for this care product. Linked consults are visible to providers in the chart's Linked Consults panel.</p>
+          <table class="wiz-table">
+            <thead><tr><th>Link Type</th><th>Enabled</th><th>Description</th><th>Auto-link rule</th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600;">Pre-Test → Post-Test</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td style="font-size:12px;color:#6B7280;">Pre-test counseling session linked to post-test results disclosure</td>
+                <td><select style="font-size:12px;border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;"><option>Auto (same episode)</option><option>Manual link only</option></select></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Rescheduled</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td style="font-size:12px;color:#6B7280;">Original consult linked to the rescheduled replacement</td>
+                <td><select style="font-size:12px;border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;"><option>Auto (system-generated)</option><option>Manual link only</option></select></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Research Companion</td>
+                <td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td>
+                <td style="font-size:12px;color:#6B7280;">Standard consult linked to a parallel research/blinded study consult</td>
+                <td><select style="font-size:12px;border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;"><option>Manual link only</option><option>Auto (same episode)</option></select></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600;">Follow-Up</td>
+                <td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td>
+                <td style="font-size:12px;color:#6B7280;">Subsequent consult linked to an earlier consult for continuity</td>
+                <td><select style="font-size:12px;border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;"><option>Auto (same episode)</option><option>Manual link only</option></select></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- NIH ACMG81 Research Linkage -->
+        <div class="form-card" style="margin-bottom:16px;">
+          <div class="form-card-title">NIH ACMG81 Research Consult Linkage <span style="font-size:11px;font-weight:400;background:#EDE9FE;color:#5B21B6;padding:2px 8px;border-radius:4px;margin-left:8px;">M04-NIH-001</span></div>
+          <div class="toggle-row" style="margin-bottom:14px;">
+            <label class="toggle"><input type="checkbox" id="nihEnabled" onchange="toggleNih()"><span class="toggle-slider"></span></label>
+            <span class="toggle-label">Enable NIH ACMG81 secondary findings research consult linkage</span>
+          </div>
+          <div id="nihConfig" style="display:none;">
+            <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;font-size:12px;color:#92400E;margin-bottom:14px;line-height:1.5;">
+              <strong>ACMG81 secondary findings</strong> — When enabled, patients who consent to ACMG81 secondary findings reporting will have a companion research consult automatically created and linked to their primary consult. The companion consult is blinded and managed separately.
+            </div>
+            <div class="form-group">
+              <label class="form-label">Patient consent capture</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="nihConsent" value="intake" checked> At intake — include ACMG81 consent in intake questionnaire</label>
+                <label class="radio-opt"><input type="radio" name="nihConsent" value="presession"> Pre-session — capture consent in pre-consult checklist</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Research consult creation</label>
+              <div class="radio-group">
+                <label class="radio-opt"><input type="radio" name="nihCreate" value="auto" checked> Auto-create companion consult on consent</label>
+                <label class="radio-opt"><input type="radio" name="nihCreate" value="manual"> Manual — staff initiates companion consult</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Blinding rules</label>
+              <div class="check-group" style="flex-direction:column;gap:8px;">
+                <label class="check-opt"><input type="checkbox" checked> Research consult hidden from patient portal</label>
+                <label class="check-opt"><input type="checkbox" checked> Research consult hidden from standard provider view</label>
+                <label class="check-opt"><input type="checkbox"> Research coordinator role required to access</label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -985,11 +1756,25 @@ const STEP_NAMES = [
 
 function goToStep(n) {
   // Hide current
-  document.getElementById('step' + currentStep).classList.remove('active');
-  document.getElementById('sni' + currentStep).classList.remove('active');
+  var curStepEl = document.getElementById('step' + currentStep);
+  var curSniEl  = document.getElementById('sni' + currentStep);
+  if (curStepEl) curStepEl.classList.remove('active');
+  if (curSniEl)  curSniEl.classList.remove('active');
+  // Handle named steps (e.g., 'branding')
+  if (typeof n === 'string') {
+    var namedPanel = document.getElementById('step_' + n);
+    var namedSni   = document.getElementById('sni_' + n);
+    if (namedPanel) namedPanel.classList.add('active');
+    if (namedSni)   namedSni.classList.add('active');
+    currentStep = n;
+    document.getElementById('stepCounterLabel').textContent = 'Step ' + n + ' of ' + TOTAL;
+    document.querySelector('.wiz-panels').scrollTop = 0;
+    return;
+  }
   // Show new
   currentStep = n;
-  document.getElementById('step' + n).classList.add('active');
+  var stepEl = document.getElementById('step' + n);
+  if (stepEl) stepEl.classList.add('active');
   // Update left nav
   for (let i = 1; i <= TOTAL; i++) {
     const el = document.getElementById('sni' + i);
@@ -1017,6 +1802,18 @@ function goToStep(n) {
   // If step 19, build review
   if (n === 20) buildReview();
   if (n === 10) checkDocTplAutoSelect();
+}
+
+function selectBrandCard(idx) {
+  [0,1,2].forEach(function(i) {
+    var c = document.getElementById('brandCard'+i);
+    var b = document.getElementById('brandBadge'+i);
+    if (!c) return;
+    if (i===idx) { c.style.border='2px solid #6B21A8'; c.style.background='#F5F3FF'; if(b) b.style.display=''; }
+    else { c.style.border='1px solid #E5E7EB'; c.style.background='#fff'; if(b) b.style.display='none'; }
+  });
+  var fields = document.getElementById('clientBrandFields');
+  if (fields) fields.style.display = (idx===1) ? '' : 'none';
 }
 
 function nextStep() {
@@ -1142,7 +1939,7 @@ function buildReview() {
     { n:10, name:'Documentation Template', rows:[
       ['Template', docTplLabels[docTplSelected] || 'No Template'],
     ]},
-    { n:11,  name:'Workflow Configuration', rows:[['Template', 'Standard Async Workflow v2']]},
+    { n:11,  name:'Workflow Configuration', rows:[['Stages', wfbWorkflow.length + ' stages configured'], ['Template', (document.getElementById('wfbTplSelect') ? document.getElementById('wfbTplSelect').options[document.getElementById('wfbTplSelect').selectedIndex].text : 'Custom') ]]},
     { n:12, name:'SLA Configuration', rows:[
       ['Patient → Provider Review', '4 hrs / warn 3 hrs'],
       ['Provider Review → Response', '24 hrs / warn 20 hrs'],
@@ -1197,280 +1994,412 @@ function buildReview() {
   });
 }
 
-// Init
-goToStep(1);
-// Auto-trigger pre-selected client (Humana)
-(function() { var sel = document.getElementById('s0_client'); if (sel && sel.value) onClientSelect(sel); })();
 
-// ─── Step 9: Workflow Configuration ───
-const WF_STAGE_CATALOG = {
-  'SYS-01': { id:'SYS-01', name:'Intake received', type:'system', role:'System', queue:null, sla:null, trigger:'Patient submits consult intake form', conditional:false },
-  'SYS-03': { id:'SYS-03', name:'Awaiting lab results', type:'system_wait', role:'System (wait)', queue:null, sla:null, trigger:'Lab results received via integration upload', conditional:true, condition:'Blocking wait — chart paused and removed from all queues. SLA clock paused. Resumes automatically when lab results are received.' },
-  'SYS-06': { id:'SYS-06', name:'Results released', type:'system', role:'System', queue:null, sla:null, trigger:'Results released to patient portal', conditional:false },
-  'SYS-07': { id:'SYS-07', name:'Consult closed', type:'system', role:'System', queue:null, sla:null, trigger:'All required fields signed and closed', conditional:false },
-  'HUM-01': { id:'HUM-01', name:'Intake review', type:'human', role:'MA', queue:'ma_queue', sla:4, trigger:'MA marks intake complete and confirms patient eligibility', conditional:false },
-  'HUM-02': { id:'HUM-02', name:'Clinical review', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider reviews chart and begins clinical response', conditional:false },
-  'HUM-03': { id:'HUM-03', name:'Lab review', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider reviews and annotates lab results', conditional:true, condition:'Triggered when lab results required but not yet reviewed by provider' },
-  'HUM-03b': { id:'HUM-03b', name:'Lab ordered', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'Provider creates lab requisition', conditional:false },
-  'HUM-04': { id:'HUM-04', name:'Treatment plan', type:'human', role:'MD / NP', queue:'provider_queue', sla:24, trigger:'SOAP note drafted with Rx or clinical recommendation', conditional:false },
-  'HUM-04gc': { id:'HUM-04gc', name:'Counseling plan', type:'human', role:'GC', queue:'provider_queue', sla:24, trigger:'Counseling summary and recommendations finalized', conditional:false },
-  'HUM-05': { id:'HUM-05', name:'Chart close', type:'human', role:'MD / NP', queue:'provider_queue', sla:4, trigger:'Provider signs SOAP note', conditional:false },
-  'HUM-05gc': { id:'HUM-05gc', name:'Chart close (GC)', type:'human', role:'GC', queue:'provider_queue', sla:4, trigger:'GC signs and closes chart', conditional:false },
-  'HUM-07': { id:'HUM-07', name:'QA review', type:'human', role:'GC / Supervisor', queue:'provider_queue', sla:24, trigger:'Second reviewer approves clinical content before chart close', conditional:false },
-  'HUM-08': { id:'HUM-08', name:'Pre-visit prep', type:'human', role:'MA', queue:'ma_queue', sla:2, trigger:'Chart prepped and patient confirmed for upcoming visit', conditional:false },
-  'HUM-09': { id:'HUM-09', name:'Consult in progress', type:'human', role:'MD / NP', queue:'provider_queue', sla:null, trigger:'Call or video session completed and documented', conditional:false },
-  'HUM-11': { id:'HUM-11', name:'Results review', type:'human', role:'MD / NP', queue:'provider_queue', sla:48, trigger:'Provider reviews and annotates results in chart', conditional:false },
-  'HUM-12': { id:'HUM-12', name:'Appointment booked', type:'human', role:'Scheduler', queue:'scheduler_queue', sla:48, trigger:'Appointment confirmed on calendar by scheduler', conditional:false },
-};
-
-const WF_TEMPLATES = {
-  standard_async_v2: { name:'Standard async workflow v2', applicable:'Weight management, testosterone care, skincare, ED, thyroid — most async products', description:'Patient submits intake → MA intake review → provider clinical review → optional lab review → treatment plan → chart close.', stages:['SYS-01','HUM-01','HUM-02','HUM-03','HUM-04','HUM-05'], scale:'This async template supports unlimited concurrent consults — providers see only their assigned charts, queued by SLA urgency. The conditional lab review stage automatically pauses and resumes the SLA clock without manual intervention.' },
-  standard_phone_video: { name:'Standard phone / video', applicable:'Weight management (phone/video), testosterone (phone), A1C treat, ED (video)', description:'Scheduler books appointment → MA preps chart → provider conducts live consult → SOAP note → chart close.', stages:['HUM-12','HUM-08','HUM-09','HUM-04','HUM-05'], scale:'Appointment-based workflows are coordinated through the scheduler queue, then flow into the provider queue after the visit. SLA tracking begins at appointment booking and pauses during the live session.' },
-  lab_required_async: { name:'Lab-required async', applicable:'BRCA counseling, hereditary cancer panel, carrier screening, STI treatment', description:'Patient submits → MA review → provider orders lab → system wait for results → results review → results released → chart close.', stages:['SYS-01','HUM-01','HUM-03b','SYS-03','HUM-11','SYS-06','HUM-05'], scale:'The blocking wait stage (SYS-03) removes the chart from all queues and pauses SLA. This prevents provider burnout from charts that cannot progress. The chart auto-reappears in the queue when lab results are received via integration.' },
-  genetic_counseling_specialty: { name:'Genetic counseling / specialty', applicable:'BRCA counseling with GC, carrier screening with counseling, rare disease specialty', description:'Patient submits → MA intake review → GC clinical review → QA approval (two-eye check) → counseling plan → chart close.', stages:['SYS-01','HUM-01','HUM-02','HUM-07','HUM-04gc','HUM-05gc'], scale:'Genetic counseling workflows require a two-eye QA check before plan delivery. The QA stage routes to a GC supervisor queue, ensuring all genetic findings are reviewed by a second licensed counselor before patient disclosure.' },
-};
-
-function s9StageColor(s) {
-  if (s.type === 'system' || s.type === 'system_wait') return '#64748B';
-  if (s.role === 'MA') return '#D97706';
-  if (s.role === 'Scheduler') return '#0D7490';
-  if (s.role === 'GC' || s.role === 'GC / Supervisor') return '#7C3AED';
-  return '#1D4ED8';
-}
-
-var s9ActiveStage = null, s9SimIndex = 0, s9SimRunning = false, s9CurrentTemplate = 'standard_async_v2';
-
-function setWfMode(mode) {
-  var tCard = document.getElementById('modeCardTemplate'), cCard = document.getElementById('modeCardCustom');
-  var tMode = document.getElementById('s9TemplateMode'), cMode = document.getElementById('s9CustomMode');
-  if (mode === 'template') {
-    tCard.style.border = '2px solid #1D4ED8'; tCard.style.background = '#EFF6FF';
-    cCard.style.border = '2px solid #E5E0D8'; cCard.style.background = '#fff';
-    tMode.style.display = ''; cMode.style.display = 'none';
-  } else {
-    cCard.style.border = '2px solid #1D4ED8'; cCard.style.background = '#EFF6FF';
-    tCard.style.border = '2px solid #E5E0D8'; tCard.style.background = '#fff';
-    tMode.style.display = 'none'; cMode.style.display = '';
-  }
-}
-
-function updateWfTemplate(key) {
-  s9CurrentTemplate = key;
-  var tpl = WF_TEMPLATES[key]; if (!tpl) return;
-  document.getElementById('s9TplApplicable').textContent = 'Applicable: ' + tpl.applicable;
-  document.getElementById('s9TplDesc').textContent = tpl.description;
-  document.getElementById('s9ScaleText').textContent = tpl.scale;
-  document.getElementById('s9SelectedTemplate').value = key;
-  s9RenderPipeline(tpl.stages);
-  closeStagePanel();
-  if (s9SimRunning) { s9SimRunning = false; document.getElementById('s9SimPanel').style.display = 'none'; document.getElementById('s9ScaleCallout').style.display = ''; document.getElementById('s9SimBtn').textContent = '▶ Simulate'; document.getElementById('s9SimBtn').style.background = '#059669'; }
-}
-
-function s9RenderPipeline(stageIds) {
-  var container = document.getElementById('s9Pipeline'); container.innerHTML = '';
-  stageIds.forEach(function(sid, i) {
-    var s = WF_STAGE_CATALOG[sid]; if (!s) return;
-    var color = s9StageColor(s);
-    var box = document.createElement('div');
-    box.id = 's9stage_' + sid; box.dataset.sid = sid;
-    box.style.cssText = 'width:88px;min-height:100px;background:' + color + ';border-radius:8px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;cursor:pointer;border:' + (s.conditional ? '2px dashed rgba(255,255,255,0.55)' : '2px solid transparent') + ';gap:4px;flex-shrink:0;';
-    box.innerHTML = '<div style="font-size:11px;font-weight:600;color:#fff;text-align:center;line-height:1.3;min-height:30px;">' + s.name + '</div>' +
-      '<div style="flex:1;"></div>' +
-      '<div style="font-size:9px;font-weight:700;background:rgba(255,255,255,0.22);color:#fff;padding:2px 7px;border-radius:9px;text-align:center;">' + s.role + '</div>' +
-      (s.sla ? '<div style="font-size:9px;color:rgba(255,255,255,0.8);margin-top:2px;">' + s.sla + 'h SLA</div>' : '') +
-      (s.conditional ? '<div style="font-size:9px;font-style:italic;color:rgba(255,255,255,0.75);">conditional</div>' : '');
-    box.addEventListener('click', function() { selectStage(sid); });
-    container.appendChild(box);
-    if (i < stageIds.length - 1) {
-      var arrow = document.createElement('div');
-      arrow.style.cssText = 'font-size:18px;color:#9CA3AF;padding:0 4px;align-self:center;flex-shrink:0;';
-      arrow.textContent = '→'; container.appendChild(arrow);
+// Ecosystem Classification card selection
+var _ecoSelected = 1;
+function selectEcoCard(idx) {
+  _ecoSelected = idx;
+  [0,1].forEach(function(i) {
+    var card = document.getElementById('ecoCard' + i);
+    var radio = document.getElementById('ecoRadio' + i);
+    if (i === idx) {
+      card.style.border = '2px solid #6B21A8';
+      card.style.background = '#FAFAF9';
+      radio.innerHTML = '<div style="width:8px;height:8px;background:#6B21A8;border-radius:50%;"></div>';
+      radio.style.border = '2px solid #6B21A8';
+    } else {
+      card.style.border = '1px solid #E5E7EB';
+      card.style.background = '#fff';
+      radio.innerHTML = '';
+      radio.style.border = '2px solid #D1D5DB';
     }
   });
 }
 
-function selectStage(sid) {
-  if (s9ActiveStage) { var prev = document.getElementById('s9stage_' + s9ActiveStage); if (prev) prev.style.outline = 'none'; }
-  s9ActiveStage = sid;
-  var box = document.getElementById('s9stage_' + sid); if (box) box.style.outline = '3px solid #F59E0B';
-  var s = WF_STAGE_CATALOG[sid]; if (!s) return;
-  var color = s9StageColor(s);
-  document.getElementById('s9StagePanel').style.display = '';
-  document.getElementById('s9PanelTitle').textContent = s.id + ' — ' + s.name;
-  var roleOptions = ['MD / NP','MA','GC','GC / Supervisor','Scheduler','System','RN'];
-  document.getElementById('s9PanelGrid').innerHTML =
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Stage ID</div><div style="font-family:monospace;font-size:13px;color:#111827;">' + s.id + '</div></div>' +
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Stage Type</div><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;background:' + color + ';color:#fff;">' + s.type + '</span></div>' +
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Assigned Role</div><select style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;">' + roleOptions.map(function(r){ return '<option' + (r===s.role?' selected':'') + '>' + r + '</option>'; }).join('') + '</select></div>' +
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Routes to Queue</div><div style="font-size:12px;color:#374151;font-family:monospace;">' + (s.queue || 'N/A') + '</div></div>' +
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">SLA Timer (hours)</div><input type="number" value="' + (s.sla || '') + '" placeholder="None" style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;"></div>' +
-    '<div><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Notify on Stage Start</div><label style="display:flex;align-items:center;gap:6px;"><input type="checkbox"' + (s.type==='human'?' checked':'') + '><span style="font-size:12px;">Send notification</span></label></div>' +
-    '<div style="grid-column:1/-1;"><div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:4px;">Completion Trigger</div><div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:6px;padding:8px 10px;font-size:12px;color:#374151;">' + s.trigger + '</div></div>' +
-    (s.conditional ? '<div style="grid-column:1/-1;"><div style="font-size:11px;font-weight:600;color:#D97706;margin-bottom:4px;">⚠ Conditional Logic</div><div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:6px;padding:8px 10px;font-size:12px;color:#92400E;">' + (s.condition || '') + '</div></div>' : '');
-}
-
-function closeStagePanel() {
-  if (s9ActiveStage) { var prev = document.getElementById('s9stage_' + s9ActiveStage); if (prev) prev.style.outline = 'none'; s9ActiveStage = null; }
-  document.getElementById('s9StagePanel').style.display = 'none';
-}
-
-function toggleSimulation() {
-  s9SimRunning = !s9SimRunning;
-  var btn = document.getElementById('s9SimBtn');
-  if (s9SimRunning) {
-    btn.textContent = '◼ Stop'; btn.style.background = '#6B7280';
-    document.getElementById('s9SimPanel').style.display = '';
-    document.getElementById('s9ScaleCallout').style.display = 'none';
-    resetSimulation();
+// Provider Eligibility program type toggle
+function onProgTypeChange(val) {
+  var assignSection = document.getElementById('providerAssignmentSection');
+  var exclSection = document.getElementById('exclusionSection');
+  var label = document.getElementById('assignmentSectionLabel');
+  if (val === 'commercial') {
+    if (assignSection) assignSection.style.display = 'none';
+    if (exclSection)   exclSection.style.display = '';
   } else {
-    btn.textContent = '▶ Simulate'; btn.style.background = '#059669';
-    document.getElementById('s9SimPanel').style.display = 'none';
-    document.getElementById('s9ScaleCallout').style.display = '';
+    if (assignSection) { assignSection.style.display = ''; }
+    if (label) label.textContent = (val === 'medicare' ? 'Medicare' : 'Medicaid') + ' Program — Provider Assignment';
+    if (exclSection)   exclSection.style.display = 'none';
   }
 }
 
-function resetSimulation() {
-  s9SimIndex = 0;
-  document.getElementById('s9SimComplete').style.display = 'none';
-  var advBtn = document.getElementById('s9AdvanceBtn');
-  advBtn.textContent = 'Complete stage & advance →'; advBtn.disabled = false; advBtn.style.background = '#1D4ED8';
-  s9RenderSimStages();
+// Portal Branding live preview
+function updateBrandPreview() {
+  var hdr = document.getElementById('previewHeader');
+  var icon = document.getElementById('previewIcon');
+  var primary = document.getElementById('brandPrimary');
+  var secondary = document.getElementById('brandSecondary');
+  var headerBg = document.getElementById('brandHeader');
+  if (!hdr) return;
+  hdr.style.background = headerBg ? headerBg.value : '#0A2F5C';
+  if (icon && secondary) icon.style.color = secondary.value;
+  // Update hex fields
+  if (primary) { var phx = document.getElementById('brandPrimaryHex'); if (phx) phx.value = primary.value; }
+  if (secondary) { var shx = document.getElementById('brandSecondaryHex'); if (shx) shx.value = secondary.value; }
+  if (headerBg) { var hhx = document.getElementById('brandHeaderHex'); if (hhx) hhx.value = headerBg.value; }
+}
+function syncColorPicker(pickerId, hexId) {
+  var hex = document.getElementById(hexId);
+  var picker = document.getElementById(pickerId);
+  if (!hex || !picker) return;
+  var val = hex.value.trim();
+  if (/^#[0-9A-Fa-f]{6}$/.test(val)) { picker.value = val; updateBrandPreview(); }
 }
 
-function s9RenderSimStages() {
-  var tpl = WF_TEMPLATES[s9CurrentTemplate]; if (!tpl) return;
-  var container = document.getElementById('s9SimStages'); container.innerHTML = '';
-  tpl.stages.forEach(function(sid, i) {
-    var s = WF_STAGE_CATALOG[sid]; if (!s) return;
-    var isComplete = i < s9SimIndex, isActive = i === s9SimIndex, isPending = i > s9SimIndex;
-    var color = s9StageColor(s);
-    var row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;opacity:' + (isPending?'0.4':'1') + ';' + (isActive?'background:#EFF6FF;':'');
-    row.innerHTML =
-      '<div style="width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:' + (isComplete?'#1A1D23':isActive?'#1D4ED8':'#E5E7EB') + ';font-size:11px;font-weight:700;flex-shrink:0;">' +
-        (isComplete?'<span style="color:#fff;">✓</span>':isActive?'<span style="color:#fff;">'+(i+1)+'</span>':'<span style="color:#9CA3AF;">○</span>') +
-      '</div>' +
-      '<div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#111827;">' + s.name + (isActive?' <span style="font-size:10px;background:#1D4ED8;color:#fff;padding:1px 7px;border-radius:8px;font-weight:700;">active</span>':'') + '</div><div style="font-size:11px;color:#6B7280;">' + s.role + (s.queue?' · '+s.queue:'') + (s.sla?' · '+s.sla+'h SLA':'') + '</div></div>';
-    container.appendChild(row);
-  });
-  if (s9SimIndex < tpl.stages.length) {
-    var cur = WF_STAGE_CATALOG[tpl.stages[s9SimIndex]];
-    document.getElementById('s9SimQueueLabel').textContent = cur ? 'Currently in: ' + (cur.queue || 'N/A') : '';
-  }
-}
+// Init
+goToStep(1);
+// Auto-trigger pre-selected client (Humana)
+(function() { var sel = document.getElementById('s0_client'); if (sel) { if (!sel.value && sel.options.length > 1) sel.selectedIndex = 1; if (sel.value) onClientSelect(sel); } })();
 
-function advanceSimulation() {
-  var tpl = WF_TEMPLATES[s9CurrentTemplate]; if (!tpl) return;
-  if (s9SimIndex < tpl.stages.length - 1) {
-    s9SimIndex++; s9RenderSimStages();
-  } else {
-    s9SimIndex = tpl.stages.length; s9RenderSimStages();
-    var advBtn = document.getElementById('s9AdvanceBtn');
-    advBtn.textContent = 'Workflow complete ✓'; advBtn.disabled = true; advBtn.style.background = '#22C55E';
-    document.getElementById('s9SimQueueLabel').textContent = '';
-    var cd = document.getElementById('s9SimComplete'); cd.style.display = '';
-    cd.textContent = 'All ' + tpl.stages.length + ' stages completed. Chart would be closed and consult marked complete.';
-  }
-}
+// ─── Workflow Builder (Step 11) ───
+var WFB_DEF = [
+  {name:'Patient Intake', role:'MA'},
+  {name:'Identity Verification', role:'Patient'},
+  {name:'Insurance Verification', role:'MA'},
+  {name:'MA Review', role:'MA'},
+  {name:'Provider Assignment', role:'System'},
+  {name:'Async Review', role:'Provider'},
+  {name:'Consult — Phone/Video', role:'Provider'},
+  {name:'Consult — Video Only', role:'Provider'},
+  {name:'Lab Order', role:'Provider'},
+  {name:'Lab Review', role:'Provider'},
+  {name:'Prescription/Rx', role:'Provider'},
+  {name:'Referral', role:'Provider'},
+  {name:'Follow-up Consult', role:'Provider'},
+  {name:'Care Coordination Review', role:'MA'},
+  {name:'Patient Education', role:'MA'},
+  {name:'Provider Documentation', role:'Provider'},
+  {name:'Chart Closure', role:'Provider'},
+];
 
-
-// Step 10: Documentation Template
-var docTplSelected = 4;
-var docTplLabels = ['', 'A1C E&M Template', 'Annual Wellness Visit Template', 'Standard SOAP Note', 'No Template'];
-var DOC_TPL_COLORS = ['', '#6B21A8', '#065F46', '#1D4ED8', '#1D4ED8'];
-var DOC_TPL_BG = ['', '#FAF5FF', '#F0FDF4', '#EFF6FF', '#EFF6FF'];
-
-function selectDocTpl(n) {
-  docTplSelected = n;
-  for (var i = 1; i <= 4; i++) {
-    var card = document.getElementById('docTplCard' + i);
-    if (!card) continue;
-    card.style.borderColor = (i === n) ? DOC_TPL_COLORS[i] : '#E5E0D8';
-    card.style.background = (i === n) ? DOC_TPL_BG[i] : '#fff';
-  }
-  var pb = document.getElementById('docTplPreviewBody');
-  if (pb && pb.style.display !== 'none') updateDocTplPreview();
-}
-
-function checkDocTplAutoSelect() {
-  var name = (document.getElementById('s1_name') ? document.getElementById('s1_name').value : '').toLowerCase();
-  var banner = document.getElementById('docTplBanner');
-  if (!banner) return;
-  if (name.indexOf('a1c') !== -1 || name.indexOf('diabetes') !== -1 || name.indexOf('glycemic') !== -1) {
-    var r = document.querySelector('input[name="docTemplate"][value="a1c_em"]');
-    if (r) r.checked = true;
-    selectDocTpl(1);
-    banner.style.display = '';
-  } else if (name.indexOf('wellness') !== -1 || name.indexOf('awv') !== -1 || name.indexOf('annual') !== -1) {
-    var r = document.querySelector('input[name="docTemplate"][value="awv"]');
-    if (r) r.checked = true;
-    selectDocTpl(2);
-    banner.style.display = '';
-  } else {
-    banner.style.display = 'none';
-  }
-}
-
-var DOC_TPL_SECTIONS = {
-  1: [
-    {num:1, name:'Chief Complaint', desc:'Primary reason for visit, free text'},
-    {num:2, name:'HPI', desc:'Structured narrative with glucose control status, adherence, and hypoglycemia fields'},
-    {num:3, name:'Review of Systems', desc:'System-by-system checkboxes (8 systems)'},
-    {num:4, name:'Vitals', desc:'BP, HR, weight, height, BMI with automated flag logic'},
-    {num:5, name:'Lab Results', desc:'Structured table: HbA1c, glucose, LDL, eGFR, urine microalbumin, cholesterol'},
-    {num:6, name:'Physical Exam', desc:'Body system findings, foot exam, monofilament'},
-    {num:7, name:'Assessment / Diagnoses', desc:'ICD-10 code entry with status badges'},
-    {num:8, name:'Plan', desc:'Medication, labs, referrals, education, follow-up'},
-    {num:9, name:'HEDIS CDC Measures', desc:'7-measure checklist: HbA1c tested, HbA1c &lt;8%, BP &lt;140/90, nephropathy screen, retinal exam, statin therapy, tobacco use'},
-    {num:10, name:'MDM / Billing', desc:'Complexity selector + CPT/telehealth billing codes'},
+var WFB_TEMPLATES = {
+  phone_video: [
+    {name:'Patient Intake', role:'MA', sla:2, required:true},
+    {name:'MA Review', role:'MA', sla:1, required:true},
+    {name:'Provider Assignment', role:'System', sla:1, required:true},
+    {name:'Consult — Phone/Video', role:'Provider', sla:24, required:true},
+    {name:'Provider Documentation', role:'Provider', sla:4, required:true},
+    {name:'Chart Closure', role:'Provider', sla:2, required:true},
   ],
-  2: [
-    {num:1, name:'Chief Complaint', desc:'Annual wellness visit reason'},
-    {num:2, name:'Medication Reconciliation', desc:'Active med list review and attestation (COA measure)'},
-    {num:3, name:'Functional Assessment / Katz ADL', desc:'6-item ADL scale, score auto-calculated (COA measure)'},
-    {num:4, name:'Vitals', desc:'BP with CBP measure flag logic'},
-    {num:5, name:'Review of Systems', desc:'System-by-system'},
-    {num:6, name:'PRAPARE Social Needs Screener', desc:'5-domain screener: food, housing, transportation, safety, financial (SNS-E measure)'},
-    {num:7, name:'Assessment / Diagnoses', desc:'ICD-10 code entry'},
-    {num:8, name:'HEDIS Gap Closure Actions', desc:'11-measure panel: BCS, COA, COL, CBP, EED, GSD, KED, OMW, OSW, SPC, SNS-E with eligibility logic and N/A handling'},
-    {num:9, name:'Plan / Orders / Referrals', desc:'Auto-summarized from HEDIS section actions'},
-    {num:10, name:'MDM / Billing', desc:'Complexity selector + AWV billing codes (G0438/G0439)'},
+  async_only: [
+    {name:'Patient Intake', role:'MA', sla:2, required:true},
+    {name:'MA Review', role:'MA', sla:1, required:true},
+    {name:'Provider Assignment', role:'System', sla:1, required:true},
+    {name:'Async Review', role:'Provider', sla:48, required:true},
+    {name:'Provider Documentation', role:'Provider', sla:4, required:true},
+    {name:'Chart Closure', role:'Provider', sla:2, required:true},
   ],
-  3: [
-    {num:1, name:'Subjective', desc:'Patient-reported symptoms, history, and chief complaint'},
-    {num:2, name:'Objective', desc:'Measurable clinical findings: vitals, exam, labs'},
-    {num:3, name:'Assessment', desc:'Clinical diagnosis and differential'},
-    {num:4, name:'Plan', desc:'Treatment, orders, referrals, and follow-up'},
+  hybrid: [
+    {name:'Patient Intake', role:'MA', sla:2, required:true},
+    {name:'MA Review', role:'MA', sla:1, required:true},
+    {name:'Provider Assignment', role:'System', sla:1, required:true},
+    {name:'Async Review', role:'Provider', sla:48, required:true},
+    {name:'Consult — Phone/Video', role:'Provider', sla:24, required:false},
+    {name:'Provider Documentation', role:'Provider', sla:4, required:true},
+    {name:'Chart Closure', role:'Provider', sla:2, required:true},
+  ],
+  ccm: [
+    {name:'Patient Intake', role:'MA', sla:2, required:true},
+    {name:'Care Coordination Review', role:'MA', sla:4, required:true},
+    {name:'Provider Assignment', role:'System', sla:1, required:true},
+    {name:'Consult — Phone/Video', role:'Provider', sla:24, required:true},
+    {name:'Lab Order', role:'Provider', sla:48, required:false},
+    {name:'Lab Review', role:'Provider', sla:24, required:false},
+    {name:'Follow-up Consult', role:'Provider', sla:72, required:false},
+    {name:'Prescription/Rx', role:'Provider', sla:4, required:false},
+    {name:'Provider Documentation', role:'Provider', sla:4, required:true},
+    {name:'Chart Closure', role:'Provider', sla:2, required:true},
   ],
 };
 
-function updateDocTplPreview() {
-  var el = document.getElementById('docTplPreviewContent');
-  if (!el) return;
-  var secs = DOC_TPL_SECTIONS[docTplSelected];
-  if (!secs) {
-    el.innerHTML = '<div style="font-size:12px;color:#9CA3AF;font-style:italic;padding:8px 0;">No documentation template selected.</div>';
+var WFB_DESCS = {
+  'Patient Intake': 'MA collects patient demographics, verifies identity, and confirms insurance eligibility.',
+  'Identity Verification': 'Patient completes identity verification through an IAL2-compliant process.',
+  'Insurance Verification': 'MA verifies insurance eligibility and coverage for the care product.',
+  'MA Review': 'MA reviews intake submission, flags clinical gaps, and prepares chart for provider.',
+  'Provider Assignment': 'System matches patient to available provider based on licensure, availability, and care product rules.',
+  'Async Review': 'Provider reviews patient submission asynchronously and documents clinical findings.',
+  'Consult — Phone/Video': 'Provider conducts live consultation with patient via phone or video.',
+  'Consult — Video Only': 'Provider conducts live video consultation with patient.',
+  'Lab Order': 'Provider orders required diagnostic labs through the integrated lab network.',
+  'Lab Review': 'Provider reviews returned lab results and updates assessment and plan.',
+  'Prescription/Rx': 'Provider submits prescription through integrated pharmacy network.',
+  'Referral': 'Provider creates and routes referral to appropriate specialist or service.',
+  'Follow-up Consult': 'Provider conducts follow-up consultation to review progress and adjust care plan.',
+  'Care Coordination Review': 'MA coordinates care plan with interdisciplinary team and verifies patient readiness for next stage.',
+  'Patient Education': 'MA provides patient education materials and confirms patient understanding of care plan.',
+  'Provider Documentation': 'Provider completes SOAP note, updates assessment and plan, and prepares chart for closure.',
+  'Chart Closure': 'Provider finalizes and signs chart, triggering billing submission and patient notification.',
+};
+
+var wfbWorkflow = [];
+var wfbSimIdx = 0;
+var wfbDragSrc = null;
+
+function wfbRoleStyle(role) {
+  if (role === 'MA') return 'background:#FEF3C7;color:#92400E;';
+  if (role === 'System') return 'background:#E0E7FF;color:#3730A3;';
+  if (role === 'Patient') return 'background:#D1FAE5;color:#065F46;';
+  return 'background:#EDE9FE;color:#6B21A8;';
+}
+
+function wfbSetMode(mode) {
+  var tc = document.getElementById('wfbModeCardTemplate');
+  var cc = document.getElementById('wfbModeCardCustom');
+  var tr = document.getElementById('wfbTemplateRow');
+  var cn = document.getElementById('wfbCustomNote');
+  if (mode === 'template') {
+    if (tc) { tc.style.border='2px solid #6B21A8'; tc.style.background='#F5F3FF'; }
+    if (cc) { cc.style.border='2px solid #E5E0D8'; cc.style.background='#fff'; }
+    if (tr) tr.style.display='flex';
+    if (cn) cn.style.display='none';
+  } else {
+    if (cc) { cc.style.border='2px solid #6B21A8'; cc.style.background='#F5F3FF'; }
+    if (tc) { tc.style.border='2px solid #E5E0D8'; tc.style.background='#fff'; }
+    if (tr) tr.style.display='none';
+    if (cn) cn.style.display='';
+  }
+}
+
+function wfbLoadTemplate() {
+  var sel = document.getElementById('wfbTplSelect');
+  if (!sel) return;
+  var tpl = WFB_TEMPLATES[sel.value];
+  if (!tpl) return;
+  wfbWorkflow = tpl.map(function(s){ return {name:s.name,role:s.role,sla:s.sla,required:s.required}; });
+  wfbSimIdx = 0;
+  wfbRenderAll();
+}
+
+function wfbAddStage(i) {
+  var def = WFB_DEF[i]; if (!def) return;
+  wfbWorkflow.push({name:def.name, role:def.role, sla:4, required:false});
+  wfbSimIdx = 0;
+  wfbRenderAll();
+}
+
+function wfbRemoveStage(i) {
+  if (wfbWorkflow[i] && wfbWorkflow[i].required) return;
+  wfbWorkflow.splice(i,1);
+  wfbSimIdx = 0;
+  wfbRenderAll();
+}
+
+function wfbClearAll() {
+  wfbWorkflow = [];
+  wfbSimIdx = 0;
+  wfbRenderAll();
+}
+
+function wfbUpdateSla(i, val) {
+  var v = parseFloat(val);
+  if (isNaN(v)||v<1) v=1;
+  if (v>720) v=720;
+  if (wfbWorkflow[i]) { wfbWorkflow[i].sla=v; wfbUpdateSummary(); wfbRenderSim(); }
+}
+
+function wfbToggleRequired(i, req) {
+  if (wfbWorkflow[i]) { wfbWorkflow[i].required=req; wfbRenderBuilder(); wfbRenderLibrary(); }
+}
+
+function wfbRenderAll() {
+  wfbRenderLibrary();
+  wfbRenderBuilder();
+  wfbUpdateSummary();
+  wfbRenderSim();
+}
+
+function wfbRenderLibrary() {
+  var lib = document.getElementById('wfbLibrary'); if (!lib) return;
+  var inWf = {};
+  wfbWorkflow.forEach(function(s){ inWf[s.name]=true; });
+  lib.innerHTML = '';
+  WFB_DEF.forEach(function(def,i) {
+    var added = !!inWf[def.name];
+    var card = document.createElement('div');
+    card.style.cssText='border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;background:#fff;display:flex;align-items:center;gap:7px;';
+    card.innerHTML =
+      '<span style="font-size:12px;font-weight:600;color:#1F2937;flex:1;line-height:1.35;">' + def.name + '</span>' +
+      '<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0;' + wfbRoleStyle(def.role) + '">' + def.role + '</span>' +
+      (added
+        ? '<span style="font-size:11px;font-weight:700;color:#059669;white-space:nowrap;min-width:52px;text-align:right;">✓ Added</span>'
+        : '<button onclick="wfbAddStage(' + i + ')" style="font-size:11px;font-weight:600;border:1.5px solid #6B21A8;color:#6B21A8;background:#fff;border-radius:6px;padding:3px 9px;cursor:pointer;white-space:nowrap;flex-shrink:0;">+ Add</button>');
+    lib.appendChild(card);
+  });
+}
+
+function wfbRenderBuilder() {
+  var bld = document.getElementById('wfbBuilder'); if (!bld) return;
+  var cnt = document.getElementById('wfbStageCount');
+  if (cnt) cnt.textContent = wfbWorkflow.length + ' stage' + (wfbWorkflow.length!==1?'s':'');
+  if (wfbWorkflow.length === 0) {
+    bld.innerHTML = '<div style="font-size:13px;color:#9CA3AF;font-style:italic;padding:28px 0;text-align:center;">No stages configured. Load a template or add stages from the library.</div>';
     return;
   }
-  el.innerHTML = secs.map(function(s) {
-    return '<div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #F3F4F6;">' +
-      '<div style="font-size:12px;font-weight:700;color:#6B21A8;width:20px;flex-shrink:0;text-align:right;">' + s.num + '</div>' +
-      '<div style="flex:1;"><span style="font-size:12px;font-weight:600;color:#111827;">' + s.name + '</span>' +
-      '<span style="font-size:12px;color:#6B7280;"> — ' + s.desc + '</span></div></div>';
-  }).join('');
+  bld.innerHTML = '';
+  wfbWorkflow.forEach(function(stage, i) {
+    var card = document.createElement('div');
+    card.draggable = true;
+    card.dataset.idx = i;
+    card.style.cssText='background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;margin-bottom:4px;';
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
+        '<span style="font-size:18px;cursor:grab;color:#D1D5DB;flex-shrink:0;line-height:1;" title="Drag to reorder">⠿</span>' +
+        '<span style="font-size:11px;font-weight:700;background:#F3F4F6;color:#374151;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">' + (i+1) + '</span>' +
+        '<span style="font-size:13px;font-weight:700;color:#111827;flex:1;">' + stage.name + '</span>' +
+        '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;flex-shrink:0;' + wfbRoleStyle(stage.role) + '">' + stage.role + '</span>' +
+        (stage.required
+          ? '<span title="Required stages cannot be removed" style="font-size:20px;color:#D1D5DB;cursor:not-allowed;flex-shrink:0;line-height:1;">×</span>'
+          : '<button onclick="wfbRemoveStage(' + i + ')" style="font-size:18px;background:none;border:none;color:#9CA3AF;cursor:pointer;flex-shrink:0;line-height:1;padding:0;" onmouseover="this.style.color='#EF4444'" onmouseout="this.style.color='#9CA3AF'">×</button>') +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:14px;padding-left:48px;flex-wrap:wrap;">' +
+        '<div style="display:flex;align-items:center;gap:5px;">' +
+          '<span style="font-size:11px;color:#6B7280;white-space:nowrap;">SLA:</span>' +
+          '<input type="number" min="1" max="720" value="' + stage.sla + '" onchange="wfbUpdateSla(' + i + ',this.value)" style="width:54px;border:1px solid #E5E0D8;border-radius:6px;padding:3px 6px;font-size:12px;text-align:center;">' +
+          '<span style="font-size:11px;color:#6B7280;">hrs</span>' +
+        '</div>' +
+        '<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">' +
+          '<input type="radio" name="wfbReq' + i + '" value="required"' + (stage.required?' checked':'') + ' onchange="wfbToggleRequired(' + i + ',true)" style="accent-color:#6B21A8;"> Required' +
+        '</label>' +
+        '<label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;">' +
+          '<input type="radio" name="wfbReq' + i + '" value="optional"' + (!stage.required?' checked':'') + ' onchange="wfbToggleRequired(' + i + ',false)" style="accent-color:#6B21A8;"> Optional' +
+        '</label>' +
+      '</div>';
+    // HTML5 drag-to-reorder
+    card.addEventListener('dragstart', function(e) {
+      wfbDragSrc = i;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(function(){ card.style.opacity='0.45'; }, 0);
+    });
+    card.addEventListener('dragend', function() {
+      card.style.opacity='1';
+      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
+    });
+    card.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
+      var ind = document.createElement('div');
+      ind.className='wfb-drop-line';
+      ind.style.cssText='height:3px;background:#6B21A8;border-radius:2px;margin:1px 0;';
+      bld.insertBefore(ind, card);
+    });
+    card.addEventListener('drop', function(e) {
+      e.preventDefault();
+      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
+      if (wfbDragSrc===null || wfbDragSrc===i) return;
+      var moved = wfbWorkflow.splice(wfbDragSrc, 1)[0];
+      var target = (i > wfbDragSrc) ? i-1 : i;
+      wfbWorkflow.splice(target, 0, moved);
+      wfbDragSrc = null;
+      wfbSimIdx = 0;
+      wfbRenderAll();
+    });
+    bld.appendChild(card);
+    if (i < wfbWorkflow.length-1) {
+      var arr = document.createElement('div');
+      arr.style.cssText='text-align:center;color:#9CA3AF;font-size:16px;line-height:1.4;user-select:none;';
+      arr.textContent='↓';
+      bld.appendChild(arr);
+    }
+  });
 }
 
-function toggleDocTplPreview() {
-  var body = document.getElementById('docTplPreviewBody');
-  var chev = document.getElementById('docTplChev');
-  if (!body || !chev) return;
-  var open = body.style.display === 'none';
-  body.style.display = open ? '' : 'none';
-  chev.style.transform = open ? 'rotate(180deg)' : '';
-  if (open) updateDocTplPreview();
+function wfbUpdateSummary() {
+  var total = wfbWorkflow.length;
+  var totalSla = 0; var roles = {};
+  wfbWorkflow.forEach(function(s){ totalSla+=(s.sla||0); roles[s.role]=true; });
+  var h = Math.floor(totalSla), m = Math.round((totalSla-h)*60);
+  var slaStr = h+'h'+(m>0?' '+m+'m':'');
+  var sc=document.getElementById('wfbSumStages'); if(sc) sc.textContent=total;
+  var sl=document.getElementById('wfbSumSla'); if(sl) sl.textContent=totalSla>0?slaStr:'0h';
+  var rl=document.getElementById('wfbSumRoles'); if(rl) rl.textContent=Object.keys(roles).join(', ')||'—';
 }
 
-updateWfTemplate('standard_async_v2');
+function wfbRenderSim() {
+  var tracker=document.getElementById('wfbSimTracker');
+  var detail=document.getElementById('wfbSimDetail');
+  var advBtn=document.getElementById('wfbSimAdvBtn');
+  if (!tracker) return;
+  if (wfbWorkflow.length===0) {
+    tracker.innerHTML='<div style="font-size:12px;color:#9CA3AF;font-style:italic;padding:8px 0;">Configure your workflow above to run the simulation.</div>';
+    if (detail) detail.innerHTML='';
+    if (advBtn) { advBtn.disabled=true; advBtn.style.opacity='0.5'; }
+    return;
+  }
+  var done = wfbSimIdx>=wfbWorkflow.length;
+  if (advBtn) {
+    advBtn.disabled=done;
+    advBtn.textContent=done?'Workflow complete ✓':'Complete stage & advance →';
+    advBtn.style.background=done?'#059669':'#6B21A8';
+    advBtn.style.cursor=done?'default':'pointer';
+    advBtn.style.opacity='1';
+  }
+  // Tracker circles + connecting lines
+  tracker.innerHTML='';
+  wfbWorkflow.forEach(function(stage,i) {
+    var isComplete=i<wfbSimIdx, isActive=i===wfbSimIdx;
+    var wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;';
+    var circle=document.createElement('div');
+    circle.style.cssText='width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;' +
+      (isComplete?'background:#1A1D23;color:#fff;':isActive?'background:#6B21A8;color:#fff;box-shadow:0 0 0 3px rgba(107,33,168,0.22);':'background:#E5E7EB;color:#9CA3AF;border:2px solid #D1D5DB;');
+    circle.textContent=isComplete?'✓':(i+1);
+    var lbl=document.createElement('div');
+    lbl.style.cssText='font-size:9px;text-align:center;max-width:62px;line-height:1.3;'+(isActive?'color:#6B21A8;font-weight:700;':isComplete?'color:#374151;':'color:#9CA3AF;');
+    lbl.textContent=stage.name;
+    wrap.appendChild(circle); wrap.appendChild(lbl);
+    tracker.appendChild(wrap);
+    if (i<wfbWorkflow.length-1) {
+      var line=document.createElement('div');
+      line.style.cssText='height:2px;flex:1;min-width:10px;margin-top:13px;align-self:flex-start;'+(isComplete?'background:#1A1D23;':'background:#E5E7EB;');
+      tracker.appendChild(line);
+    }
+  });
+  // Detail card
+  if (detail) {
+    if (wfbSimIdx<wfbWorkflow.length) {
+      var cur=wfbWorkflow[wfbSimIdx];
+      var desc=WFB_DESCS[cur.name]||'Stage in progress.';
+      detail.innerHTML=
+        '<div style="display:grid;grid-template-columns:140px 1fr;gap:5px 12px;font-size:12px;">' +
+        '<span style="color:#6B7280;font-weight:600;">Currently Active:</span><span style="font-weight:700;color:#6B21A8;">'+cur.name+'</span>'+
+        '<span style="color:#6B7280;font-weight:600;">Role:</span><span>'+cur.role+'</span>'+
+        '<span style="color:#6B7280;font-weight:600;">SLA:</span><span>'+cur.sla+' hours</span>'+
+        '<span style="color:#6B7280;font-weight:600;">Status:</span><span><strong style="background:#D1FAE5;color:#065F46;padding:1px 7px;border-radius:8px;font-size:10px;font-weight:700;">In Progress</strong></span>'+
+        '<span style="color:#6B7280;font-weight:600;">Description:</span><span style="color:#374151;">'+desc+'</span>'+
+        '</div>';
+    } else {
+      detail.innerHTML='<div style="text-align:center;padding:8px 0;font-size:13px;font-weight:700;color:#059669;">✓ All '+wfbWorkflow.length+' stages complete. Chart would be closed and consult marked complete.</div>';
+    }
+  }
+}
+
+function wfbAdvanceSim() {
+  if (wfbSimIdx<wfbWorkflow.length) { wfbSimIdx++; wfbRenderSim(); }
+}
+
+function wfbResetSim() {
+  wfbSimIdx=0; wfbRenderSim();
+}
+
+// Init Step 11 with Standard Phone/Video template on DOMContentLoaded
+(function() {
+  var tpl=WFB_TEMPLATES['phone_video'];
+  if (tpl) wfbWorkflow=tpl.map(function(s){ return {name:s.name,role:s.role,sla:s.sla,required:s.required}; });
+  function init() { wfbRenderAll(); }
+  if (document.readyState==='loading') { document.addEventListener('DOMContentLoaded', init); }
+  else { init(); }
+})();
+
 </script>
 {% endraw %}
 {% endblock %}

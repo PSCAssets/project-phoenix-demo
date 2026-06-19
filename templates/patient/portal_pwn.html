@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PWN Health — Patient Portal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F3F4F6; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* Header */
+  .portal-header {
+    background: #0A2F5C;
+    color: #fff;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .header-logo { display: flex; align-items: center; gap: 8px; }
+  .header-logo .icon { font-size: 20px; color: #00BFB3; }
+  .header-logo .name { font-size: 18px; font-weight: 700; color: #fff; }
+  .header-title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); }
+  .header-user { display: flex; align-items: center; gap: 14px; font-size: 13px; }
+  .header-user .patient-name { color: #fff; font-weight: 600; }
+  .header-user a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 12px; }
+  .header-user a:hover { color: #fff; }
+
+  /* Patient banner */
+  .patient-banner {
+    background: #EFF6FF;
+    border-bottom: 1px solid #BFDBFE;
+    padding: 10px 24px;
+    font-size: 13px;
+    color: #1E3A5F;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-shrink: 0;
+  }
+  .patient-banner span { color: #6B7280; }
+
+  /* Layout */
+  .portal-body { display: flex; flex: 1; min-height: 0; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background: #fff;
+    border-right: 1px solid #E5E7EB;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    display: block;
+    padding: 11px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B7280;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.1s;
+  }
+  .nav-item:hover { background: #F9FAFB; color: #0A2F5C; }
+  .nav-item.active { border-left-color: #0A2F5C; color: #0A2F5C; font-weight: 700; background: #EFF6FF; }
+
+  /* Main */
+  .portal-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #9CA3AF;
+    margin-bottom: 14px;
+  }
+
+  /* Consult cards */
+  .consult-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .consult-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+  .consult-title { font-size: 15px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 8px; }
+  .status-pill {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .status-scheduled { background: #DBEAFE; color: #1D4ED8; }
+  .status-results   { background: #D1FAE5; color: #065F46; }
+
+  .consult-meta { font-size: 12px; color: #6B7280; margin-bottom: 4px; }
+  .consult-meta strong { color: #374151; font-weight: 600; }
+
+  /* Care Journey */
+  .journey-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #9CA3AF; margin: 14px 0 10px; }
+  .journey-track { display: flex; align-items: center; gap: 0; }
+  .journey-stage { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .journey-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .dot-done    { background: #0A2F5C; color: #fff; }
+  .dot-active  { background: #00BFB3; color: #fff; }
+  .dot-pending { background: #fff; border: 2px solid #D1D5DB; color: #9CA3AF; }
+  .journey-name { font-size: 10px; color: #9CA3AF; margin-top: 4px; text-align: center; }
+  .journey-connector {
+    flex: 1; height: 2px;
+    max-width: 40px;
+    margin-bottom: 14px;
+  }
+  .connector-done { background: #0A2F5C; }
+  .connector-pending { background: #E5E7EB; }
+
+  /* Card actions */
+  .card-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .btn-primary-pwn {
+    background: #0A2F5C; color: #fff; border: none;
+    border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primary-pwn:hover { background: #0c3a70; }
+  .btn-outline-pwn {
+    background: #fff; color: #0A2F5C;
+    border: 1.5px solid #0A2F5C;
+    border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .btn-outline-pwn:hover { background: #EFF6FF; }
+
+  /* Footer */
+  .portal-footer {
+    background: #F9FAFB;
+    border-top: 1px solid #E5E7EB;
+    padding: 12px 24px;
+    font-size: 11px;
+    color: #9CA3AF;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .portal-footer a { color: #9CA3AF; text-decoration: underline; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="header-logo">
+      <span class="icon">&#9672;</span>
+      <span class="name">PWN Health</span>
+    </div>
+    <div class="header-title">Patient Portal</div>
+    <div class="header-user">
+      <span class="patient-name">Jennifer Adams</span>
+      <a href="/pwn/login">Logout</a>
+    </div>
+  </header>
+
+  <div class="patient-banner">
+    <strong>Jennifer Adams</strong>
+    <span>DOB: 03/14/1985</span>
+    <span>Member ID: PWN-847291</span>
+  </div>
+
+  <div class="portal-body">
+
+    <nav class="sidebar">
+      <a class="nav-item active">Dashboard</a>
+      <a class="nav-item">My Consultations</a>
+      <a class="nav-item">Lab Results</a>
+      <a class="nav-item">Messages</a>
+      <a class="nav-item">Account Settings</a>
+    </nav>
+
+    <main class="portal-main">
+      <div class="section-label">My Consultations</div>
+
+      <!-- Consult 1: Pre-Test -->
+      <div class="consult-card">
+        <div class="consult-header">
+          <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
+          <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
+        </div>
+        <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+        <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
+        <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
+
+        <div class="care-journey">
+        <div class="journey-label">CARE JOURNEY</div>
+        <div class="journey-track">
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Request<br>Received</div>
+          </div>
+          <div class="journey-connector connector-done"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Intake<br>Complete</div>
+          </div>
+          <div class="journey-connector connector-done"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-active">&#9679;</div>
+            <div class="journey-name">Consultation<br>Scheduled</div>
+          </div>
+          <div class="journey-connector connector-pending"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-pending">&#9675;</div>
+            <div class="journey-name">Results<br>Review</div>
+          </div>
+        </div>
+        <div style="display:none;">Care Journey</div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-primary-pwn">Join Video Consultation</button>
+          <button class="btn-outline-pwn">View Details</button>
+        </div>
+      </div>
+
+      <!-- Consult 2: Post-Test -->
+      <div class="consult-card">
+        <div class="consult-header">
+          <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
+          <span class="status-pill status-results">&#10003; Results Available</span>
+        </div>
+        <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+        <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
+        <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
+
+        <div class="journey-label">Care Journey</div>
+        <div class="journey-track">
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Request<br>Received</div>
+          </div>
+          <div class="journey-connector connector-done"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Intake<br>Complete</div>
+          </div>
+          <div class="journey-connector connector-done"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Consult<br>Complete</div>
+          </div>
+          <div class="journey-connector connector-done"></div>
+          <div class="journey-stage">
+            <div class="journey-dot dot-done">&#10003;</div>
+            <div class="journey-name">Results<br>Available</div>
+          </div>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn-outline-pwn">View Results</button>
+          <button class="btn-outline-pwn">Download Report</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <footer class="portal-footer">
+    &copy; PWN Health. All rights reserved.
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Use</a>
+  </footer>
+
+</body>
+</html>

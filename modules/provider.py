@@ -153,3 +153,12 @@ def pharmacy():
 @bp.route("/billing")
 def billing():
     return render_template("provider/billing.html")
+
+
+@bp.route("/qa-reviewer")
+def qa_reviewer_dashboard():
+    return render_template("provider/qa_reviewer_dashboard.html")
+
+@bp.route("/gc-admin")
+def gc_admin_dashboard():
+    return render_template("provider/gc_admin_dashboard.html")

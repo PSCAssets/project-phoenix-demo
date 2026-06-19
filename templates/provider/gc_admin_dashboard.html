@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}GC Administrator — Project Phoenix{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+.ga-shell { margin-top: 60px; }
+.ga-topbar { background: #0E7490; color: #fff; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 14px; }
+.ga-topbar-title { font-size: 16px; font-weight: 700; }
+.ga-topbar-sub { font-size: 12px; color: #A5F3FC; }
+.ga-body { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+.page-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: #6B7280; margin-bottom: 20px; }
+.tab-bar { display: flex; gap: 0; border-bottom: 2px solid #E5E0D8; margin-bottom: 24px; }
+.ga-tab { padding: 10px 22px; font-size: 13px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.ga-tab.active { color: #0E7490; border-bottom-color: #0E7490; }
+.ga-tab:hover:not(.active) { color: #374151; }
+.panel { display: none; }
+.panel.active { display: block; }
+.stat-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 16px 20px; min-width: 150px; flex: 1; }
+.stat-label { font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-value { font-size: 26px; font-weight: 700; }
+.stat-value.teal { color: #0E7490; }
+.stat-value.red { color: #DC2626; }
+.stat-value.amber { color: #B45309; }
+.stat-value.green { color: #059669; }
+.queue-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.queue-header { padding: 14px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; }
+.queue-title { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+.badge-red { background: #FEE2E2; color: #B91C1C; }
+.badge-amber { background: #FEF3C7; color: #92400E; }
+.badge-teal { background: #CFFAFE; color: #164E63; }
+.badge-green { background: #D1FAE5; color: #065F46; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F9F5EE; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+.p-name { font-weight: 600; color: #111827; }
+.p-id { font-size: 11px; color: #9CA3AF; }
+.cp-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EDE9FE; color: #5B21B6; }
+.action-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; margin-right: 6px; }
+.btn-resolve { border-color: #0E7490; color: #0E7490; background: #fff; }
+.btn-resolve:hover { background: #CFFAFE; }
+.btn-approve-cl { border-color: #059669; color: #059669; background: #fff; }
+.btn-approve-cl:hover { background: #D1FAE5; }
+.sla-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.sla-ok { background: #D1FAE5; color: #065F46; }
+.sla-warn { background: #FEF3C7; color: #92400E; }
+.sla-breach { background: #FEE2E2; color: #B91C1C; }
+.cl-status { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.cl-draft { background: #F3F4F6; color: #6B7280; }
+.cl-pending { background: #FEF3C7; color: #92400E; }
+.cl-published { background: #D1FAE5; color: #065F46; }
+.reject-note { font-size: 11px; color: #DC2626; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 6px; padding: 6px 10px; margin-top: 4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="ga-shell">
+  <div class="ga-topbar">
+    <div class="ga-title">GC Administrator — Dana Cooper</div>
+    <div class="ga-topbar-sub">Supervisory · QA Resolution · Blurb Queue · Content Library</div>
+  </div>
+
+  <div class="ga-body">
+    <div class="page-title">GC Administrator Dashboard</div>
+    <div class="page-sub">Manage QA failures, blurb requests, and clinical content library publishing.</div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">QA Failures Pending</div><div class="stat-value red">2</div></div>
+      <div class="stat-card"><div class="stat-label">Blurb Requests</div><div class="stat-value amber">5</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue Blurbs (>24h)</div><div class="stat-value red">1</div></div>
+      <div class="stat-card"><div class="stat-label">Articles Pending Publish</div><div class="stat-value teal">3</div></div>
+      <div class="stat-card"><div class="stat-label">Published Articles</div><div class="stat-value green">47</div></div>
+    </div>
+
+    <div class="tab-bar">
+      <div class="ga-tab active" onclick="switchTab('qa')">🔴 QA Failure Queue (2)</div>
+      <div class="ga-tab" onclick="switchTab('blurb')">📋 Blurb Requests (5)</div>
+      <div class="ga-tab" onclick="switchTab('library')">📚 Content Library</div>
+    </div>
+
+    <!-- QA Failure Queue Panel -->
+    <div class="panel active" id="panelQa">
+      <div class="queue-card">
+        <div class="queue-header">
+          <div class="queue-title">QA Failures — Requires Resolution</div>
+          <span class="badge badge-red">2 blocked consults</span>
+        </div>
+        <table>
+          <thead><tr><th>Patient</th><th>Consult</th><th>Care Product</th><th>GC</th><th>Reject Reason</th><th>Blocked Since</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="p-name">James O.</div><div class="p-id">PT-2026-00388</div></td>
+              <td>CST-2026-11119</td>
+              <td><span class="cp-tag">ED Treatment</span></td>
+              <td>Taylor Brooks, GC</td>
+              <td><div class="reject-note">Missing POA document — patient's legal guardian documentation not uploaded before consult submission.</div></td>
+              <td>Today 8:22 AM<br><span style="font-size:11px;color:#DC2626;font-weight:600;">1h 43m blocked</span></td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="resolveQA('CST-2026-11119')">Resolve &amp; Resume →</button>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="p-name">Sarah T. (minor)</div><div class="p-id">PT-2026-00619</div></td>
+              <td>CST-2026-11188</td>
+              <td><span class="cp-tag">BRCA Hereditary</span></td>
+              <td>Jordan Patel, RN</td>
+              <td><div class="reject-note">Parent/guardian consent form unsigned — patient is 16 years old, guardian signature required on all documentation.</div></td>
+              <td>Yesterday 4:17 PM<br><span style="font-size:11px;color:#DC2626;font-weight:600;">18h 6m blocked</span></td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="resolveQA('CST-2026-11188')">Resolve &amp; Resume →</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Blurb Request Queue Panel -->
+    <div class="panel" id="panelBlurb">
+      <div class="queue-card">
+        <div class="queue-header">
+          <div class="queue-title">Blurb Requests — Clinical Content Queue</div>
+          <span class="badge badge-amber">5 open · 1 overdue</span>
+        </div>
+        <table>
+          <thead><tr><th>Request</th><th>Submitted By</th><th>Patient / Topic</th><th>SLA Status</th><th>Notes</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr style="background:#FEF2F2;">
+              <td><strong>BLB-2026-041</strong></td>
+              <td>Taylor Brooks, GC</td>
+              <td>CST-2026-11099<br><span class="p-id">BRCA2 variant — unusual presentation</span></td>
+              <td><span class="sla-pill sla-breach">⚠ OVERDUE — 26h 14m</span></td>
+              <td>Unusual BRCA2 splice variant, unclear clinical significance. Need literature summary for patient letter.</td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="reviewBlurb('BLB-2026-041')">Review &amp; Publish</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BLB-2026-044</strong></td>
+              <td>Alex Kim, MA</td>
+              <td>CST-2026-11187<br><span class="p-id">Lynch syndrome — MMR variant</span></td>
+              <td><span class="sla-pill sla-warn">⏱ 18h 32m remaining</span></td>
+              <td>Patient asking about surveillance recommendations for MLH1 variant.</td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="reviewBlurb('BLB-2026-044')">Review &amp; Publish</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BLB-2026-046</strong></td>
+              <td>Taylor Brooks, GC</td>
+              <td>CST-2026-11204<br><span class="p-id">APOE4 — Alzheimer risk</span></td>
+              <td><span class="sla-pill sla-ok">✓ 21h 5m remaining</span></td>
+              <td>Need plain-language explanation of APOE4 carrier risk for patient disclosure.</td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="reviewBlurb('BLB-2026-046')">Review &amp; Publish</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BLB-2026-047</strong></td>
+              <td>Jordan Patel, RN</td>
+              <td>CST-2026-11218<br><span class="p-id">VUS in ATM gene</span></td>
+              <td><span class="sla-pill sla-ok">✓ 22h 41m remaining</span></td>
+              <td>ATM variant of uncertain significance — patient requesting clarification on cancer risk.</td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="reviewBlurb('BLB-2026-047')">Review &amp; Publish</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BLB-2026-048</strong></td>
+              <td>Taylor Brooks, GC</td>
+              <td>CST-2026-11229<br><span class="p-id">PALB2 hereditary breast</span></td>
+              <td><span class="sla-pill sla-ok">✓ 23h 58m remaining</span></td>
+              <td>PALB2 pathogenic variant — patient wants comparison to BRCA2 risk for family planning.</td>
+              <td>
+                <button class="action-btn btn-resolve" onclick="reviewBlurb('BLB-2026-048')">Review &amp; Publish</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Content Library Panel -->
+    <div class="panel" id="panelLibrary">
+      <div class="queue-card">
+        <div class="queue-header">
+          <div class="queue-title">Clinical Content Library</div>
+          <span class="badge badge-teal">47 published · 3 pending · 8 drafts</span>
+        </div>
+        <table>
+          <thead><tr><th>Article Title</th><th>Gene / Topic</th><th>Inheritance</th><th>Research Flag</th><th>Author</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>BRCA2 Splice Variant — Patient Summary</strong></td>
+              <td>BRCA2</td>
+              <td>Autosomal dominant</td>
+              <td>—</td>
+              <td>Taylor Brooks, GC</td>
+              <td><span class="cl-status cl-pending">Pending Publish</span></td>
+              <td>
+                <button class="action-btn btn-approve-cl" onclick="publishArticle('BRCA2 Splice Variant')">Publish ✓</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Lynch Syndrome — Surveillance Guide</strong></td>
+              <td>MLH1, MSH2, MSH6</td>
+              <td>Autosomal dominant</td>
+              <td>✓ Eligible for NIH ACMG81</td>
+              <td>Taylor Brooks, GC</td>
+              <td><span class="cl-status cl-pending">Pending Publish</span></td>
+              <td>
+                <button class="action-btn btn-approve-cl" onclick="publishArticle('Lynch Syndrome')">Publish ✓</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>PALB2 — Hereditary Breast Cancer Risk</strong></td>
+              <td>PALB2</td>
+              <td>Autosomal dominant</td>
+              <td>—</td>
+              <td>Alex Kim, MA</td>
+              <td><span class="cl-status cl-pending">Pending Publish</span></td>
+              <td>
+                <button class="action-btn btn-approve-cl" onclick="publishArticle('PALB2')">Publish ✓</button>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>BRCA1 — Patient Education Overview</strong></td>
+              <td>BRCA1</td>
+              <td>Autosomal dominant</td>
+              <td>✓ Eligible for NIH ACMG81</td>
+              <td>Taylor Brooks, GC</td>
+              <td><span class="cl-status cl-published">Published</span></td>
+              <td><button class="action-btn" style="border-color:#E5E0D8;color:#6B7280;" onclick="alert('View article')">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>APOE4 — Alzheimer Risk Disclosure</strong></td>
+              <td>APOE</td>
+              <td>Complex / Multi-factorial</td>
+              <td>—</td>
+              <td>Jordan Patel, RN</td>
+              <td><span class="cl-status cl-published">Published</span></td>
+              <td><button class="action-btn" style="border-color:#E5E0D8;color:#6B7280;" onclick="alert('View article')">View</button></td>
+            </tr>
+            <tr>
+              <td><strong>ATM — VUS Patient Communication</strong></td>
+              <td>ATM</td>
+              <td>Autosomal dominant</td>
+              <td>—</td>
+              <td>Taylor Brooks, GC</td>
+              <td><span class="cl-status cl-draft">Draft</span></td>
+              <td><button class="action-btn" style="border-color:#E5E0D8;color:#6B7280;">Edit Draft</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.ga-tab').forEach((t, i) => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['qa','blurb','library'];
+  const idx = tabs.indexOf(tab);
+  document.querySelectorAll('.ga-tab')[idx].classList.add('active');
+  document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+}
+function resolveQA(id) {
+  var action = prompt('Resolve QA failure for consult ' + id + ':\n1. Override — approve despite rejection\n2. Return to GC — request corrected docs\n\nEnter 1 or 2:');
+  if (action === '1') alert('Override applied — consult ' + id + ' resumed. QA Reviewer and GC notified. Audit logged.');
+  else if (action === '2') alert('Returned to GC — request for corrected documentation sent. Consult remains paused.');
+}
+function reviewBlurb(id) {
+  alert('Opening blurb request ' + id + '\n\nReview GC notes, draft content, and attached case context.\nPublish to add to patient-facing letter queue.');
+}
+function publishArticle(title) {
+  if (confirm('Publish article: "' + title + '"?\n\nThis will make the article available to GCs when composing patient letters.')) {
+    alert('✓ Published — "' + title + '" is now live in the Clinical Content Library.');
+  }
+}
+</script>
+{% endraw %}
+{% endblock %}

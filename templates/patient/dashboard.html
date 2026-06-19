@@ -115,6 +115,65 @@
         <span>You have <strong>2 unread messages</strong> from your care team.</span>
         <a href="/patient/messages">View messages →</a>
       </div>
+      <!-- Care Journey Tracker -->
+      <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:16px;">Your Care Journey</div>
+
+        <!-- Stage tracker -->
+        <div style="display:flex;align-items:flex-start;gap:0;margin-bottom:16px;">
+          <!-- Stage 1: Order Placed (complete) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">✓</div>
+            <div style="font-size:11px;color:#6B7280;text-align:center;white-space:nowrap;">Order<br>Placed</div>
+          </div>
+          <div style="flex:1;height:2px;background:#6B21A8;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 2: Consultation Complete (complete) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">✓</div>
+            <div style="font-size:11px;color:#6B7280;text-align:center;white-space:nowrap;">Consultation<br>Complete</div>
+          </div>
+          <div style="flex:1;height:2px;background:#6B21A8;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 3: Provider Review (active) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #6B21A8;background:#fff;color:#6B21A8;font-size:13px;display:flex;align-items:center;justify-content:center;animation:journey-pulse 2s ease-in-out infinite;">⏱</div>
+            <div style="font-size:11px;color:#6B21A8;font-weight:700;text-align:center;white-space:nowrap;">Provider<br>Review</div>
+          </div>
+          <div style="flex:1;height:0;border-top:2px dashed #D1D5DB;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 4: Prescription Sent (upcoming) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;color:#9CA3AF;font-size:11px;display:flex;align-items:center;justify-content:center;"></div>
+            <div style="font-size:11px;color:#9CA3AF;text-align:center;white-space:nowrap;">Prescription<br>Sent</div>
+          </div>
+          <div style="flex:1;height:0;border-top:2px dashed #D1D5DB;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 5: Complete (upcoming) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;color:#9CA3AF;font-size:11px;display:flex;align-items:center;justify-content:center;"></div>
+            <div style="font-size:11px;color:#9CA3AF;text-align:center;white-space:nowrap;">Complete</div>
+          </div>
+        </div>
+
+        <!-- Status card -->
+        <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 16px;font-size:13px;color:#5B21B6;margin-bottom:12px;">
+          ⏱ <strong>Provider Review in Progress</strong> — Dr. Sarah Lee is reviewing your consultation notes. Estimated completion: within 4 hours.
+        </div>
+
+        <!-- SLA progress bar -->
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B7280;margin-bottom:4px;">
+            <span>SLA: 4 hrs</span>
+            <span>2h 24m remaining</span>
+          </div>
+          <div style="height:6px;background:#FEF3C7;border-radius:3px;overflow:hidden;">
+            <div style="width:60%;height:100%;background:#F59E0B;border-radius:3px;"></div>
+          </div>
+        </div>
+      </div>
+      <style>
+      @keyframes journey-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(107,33,168,0.3); }
+        50% { box-shadow: 0 0 0 6px rgba(107,33,168,0); }
+      }
+      </style>
       <!-- Getting Started Checklist -->
       <div class="widget">
         <div class="widget-header">

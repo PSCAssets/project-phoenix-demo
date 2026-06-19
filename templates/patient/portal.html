@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everlywell — Patient Portal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F9FAFB; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* Header */
+  .portal-header {
+    background: #fff;
+    border-bottom: 1px solid #E5E7EB;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+  .header-logo { font-size: 22px; font-weight: 700; color: #1F2937; letter-spacing: -0.5px; min-width: 130px; }
+
+  /* Program Switcher */
+  .switcher-wrap { flex: 1; display: flex; justify-content: center; position: relative; }
+  .switcher-btn {
+    display: flex; align-items: center; gap: 8px;
+    border: 1.5px solid #6B21A8;
+    color: #6B21A8;
+    background: #fff;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .switcher-btn .arrow { font-size: 10px; transition: transform 0.15s; }
+  .switcher-btn.open .arrow { transform: rotate(180deg); }
+  .switcher-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    min-width: 280px;
+    z-index: 100;
+    overflow: hidden;
+  }
+  .switcher-dropdown.open { display: block; }
+  .dropdown-option {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #374151;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: background 0.1s;
+  }
+  .dropdown-option:hover { background: #F9FAFB; }
+  .dropdown-option.active { border-left-color: #6B21A8; font-weight: 700; color: #6B21A8; }
+
+  /* Header right */
+  .header-user { display: flex; align-items: center; gap: 14px; min-width: 130px; justify-content: flex-end; }
+  .header-user .name { font-size: 13px; font-weight: 600; color: #374151; }
+  .header-user a { font-size: 12px; color: #9CA3AF; text-decoration: none; }
+  .header-user a:hover { color: #374151; }
+
+  /* Sub-banner */
+  .sub-banner {
+    padding: 9px 24px;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s, color 0.2s;
+  }
+  .humana-badge {
+    background: #047857;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 8px;
+  }
+
+  /* Layout */
+  .portal-body { display: flex; flex: 1; min-height: 0; }
+
+  /* Sidebar */
+  .sidebar { width: 200px; background: #fff; border-right: 1px solid #E5E7EB; padding: 20px 0; flex-shrink: 0; }
+  .nav-item {
+    display: block;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6B7280;
+    text-decoration: none;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover { background: #F9FAFB; color: #6B21A8; }
+  .nav-item.active { border-left-color: #6B21A8; color: #6B21A8; font-weight: 700; background: #F5F3FF; }
+
+  /* Main */
+  .portal-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #9CA3AF; margin-bottom: 14px; }
+
+  /* Consult card */
+  .consult-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .consult-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .consult-title { font-size: 15px; font-weight: 700; color: #111827; }
+  .status-pill { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+  .status-in-progress { background: #FEF3C7; color: #92400E; }
+  .status-awaiting    { background: #DBEAFE; color: #1D4ED8; }
+  .status-complete    { background: #D1FAE5; color: #065F46; }
+
+  .meta { font-size: 12px; color: #6B7280; margin-bottom: 3px; }
+  .meta strong { color: #374151; }
+
+  /* Care Journey */
+  .journey-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #9CA3AF; margin: 14px 0 10px; }
+  .journey-track { display: flex; align-items: center; }
+  .j-stage { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .j-dot { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .j-done    { background: #6B21A8; color: #fff; }
+  .j-active  { background: #D97706; color: #fff; }
+  .j-pending { background: #fff; border: 2px solid #D1D5DB; color: #9CA3AF; }
+  .j-name { font-size: 10px; color: #9CA3AF; margin-top: 4px; text-align: center; line-height: 1.3; }
+  .j-line { flex: 1; height: 2px; max-width: 36px; margin-bottom: 14px; }
+  .j-line-done { background: #6B21A8; }
+  .j-line-pending { background: #E5E7EB; }
+
+  .card-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+  .btn-primary { background: #6B21A8; color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-primary:hover { background: #5B1898; }
+  .btn-outline { background: #fff; color: #6B21A8; border: 1.5px solid #6B21A8; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-outline:hover { background: #F5F3FF; }
+
+  .humana-note { margin-top: 14px; background: #D1FAE5; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #065F46; display: none; line-height: 1.5; }
+
+  .portal-footer { background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 12px 24px; font-size: 11px; color: #9CA3AF; text-align: center; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+  <header class="portal-header">
+    <div class="header-logo">everlywell</div>
+
+    <div class="switcher-wrap">
+      <button class="switcher-btn" id="switcherBtn" onclick="toggleDropdown()">
+        <span id="switcherLabel">Everlywell Direct &mdash; Men's Health</span>
+        <span class="arrow">&#9660;</span>
+      </button>
+      <div class="switcher-dropdown" id="switcherDropdown">
+        <div class="dropdown-option active" data-program="mens-health" onclick="switchProgram('mens-health', this)">Everlywell Direct &mdash; Men's Health</div>
+        <div class="dropdown-option" data-program="weight" onclick="switchProgram('weight', this)">Everlywell Direct &mdash; Weight Management</div>
+        <div class="dropdown-option" data-program="humana" onclick="switchProgram('humana', this)">Humana A1C Program</div>
+      </div>
+    </div>
+
+    <div class="header-user">
+      <span class="name">Marcus Johnson</span>
+      <a href="/patient/login">Logout</a>
+    </div>
+  </header>
+
+  <div class="sub-banner" id="subBanner" style="background:#EDE9FE;color:#6B21A8;">
+    <span id="subBannerText">Men's Testosterone Program</span>
+  </div>
+
+  <div class="portal-body">
+
+    <nav class="sidebar">
+      <a class="nav-item active">Dashboard</a>
+      <a class="nav-item">My Consultations</a>
+      <a class="nav-item">Lab Results</a>
+      <a class="nav-item">Messages</a>
+      <a class="nav-item">Account Settings</a>
+    </nav>
+
+    <main class="portal-main">
+      <div class="section-label" id="mainSectionLabel">Active Consultation</div>
+      <div id="consultCard"></div>
+      <div class="humana-note" id="humanaNoteBox">
+        This program is provided through your Humana health plan benefit. Contact Humana Member Services for coverage questions.
+      </div>
+    </main>
+  </div>
+
+  <footer class="portal-footer">
+    &copy; 2026 Everlywell Inc. All rights reserved. &nbsp;|&nbsp; <a href="#" style="color:#9CA3AF;">Privacy Policy</a> &nbsp;|&nbsp; <a href="#" style="color:#9CA3AF;">Terms of Use</a>
+  </footer>
+
+<script>
+const programs = {
+  'mens-health': {
+    label: "Everlywell Direct — Men's Health",
+    subheaderText: "Men's Testosterone Program",
+    subheaderBg: '#EDE9FE', subheaderColor: '#6B21A8',
+    statusClass: 'status-in-progress', statusText: '● In Progress',
+    title: 'Testosterone Care Consultation',
+    meta: [
+      ['Provider', 'Dr. Sarah Lee'],
+      ['Consult ID', 'CST-2026-10849'],
+      ['Last Updated', 'Today']
+    ],
+    journey: [
+      {label:'Intake', state:'done'},
+      {label:'MA Review', state:'done'},
+      {label:'Provider Consult', state:'active'},
+      {label:'Documentation', state:'pending'},
+      {label:'Complete', state:'pending'}
+    ],
+    actions: ['View Chart Details', 'Message Provider'],
+    humana: false
+  },
+  'weight': {
+    label: 'Everlywell Direct — Weight Management',
+    subheaderText: 'GLP-1 Weight Management Program',
+    subheaderBg: '#CFFAFE', subheaderColor: '#0891B2',
+    statusClass: 'status-awaiting', statusText: '● Awaiting Provider Review',
+    title: 'GLP-1 / Weight Management Consultation',
+    meta: [
+      ['Provider', 'Assigned upon review'],
+      ['Consult ID', 'CST-2026-11203'],
+      ['Submitted', 'June 17, 2026']
+    ],
+    journey: [
+      {label:'Intake', state:'done'},
+      {label:'MA Review', state:'active'},
+      {label:'Provider Review', state:'pending'},
+      {label:'Prescription', state:'pending'},
+      {label:'Complete', state:'pending'}
+    ],
+    actions: ['View Status', 'Complete Intake'],
+    humana: false
+  },
+  'humana': {
+    label: 'Humana A1C Program',
+    subheaderText: 'Humana A1C Program — Powered by Everlywell',
+    subheaderBg: '#D1FAE5', subheaderColor: '#047857',
+    statusClass: 'status-complete', statusText: '✓ Completed',
+    title: 'Hemoglobin A1C Care Consultation',
+    meta: [
+      ['Provider', 'Dr. Marcus Webb'],
+      ['Consult ID', 'HMN-2026-00847'],
+      ['Completed', 'June 1, 2026']
+    ],
+    journey: [
+      {label:'Intake', state:'done'},
+      {label:'MA Review', state:'done'},
+      {label:'Provider Review', state:'done'},
+      {label:'Documentation', state:'done'},
+      {label:'Complete', state:'done'}
+    ],
+    actions: ['View Results', 'Schedule Follow-up'],
+    humana: true
+  }
+};
+
+let currentProgram = 'mens-health';
+
+function toggleDropdown() {
+  var btn = document.getElementById('switcherBtn');
+  var dd = document.getElementById('switcherDropdown');
+  btn.classList.toggle('open');
+  dd.classList.toggle('open');
+}
+
+function switchProgram(key, el) {
+  currentProgram = key;
+  var p = programs[key];
+
+  // Update switcher button
+  document.getElementById('switcherLabel').textContent = p.label;
+  document.getElementById('switcherBtn').classList.remove('open');
+  document.getElementById('switcherDropdown').classList.remove('open');
+
+  // Mark active option
+  document.querySelectorAll('.dropdown-option').forEach(function(opt) {
+    opt.classList.toggle('active', opt.dataset.program === key);
+  });
+
+  // Update sub-banner
+  var banner = document.getElementById('subBanner');
+  banner.style.background = p.subheaderBg;
+  banner.style.color = p.subheaderColor;
+  var bannerText = document.getElementById('subBannerText');
+  if (key === 'humana') {
+    bannerText.innerHTML = p.subheaderText + ' <span class="humana-badge">Humana Member</span>';
+  } else {
+    bannerText.textContent = p.subheaderText;
+  }
+
+  // Humana note
+  document.getElementById('humanaNoteBox').style.display = p.humana ? 'block' : 'none';
+
+  // Render card
+  renderCard(p);
+}
+
+function dotClass(state) {
+  if (state === 'done') return 'j-dot j-done';
+  if (state === 'active') return 'j-dot j-active';
+  return 'j-dot j-pending';
+}
+function dotContent(state) {
+  if (state === 'done') return '&#10003;';
+  if (state === 'active') return '&#9679;';
+  return '&#9675;';
+}
+function lineClass(idx, journey) {
+  if (idx >= journey.length - 1) return '';
+  var thisState = journey[idx].state;
+  var nextState = journey[idx+1].state;
+  return (thisState === 'done') ? 'j-line j-line-done' : 'j-line j-line-pending';
+}
+
+function renderCard(p) {
+  var journeyHtml = '<div class="journey-track">';
+  p.journey.forEach(function(stage, i) {
+    journeyHtml += '<div class="j-stage"><div class="' + dotClass(stage.state) + '">' + dotContent(stage.state) + '</div><div class="j-name">' + stage.label + '</div></div>';
+    if (i < p.journey.length - 1) {
+      var lc = (stage.state === 'done') ? 'j-line j-line-done' : 'j-line j-line-pending';
+      journeyHtml += '<div class="' + lc + '"></div>';
+    }
+  });
+  journeyHtml += '</div>';
+
+  var metaHtml = p.meta.map(function(m) {
+    return '<div class="meta"><strong>' + m[0] + ':</strong> ' + m[1] + '</div>';
+  }).join('');
+
+  var actionsHtml = p.actions.map(function(a, i) {
+    return '<button class="' + (i === 0 ? 'btn-primary' : 'btn-outline') + '">' + a + '</button>';
+  }).join('');
+
+  document.getElementById('consultCard').innerHTML =
+    '<div class="consult-card">' +
+      '<div class="consult-top">' +
+        '<div class="consult-title">' + p.title + '</div>' +
+        '<span class="status-pill ' + p.statusClass + '">' + p.statusText + '</span>' +
+      '</div>' +
+      metaHtml +
+      '<div class="journey-label">Care Journey</div>' +
+      journeyHtml +
+      '<div class="card-actions">' + actionsHtml + '</div>' +
+    '</div>';
+}
+
+// Init
+renderCard(programs['mens-health']);
+
+// Close dropdown on outside click
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.switcher-wrap')) {
+    document.getElementById('switcherBtn').classList.remove('open');
+    document.getElementById('switcherDropdown').classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>

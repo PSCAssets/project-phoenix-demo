@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}QA Review Queue — Project Phoenix{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+.qr-shell { margin-top: 60px; }
+.qr-topbar { background: #B45309; color: #fff; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 14px; }
+.qr-topbar-title { font-size: 16px; font-weight: 700; }
+.qr-topbar-sub { font-size: 12px; color: #FDE68A; }
+.qr-body { max-width: 1100px; margin: 0 auto; padding: 28px 24px; }
+.page-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: #6B7280; margin-bottom: 24px; }
+.stat-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 16px 20px; min-width: 160px; flex: 1; }
+.stat-label { font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-value.amber { color: #B45309; }
+.stat-value.green { color: #059669; }
+.stat-value.red { color: #DC2626; }
+.queue-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.queue-header { padding: 14px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; }
+.queue-title { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+.badge-amber { background: #FEF3C7; color: #92400E; }
+.badge-green { background: #D1FAE5; color: #065F46; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F9F5EE; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+.p-name { font-weight: 600; color: #111827; }
+.p-id { font-size: 11px; color: #9CA3AF; }
+.cp-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EDE9FE; color: #5B21B6; }
+.trigger-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.trigger-minor { background: #DBEAFE; color: #1D4ED8; }
+.trigger-poa { background: #FEF3C7; color: #92400E; }
+.trigger-third { background: #F3E8FF; color: #6B21A8; }
+.action-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; margin-right: 6px; }
+.btn-review { border-color: #6B21A8; color: #6B21A8; background: #fff; }
+.btn-review:hover { background: #F5F0FB; }
+.btn-approve { border-color: #059669; color: #059669; background: #fff; }
+.btn-approve:hover { background: #D1FAE5; }
+.btn-reject { border-color: #DC2626; color: #DC2626; background: #fff; }
+.btn-reject:hover { background: #FEF2F2; }
+.qa-note { font-size: 11px; color: #6B7280; font-style: italic; }
+.completed-tag { font-size: 11px; font-weight: 600; color: #059669; background: #D1FAE5; padding: 2px 8px; border-radius: 4px; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="qr-shell">
+  <div class="qr-topbar">
+    <div class="qr-topbar-title">QA Review Queue — Rachel Chen</div>
+    <div class="qr-topbar-sub">Role: QA Reviewer · Read-only access · Approve / Reject only</div>
+  </div>
+
+  <div class="qr-body">
+    <div class="page-title">QA Review Queue</div>
+    <div class="page-sub">Review submitted documentation for minor, POA, and third-party consults. You may approve or reject — all decisions are audit-logged.</div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value amber">4</div></div>
+      <div class="stat-card"><div class="stat-label">Approved Today</div><div class="stat-value green">7</div></div>
+      <div class="stat-card"><div class="stat-label">Rejected Today</div><div class="stat-value red">1</div></div>
+      <div class="stat-card"><div class="stat-label">SLA Breach Risk</div><div class="stat-value amber">1</div></div>
+    </div>
+
+    <!-- Pending Queue -->
+    <div class="queue-card">
+      <div class="queue-header">
+        <div class="queue-title">Pending Review</div>
+        <span class="badge badge-amber">4 items</span>
+      </div>
+      <table>
+        <thead><tr><th>Patient</th><th>Consult</th><th>Care Product</th><th>QA Trigger</th><th>Submitted By</th><th>Submitted</th><th>Documents</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="p-name">Emily W. (minor)</div><div class="p-id">PT-2026-00602</div></td>
+            <td>CST-2026-11221</td>
+            <td><span class="cp-tag">BRCA Hereditary</span></td>
+            <td><span class="trigger-badge trigger-minor">Minor — Under 18</span></td>
+            <td>Taylor Brooks, GC</td>
+            <td>Today 8:14 AM</td>
+            <td>2 documents uploaded ✓</td>
+            <td>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11221')">Review Docs</button>
+              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11221')">Approve ✓</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11221')">Reject ✗</button>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="p-name">Robert C. (POA)</div><div class="p-id">PT-2026-00587</div></td>
+            <td>CST-2026-11198</td>
+            <td><span class="cp-tag">GLP-1 Weight</span></td>
+            <td><span class="trigger-badge trigger-poa">POA — Third-party order</span></td>
+            <td>Jordan Patel, RN</td>
+            <td>Today 9:02 AM</td>
+            <td>1 document uploaded ✓</td>
+            <td>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11198')">Review Docs</button>
+              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11198')">Approve ✓</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11198')">Reject ✗</button>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="p-name">Maria S.</div><div class="p-id">PT-2026-00614</div></td>
+            <td>CST-2026-11244 <span style="font-size:10px;color:#DC2626;font-weight:700;">⚠ SLA at risk</span></td>
+            <td><span class="cp-tag">Hereditary Cancer</span></td>
+            <td><span class="trigger-badge trigger-third">Third-party order</span></td>
+            <td>Taylor Brooks, GC</td>
+            <td>Yesterday 3:45 PM</td>
+            <td>3 documents uploaded ✓</td>
+            <td>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11244')">Review Docs</button>
+              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11244')">Approve ✓</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11244')">Reject ✗</button>
+            </td>
+          </tr>
+          <tr>
+            <td><div class="p-name">Thomas K. (minor)</div><div class="p-id">PT-2026-00631</div></td>
+            <td>CST-2026-11267</td>
+            <td><span class="cp-tag">BRCA Hereditary</span></td>
+            <td><span class="trigger-badge trigger-minor">Minor — Under 18</span></td>
+            <td>Alex Kim, MA</td>
+            <td>Today 10:33 AM</td>
+            <td>Documents pending upload</td>
+            <td>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11267')" style="opacity:0.4;cursor:not-allowed;" disabled>Review Docs</button>
+              <button class="action-btn btn-approve" style="opacity:0.4;cursor:not-allowed;" disabled>Approve ✓</button>
+              <button class="action-btn btn-reject" style="opacity:0.4;cursor:not-allowed;" disabled>Reject ✗</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Completed Today -->
+    <div class="queue-card">
+      <div class="queue-header">
+        <div class="queue-title">Completed Today</div>
+        <span class="badge badge-green">8 items</span>
+      </div>
+      <table>
+        <thead><tr><th>Patient</th><th>Consult</th><th>Care Product</th><th>QA Trigger</th><th>Decision</th><th>Time</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="p-name">Linda P.</div><div class="p-id">PT-2026-00571</div></td>
+            <td>CST-2026-11175</td>
+            <td><span class="cp-tag">Testosterone</span></td>
+            <td><span class="trigger-badge trigger-third">Third-party order</span></td>
+            <td><span class="completed-tag">✓ Approved</span></td>
+            <td>7:58 AM</td>
+          </tr>
+          <tr>
+            <td><div class="p-name">James O.</div><div class="p-id">PT-2026-00388</div></td>
+            <td>CST-2026-11119</td>
+            <td><span class="cp-tag">ED Treatment</span></td>
+            <td><span class="trigger-badge trigger-poa">POA — Third-party order</span></td>
+            <td><span style="font-size:11px;font-weight:600;color:#DC2626;background:#FEF2F2;padding:2px 8px;border-radius:4px;">✗ Rejected — Missing POA doc</span></td>
+            <td>8:22 AM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:14px 18px;font-size:13px;color:#92400E;">
+      <strong>Role reminder:</strong> As QA Reviewer, you may review documents and approve or reject the QA stage. You cannot edit clinical content or consult notes. All decisions are logged to the audit trail.
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function openReview(id) {
+  alert('Opening document viewer for consult ' + id + '\n\nDocuments loaded in read-only view.\nReview all uploaded files before approving or rejecting.');
+}
+function approveQA(id) {
+  if (confirm('Approve QA stage for consult ' + id + '?\n\nThe consult workflow will automatically resume.')) {
+    alert('✓ Approved — Consult ' + id + ' resumed. GC notified.');
+    location.reload();
+  }
+}
+function rejectQA(id) {
+  var reason = prompt('Reject reason for consult ' + id + ':\n(Required — will be sent to GC Administrator queue)');
+  if (reason) {
+    alert('✗ Rejected — Consult ' + id + ' routed to GC Administrator queue.\nReason: ' + reason);
+    location.reload();
+  }
+}
+</script>
+{% endraw %}
+{% endblock %}

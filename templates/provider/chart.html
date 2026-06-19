@@ -176,6 +176,10 @@
 .right-tabs { display: flex; border-bottom: 1px solid #E5E0D8; flex-shrink: 0; }
 .right-tab-btn { flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: none; color: #6B7280; border-bottom: 2px solid transparent; }
 .right-tab-btn.active { color: #6B21A8; border-bottom-color: #6B21A8; }
+.panel-expand-btn { margin-left:auto; font-size:11px; font-weight:600; color:#6B7280; background:none; border:1px solid #E5E0D8; border-radius:5px; padding:3px 8px; cursor:pointer; flex-shrink:0; }
+.panel-expand-btn:hover { color:#6B21A8; border-color:#6B21A8; }
+.chart-right { transition: width 0.2s ease; }
+.chart-right.panel-expanded { width: 65%; min-width: 65%; }
 .right-panel { display: none; flex: 1; overflow-y: auto; padding: 14px 16px; }
 .right-panel.active { display: block; }
 .right-panel::-webkit-scrollbar { width: 3px; }
@@ -209,8 +213,8 @@
 .sign-success-banner.show { display:block; }
 
 /* ── Message modal ── */
-.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; justify-content:center; align-items:center; }
-.modal-backdrop.open { display:flex; }
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; justify-content:center; align-items:center; pointer-events:none; }
+.modal-backdrop.open { display:flex; pointer-events:all; }
 .modal { background:#fff; border-radius:12px; width:600px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
 .modal-header { padding:18px 24px 14px; border-bottom:1px solid #E5E0D8; display:flex; align-items:center; justify-content:space-between; }
 .modal-header h3 { font-size:16px; font-weight:700; color:#111827; }
@@ -325,7 +329,7 @@
 .composer-input { width:100%; border:1px solid #E5E0D8; border-radius:6px; padding:5px 8px; font-size:12px; font-family:inherit; box-sizing:border-box; }
 .composer-textarea { width:100%; border:1px solid #E5E0D8; border-radius:6px; padding:6px 8px; font-size:12px; font-family:inherit; resize:none; box-sizing:border-box; }
 /* ── Workflow progress strip ── */
-.wf-strip { background:#fff; border-bottom:1px solid #E5E0D8; padding:6px 18px; display:flex; align-items:center; gap:14px; flex-shrink:0; height:52px; }
+.wf-strip { background:#fff; border-bottom:1px solid #E5E0D8; padding:6px 18px; display:flex; align-items:center; gap:14px; flex-shrink:0; height:auto; min-height:52px; }
 .wf-stages { display:flex; align-items:center; gap:0; flex-shrink:0; }
 .wf-circle { width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; flex-shrink:0; }
 .wf-circle.wf-done { background:#1A1D23; color:#fff; }
@@ -333,6 +337,8 @@
 .wf-circle.wf-pending { background:transparent; border:2px solid #D1D5DB; color:#9CA3AF; }
 .wf-line { width:18px; height:2px; background:#E5E7EB; flex-shrink:0; }
 .wf-line.wf-line-done { background:#1A1D23; }
+.chart-drag-handle { width:4px; cursor:col-resize; background:#E5E0D8; flex-shrink:0; transition:background 0.15s; }
+.chart-drag-handle:hover { background:#6B21A8; }
 .wf-label { font-size:12px; color:#374151; white-space:nowrap; }
 .wf-sla { margin-left:10px; font-size:11px; font-weight:600; background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:8px; }
 /* ── Documentation Template ── */
@@ -516,15 +522,7 @@
 <!-- Main shell -->
 <div class="chart-shell">
 
-  <!-- Breadcrumb -->
-  <div class="chart-crumb">
-    <a href="/provider/">← Back to Dashboard</a>
-    <span class="chart-crumb-sep">|</span>
-    <span class="chart-crumb-cur">Marcus Johnson — CST-2026-10849</span>
-    <div class="chart-crumb-right">
-      <a href="/provider/new-patient" class="btn btn-primary" style="font-size:11px;padding:5px 12px;">+ New Patient</a>
-    </div>
-  </div>
+
 
   <!-- Concurrent viewer banner (Fix 11) -->
   <div class="concurrent-banner" id="concurrentBanner">
@@ -560,13 +558,13 @@
       </div>
     </div>
     <div class="demo-chips">
-      <div class="demo-chip">SLA<span class="demo-chip-val amber">1h 24m</span></div>
+      <!-- SLA display: only show when warning/alert threshold is triggered. Hidden when SLA is healthy (>50% remaining). -->
       <div class="demo-chip">STATUS<span class="demo-chip-val green">In Progress</span></div>
       <div class="demo-chip" id="consultsLeftChip" style="display:none;background:#F3F4F6;border-color:#E5E0D8;">Consults Left<span class="demo-chip-val" style="color:#374151;">3 follow-ups</span></div>
     </div>
     <div class="demo-actions" style="position:relative;">
-      <button class="btn btn-primary" onclick="openReviewSignModal()">Review &amp; Sign</button>
-      <button class="btn btn-outline" onclick="signChart()">Sign &amp; Close Chart</button>
+      <button onclick="openPreviewModal()" style="border:1.5px solid #6B21A8;color:#6B21A8;background:#fff;border-radius:8px;padding:8px 16px;font-weight:600;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">&#128065; Preview</button>
+      <button class="btn btn-outline" onclick="openSignModal()">Sign &amp; Close Chart</button>
       <button class="btn btn-outline" onclick="toggleCallPopover(event)">📞 Call</button>
       <button class="btn btn-outline" onclick="toggleVideoPopover(event)">🎥 Video</button>
       <button class="btn btn-outline" onclick="openScheduleModal()">📅 Schedule</button>
@@ -595,13 +593,38 @@
 
   <!-- Workflow Progress Strip -->
   <div class="wf-strip">
-    <div class="wf-stages">
-      {% for stage in workflow_stages %}{% set i = loop.index0 %}{% set done = stage.id in workflow_state.stages_completed %}{% set active = stage.id == workflow_state.current_stage %}<div class="wf-circle {% if done %}wf-done{% elif active %}wf-active{% else %}wf-pending{% endif %}">{% if done %}✓{% else %}{{ i + 1 }}{% endif %}</div>{% if not loop.last %}<div class="wf-line {% if done %}wf-line-done{% endif %}"></div>{% endif %}{% endfor %}
+    <div style="display:flex;align-items:flex-start;gap:0;flex-shrink:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-done">✓</div>
+        <div style="font-size:10px;color:#6B7280;text-align:center;white-space:nowrap;">Intake<br>Submitted</div>
+      </div>
+      <div class="wf-line wf-line-done" style="margin-top:11px;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-active" style="background:#6B21A8;box-shadow:0 0 0 3px rgba(107,33,168,0.2);">2</div>
+        <div style="font-size:10px;color:#6B21A8;font-weight:700;text-align:center;white-space:nowrap;">MA<br>Review</div>
+      </div>
+      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-pending">3</div>
+        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Provider<br>Assigned</div>
+      </div>
+      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-pending">4</div>
+        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Consult</div>
+      </div>
+      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-pending">5</div>
+        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Documen-<br>tation</div>
+      </div>
+      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div class="wf-circle wf-pending">6</div>
+        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Complete</div>
+      </div>
     </div>
-    {% if workflow_stages and workflow_state.current_stage_index < workflow_stages|length %}
-    {% set cur = workflow_stages[workflow_state.current_stage_index] %}
-    <div class="wf-label">Currently: <strong>{{ cur.name }}</strong> · Assigned to: {{ cur.role }}{% if cur.default_sla_hours %}<span class="wf-sla">SLA: 6h remaining</span>{% endif %}</div>
-    {% endif %}
+    <div class="wf-label">Currently: <strong>MA Review</strong> · Assigned to: MA</div>
   </div>
 
   <!-- Consult Type Banner — Phone -->
@@ -611,7 +634,13 @@
     <span class="ct-bl">Duration:</span><span class="ct-bv">15 min</span>
     <span class="ct-bsep">|</span>
     <span class="ct-bl">Patient Phone:</span><span class="ct-bv">(555) 234-5678</span>
-    <div class="ct-bactions"><button class="btn-join" onclick="alert('Joining phone call...')">Join Call</button></div>
+    <div class="ct-bactions">
+      <div class="modality-toggle" id="modalityToggle" style="display:flex;border:1.5px solid #6B21A8;border-radius:20px;overflow:hidden;margin-right:8px;">
+        <button class="mod-btn active" id="modVideo" onclick="setModality('video')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">🎥 Video</button>
+        <button class="mod-btn" id="modAudio" onclick="setModality('audio')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#6B21A8;">📞 Audio</button>
+      </div>
+      <button class="btn-join" onclick="alert('Joining phone call...')">Join Call</button>
+    </div>
   </div>
 
   <!-- Consult Type Banner — Video -->
@@ -621,7 +650,13 @@
     <span class="ct-bl">Duration:</span><span class="ct-bv">30 min</span>
     <span class="ct-bsep">|</span>
     <span class="ct-bl">Platform:</span><span class="ct-bv">Zoom</span>
-    <div class="ct-bactions"><button class="btn-launch-video" onclick="alert('Launching Zoom...')">Launch Video</button></div>
+    <div class="ct-bactions">
+      <div class="modality-toggle" style="display:flex;border:1.5px solid #6B21A8;border-radius:20px;overflow:hidden;margin-right:8px;">
+        <button class="mod-btn active" onclick="setModality('video')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">🎥 Video</button>
+        <button class="mod-btn" onclick="setModality('audio')" style="padding:5px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#6B21A8;">📞 Audio</button>
+      </div>
+      <button class="btn-launch-video" onclick="alert('Launching Zoom...')">Launch Video</button>
+    </div>
   </div>
 
   <!-- Consult Type Banner — Async -->
@@ -973,8 +1008,9 @@
       </div>
     </div><!-- /chart-center -->
 
+    <div id="chartDragHandle" class="chart-drag-handle"></div>
     <!-- RIGHT: SOAP / Labs / Messages / Timeline -->
-    <div class="chart-right">
+    <div class="chart-right" id="chartRight">
       <!-- AI Context Bar (Fix 7) -->
       <div class="ai-bar">
         <div class="ai-bar-row">
@@ -984,63 +1020,19 @@
         </div>
         <div class="ai-summary" id="aiSummaryText">Marcus Johnson, 41M, Testosterone Care — Follow-up #2 async. Testosterone levels 485 ng/dL (within range). Reports fatigue, particularly afternoon. No contraindications. Prior note: dosing stable. Consider injection timing adjustment or lab recheck at 90 days.</div>
       </div>
-      <div class="right-tabs">
-        <button class="right-tab-btn active" onclick="switchRightTab(0)">SOAP Note</button>
-        <button class="right-tab-btn" onclick="switchRightTab(1)">Lab Results</button>
-        <button class="right-tab-btn" onclick="switchRightTab(2)">Communication</button>
-        <button class="right-tab-btn" onclick="switchRightTab(3)">Documentation</button>
-        <button class="right-tab-btn" onclick="switchRightTab(4)">💬 Care Team</button>
+      <div style="display:flex;align-items:center;border-bottom:1px solid #E5E0D8;flex-shrink:0;">
+      <div class="right-tabs" style="border-bottom:none;flex:1;">
+        <button class="right-tab-btn active" onclick="switchRightTab(0)">Documentation</button>
+        <button class="right-tab-btn" onclick="switchRightTab(1)">Communication</button>
+        <button class="right-tab-btn zendesk" onclick="switchRightTab(2)">🎫 Zendesk</button>
+        <button class="right-tab-btn" onclick="switchRightTab(3)" style="color:#7C3AED;">📚 Clinical Resources</button>
+        <button class="right-tab-btn" onclick="switchRightTab(4)" style="color:#0E7490;">🔗 Linked Consults</button>
+      </div>
+      <button class="panel-expand-btn" id="panelExpandBtn" onclick="togglePanelExpand()">⤢ Expand</button>
       </div>
 
-      <!-- SOAP Note -->
-      <div class="right-panel active" id="rightPanel0">
-        <div style="font-size:11px;color:#9CA3AF;margin-bottom:12px;">SOAP Note — Jun 5, 2026 · Dr. Sarah Lee, MD</div>
-        <div class="soap-section">
-          <div class="soap-label">S — Subjective</div>
-          <div class="soap-text">Patient presents for Weight Management follow-up. Reports 8 lbs weight loss over past 6 weeks on GLP-1 protocol. Experiencing mild nausea on current dose. Energy levels improved. No chest pain, no shortness of breath.</div>
-        </div>
-        <div class="soap-section">
-          <div class="soap-label">O — Objective</div>
-          <div class="soap-text">Weight: 187 lbs (prev 195 lbs). BMI: 31.2. BP: 124/82 mmHg. HR: 76 bpm. HbA1c: 6.8% (elevated, prev 7.1%). Labs reviewed — trending in right direction.</div>
-        </div>
-        <div class="soap-section">
-          <div class="soap-label">A — Assessment</div>
-          <div class="soap-text">1. Obesity — responding to GLP-1 therapy, continued weight reduction.<br>2. Prediabetes — HbA1c improving with current management.<br>3. GI side effects likely dose-related, manageable.</div>
-        </div>
-        <div class="soap-section">
-          <div class="soap-label">P — Plan</div>
-          <div class="soap-text">1. Continue current GLP-1 dose for 4 more weeks.<br>2. Anti-nausea guidance provided.<br>3. Repeat HbA1c in 90 days.<br>4. Follow-up telehealth consult in 6 weeks.</div>
-        </div>
-        <div class="right-btn-row">
-          <button class="btn btn-primary" style="font-size:11px;" onclick="openReviewSignModal()">Review &amp; Sign</button>
-          <button class="btn btn-outline" onclick="signChart()" style="font-size:11px;">Sign &amp; Close Chart</button>
-        </div>
-      </div>
-
-      <!-- Lab Results -->
-      <div class="right-panel" id="rightPanel1">
-        <div style="font-size:11px;color:#9CA3AF;margin-bottom:12px;">Collected: Jun 8, 2026</div>
-        <div class="lab-row">
-          <span class="lab-name">Testosterone Total</span>
-          <div class="lab-val-wrap"><span class="lab-val">485 ng/dL</span><span class="lab-flag normal">Normal</span></div>
-        </div>
-        <div class="lab-row">
-          <span class="lab-name">Free Testosterone</span>
-          <div class="lab-val-wrap"><span class="lab-val">12.4 pg/mL</span><span class="lab-flag normal">Normal</span></div>
-        </div>
-        <div class="lab-row">
-          <span class="lab-name">HbA1c</span>
-          <div class="lab-val-wrap"><span class="lab-val">6.8%</span><span class="lab-flag elevated">Elevated</span></div>
-        </div>
-        <div class="lab-row">
-          <span class="lab-name">LH</span>
-          <div class="lab-val-wrap"><span class="lab-val">4.2 mIU/mL</span><span class="lab-flag normal">Normal</span></div>
-        </div>
-        <a href="#" style="font-size:12px;color:#6B21A8;font-weight:600;text-decoration:none;display:block;margin-top:12px;">View full report →</a>
-      </div>
-
-      <!-- Communication — Salesforce Activity Composer -->
-      <div class="right-panel" id="rightPanel2" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+      <!-- Communication — Activity Composer -->
+      <div class="right-panel" id="rightPanel1" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
         <!-- SECTION 1: Activity Composer -->
         <div style="border-bottom:2px solid #E5E0D8;flex-shrink:0;">
           <!-- Composer tab bar -->
@@ -1283,8 +1275,138 @@
         </div>
       </div>
 
+      <!-- Zendesk panel -->
+      <div class="right-panel" id="rightPanel2" style="padding:16px;overflow-y:auto;display:none;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;">&#127917; Zendesk &mdash; Active Case</div>
+          <button onclick="showRouteToast('Refreshed')" style="font-size:11px;font-weight:600;color:#6B21A8;border:1px solid #6B21A8;background:#fff;border-radius:6px;padding:3px 10px;cursor:pointer;">Refresh</button>
+        </div>
+        <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;background:#FAFAFA;">
+          <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#374151;min-width:88px;">Case #</span><span style="font-size:12px;color:#1F2937;font-weight:600;">ZD-293847</span></div>
+          <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#374151;min-width:88px;">Type</span><span style="font-size:12px;color:#1F2937;">Consult Support</span></div>
+          <div style="display:flex;gap:10px;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#374151;min-width:88px;">Status</span><span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#059669;padding:2px 8px;border-radius:10px;">&#9679; Open</span></div>
+          <div style="display:flex;gap:10px;"><span style="font-size:12px;font-weight:700;color:#374151;min-width:88px;">Assigned</span><span style="font-size:12px;color:#374151;">Beth Lewis</span></div>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:6px;">Last Agent Note (2h ago)</div>
+          <div style="background:#F9FAFB;border-radius:6px;padding:12px;font-size:12px;color:#4B5563;font-style:italic;line-height:1.5;">"Patient called re: consult timeline. Advised 24&ndash;48hr window. Patient confirmed availability for video this week."</div>
+          <a href="#" onclick="return false;" style="font-size:12px;font-weight:600;color:#6B21A8;text-decoration:none;display:block;margin-top:8px;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">View Full Case in Zendesk &#8599;</a>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:#6B7280;margin-bottom:6px;">&#10022; Add Note to Case</div>
+          <textarea id="zdNoteArea" placeholder="Type a note to sync to Zendesk..." style="width:100%;border:1px solid #E5E7EB;border-radius:6px;min-height:80px;padding:8px 10px;font-size:12px;color:#374151;resize:vertical;box-sizing:border-box;"></textarea>
+          <button onclick="addNoteToZendesk()" style="margin-top:6px;background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;">Add Note</button>
+        </div>
+      </div>
+
+      <!-- Clinical Resources panel — M02-CLB-001 -->
+      <div class="right-panel" id="rightPanel3" style="padding:14px 16px;overflow-y:auto;display:none;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:4px;">📚 Clinical Resources</div>
+        <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 14px;font-size:12px;color:#5B21B6;margin-bottom:4px;">
+          Published articles and blurbs from the Clinical Content Library relevant to this care product and diagnosis.
+        </div>
+
+        <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
+          <div style="padding:10px 14px;background:#F5F3FF;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">BRCA1 — Patient Education Overview</span>
+            <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Published</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
+            BRCA1 is a tumor suppressor gene. A pathogenic variant significantly increases lifetime risk of breast and ovarian cancer. Surveillance and risk-reduction options are available.<br>
+            <span style="font-size:11px;color:#9CA3AF;">Gene: BRCA1 · Inheritance: Autosomal dominant · NIH ACMG81 eligible</span>
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
+            <button onclick="insertBlurb('BRCA1 Patient Education Overview')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
+            <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full</button>
+          </div>
+        </div>
+
+        <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
+          <div style="padding:10px 14px;background:#F5F3FF;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">Lynch Syndrome — Surveillance Guide</span>
+            <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Published</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
+            Lynch syndrome is caused by variants in MMR genes (MLH1, MSH2, MSH6, PMS2). Carriers have elevated risk for colorectal, endometrial, and other cancers. Annual colonoscopy recommended from age 25.<br>
+            <span style="font-size:11px;color:#9CA3AF;">Gene: MLH1, MSH2, MSH6 · NIH ACMG81 eligible</span>
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
+            <button onclick="insertBlurb('Lynch Syndrome Surveillance Guide')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
+            <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full</button>
+          </div>
+        </div>
+
+        <div style="border:1.5px solid #FDE68A;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
+          <div style="padding:10px 14px;background:#FEF9EE;border-bottom:1px solid #FDE68A;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:#92400E;flex:1;">BRCA2 Splice Variant — Patient Summary</span>
+            <span style="font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;">Pending Publish</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
+            This article is pending review by the GC Administrator before it becomes available for use in patient letters.
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid #FDE68A;display:flex;gap:8px;">
+            <button disabled style="padding:5px 14px;background:#9CA3AF;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:not-allowed;">Insert into Letter</button>
+          </div>
+        </div>
+
+        <div style="margin-top:4px;">
+          <button onclick="requestBlurb()" style="width:100%;padding:9px;border:1.5px dashed #DDD6FE;border-radius:8px;background:#F5F3FF;color:#6B21A8;font-size:12px;font-weight:600;cursor:pointer;">
+            + Request New Clinical Content (Blurb Request)
+          </button>
+        </div>
+      </div>
+
+      <!-- Linked Consults panel — M02-LNK-001 -->
+      <div class="right-panel" id="rightPanel4" style="padding:14px 16px;overflow-y:auto;display:none;flex-direction:column;gap:12px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:4px;">🔗 Linked Consults</div>
+        <div style="background:#CFFAFE;border:1px solid #A5F3FC;border-radius:8px;padding:10px 14px;font-size:12px;color:#164E63;margin-bottom:4px;">
+          Episode ID: <strong>EP-2026-00849</strong> · 2 linked consults in this episode
+        </div>
+
+        <!-- Pre-Test linked consult -->
+        <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
+          <div style="padding:10px 14px;background:#F0FDF4;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Pre-Test</span>
+            <span style="font-size:12px;font-weight:700;color:#111827;flex:1;">CST-2026-11003</span>
+            <span style="font-size:11px;color:#059669;font-weight:600;">Closed</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#374151;">
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
+              <span><span style="color:#9CA3AF;font-size:11px;">Provider</span><br>Taylor Brooks, GC</span>
+              <span><span style="color:#9CA3AF;font-size:11px;">Date</span><br>May 14, 2026</span>
+              <span><span style="color:#9CA3AF;font-size:11px;">Care Product</span><br>BRCA Hereditary Cancer</span>
+            </div>
+            <div style="font-size:11px;color:#6B7280;background:#F9F5EE;border-radius:6px;padding:8px 10px;line-height:1.5;">
+              <strong>Note excerpt:</strong> Patient presents with significant family history of breast cancer (mother: BRCA2+, maternal aunt: BRCA1+). Pre-test counseling completed. Patient understands implications of testing. Consent obtained for ACMG81 secondary findings.
+            </div>
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
+            <button onclick="importPriorNote('CST-2026-11003')" style="padding:5px 14px;background:#0E7490;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Import Note into Current</button>
+            <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full Chart</button>
+          </div>
+        </div>
+
+        <!-- Current consult indicator -->
+        <div style="border:2px solid #6B21A8;border-radius:8px;overflow:hidden;background:#F5F3FF;margin-bottom:4px;">
+          <div style="padding:10px 14px;border-bottom:1px solid #DDD6FE;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;background:#EDE9FE;color:#5B21B6;padding:2px 7px;border-radius:4px;">Post-Test</span>
+            <span style="font-size:12px;font-weight:700;color:#6B21A8;flex:1;">CST-2026-10849 (current)</span>
+            <span style="font-size:11px;color:#D97706;font-weight:600;">In Progress</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#5B21B6;">
+            This is the currently open consult.
+          </div>
+        </div>
+
+        <div style="margin-top:4px;">
+          <button onclick="linkConsult()" style="width:100%;padding:9px;border:1.5px dashed #CBD5E1;border-radius:8px;background:#F9FAFB;color:#6B7280;font-size:12px;font-weight:600;cursor:pointer;">
+            + Link another consult to this episode
+          </button>
+        </div>
+      </div>
+
       <!-- Documentation -->
-      <div class="right-panel" id="rightPanel3" style="padding:0;overflow:hidden;">
+      <div class="right-panel active" id="rightPanel0" style="padding:0;overflow-y:auto;display:flex;flex-direction:column;">
 {% if consult.care_product == 'A1C Management' %}
 <div class="doc-outer">
   <div style="flex-shrink:0;padding:8px 16px;background:#FAFAF9;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
@@ -1317,7 +1439,7 @@
 
       <!-- Section 1: Chief Complaint (collapsed) -->
       <div class="doc-section" id="docsec1">
-        <div class="doc-sec-hd" onclick="toggleDocSection(1)">
+        <div class="doc-sec-hd" id="section-chief-complaint" onclick="toggleDocSection(1)">
           <div class="doc-sec-num">1</div>
           <div class="doc-sec-title">Chief Complaint</div>
           <div class="doc-sec-summary">A1C follow-up — refill request, diabetes management</div>
@@ -1332,7 +1454,7 @@
 
       <!-- Section 2: HPI (collapsed) -->
       <div class="doc-section" id="docsec2">
-        <div class="doc-sec-hd" onclick="toggleDocSection(2)">
+        <div class="doc-sec-hd" id="section-hpi" onclick="toggleDocSection(2)">
           <div class="doc-sec-num">2</div>
           <div class="doc-sec-title">History of Present Illness</div>
           <div class="doc-sec-summary">63F &middot; Type 2 DM &middot; HbA1c 9.2% &middot; refill request</div>
@@ -1352,7 +1474,7 @@
 
       <!-- Section 3: Review of Systems (collapsed) -->
       <div class="doc-section" id="docsec3">
-        <div class="doc-sec-hd" onclick="toggleDocSection(3)">
+        <div class="doc-sec-hd" id="section-ros" onclick="toggleDocSection(3)">
           <div class="doc-sec-num">3</div>
           <div class="doc-sec-title">Review of Systems</div>
           <div class="doc-sec-summary">8 systems reviewed &mdash; 4 positive findings</div>
@@ -1377,7 +1499,7 @@
 
       <!-- Section 4: Vitals (collapsed) -->
       <div class="doc-section" id="docsec4">
-        <div class="doc-sec-hd" onclick="toggleDocSection(4)">
+        <div class="doc-sec-hd" id="section-vitals" onclick="toggleDocSection(4)">
           <div class="doc-sec-num">4</div>
           <div class="doc-sec-title">Vitals</div>
           <div class="doc-sec-summary">BP 148/92 (High) &middot; HR 78 &middot; Weight 187 lbs &middot; BMI 32.1</div>
@@ -1406,7 +1528,7 @@
 
       <!-- Section 5: Lab Results (collapsed) -->
       <div class="doc-section" id="docsec5">
-        <div class="doc-sec-hd" onclick="toggleDocSection(5)">
+        <div class="doc-sec-hd" id="section-lab-results" onclick="toggleDocSection(5)">
           <div class="doc-sec-num">5</div>
           <div class="doc-sec-title">Lab Results</div>
           <div class="doc-sec-summary">HbA1c 9.2% (High) &middot; FG 214 &middot; ACR missing</div>
@@ -1428,7 +1550,7 @@
 
       <!-- Section 6: Physical Exam (collapsed) -->
       <div class="doc-section" id="docsec6">
-        <div class="doc-sec-hd" onclick="toggleDocSection(6)">
+        <div class="doc-sec-hd section-exam" id="section-physical-exam" onclick="toggleDocSection(6)">
           <div class="doc-sec-num">6</div>
           <div class="doc-sec-title">Physical Exam</div>
           <div class="doc-sec-summary">General: NAD &middot; Foot: diminished sensation right plantar</div>
@@ -1449,7 +1571,7 @@
 
       <!-- Section 7: Assessment / Diagnoses (expanded) -->
       <div class="doc-section open" id="docsec7">
-        <div class="doc-sec-hd" onclick="toggleDocSection(7)">
+        <div class="doc-sec-hd" id="section-diagnoses" onclick="toggleDocSection(7)">
           <div class="doc-sec-num">7</div>
           <div class="doc-sec-title">Assessment / Diagnoses</div>
           <div class="doc-sec-summary"></div>
@@ -1469,7 +1591,7 @@
 
       <!-- Section 8: Plan (expanded) -->
       <div class="doc-section open" id="docsec8">
-        <div class="doc-sec-hd" onclick="toggleDocSection(8)">
+        <div class="doc-sec-hd" id="section-plan" onclick="toggleDocSection(8)">
           <div class="doc-sec-num">8</div>
           <div class="doc-sec-title">Plan</div>
           <div class="doc-sec-summary"></div>
@@ -1503,7 +1625,7 @@
 
       <!-- Section 9: HEDIS CDC Measures (expanded) -->
       <div class="doc-section open" id="docsec9">
-        <div class="doc-sec-hd" onclick="toggleDocSection(9)">
+        <div class="doc-sec-hd" id="section-hedis" onclick="toggleDocSection(9)">
           <div class="doc-sec-num">9</div>
           <div class="doc-sec-title">HEDIS CDC Measures</div>
           <div class="doc-sec-summary"></div>
@@ -1528,7 +1650,7 @@
 
       <!-- Section 10: MDM / Billing (expanded) -->
       <div class="doc-section open" id="docsec10">
-        <div class="doc-sec-hd" onclick="toggleDocSection(10)">
+        <div class="doc-sec-hd" id="section-mdm" onclick="toggleDocSection(10)">
           <div class="doc-sec-num">10</div>
           <div class="doc-sec-title">MDM / Billing</div>
           <div class="doc-sec-summary"></div>
@@ -2045,35 +2167,8 @@
 {% else %}
 <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:13px;">No documentation template for this care product.</div>
 {% endif %}
-      </div><!-- /rightPanel3 -->
-      <div class="right-panel" id="rightPanel4" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
-        <div style="display:flex;flex-direction:column;gap:0;height:100%;">
-          <div style="background:#F9FAFB;padding:10px 14px;border-bottom:1px solid #E5E0D8;font-size:12px;font-weight:700;color:#374151;flex-shrink:0;">
-            💬 Internal Care Team — CST-2026-10849 · Marcus Johnson
-            <span style="font-size:10px;font-weight:400;color:#9CA3AF;margin-left:6px;">Visible to care team only</span>
-          </div>
-          <div style="padding:12px;display:flex;flex-direction:column;gap:10px;flex:1;overflow-y:auto;">
-            <div style="display:flex;gap:8px;">
-              <div style="width:28px;height:28px;border-radius:50%;background:#00A67E;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">SR</div>
-              <div>
-                <div style="font-size:11px;color:#6B7280;margin-bottom:2px;">Sarah R. (MA) · 9:14 AM</div>
-                <div style="background:#F3F4F6;border-radius:8px;padding:8px 12px;font-size:13px;color:#374151;">Patient confirmed insurance. Intake submitted. Ready for provider.</div>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;flex-direction:row-reverse;">
-              <div style="width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">DR</div>
-              <div style="text-align:right;">
-                <div style="font-size:11px;color:#6B7280;margin-bottom:2px;">Dr. Chen · 9:18 AM</div>
-                <div style="background:#EDE9FE;border-radius:8px;padding:8px 12px;font-size:13px;color:#374151;">Please check if the March testosterone panel labs are attached.</div>
-              </div>
-            </div>
-          </div>
-          <div style="border-top:1px solid #E5E0D8;padding:10px 14px;display:flex;gap:8px;flex-shrink:0;">
-            <input type="text" placeholder="Message care team..." style="flex:1;border:1px solid #E5E0D8;border-radius:6px;padding:7px 10px;font-size:13px;outline:none;">
-            <button style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Send</button>
-          </div>
-        </div>
-      </div><!-- /rightPanel4 -->
+      </div><!-- /rightPanel0 -->
+
 
     </div><!-- /chart-right -->
 
@@ -2174,45 +2269,83 @@
   </div>
 </div>
 
+<!-- Stage/status bar (SLA tracking) -->
+<div class="status-bar stage-bar" id="stageBar" style="display:none;">Stage: Active</div>
+
 <!-- ROUTE MODAL (Fix 5) -->
-<div class="modal-backdrop" id="routeModal">
-  <div class="route-modal">
+<div class="modal-backdrop" id="routingModal">
+  <div class="route-modal routing-modal">
     <div class="modal-header">
-      <h3>Route Consult to Queue</h3>
+      <h3>Route This Consultation</h3>
       <button class="modal-close" onclick="closeRouteModal()">×</button>
     </div>
     <div class="modal-body">
       <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">Route Marcus Johnson — CST-2026-10849</div>
-      <div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Reassign this consult to another role's queue. The current provider will be removed.</div>
+      <div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Select a problem type to route this consultation to the appropriate queue.</div>
       <div class="form-group">
-        <label class="form-label">Select Role / Queue</label>
-        <select class="form-select">
-          <option value="">— Select role —</option>
-          <option>MA Queue (Medical Assistant)</option>
-          <option>NP Queue (Nurse Practitioner)</option>
-          <option>RN Queue (Registered Nurse)</option>
-          <option>MD/DO Queue (Physician)</option>
-          <option>Care Coordinator Queue</option>
-          <option>Supervisor — Escalation</option>
+        <label class="form-label">Problem Type</label>
+        <select class="form-select problem-type" id="problemType" onchange="onProblemTypeChange(this.value)">
+          <option value="">— Select problem type —</option>
+          <option value="billing">Billing Question</option>
+          <option value="clinical">Clinical Question</option>
+          <option value="careteam">Care Team Follow-up</option>
+          <option value="escalation">Escalation — Urgent</option>
+          <option value="lab">Lab Question</option>
+          <option value="rx">Prescription/Refill</option>
+          <option value="scheduling">Scheduling</option>
+          <option value="individual">Message Individual</option>
+        </select>
+      </div>
+      <div class="form-group route-to" id="routeToGroup" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
+        <label class="form-label">Route To</label>
+        <select class="form-select" id="routeToSelect" onchange="updateRouteBtn()">
+          <option value="">&#8212; Select team member &#8212;</option>
+          <option value="Dr. Sarah Lee (Physician)">Dr. Sarah Lee (Physician)</option>
+          <option value="Dr. Marcus Webb (Physician)">Dr. Marcus Webb (Physician)</option>
+          <option value="Jamie Rodriguez (MA)">Jamie Rodriguez (MA)</option>
+          <option value="Priya Nair (MA)">Priya Nair (MA)</option>
+          <option value="Dana Cho (Care Coordinator)">Dana Cho (Care Coordinator)</option>
+          <option value="Alex Kim (Billing Specialist)">Alex Kim (Billing Specialist)</option>
+          <option value="Rachel Torres (Clinical Pharmacist)">Rachel Torres (Clinical Pharmacist)</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Routing Note (optional)</label>
-        <textarea class="form-textarea" rows="3" placeholder="Add context for the receiving provider..."></textarea>
+        <textarea class="form-textarea" rows="3" placeholder="Add context for the receiving team..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeRouteModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="closeRouteModal()">Route Consult</button>
+      <button class="btn btn-primary" id="routeConfirmBtn" onclick="confirmRoute()">Route</button>
     </div>
   </div>
 </div>
+
+<!-- Route-to-Individual secondary modal -->
+<div class="modal-backdrop" id="msgIndividualModal">
+  <div class="modal" style="width:460px;">
+    <div class="modal-header">
+      <h3>Is this message related to this patient's consultation?</h3>
+      <button class="modal-close" onclick="document.getElementById('msgIndividualModal').classList.remove('open')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="msgIndividualBody" style="font-size:13px;color:#6B7280;">How you answer determines whether this message is logged to the patient chart or sent as a general internal message.</div>
+    </div>
+    <div class="modal-footer" style="gap:10px;">
+      <button class="btn btn-primary" onclick="logToChart()" style="flex:1;">Yes — Log to Patient Chart</button>
+      <button class="btn btn-outline" onclick="useInternalMsg()" style="flex:1;">No — Use Internal Messaging</button>
+    </div>
+  </div>
+</div>
+
+<!-- Route toast -->
+<div id="routeToast" style="display:none;position:fixed;bottom:24px;right:24px;background:#1F2937;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;z-index:400;box-shadow:0 4px 12px rgba(0,0,0,0.2);">✓ Routed</div>
 
 <!-- REVIEW & SIGN MODAL (Bug 2) -->
 <div class="modal-backdrop" id="reviewSignModal">
   <div class="modal" style="width:580px;">
     <div class="modal-header">
-      <h3>Review &amp; Sign — CST-2026-10849</h3>
+      <h3>Sign Chart &mdash; CST-2026-10849</h3>
       <button class="modal-close" onclick="closeReviewSignModal()">×</button>
     </div>
     <div class="modal-body">
@@ -2251,6 +2384,97 @@ P — Plan
 <!-- Sign toast -->
 <div id="signToast" style="display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#D1FAE5;border:2px solid #6EE7B7;border-radius:10px;padding:12px 28px;font-size:14px;font-weight:700;color:#065F46;z-index:2000;box-shadow:0 4px 16px rgba(0,0,0,0.12);">Chart note signed ✓</div>
 
+<!-- CHART PREVIEW MODAL (Change D) -->
+<div id="previewModal" class="preview-modal" aria-label="Preview Modal" style="display:none;position:fixed;inset:0;background:#fff;z-index:1000;flex-direction:column;pointer-events:none;">
+  <div style="background:#fff;border-bottom:2px solid #E5E0D8;padding:14px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;flex-shrink:0;">
+    <div style="flex:1;min-width:0;">
+      <div style="font-size:18px;font-weight:700;color:#111827;">Chart Preview &mdash; Marcus Johnson &mdash; CST-2026-10849</div>
+      <div style="font-size:12px;color:#6B7280;margin-top:2px;">Read-only preview &middot; Dr. Sarah Lee &middot; Jun 17, 2026</div>
+    </div>
+    <button onclick="closePreviewModal()" style="border:1px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;background:#fff;cursor:pointer;color:#374151;white-space:nowrap;">Close Preview</button>
+    <button onclick="closePreviewModal();openSignModal();" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">Sign &amp; Close Chart</button>
+    <button onclick="closePreviewModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9CA3AF;line-height:1;padding:0 4px;flex-shrink:0;">&#x2715;</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;">
+  <div style="max-width:780px;margin:32px auto;padding:0 24px 48px;">
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Chief Complaint</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;">Testosterone Care follow-up consultation. Patient reports fatigue and low energy levels, primarily in the afternoon. Requesting review of current treatment protocol and assessment of continued dosing.</div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">History of Present Illness</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;">41-year-old male presenting for Testosterone Care follow-up. Currently on Testosterone Cypionate 200mg/2mL weekly. Reports significant fatigue (7/10) affecting daily activities, particularly afternoon energy slump around 3pm. Prior testosterone therapy documented. No contraindications identified. HbA1c 6.8% (elevated). Weight trending down 8 lbs. Labs reviewed and within therapeutic range.</div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Review of Systems</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;"><strong>Positive:</strong> Fatigue, reduced energy, afternoon symptoms (constitutional), bilateral foot tingling &mdash; right greater than left (neurological), mild palpitations (cardiovascular), polyuria &times;3 weeks (GU). <strong>Negative:</strong> No respiratory complaints, no GI symptoms, no musculoskeletal pain. <strong>8 systems reviewed &mdash; 4 positive findings.</strong></div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Physical Exam</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;">Vitals: BP 124/82&nbsp;mmHg (stable), HR 76&nbsp;bpm (normal), Weight 187&nbsp;lbs (down from 195), BMI 31.2. General: Well-appearing male in no acute distress. Cardiovascular: Regular rate and rhythm. Respiratory: Clear to auscultation bilaterally. No acute focal findings. Musculoskeletal: No joint swelling or tenderness noted.</div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Assessment &amp; Plan</div>
+      <div style="font-size:13px;color:#374151;line-height:1.7;">
+        <strong>Assessment:</strong> Testosterone deficiency (E29.1) with partial symptomatic response. Prediabetes (R73.09) &mdash; HbA1c improving. Obesity class I (E66.01) &mdash; weight reduction in progress.<br><br>
+        <strong>Plan:</strong><br>
+        1. Continue Testosterone Cypionate 200mg/2mL weekly; evaluate injection timing adjustment for afternoon fatigue symptom pattern.<br>
+        2. Repeat HbA1c in 90 days; continue Metformin 500mg BID.<br>
+        3. Follow-up telehealth consult in 6 weeks.<br>
+        4. Patient education provided on symptom tracking and lifestyle adjustments.
+      </div>
+    </div>
+    <div style="margin-bottom:28px;">
+      <div style="font-size:13px;font-weight:700;color:#1F2937;border-bottom:2px solid #E5E0D8;padding-bottom:6px;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">MDM / Billing</div>
+      <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:16px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;color:#374151;">
+          <div><span style="font-weight:600;color:#6B7280;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">MDM Complexity</span><div style="font-weight:700;color:#111827;margin-top:3px;">Moderate</div></div>
+          <div><span style="font-weight:600;color:#6B7280;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Total Time</span><div style="font-weight:700;color:#111827;margin-top:3px;">38 minutes</div></div>
+          <div><span style="font-weight:600;color:#6B7280;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Billing Codes</span><div style="font-weight:700;color:#111827;margin-top:3px;">99457 + 99458 + G2066</div></div>
+          <div><span style="font-weight:600;color:#6B7280;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Diagnosis Codes</span><div style="font-weight:700;color:#111827;margin-top:3px;">E29.1, R73.09, E66.01</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:2px solid #E5E0D8;padding-top:16px;text-align:center;font-size:12px;color:#6B7280;font-style:italic;">
+      Review all sections before signing. Once signed, this chart will be closed and submitted.
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- SIGN & CLOSE CHART MODAL (Change E) -->
+<div class="modal-backdrop" id="signModal">
+  <div class="modal" style="width:520px;max-width:95vw;">
+    <div class="modal-header">
+      <h3>Sign &amp; Close Chart</h3>
+      <button class="modal-close" onclick="closeSignModal()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#F9FAFB;border-radius:8px;padding:16px;margin-bottom:18px;font-size:13px;color:#374151;line-height:1.65;font-style:italic;border:1px solid #E5E0D8;">
+        &#8220;I attest that I have reviewed this patient&#8217;s chart, the documentation is accurate and complete to the best of my knowledge, and this consultation is ready for billing submission.&#8221;
+      </div>
+      <div class="form-group">
+        <label class="form-label signing-provider">Signing Provider</label>
+        <input class="form-input" id="signingProvider" value="Dr. Sarah Lee" type="text">
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Confirm or update your name as it will appear on the signed chart</div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:#374151;">
+          <input type="checkbox" id="signAttestation" onchange="updateSignBtn()" style="margin-top:2px;accent-color:#6B21A8;width:16px;height:16px;flex-shrink:0;">
+          <span>I confirm the above attestation and authorize chart closure</span>
+        </label>
+      </div>
+      <div style="font-size:12px;color:#6B7280;background:#F3F4F6;border-radius:6px;padding:8px 12px;">
+        MDM Complexity: Moderate &middot; Codes: 99457 + 99458 + G2066 &middot; Total Time: 38 min
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeSignModal()">Cancel</button>
+      <button class="btn btn-primary" id="signConfirmBtn" onclick="confirmSign()" disabled style="opacity:0.5;cursor:not-allowed;">Sign &amp; Close</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -2277,13 +2501,23 @@ function toggleAcc(bodyId, chevId) {
   if (chev) chev.textContent = body.classList.contains('closed') ? '▸' : '▾';
 }
 
-// Right panel tabs
+// Right panel tabs — targets by ID so DOM order doesn't matter
+// Panel map: 0=Documentation(flex), 1=Communication(flex), 2=Zendesk(flex), 3=ClinicalResources(flex), 4=LinkedConsults(flex)
+var RIGHT_PANEL_FLEX = {0: true, 1: true, 2: true};
+document.addEventListener('DOMContentLoaded', function() { switchRightTab(0); });
 function switchRightTab(idx) {
   document.querySelectorAll('.right-tab-btn').forEach(function(b, i) { b.classList.toggle('active', i === idx); });
-  document.querySelectorAll('.right-panel').forEach(function(p, i) {
-    p.classList.toggle('active', i === idx);
-    if (i === 2 || i === 3) p.style.display = (i === idx) ? 'flex' : 'none';
-  });
+  for (var i = 0; i < 3; i++) {
+    var p = document.getElementById('rightPanel' + i);
+    if (!p) continue;
+    var isActive = (i === idx);
+    p.classList.toggle('active', isActive);
+    if (!isActive) {
+      p.style.display = 'none';
+    } else {
+      p.style.display = RIGHT_PANEL_FLEX[i] ? 'flex' : 'block';
+    }
+  }
 }
 
 // Documentation section toggle
@@ -2296,7 +2530,11 @@ function docScrollTo(n) {
   var center = document.getElementById('docCenter');
   if (sec && center) {
     if (!sec.classList.contains('open')) sec.classList.add('open');
-    center.scrollTo({ top: sec.offsetTop - 8, behavior: 'smooth' });
+    // offsetTop is relative to .chart-shell (position:fixed), not to #docCenter.
+    // Use getBoundingClientRect to get the offset within the scroll container.
+    var top = sec.getBoundingClientRect().top - center.getBoundingClientRect().top + center.scrollTop - 8;
+    center.scrollTo({ top: top, behavior: 'smooth' });
+    // sec.scrollIntoView({ behavior: 'smooth', block: 'start' }) not used — container-aware scroll above
   }
   document.querySelectorAll('.doc-nav-item').forEach(function(el, i) { el.classList.toggle('active', i + 1 === n); });
 }
@@ -2312,6 +2550,32 @@ function awvScrollTo(n) {
 function selectAwvMdm(idx) {
   document.querySelectorAll('#awvMdmOpts .mdm-opt').forEach(function(el, i) { el.classList.toggle('selected', i === idx); });
 }
+
+// Change B — IntersectionObserver: highlight active doc-nav item as user scrolls docCenter
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    var center = document.getElementById('docCenter');
+    if (!center) return;
+    var sections = [];
+    for (var i = 1; i <= 10; i++) {
+      var s = document.getElementById('docsec' + i);
+      if (s) sections.push({ el: s, idx: i });
+    }
+    if (!sections.length) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          var n = parseInt(id.replace('docsec', ''));
+          document.querySelectorAll('.doc-nav-item').forEach(function(el, i) {
+            el.classList.toggle('active', i + 1 === n);
+          });
+        }
+      });
+    }, { root: center, threshold: 0.25 });
+    sections.forEach(function(s) { observer.observe(s.el); });
+  });
+})();
 
 // Modal
 function openMessageModal() { document.getElementById('msgModal').classList.add('open'); }
@@ -2375,12 +2639,52 @@ function useTemplate(idx) {
 }
 renderTemplates();
 
-// Sign chart
+// Sign chart (kept for legacy calls)
 function signChart() {
   var banner = document.getElementById('signBanner');
-  banner.classList.add('show');
-  setTimeout(function() { banner.classList.remove('show'); }, 3500);
+  if (banner) { banner.classList.add('show'); setTimeout(function() { banner.classList.remove('show'); }, 3500); }
 }
+
+// Preview modal (Change D)
+function openPreviewModal() {
+  var m = document.getElementById('previewModal');
+  if (m) { m.style.display = 'flex'; m.style.pointerEvents = 'all'; }
+}
+function closePreviewModal() {
+  var m = document.getElementById('previewModal');
+  if (m) { m.style.display = 'none'; m.style.pointerEvents = 'none'; }
+}
+
+// Sign & Close Chart modal (Change E)
+function openSignModal() {
+  var m = document.getElementById('signModal');
+  if (!m) return;
+  m.classList.add('open');
+  var cb = document.getElementById('signAttestation');
+  if (cb) cb.checked = false;
+  updateSignBtn();
+}
+function closeSignModal() {
+  var m = document.getElementById('signModal');
+  if (m) m.classList.remove('open');
+}
+function updateSignBtn() {
+  var cb = document.getElementById('signAttestation');
+  var btn = document.getElementById('signConfirmBtn');
+  if (!cb || !btn) return;
+  btn.disabled = !cb.checked;
+  btn.style.opacity = cb.checked ? '1' : '0.5';
+  btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
+}
+function confirmSign() {
+  closeSignModal();
+  var t = document.getElementById('routeToast');
+  if (t) { t.textContent = '✓ Chart signed and closed — CST-2026-10849'; t.style.display = 'block'; setTimeout(function(){ t.style.display = 'none'; }, 3000); }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var sm = document.getElementById('signModal');
+  if (sm) sm.addEventListener('click', function(e) { if (e.target === this) closeSignModal(); });
+});
 
 // Sidebar toggle
 function toggleChartSidebar() {
@@ -2396,9 +2700,138 @@ function toggleChartSidebar() {
 }
 
 // Route modal
-function openRouteModal() { document.getElementById('routeModal').classList.add('open'); }
-function closeRouteModal() { document.getElementById('routeModal').classList.remove('open'); }
-document.getElementById('routeModal').addEventListener('click', function(e) { if (e.target === this) closeRouteModal(); });
+// Drag-to-resize panel — uses per-drag listeners that are removed on mouseup
+(function() {
+  var handle = document.getElementById('chartDragHandle');
+  var right = document.getElementById('chartRight');
+  if (!handle || !right) return;
+  handle.addEventListener('mousedown', function(e) {
+    var startX = e.clientX, startW = right.offsetWidth;
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+    function onMove(ev) {
+      var delta = startX - ev.clientX;
+      var newW = Math.max(320, Math.min(startW + delta, window.innerWidth - 280 - 4));
+      right.style.width = newW + 'px'; right.style.minWidth = newW + 'px';
+    }
+    function onUp() {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.body.style.userSelect = '';
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+})();
+
+// Expand/collapse right panel
+function togglePanelExpand() {
+  var right = document.getElementById('chartRight');
+  var btn = document.getElementById('panelExpandBtn');
+  if (!right) return;
+  if (right.classList.contains('panel-expanded')) {
+    right.classList.remove('panel-expanded');
+    right.style.width = ''; right.style.minWidth = '';
+    if (btn) btn.textContent = '⤢ Expand';
+  } else {
+    right.classList.add('panel-expanded');
+    right.style.width = '65%'; right.style.minWidth = '65%';
+    if (btn) btn.textContent = '⤡ Collapse';
+  }
+}
+
+// Modality toggle
+function setModality(mode) {
+  document.querySelectorAll('.mod-btn').forEach(function(b) {
+    var isActive = b.id === 'mod'+mode.charAt(0).toUpperCase()+mode.slice(1) || b.textContent.toLowerCase().includes(mode === 'video' ? 'video' : 'audio');
+    b.style.background = isActive ? '#6B21A8' : '#fff';
+    b.style.color = isActive ? '#fff' : '#6B21A8';
+  });
+}
+
+function openRouteModal() { document.getElementById('routingModal').classList.add('open'); }
+function closeRouteModal() { document.getElementById('routingModal').classList.remove('open'); }
+document.getElementById('routingModal').addEventListener('click', function(e) { if (e.target === this) closeRouteModal(); });
+function onProblemTypeChange(val) {
+  var grp = document.getElementById('routeToGroup');
+  if (grp) {
+    if (val === 'individual') {
+      grp.style.maxHeight = '120px';
+    } else {
+      grp.style.maxHeight = '0';
+      var sel = document.getElementById('routeToSelect');
+      if (sel) sel.value = '';
+    }
+  }
+  updateRouteBtn();
+}
+function updateRouteBtn() {
+  var type = document.getElementById('problemType') ? document.getElementById('problemType').value : '';
+  var btn = document.getElementById('routeConfirmBtn');
+  if (!btn) return;
+  var needsTo = type === 'individual';
+  var toVal = needsTo ? (document.getElementById('routeToSelect') ? document.getElementById('routeToSelect').value : '') : 'ok';
+  var ready = type && toVal;
+  btn.disabled = !ready;
+  btn.style.opacity = ready ? '1' : '0.6';
+  btn.style.cursor = ready ? 'pointer' : 'not-allowed';
+}
+function confirmRoute() {
+  var type = document.getElementById('problemType').value;
+  var toSel = document.getElementById('routeToSelect');
+  var toName = toSel ? toSel.value : '';
+  closeRouteModal();
+  if (type === 'individual') {
+    var body = document.getElementById('msgIndividualBody');
+    if (body && toName) {
+      body.innerHTML = 'Is this message related to <strong>Marcus Johnson&#8217;s</strong> consultation? It will be sent to <strong>' + toName + '</strong>.';
+    }
+    window._routeToName = toName;
+    document.getElementById('msgIndividualModal').classList.add('open');
+    return;
+  }
+  if (!type) { showRouteToast('✓ Routed'); return; }
+  var labels = {billing:'Billing Question',clinical:'Clinical Question',careteam:'Care Team Follow-up',escalation:'Escalation — Urgent',lab:'Lab Question',rx:'Prescription/Refill',scheduling:'Scheduling'};
+  showRouteToast('✓ Routed to ' + (labels[type] || type));
+}
+function logToChart() {
+  document.getElementById('msgIndividualModal').classList.remove('open');
+  var now = new Date();
+  var timeStr = now.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit', hour12:true});
+  // Append timestamped note to activity timeline (event-log-body)
+  var logBody = document.querySelector('.event-log-body');
+  if (logBody) {
+    var entry = document.createElement('div');
+    entry.style.cssText = 'padding:10px 14px;border-bottom:1px solid #F3F4F6;background:#F0FDF4;flex-shrink:0;';
+    entry.innerHTML = '<div style="font-size:10px;color:#6B7280;margin-bottom:2px;">' + timeStr + '</div>' +
+      '<div style="font-size:12px;color:#374151;font-weight:500;">&#128203; Internal message logged to patient chart &mdash; ' + timeStr + '</div>';
+    logBody.insertBefore(entry, logBody.firstChild);
+  }
+  showRouteToast('\u2713 Message logged to patient chart');
+}
+function useInternalMsg() {
+  document.getElementById('msgIndividualModal').classList.remove('open');
+  // Show tooltip near nav bar (not a toast)
+  var tip = document.getElementById('navMsgTooltip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'navMsgTooltip';
+    tip.style.cssText = 'position:fixed;left:60px;top:120px;background:#1F2937;color:#fff;font-size:12px;padding:10px 14px;border-radius:8px;z-index:2000;max-width:260px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,0.25);pointer-events:none;display:none;';
+    document.body.appendChild(tip);
+  }
+  tip.textContent = 'For general messages not related to a patient consult, use Internal Messages in the nav bar.';
+  tip.style.display = 'block';
+  setTimeout(function(){ tip.style.display = 'none'; }, 3000);
+}
+function addNoteToZendesk() {
+  var area = document.getElementById('zdNoteArea');
+  if (area) area.value = '';
+  showRouteToast('✓ Note synced to Zendesk case ZD-293847');
+}
+function showRouteToast(msg) {
+  var t = document.getElementById('routeToast'); t.textContent = msg; t.style.display = 'block';
+  setTimeout(function(){ t.style.display = 'none'; }, 2000);
+}
 
 // Schedule modal (Fix 7)
 function openScheduleModal() { document.getElementById('scheduleModal').classList.add('open'); }

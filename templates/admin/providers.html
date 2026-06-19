@@ -38,6 +38,17 @@
   .s-review { background: #FEF3C7; color: #92400E; }
   .action-link { color: #7C3AED; font-size: 12px; font-weight: 600; text-decoration: none; }
   .action-link:hover { text-decoration: underline; }
+  .ios-toggle-wrap { display:flex;align-items:center;gap:12px;margin-bottom:10px; }
+  .ios-toggle { width:44px;height:24px;border-radius:12px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s; }
+  .ios-toggle.on { background:#6B21A8; }
+  .ios-toggle.off { background:#D1D5DB; }
+  .ios-knob { width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.2);position:absolute;top:2px;transition:left 0.2s; }
+  .ios-toggle.on .ios-knob { left:22px; }
+  .ios-toggle.off .ios-knob { left:2px; }
+  .ios-label { font-size:13px;color:#374151; }
+  .ios-sub { font-size:11px;color:#6B7280;margin-top:2px; }
+  .avail-dot-green { color:#16A34A;font-size:14px; }
+  .avail-dot-gray  { color:#9CA3AF;font-size:14px; }
 </style>
 {% endblock %}
 {% block content %}
@@ -78,6 +89,7 @@
             <th>States Licensed</th>
             <th>Care Products</th>
             <th>Status</th>
+            <th>Availability</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -88,6 +100,7 @@
             <td>TX, CA, FL + 12 more</td>
             <td>Testosterone, Skincare, ED</td>
             <td><span class="status-pill s-active">Active</span></td>
+            <td><span class="avail-dot-green">●</span> Real-Time</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
           <tr>
@@ -96,6 +109,7 @@
             <td>TX, CA</td>
             <td>Testosterone, Weight Management</td>
             <td><span class="status-pill s-active">Active</span></td>
+            <td><span class="avail-dot-green">●</span> Real-Time</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
           <tr>
@@ -104,6 +118,7 @@
             <td>TX, FL, NY + 8 more</td>
             <td>Women's Health, Weight Management</td>
             <td><span class="status-pill s-active">Active</span></td>
+            <td><span class="avail-dot-green">●</span> Real-Time</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
           <tr>
@@ -112,6 +127,7 @@
             <td>National</td>
             <td>Women's Health</td>
             <td><span class="status-pill s-active">Active</span></td>
+            <td><span class="avail-dot-gray">●</span> Scheduled Only</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
           <tr>
@@ -120,6 +136,7 @@
             <td>NY, NJ, CT + 5 more</td>
             <td>Mental Health</td>
             <td><span class="status-pill s-review">Review</span></td>
+            <td><span class="avail-dot-gray">●</span> Scheduled Only</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
           <tr>
@@ -128,11 +145,42 @@
             <td>CA, AZ, NV + 9 more</td>
             <td>Testosterone, ED Treatment</td>
             <td><span class="status-pill s-active">Active</span></td>
+            <td><span class="avail-dot-green">●</span> Real-Time</td>
             <td><a href="#" class="action-link">View</a></td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- Consultation Availability Settings -->
+  <div class="widget" style="margin-top:20px;">
+    <div class="widget-header">
+      <span class="widget-title">Consultation Availability Settings</span>
+    </div>
+    <div style="padding:20px;">
+      <div style="font-size:13px;color:#6B7280;margin-bottom:16px;">Configure when providers appear in the queue and booking systems. These settings apply globally unless overridden at the care product level.</div>
+      <div class="ios-toggle-wrap">
+        <div class="ios-toggle on" id="toggleRealTime" onclick="this.classList.toggle('on');this.classList.toggle('off');">
+          <div class="ios-knob"></div>
+        </div>
+        <div>
+          <div class="ios-label">Available for Real-Time / On-Demand Consultations</div>
+          <div class="ios-sub">When enabled, this provider appears in the instant-booking queue for on-demand patient requests</div>
+        </div>
+      </div>
+      <div class="ios-toggle-wrap">
+        <div class="ios-toggle on" id="toggleScheduled" onclick="this.classList.toggle('on');this.classList.toggle('off');">
+          <div class="ios-knob"></div>
+        </div>
+        <div>
+          <div class="ios-label">Available for Scheduled Consultations</div>
+          <div class="ios-sub">When enabled, this provider accepts future scheduled appointments</div>
+        </div>
+      </div>
+      <button onclick="alert('Availability settings saved.')" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;">Save Settings</button>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

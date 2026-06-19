@@ -1,4 +1,38 @@
-{% extends "base.html" %}
+#!/usr/bin/env python3
+"""
+Project Phoenix — Demo Update: 6-Step Book Appointment Modal
+Adds member lookup + full scheduling modal to templates/scheduler/search_patient.html.
+
+Screenshots reference:
+  Step 2: Register Patient — state/timezone/consent
+  Step 3: Appointment Types — EverlyCare Treat Visit
+  Step 4: Providers — Next Available + 5 named providers
+  Step 5: Available Dates — June 2026 calendar + evening slots
+  Step 6: Confirmation
+  Background: Member ID H61755723 / Member Facing ID H6175572300
+
+Files modified:
+  templates/scheduler/search_patient.html
+"""
+
+import os
+
+BASE = '/Users/justin.woller/Documents/project-phoenix-demo'
+changes = []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# New search_patient.html with Member Lookup tab + 6-step modal
+# ─────────────────────────────────────────────────────────────────────────────
+search_path = os.path.join(BASE, 'templates', 'scheduler', 'search_patient.html')
+
+with open(search_path, 'r') as f:
+    original = f.read()
+
+if 'book-appt-modal' in original:
+    print('  SKIP — Book Appointment modal already present')
+    changes.append('templates/scheduler/search_patient.html: SKIP — already patched')
+else:
+    new_html = '''{% extends "base.html" %}
 {% block title %}Patient &amp; Member Search — Scheduler{% endblock %}
 
 {% block head %}
@@ -803,19 +837,12 @@ function populateConfirmation() {
 }
 
 function confirmBooking() {
-  alert('✅ Appointment booked!
-
-Member: ' + state.member.first + ' ' + state.member.last +
-    '
-Provider: ' + state.provider.name +
-    '
-Type: ' + state.apptType +
-    '
-Date: ' + (state.date ? MONTH_LABELS[calMonth]+' '+state.date+', '+calYear : '—') +
+  alert('✅ Appointment booked!\n\nMember: ' + state.member.first + ' ' + state.member.last +
+    '\nProvider: ' + state.provider.name +
+    '\nType: ' + state.apptType +
+    '\nDate: ' + (state.date ? MONTH_LABELS[calMonth]+' '+state.date+', '+calYear : '—') +
     (state.time ? ' at '+state.time : '') +
-    '
-
-The member has been registered as a patient and an intake notification has been sent.');
+    '\n\nThe member has been registered as a patient and an intake notification has been sent.');
   closeModal();
 }
 
@@ -830,3 +857,12 @@ renderMembers(MEMBERS);
 </script>
 {% endraw %}
 {% endblock %}
+'''
+    with open(search_path, 'w') as f:
+        f.write(new_html)
+    changes.append('templates/scheduler/search_patient.html: replaced with Member Lookup + 6-step modal')
+
+print('\n── apply_book_appointment_modal_v1.py ──')
+for c in changes:
+    print('  ' + c)
+print(f'\n  {len(changes)} operation(s) complete.\n')

@@ -61,10 +61,16 @@ ROUTES = [
     ("/logout",             "Logout redirect",          []),
     ("/scheduler/",           "Scheduler Dashboard",       ["David Nguyen", "Today's Appointments"]),
     ("/scheduler/schedule",   "Scheduling Tool",           ["Scheduling Tool", "Patient First"]),
-    ("/scheduler/search-patient", "Patient Search",        ["Patient Search", "Find a Patient"]),
+    ("/scheduler/search-patient", "Patient Search",        ["Patient Search", "Member Lookup"]),
     ("/admin/coordinator",   "Coordinator Dashboard",     ["Coordinator Dashboard", "SLA Monitor"]),
     ("/provider/pharmacy",   "Pharmacy Fulfillment",      ["Pharmacy Fulfillment", "GoGoMeds"]),
     ("/provider/billing",    "Billing & Compensation",    ["Billing", "Athena"]),
+    # Change 1 — PWN Health isolated portal
+    ("/pwn/login",            "PWN Login",                 ["PWN Health", "jennifer.adams"]),
+    ("/pwn/portal",           "PWN Portal",                ["PWN Health", "Jennifer Adams", "Genetic Counseling"]),
+    # Change 2 — Everlywell multi-program portal
+    ("/patient/login",        "Everlywell Login",          ["everlywell", "marcus.johnson"]),
+    ("/patient/portal",       "Everlywell Portal",         ["everlywell", "Marcus Johnson", "Testosterone"]),
 ]
 
 BLANK_SIGNALS = ["undefined", "null", "{{", "}}", "lorem ipsum",
