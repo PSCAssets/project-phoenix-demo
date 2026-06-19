@@ -367,8 +367,8 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="sidebar-nav">
-    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/home'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="sib-label">Dashboard</span>
     </div>
     <div class="sib-item active" title="Queue" onclick="window.location.href='/provider/queue'">
@@ -476,9 +476,7 @@
     <div id="ipToggleWrap" style="display:inline-flex;align-items:center;">
       <button id="ipToggleBtn" onclick="toggleInProgress()" style="font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--border-med);background:var(--bg-surface);cursor:pointer;color:var(--text-secondary);white-space:nowrap;">Show In Progress</button>
     </div>
-    {% if session.get('role') in ['provider_md','provider_np','provider_do','provider_rn','provider_gc'] %}
-    <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;opacity:0.35;pointer-events:none;cursor:not-allowed;">+ New Patient</span>
-    {% else %}
+    {% if session.get('role') not in ['provider_md','provider_np','provider_do','provider_rn','provider_gc'] %}
     <a href="/provider/new-patient" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;">+ New Patient</a>
     {% endif %}
     <div class="filter-right">
@@ -505,6 +503,120 @@
         </tr>
       </thead>
       <tbody id="queueTableBody">
+
+        {% if session.get('role') == 'provider_gc' %}
+        <!-- GC Genetics Queue — shown only for provider_gc role -->
+
+        <tr class="sla-red" data-type="async" data-sla="overdue" data-assigned="unassigned" data-product="BRCA Counseling" data-status="overdue">
+          <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Jennifer Walsh</a><div class="patient-dob">DOB: 03/14/1990 <span class="patient-gender">F</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">Blueprint Genetics</span></td>
+          <td class="age-cell">34y</td>
+          <td class="consult-id">CST-2026-10901</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">BRCA Counseling</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
+          <td class="wait-time red">4h 22m</td>
+          <td><span class="sla-badge sb-red" title="SLA Overdue — 22 min past limit">⚠ 22 min ago</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),1)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-orange" data-type="video" data-sla="urgent" data-assigned="unassigned" data-product="Hereditary Cancer Panel" data-status="urgent">
+          <td class="icon-cell"><i class="ti ti-clock" style="color:var(--orange);font-size:16px;"></i></td>
+          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">Robert Kim</a><div class="patient-dob">DOB: 07/22/1979 <span class="patient-gender">M</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">GeneDx Referral</span></td>
+          <td class="age-cell">45y</td>
+          <td class="consult-id">CST-2026-10902</td>
+          <td><span class="type-pill t-video">Video</span></td>
+          <td class="program-cell">Hereditary Cancer Panel</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">CA</td>
+          <td class="wait-time orange">2h 15m</td>
+          <td><span class="sla-badge sb-orange">⚠ 45 min</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),2)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr class="sla-yellow" data-type="async" data-sla="warning" data-assigned="unassigned" data-product="Carrier Screening" data-status="active">
+          <td class="icon-cell"><i class="ti ti-clock" style="color:var(--yellow);font-size:16px;"></i></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Angela Torres</a><div class="patient-dob">DOB: 11/05/1994 <span class="patient-gender">F</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">CareFirst Insurance</span></td>
+          <td class="age-cell">29y</td>
+          <td class="consult-id">CST-2026-10903</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">Carrier Screening</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
+          <td class="wait-time yellow">1h 41m</td>
+          <td><span class="sla-badge sb-yellow">2h remaining</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),3)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr data-type="video" data-sla="ok" data-assigned="unassigned" data-product="Prenatal Carrier Screening" data-status="active">
+          <td class="icon-cell"></td>
+          <td><a class="patient-link" href="/provider/chart?type=video&amp;view_only=1">Sarah Chen</a><div class="patient-dob">DOB: 02/19/1991 <span class="patient-gender">F</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">Blueprint Genetics</span></td>
+          <td class="age-cell">33y</td>
+          <td class="consult-id">CST-2026-10904</td>
+          <td><span class="type-pill t-video">Video</span></td>
+          <td class="program-cell">Prenatal Carrier Screening</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">IL</td>
+          <td class="wait-time">52m</td>
+          <td><span class="sla-badge sb-green">Within SLA</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),4)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr data-type="async" data-sla="ok" data-assigned="unassigned" data-product="Hereditary Risk Assessment" data-status="active">
+          <td class="icon-cell"></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Michael Grant</a><div class="patient-dob">DOB: 12/03/1972 <span class="patient-gender">M</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">GeneDx Referral</span></td>
+          <td class="age-cell">52y</td>
+          <td class="consult-id">CST-2026-10905</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">Hereditary Risk Assessment</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
+          <td class="wait-time">28m</td>
+          <td><span class="sla-badge sb-green">Within SLA</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),5)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        <tr data-type="async" data-sla="ok" data-assigned="unassigned" data-product="BRCA Counseling" data-status="active">
+          <td class="icon-cell"></td>
+          <td><a class="patient-link" href="/provider/chart?type=async&amp;view_only=1">Diana Ross</a><div class="patient-dob">DOB: 01/22/1957 <span class="patient-gender">F</span></div><span class="client-badge" style="background:#EEF2FF;color:#3730A3;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;">CareFirst Insurance</span></td>
+          <td class="age-cell">68y</td>
+          <td class="consult-id">CST-2026-10906</td>
+          <td><span class="type-pill t-async">Async</span></td>
+          <td class="program-cell">BRCA Counseling</td>
+          <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
+          <td class="wait-time">12m</td>
+          <td><span class="sla-badge sb-green">Within SLA</span></td>
+          <td></td>
+          <td class="actions-cell">
+            <button class="take-btn">Take</button>
+            <button class="route-btn" onclick="toggleRoute(this.closest('tr'),6)">Route</button>
+            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
+          </td>
+        </tr>
+
+        {% else %}
+        <!-- Standard MD/NP queue rows below -->
 
         <tr class="sla-red" data-type="async" data-sla="overdue" data-assigned="unassigned" data-product="A1C Management" data-status="overdue">
           <td class="icon-cell"><i class="ti ti-alert-triangle" style="color:var(--red);font-size:16px;"></i></td>
@@ -793,6 +905,7 @@
           </td>
         </tr>
 
+        {% endif %}
       </tbody>
     </table>
   </div>
@@ -815,9 +928,31 @@
 {% raw %}
 <script>
 const SHOW_OWN_ONLY = {% endraw %}{{ show_own_only | tojson }}{% raw %};
+const IS_NP = {% endraw %}{{ (session.get('role') == 'provider_np') | tojson }}{% raw %};
 const PROVIDER_NAME = {% endraw %}"{{ provider_name }}"{% raw %};
 
 const allRows = Array.from(document.querySelectorAll('tbody tr'));
+
+// NP role: filter queue to licensed states only (TX and IL)
+(function() {
+  if (!IS_NP) return;
+  var npStates = ['TX', 'IL'];
+  allRows.forEach(function(row) {
+    var stateCell = row.cells[6];
+    if (!stateCell) return;
+    var state = stateCell.textContent.trim();
+    if (npStates.indexOf(state) === -1) {
+      row.style.display = 'none';
+    }
+  });
+  var footer = document.querySelector('.footer-info');
+  if (footer) {
+    var badge = document.createElement('span');
+    badge.style.cssText = 'margin-left:12px;font-size:11px;background:#EDE9FE;color:#6B21A8;padding:2px 8px;border-radius:10px;font-weight:600;';
+    badge.textContent = '🔒 Filtered: TX · IL only';
+    footer.appendChild(badge);
+  }
+})();
 let activeTab       = 'master';
 let activeChipId    = null;
 let activeChipSla   = null;

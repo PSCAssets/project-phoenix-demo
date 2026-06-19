@@ -75,7 +75,7 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="sidebar-nav">
-    <div class="nav-item" title="Dashboard" onclick="window.location.href='/provider/'">
+    <div class="nav-item" title="Dashboard" onclick="window.location.href='/provider/home'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       <span class="nav-label">Dashboard</span>
     </div>
@@ -103,7 +103,7 @@
     </div>
   </div>
   <div class="sidebar-footer">
-    <div class="provider-avatar">SL</div>
+    <div class="provider-avatar" id="provAvatarInit">SL</div>
     <button class="sidebar-toggle" onclick="toggleProvSidebar()" id="sidebarToggleBtn" title="Expand">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
     </button>
@@ -126,6 +126,55 @@
   </div>
 
   <!-- Unread notifications -->
+  {% if session.get('role') == 'provider_rn' %}
+  <!-- RN-specific notifications -->
+  <div class="notif-row unread" data-type="sla">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Vital Signs Review — Marcus Johnson <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+      <div class="notif-msg">Pre-visit vitals for Marcus Johnson have been recorded. MD review of BP 142/88 flagged for attention before consult.</div>
+      <div class="notif-footer">
+        <span class="notif-time">10 min ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=async">Open Chart &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="labs">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Lab Collection Task — Thomas Chen <span class="notif-type-tag nt-lab">Lab</span></div>
+      <div class="notif-msg">Dr. Lee ordered a metabolic panel for Thomas Chen. Specimen collection required before 12:00 PM. Patient checked in at front desk.</div>
+      <div class="notif-footer">
+        <span class="notif-time">45 min ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=lab">View Order &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="messages">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Care Coordination — Rosa Lopez <span class="notif-type-tag nt-msg">Message</span></div>
+      <div class="notif-msg">Dr. Lee requests follow-up coordination for Rosa Lopez post-consult. Ensure medication instructions have been communicated to patient.</div>
+      <div class="notif-footer">
+        <span class="notif-time">2h ago</span>
+        <a class="notif-action" href="/provider/messages">View Task &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="refills">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Patient Education — David Kim <span class="notif-type-tag nt-refill">Task</span></div>
+      <div class="notif-msg">Semaglutide injection technique education session scheduled for David Kim. Review materials and confirm patient readiness for self-administration.</div>
+      <div class="notif-footer">
+        <span class="notif-time">3h ago</span>
+        <a class="notif-action" href="/provider/queue">View Schedule &#8594;</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- MD/NP/default notifications -->
+
   <div class="notif-row unread" data-type="sla">
     <div class="notif-dot dot-unread"></div>
     <div class="notif-body">
@@ -133,7 +182,7 @@
       <div class="notif-msg">Consult C-20260613-009 has exceeded the 2-hour SLA threshold. Immediate review required to avoid escalation.</div>
       <div class="notif-footer">
         <span class="notif-time">5 min ago</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">View Consult &#8594;</a>
+        <a class="notif-action" href="/provider/chart/1?type=async">View Consult &#8594;</a>
       </div>
     </div>
   </div>
@@ -145,7 +194,7 @@
       <div class="notif-msg">Testosterone panel results are ready for review. All values within normal range. Awaiting provider sign-off.</div>
       <div class="notif-footer">
         <span class="notif-time">1h ago</span>
-        <a class="notif-action" href="/provider/chart/1" onclick="return false;">View Labs &#8594;</a>
+        <a class="notif-action" href="/provider/chart/1?type=lab">View Labs &#8594;</a>
       </div>
     </div>
   </div>
@@ -157,7 +206,7 @@
       <div class="notif-msg">Patient requests a 30-day testosterone refill. Last prescription filled Apr 30. Clinical review required before approval.</div>
       <div class="notif-footer">
         <span class="notif-time">2h ago</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">Review &#8594;</a>
+        <a class="notif-action" href="/provider/chart/1?type=async">Review &#8594;</a>
       </div>
     </div>
   </div>
@@ -169,11 +218,12 @@
       <div class="notif-msg">Lisa Chen sent a message about new symptoms she has been experiencing over the past week. Requesting guidance.</div>
       <div class="notif-footer">
         <span class="notif-time">3h ago</span>
-        <a class="notif-action" href="/provider/messages" onclick="return false;">Reply &#8594;</a>
+        <a class="notif-action" href="/provider/messages">Reply &#8594;</a>
       </div>
     </div>
   </div>
 
+  {% endif %}
   <!-- Read notifications -->
   <div class="notif-row" data-type="labs">
     <div class="notif-dot dot-read"></div>
@@ -182,7 +232,7 @@
       <div class="notif-msg">Weight management baseline labs returned normal. Metabolic panel within expected range. No immediate action required.</div>
       <div class="notif-footer">
         <span class="notif-time">4h ago</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">View &#8594;</a>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
       </div>
     </div>
   </div>
@@ -194,7 +244,7 @@
       <div class="notif-msg">Consult C-20260613-003 is approaching the 20-hour mark. SLA limit is 24 hours. Review recommended to avoid breach.</div>
       <div class="notif-footer">
         <span class="notif-time">6h ago</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">View &#8594;</a>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
       </div>
     </div>
   </div>
@@ -206,7 +256,7 @@
       <div class="notif-msg">Semaglutide 0.5mg refill for David Kim has been approved by Maria Rodriguez, NP and sent to pharmacy.</div>
       <div class="notif-footer">
         <span class="notif-time">Yesterday</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">View &#8594;</a>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
       </div>
     </div>
   </div>
@@ -218,7 +268,7 @@
       <div class="notif-msg">Your weekly provider performance report for June 1–7 is ready. Includes SLA compliance, consult volume, and patient satisfaction scores.</div>
       <div class="notif-footer">
         <span class="notif-time">Yesterday</span>
-        <a class="notif-action" href="/provider/settings" onclick="return false;">Download &#8594;</a>
+        <a class="notif-action" href="/provider/settings">Download &#8594;</a>
       </div>
     </div>
   </div>
@@ -230,7 +280,7 @@
       <div class="notif-msg">HbA1c panel results for Alex Kim are available. Results reviewed and released to patient portal.</div>
       <div class="notif-footer">
         <span class="notif-time">2d ago</span>
-        <a class="notif-action" href="/provider/queue" onclick="return false;">View &#8594;</a>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
       </div>
     </div>
   </div>
@@ -238,6 +288,16 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script>
+(function(){
+  var dn = "{{ session.get('display_name', 'Sarah Lee') }}";
+  var parts = dn.split(',')[0].split(' ').filter(function(w){ return w.length > 2; });
+  if (!parts.length) parts = dn.split(',')[0].split(' ');
+  var init = (parts[0]||'S')[0] + (parts.length > 1 ? (parts[parts.length-1]||'L')[0] : '');
+  var el = document.getElementById('provAvatarInit');
+  if (el) el.textContent = init.toUpperCase();
+})();
+</script>
 {% raw %}
 <script>
 function toggleProvSidebar() {

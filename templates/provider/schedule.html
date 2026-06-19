@@ -161,8 +161,8 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="sidebar-nav">
-    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/home'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span class="sib-label">Dashboard</span>
     </div>
     <div class="sib-item" title="Queue" onclick="window.location.href='/provider/queue'">
@@ -209,8 +209,7 @@
       <button class="sched-nav-btn">&#8250;</button>
     </div>
     <button onclick="openAddTimeModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Time</button>
-    <button onclick="editAvailability()" style="background:#fff;border:1.5px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">Edit Availability</button>
-    <button id="realTimeQueue" class="real-time-queue" onclick="openRTQueueModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">&#9889; Add to Real-Time Queue</button>
+    <button id="realTimeQueue" class="real-time-queue" onclick="openRTQueueModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">&#9889; Conduct Consult Now</button>
   </div>
   <div class="sched-legend">
     <span class="legend-item"><span class="legend-dot" style="background:#D1FAE5;border:1.5px dashed #34D399"></span>Available</span>
@@ -245,14 +244,14 @@
     <div class="day-view-row">
       <div class="day-view-time">8:00 AM</div>
       <div class="day-view-cell">
-        <div class="day-appt-card annual"><div class="day-appt-name">Annual Visit — Aisha N.</div><div class="day-appt-meta">Women's Health · 45 min · No SLA</div></div>
+        <div class="day-appt-card annual" style="cursor:pointer;" onclick="openApptDetail('Annual Visit','Aisha N. · Women\'s Health','annual',45,8,0,2)"><div class="day-appt-name">Annual Visit — Aisha N.</div><div class="day-appt-meta">Women's Health · 45 min · No SLA</div></div>
       </div>
     </div>
     <div class="day-view-row">
       <div class="day-view-time">9:00 AM</div>
       <div class="day-view-cell">
-        <div class="day-appt-card phone"><div class="day-appt-name">Phone Consult — James R.</div><div class="day-appt-meta">STI Panel · 15 min · SLA: OK</div></div>
-        <div class="day-appt-card async" style="background:#0D9488;"><div class="day-appt-name">A1C Treat Consult — Sandra G.</div><div class="day-appt-meta">A1C Mgmt · 15 min</div></div>
+        <div class="day-appt-card phone" style="cursor:pointer;" onclick="openApptDetail('Phone Consult','James R. · STI Panel','phone',15,9,0,2)"><div class="day-appt-name">Phone Consult — James R.</div><div class="day-appt-meta">STI Panel · 15 min · SLA: OK</div></div>
+        <div class="day-appt-card async" style="background:#0D9488;cursor:pointer;" onclick="openApptDetail('A1C Treat Consult','Sandra G. · A1C Mgmt','a1c',15,9,15,2)"><div class="day-appt-name">A1C Treat Consult — Sandra G.</div><div class="day-appt-meta">A1C Mgmt · 15 min</div></div>
       </div>
     </div>
     <div class="day-view-row">
@@ -274,13 +273,13 @@
     <div class="day-view-row">
       <div class="day-view-time">1:00 PM</div>
       <div class="day-view-cell">
-        <div class="day-appt-card" style="background:#7C3AED;"><div class="day-appt-name">Follow-up — David K.</div><div class="day-appt-meta">Weight Mgmt · 15 min · SLA: 2h remaining</div></div>
+        <div class="day-appt-card" style="background:#7C3AED;cursor:pointer;" onclick="openApptDetail('Follow-up','David K. · Weight Mgmt','followup',15,13,0,2)"><div class="day-appt-name">Follow-up — David K.</div><div class="day-appt-meta">Weight Mgmt · 15 min · SLA: 2h remaining</div></div>
       </div>
     </div>
     <div class="day-view-row">
       <div class="day-view-time">2:00 PM</div>
       <div class="day-view-cell">
-        <div class="day-appt-card video"><div class="day-appt-name">Telehealth Consult — Owen T.</div><div class="day-appt-meta">A1C Mgmt · Video · 15 min</div></div>
+        <div class="day-appt-card video" style="cursor:pointer;" onclick="openApptDetail('Telehealth Consult','Owen T. · A1C Mgmt','video',15,14,0,2)"><div class="day-appt-name">Telehealth Consult — Owen T.</div><div class="day-appt-meta">A1C Mgmt · Video · 15 min</div></div>
       </div>
     </div>
     <div class="day-view-row">
@@ -343,9 +342,26 @@
       <div class="appt-detail-row"><span class="appt-detail-key">SLA Status</span><span class="appt-detail-val" id="apptDetailSla" style="color:#059669;">Within SLA</span></div>
       <div style="margin-top:12px;padding:10px;background:#FAF7F2;border-radius:7px;font-size:12px;color:#6B7280;line-height:1.5;" id="apptDetailNotes"></div>
     </div>
-    <div class="appt-detail-ft">
+    <div class="appt-detail-ft" id="apptDetailFt">
       <a href="#" onclick="closeApptDetail();return false;" style="font-size:12px;color:#9CA3AF;text-decoration:none;">Close</a>
+      <button onclick="enterApptEditMode()" id="apptEditBtn" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">✎ Edit</button>
       <a id="apptDetailChartLink" href="/provider/chart/1" class="btn-open-chart">Open Chart →</a>
+    </div>
+    <!-- Edit mode form (hidden by default) -->
+    <div id="apptEditForm" style="display:none;padding:0 16px 14px;">
+      <div style="font-size:11px;font-weight:700;color:#6B21A8;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Edit Appointment</div>
+      <div style="display:grid;gap:8px;">
+        <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Patient</label><input id="editPatientName" style="width:100%;padding:6px 9px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:13px;box-sizing:border-box;" /></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Start Time</label><input id="editStartTime" type="time" style="width:100%;padding:6px 9px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:13px;box-sizing:border-box;" /></div>
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Duration (min)</label><input id="editDuration" type="number" min="15" max="120" step="15" style="width:100%;padding:6px 9px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:13px;box-sizing:border-box;" /></div>
+        </div>
+        <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Notes</label><textarea id="editNotes" rows="3" style="width:100%;padding:6px 9px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:12px;resize:vertical;box-sizing:border-box;"></textarea></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px;">
+        <button onclick="cancelApptEdit()" style="background:#F3F4F6;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
+        <button onclick="saveApptEdit()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">Save Changes</button>
+      </div>
     </div>
   </div>
 </div>
@@ -547,6 +563,78 @@ function openApptDetail(label, sublabel, type, dur, sh, sm, day) {
 }
 function closeApptDetail() {
   document.getElementById('apptDetailModal').classList.remove('open');
+  cancelApptEdit(); // reset edit mode on close
+}
+function enterApptEditMode() {
+  var body = document.getElementById('apptDetailModal').querySelector('.appt-detail-body');
+  var editForm = document.getElementById('apptEditForm');
+  var editBtn = document.getElementById('apptEditBtn');
+  if (body) body.style.display = 'none';
+  if (editForm) editForm.style.display = 'block';
+  if (editBtn) editBtn.style.display = 'none';
+  // Pre-fill edit fields from display values
+  var patient = document.getElementById('apptDetailPatient');
+  var dur = document.getElementById('apptDetailDuration');
+  var notes = document.getElementById('apptDetailNotes');
+  if (patient) document.getElementById('editPatientName').value = patient.textContent;
+  if (dur) {
+    var durText = dur.textContent; // e.g. "45 min · 8:00 AM"
+    var durMatch = durText.match(/^(\d+)/);
+    if (durMatch) document.getElementById('editDuration').value = durMatch[1];
+    var timeMatch = durText.match(/(\d+:\d+\s*[AP]M)/);
+    if (timeMatch) {
+      // convert to HH:MM for time input
+      var t = timeMatch[1].trim();
+      var ampm = t.slice(-2);
+      var parts = t.replace(/[AP]M/,'').trim().split(':');
+      var h = parseInt(parts[0]);
+      var m = parseInt(parts[1]);
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      document.getElementById('editStartTime').value = (h<10?'0'+h:h)+':'+(m<10?'0'+m:m);
+    }
+  }
+  if (notes) document.getElementById('editNotes').value = notes.textContent.replace(/^"|"$/g,'');
+}
+function cancelApptEdit() {
+  var body = document.getElementById('apptDetailModal').querySelector('.appt-detail-body');
+  var editForm = document.getElementById('apptEditForm');
+  var editBtn = document.getElementById('apptEditBtn');
+  if (body) body.style.display = '';
+  if (editForm) editForm.style.display = 'none';
+  if (editBtn) editBtn.style.display = '';
+}
+function saveApptEdit() {
+  // In demo: update the display values and show a confirmation toast
+  var patient = document.getElementById('editPatientName').value;
+  var dur = document.getElementById('editDuration').value;
+  var notes = document.getElementById('editNotes').value;
+  var patEl = document.getElementById('apptDetailPatient');
+  var durEl = document.getElementById('apptDetailDuration');
+  var notesEl = document.getElementById('apptDetailNotes');
+  if (patEl) patEl.textContent = patient;
+  if (durEl) {
+    var t = document.getElementById('editStartTime').value;
+    var timeDisplay = '';
+    if (t) {
+      var parts = t.split(':');
+      var h = parseInt(parts[0]), m = parseInt(parts[1]);
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      var h12 = h > 12 ? h - 12 : (h === 0 ? 12 : h);
+      timeDisplay = ' · ' + h12 + (m ? ':' + (m<10?'0'+m:m) : ':00') + ' ' + ampm;
+    }
+    durEl.textContent = dur + ' min' + timeDisplay;
+  }
+  if (notesEl) notesEl.textContent = '"' + notes + '"';
+  cancelApptEdit();
+  closeApptDetail();
+  // Show save toast
+  var toast = document.getElementById('editToast');
+  if (toast) {
+    toast.textContent = '✓ Appointment updated';
+    toast.style.display = 'block';
+    setTimeout(function(){ toast.style.display = 'none'; toast.textContent = 'Availability editing mode — click any slot to modify'; }, 2500);
+  }
 }
 document.getElementById('apptDetailModal').addEventListener('click', function(e) {
   if (e.target === this) closeApptDetail();

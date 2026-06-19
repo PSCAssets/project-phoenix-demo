@@ -36,6 +36,21 @@ def _build_chart_context(type_param, product_param='a1c'):
     )
 
 
+
+@bp.route("/home")
+def provider_home():
+    """Role-aware dashboard redirect — fixes nav persistence across all provider pages."""
+    from flask import redirect
+    role = session.get('role', 'provider_md')
+    dest_map = {
+        'provider_np': '/provider/np',
+        'provider_rn': '/provider/rn',
+        'provider_gc': '/provider/gc',
+        'provider_ma': '/provider/ma',
+    }
+    return redirect(dest_map.get(role, '/provider/'))
+
+
 @bp.route("/")
 def dashboard():
     return render_template("provider/dashboard.html")
@@ -112,7 +127,19 @@ def alerts():
 
 @bp.route("/settings")
 def settings():
-    return render_template("provider/settings.html")
+    role = session.get('role', 'provider_md')
+    role_labels = {
+        'provider_md': 'Physician (MD)',
+        'provider_np': 'Nurse Practitioner (NP)',
+        'provider_rn': 'Registered Nurse (RN)',
+        'provider_gc': 'Genetic Counselor (GC)',
+        'provider_ma': 'Medical Assistant (MA)',
+        'provider_do': 'Physician (DO)',
+        'scheduler': 'Scheduler',
+        'gc_admin': 'GC Admin',
+        'qa_reviewer': 'QA Reviewer',
+    }
+    return render_template("provider/settings.html", role_label=role_labels.get(role, 'Provider'))
 
 @bp.route("/lab-orders")
 def lab_orders():

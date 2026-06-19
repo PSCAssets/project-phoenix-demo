@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}GC Dashboard — Lisa Park | Project Phoenix{% endblock %}
+{% block title %}GC Dashboard — {{ session.get('display_name', 'Taylor Brooks, GC').split(',')[0] }} | Project Phoenix{% endblock %}
 {% block head %}
 <style>
 
@@ -317,8 +317,8 @@
     </a>
   </div>
   <div class="sidebar-footer">
-    <div class="provider-avatar" title="Lisa Park, MS CGC">LP</div>
-    <div style="font-size:9px;color:#6B7280;text-align:center">Lisa Park</div>
+    <div class="provider-avatar" id="gcAvatarInit" title="{{ session.get('display_name', 'Taylor Brooks, GC') }}">LP</div>
+    <div style="font-size:9px;color:#6B7280;text-align:center" id="gcSidebarName">Taylor Brooks</div>
   </div>
 </nav>
 
@@ -374,7 +374,7 @@
 
     <div class="greeting-bar">
       <div class="greeting-text">
-        <h2>Good morning, Lisa</h2>
+        <h2>Good morning, {% set _gcdn = session.get('display_name', 'Taylor Brooks, GC').split(',')[0].split() %}{{ (_gcdn[1] if _gcdn|length > 2 else _gcdn[0]) if _gcdn else 'there' }}</h2>
       </div>
       <button class="btn-queue" onclick="alert('Opening Patient Queue — full queue view with all care products and role-based filters.')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -777,6 +777,21 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script>
+(function(){
+  var dn = "{{ session.get('display_name', 'Taylor Brooks, GC') }}";
+  var parts = dn.split(',')[0].split(' ').filter(function(w){ return w.length > 2; });
+  if (!parts.length) parts = dn.split(',')[0].split(' ');
+  var init = (parts[0]||'T')[0] + (parts.length > 1 ? (parts[parts.length-1]||'B')[0] : '');
+  var el = document.getElementById('gcAvatarInit');
+  if (el) { el.textContent = init.toUpperCase(); el.title = dn; }
+  var nameEl = document.getElementById('gcSidebarName');
+  if (nameEl) {
+    var firstName = parts.length > 2 ? parts[1] : parts[0];
+    nameEl.textContent = firstName || 'Taylor';
+  }
+})();
+</script>
 {% raw %}
 <script>
 let breachSecs = 9 * 60;
