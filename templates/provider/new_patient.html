@@ -188,7 +188,7 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="sidebar-nav">
-    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/home'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="sib-label">Dashboard</span></div>
+    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/home'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="sib-label">Dashboard</span></div>
     <div class="sib-item" title="Queue" onclick="window.location.href='/provider/queue'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span class="sib-label">Queue</span></div>
     <div class="sib-item" title="Schedule" onclick="window.location.href='/provider/schedule'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sib-label">Schedule</span></div>
     <div class="sib-item" title="Messages" onclick="window.location.href='/provider/messages'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="sib-label">Messages</span></div>
@@ -329,22 +329,6 @@
         </div>
       </div>
 
-      <div class="card">
-        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Insurance / Payment</div>
-        <div class="form-group">
-          <div class="radio-group">
-            <label class="radio-opt"><input type="radio" name="coverage" value="Insurance" onchange="toggleInsurance()"> Insurance</label>
-            <label class="radio-opt"><input type="radio" name="coverage" value="Self-Pay" checked onchange="toggleInsurance()"> Self-Pay</label>
-            <label class="radio-opt"><input type="radio" name="coverage" value="Subscription" onchange="toggleInsurance()"> Subscription</label>
-          </div>
-        </div>
-        <div id="insuranceFields" style="display:none">
-          <div class="form-grid form-grid-2">
-            <div class="form-group"><label class="form-label">Plan Name</label><input class="form-input" placeholder="e.g. Blue Cross Blue Shield"></div>
-            <div class="form-group"><label class="form-label">Member ID</label><input class="form-input" placeholder="Member ID"></div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- STEP 2: Health Profile -->
@@ -395,14 +379,8 @@
         <label class="form-label">Care Product <span class="req">*</span></label>
         <select class="form-select" id="careProductSelect" onchange="showProductCard()" style="max-width:360px;">
           <option value="">— Select a care product —</option>
-          <option value="Testosterone">Testosterone</option>
-          <option value="Weight Management">Weight Management</option>
-          <option value="Skincare">Skincare</option>
-          <option value="ED Treatment">ED Treatment</option>
-          <option value="Women's Health">Women's Health</option>
-          <option value="Hair Loss">Hair Loss</option>
-          <option value="Mental Health">Mental Health</option>
-          <option value="A1C Management">A1C Management</option>
+          <option value="Annual Wellness Visit">Annual Wellness Visit</option>
+          <option value="Weight Loss Program">Weight Loss Program</option>
         </select>
       </div>
       <div class="product-card" id="productCard">
@@ -458,7 +436,6 @@
         <select class="form-select" id="cpqaCareProductSelect" onchange="showIntakeQ()" style="max-width:380px;">
           <option value="">— Select a care product —</option>
           <option value="Testosterone">Testosterone</option>
-          <option value="Weight Management">Weight Management</option>
           <option value="Skincare">Skincare</option>
           <option value="ED Treatment">ED Treatment</option>
           <option value="Women's Health">Women's Health</option>
@@ -550,122 +527,117 @@
 
     <!-- STEP 5: Request Consult -->
     <div class="step-panel" id="np_step5">
-      <div class="step-heading">Step 3 — Request Consult</div>
+      <div class="step-heading">Request Consult</div>
       <div class="step-sub">Choose how this patient's consult should be handled.</div>
 
-      <div class="consult-type-grid">
-        <!-- Phone Card -->
-        <label class="consult-card">
+      <!-- Lab results required notification (shown for Weight Loss / A1C) -->
+      <div id="labResultsAlert" style="display:none;background:#FEF3C7;border:1.5px solid #F59E0B;border-radius:10px;padding:14px 18px;margin-bottom:20px;align-items:flex-start;gap:12px;">
+        <span style="font-size:18px;flex-shrink:0;">&#9888;&#65039;</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px;">Lab Results Required Before Consultation</div>
+          <div style="font-size:12px;color:#78350F;line-height:1.5;">This care product requires current lab results before a provider consultation can proceed. Please ensure lab orders have been placed and results received. The patient will be notified when their results are available and a consult can be scheduled.</div>
+          <div style="margin-top:10px;display:flex;gap:8px;">
+            <button style="background:#F59E0B;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">&#128203; Order Labs Now</button>
+            <label id="uploadLabsBtn" style="background:#fff;color:#92400E;border:1.5px solid #F59E0B;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+              &#128206; Upload Lab Results
+              <input type="file" id="labFileInput" accept=".pdf,.jpg,.png" style="display:none" onchange="handleLabUpload(this)">
+            </label>
+            <span id="labUploadedBadge" style="display:none;background:#D1FAE5;color:#065F46;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;">✓ Lab results attached</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consult path cards -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <!-- Scheduled Appointment -->
+        <label class="consult-card" style="cursor:pointer;">
           <div class="consult-card-header">
-            <input type="radio" name="consultType" value="Phone" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
+            <input type="radio" name="consultPath" value="scheduled" onchange="selectConsultPath('scheduled')" style="accent-color:#6B21A8;margin-top:2px;">
             <div>
-              <div class="consult-card-title">📞 Phone Consultation</div>
-              <div class="consult-card-sub">Scheduled voice call. Provider calls patient at selected time.</div>
+              <div class="consult-card-title">&#128197; Schedule Appointment</div>
+              <div class="consult-card-sub">Book a specific date and time with an available provider.</div>
             </div>
           </div>
-          <div class="consult-card-body">
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Date <span class="req">*</span></label><input type="date" class="form-input" style="max-width:200px;" id="phoneDateInput" onchange="showTimeSlots('phone',this.value)"></div>
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Available Time Slots</label>
-              <div id="phoneSlotsPlaceholder" style="font-style:italic;color:#9CA3AF;font-size:13px;padding:10px 0;">Select a date above to see available slots</div>
-              <div class="time-slots" id="phoneSlotsGrid" style="display:none;">
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 8:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 8:30 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 9:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 9:30 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 10:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 11:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 2:00 PM</label>
-                <label class="ts-opt"><input type="radio" name="tsPhone"> 3:30 PM</label>
+          <div class="consult-card-body" id="scheduledBody" style="display:none;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label">Consult Type</label>
+                <select class="form-select"><option>&#128222; Phone</option><option>&#127909; Video</option></select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;"><label class="form-label">Date <span class="req">*</span></label>
+                <input type="date" class="form-input" id="schedDateInput" onchange="showSchedSlots(this.value)">
               </div>
             </div>
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Duration</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="durPhone" checked> 30 min</label><label class="radio-opt"><input type="radio" name="durPhone"> 60 min</label></div></div>
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Provider</label><select class="form-select" style="max-width:300px;"><option>Dr. Sarah Lee, MD (Assigned)</option><option>Maria Rodriguez, NP</option><option>Next Available</option></select></div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Available Time Slots</label>
+              <div id="schedSlotsPlaceholder" style="font-style:italic;color:#9CA3AF;font-size:13px;padding:8px 0;">Select a date above to see available slots</div>
+              <div class="time-slots" id="schedSlotsGrid" style="display:none;">
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 8:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 8:30 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 9:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 10:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 11:00 AM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 2:00 PM</label>
+                <label class="ts-opt"><input type="radio" name="tsSchedNew"> 3:30 PM</label>
+              </div>
+            </div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Duration</label>
+              <div class="radio-group"><label class="radio-opt"><input type="radio" name="durSched" checked> 30 min</label><label class="radio-opt"><input type="radio" name="durSched"> 60 min</label></div>
+            </div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Provider</label>
+              <select class="form-select" style="max-width:300px;"><option>Dr. Sarah Lee, MD (Assigned)</option><option>Jamie Rivera, NP</option><option>Next Available</option></select>
+            </div>
           </div>
         </label>
-        <!-- Video Card -->
-        <label class="consult-card">
+
+        <!-- Real-Time Queue -->
+        <label class="consult-card" style="cursor:pointer;">
           <div class="consult-card-header">
-            <input type="radio" name="consultType" value="Video" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
+            <input type="radio" name="consultPath" value="realtime" onchange="selectConsultPath('realtime')" style="accent-color:#6B21A8;margin-top:2px;">
             <div>
-              <div class="consult-card-title">🎥 Video Consultation</div>
-              <div class="consult-card-sub">Scheduled video call via secure telehealth link.</div>
+              <div class="consult-card-title">&#9889; Submit into Queue &#8212; Real Time</div>
+              <div class="consult-card-sub">Place patient in the live queue for next available provider.</div>
             </div>
           </div>
-          <div class="consult-card-body">
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Date <span class="req">*</span></label><input type="date" class="form-input" style="max-width:200px;" id="videoDateInput" onchange="showTimeSlots('video',this.value)"></div>
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Available Time Slots</label>
-              <div id="videoSlotsPlaceholder" style="font-style:italic;color:#9CA3AF;font-size:13px;padding:10px 0;">Select a date above to see available slots</div>
-              <div class="time-slots" id="videoSlotsGrid" style="display:none;">
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 8:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 9:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 10:30 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 11:00 AM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 1:00 PM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 2:30 PM</label>
-                <label class="ts-opt"><input type="radio" name="tsVideo"> 4:00 PM</label>
+          <div class="consult-card-body" id="realtimeBody" style="display:none;">
+            <div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:8px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+              <div style="text-align:center;flex-shrink:0;">
+                <div style="font-size:24px;font-weight:800;color:#059669;">4&#8211;8</div>
+                <div style="font-size:11px;color:#065F46;font-weight:600;">MIN EST. WAIT</div>
+              </div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#065F46;margin-bottom:3px;">2 providers currently active</div>
+                <div style="font-size:12px;color:#6B7280;">Based on real-time provider login activity. Actual wait may vary.</div>
               </div>
             </div>
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Duration</label><div class="radio-group"><label class="radio-opt"><input type="radio" name="durVideo" checked> 30 min</label><label class="radio-opt"><input type="radio" name="durVideo"> 60 min</label></div></div>
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Provider</label><select class="form-select" style="max-width:300px;"><option>Dr. Sarah Lee, MD (Assigned)</option><option>Maria Rodriguez, NP</option><option>Next Available</option></select></div>
-          </div>
-        </label>
-        <!-- Async Card -->
-        <label class="consult-card">
-          <div class="consult-card-header">
-            <input type="radio" name="consultType" value="Async" onchange="updateConsultCTA()" style="accent-color:#6B21A8;margin-top:2px;">
-            <div>
-              <div class="consult-card-title">✉ Async Message Consult</div>
-              <div class="consult-card-sub">No scheduling required. Provider responds within SLA window.</div>
+            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Consult Type</label>
+              <select class="form-select" style="max-width:260px;"><option>&#128222; Phone</option><option>&#127909; Video</option><option>&#9993; Async</option></select>
             </div>
-          </div>
-          <div class="consult-card-body">
-            <div class="sla-badge">⏱ 24h SLA — Standard Response Window</div>
-            <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Priority</label>
-              <div class="priority-opts">
-                <label class="priority-opt"><input type="radio" name="asyncPriority" checked> Standard</label>
-                <label class="priority-opt"><input type="radio" name="asyncPriority"> Urgent — Expedite</label>
-              </div>
+            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Routing Note (optional)</label>
+              <textarea class="form-textarea" rows="2" placeholder="Add context for the reviewing provider..."></textarea>
             </div>
-            <div class="form-group" style="margin-bottom:0;"><label class="form-label">Routing Note (optional)</label><textarea class="form-textarea" rows="2" placeholder="Add context for the reviewing provider..."></textarea></div>
           </div>
         </label>
       </div>
 
-      <!-- Queue confirm (hidden until submit) -->
       <div class="rc-queue-confirm" id="rcQueueConfirm" style="margin-top:16px;"></div>
     </div>
 
     <!-- NEW PATIENT STEP: Contact & Insurance -->
     <div class="step-panel" id="np_step_ins">
       <div class="step-heading">Contact &amp; Insurance</div>
-      <div class="step-sub">Select coverage type and enter insurance details.</div>
+      <div class="step-sub">Enter the patient's insurance information.</div>
       <div class="card">
-        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Insurance Coverage</div>
-        <div class="ins-pills" id="insPills">
-          <label class="ins-pill"><input type="radio" name="coverageNew" value="Insurance" checked onchange="toggleInsuranceFields()"> Insurance</label>
-          <label class="ins-pill"><input type="radio" name="coverageNew" value="Self-Pay" onchange="toggleInsuranceFields()"> Self-Pay</label>
-          <label class="ins-pill"><input type="radio" name="coverageNew" value="Subscription" onchange="toggleInsuranceFields()"> Subscription</label>
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:16px;">Insurance Coverage</div>
+        <div class="form-grid form-grid-2">
+          <div class="form-group"><label class="form-label">Insurance Carrier <span class="req">*</span></label><input class="form-input" placeholder="e.g. Blue Cross Blue Shield"></div>
+          <div class="form-group"><label class="form-label">Member ID <span class="req">*</span></label><input class="form-input" placeholder="Member ID"></div>
+          <div class="form-group"><label class="form-label">Group Number</label><input class="form-input" placeholder="Group number"></div>
+          <div class="form-group"><label class="form-label">Plan Type</label><select class="form-select"><option>PPO</option><option>HMO</option><option>EPO</option><option>POS</option><option>HDHP</option></select></div>
         </div>
-        <div id="insFields">
-          <div class="form-grid form-grid-2" style="margin-top:10px;">
-            <div class="form-group"><label class="form-label">Insurance Carrier <span class="req">*</span></label><input class="form-input" placeholder="e.g. Blue Cross Blue Shield"></div>
-            <div class="form-group"><label class="form-label">Member ID <span class="req">*</span></label><input class="form-input" placeholder="Member ID"></div>
-            <div class="form-group"><label class="form-label">Group Number</label><input class="form-input" placeholder="Group number"></div>
-            <div class="form-group"><label class="form-label">Plan Type</label><select class="form-select"><option>PPO</option><option>HMO</option><option>EPO</option><option>POS</option><option>HDHP</option></select></div>
-          </div>
-        </div>
-      </div>
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
-          <div style="font-size:14px;font-weight:700;color:#111827;">Billing Address</div>
-          <button class="addr-toggle" onclick="toggleAddr('insAddrFields',this)" style="margin-top:0;">+ Add billing address (optional)</button>
-        </div>
-        <div class="addr-fields" id="insAddrFields">
-          <div class="form-group" style="margin-top:10px;"><label class="form-label">Street Address</label><input class="form-input" placeholder="123 Main St"></div>
-          <div class="form-grid form-grid-3">
-            <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
-            <div class="form-group"><label class="form-label">State</label><input class="form-input" placeholder="TX"></div>
-            <div class="form-group"><label class="form-label">ZIP</label><input class="form-input" placeholder="78701"></div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #E5E0D8;">
+          <label class="form-label" style="display:block;margin-bottom:6px;">Does the patient have active insurance?</label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="hasInsurance" value="yes" checked> Yes — covered above</label>
+            <label class="radio-opt"><input type="radio" name="hasInsurance" value="no"> No insurance — payment handled in Billing</label>
           </div>
         </div>
       </div>
@@ -674,11 +646,41 @@
     <!-- NEW PATIENT STEP: Billing -->
     <div class="step-panel" id="np_step_bill">
       <div class="step-heading">Billing</div>
-      <div class="step-sub">Payment method on file. Collected at checkout.</div>
-      <div class="card" style="text-align:center;padding:32px;">
-        <div style="font-size:32px;margin-bottom:12px;">💳</div>
-        <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:8px;">Payment Collected at Checkout</div>
-        <div style="font-size:13px;color:#6B7280;max-width:380px;margin:0 auto;">For demo purposes, payment method collection is handled at the patient checkout step. No billing details are required here.</div>
+      <div class="step-sub">Select the patient's payment method for this consultation.</div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Payment Method</div>
+        <div class="ins-pills" id="billPaymentPills">
+          <label class="ins-pill"><input type="radio" name="billPayment" value="Insurance" checked onchange="toggleBillingFields()"> 🏥 Insurance</label>
+          <label class="ins-pill"><input type="radio" name="billPayment" value="Self-Pay" onchange="toggleBillingFields()"> 💳 Self-Pay</label>
+          <label class="ins-pill"><input type="radio" name="billPayment" value="Subscription" onchange="toggleBillingFields()"> 🔄 Subscription</label>
+        </div>
+        <!-- Insurance co-pay note -->
+        <div id="billInsNote" style="margin-top:14px;padding:12px 16px;background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:8px;font-size:13px;color:#065F46;">
+          Insurance on file from Contact &amp; Insurance step. Standard co-pay applies. Patient will be billed per their plan terms.
+        </div>
+        <!-- Self-Pay fields -->
+        <div id="billSelfPayFields" style="display:none;margin-top:14px;">
+          <div class="form-grid form-grid-2">
+            <div class="form-group"><label class="form-label">Cardholder Name</label><input class="form-input" placeholder="Name on card"></div>
+            <div class="form-group"><label class="form-label">Card Number</label><input class="form-input" placeholder="•••• •••• •••• ••••"></div>
+            <div class="form-group"><label class="form-label">Expiration</label><input class="form-input" placeholder="MM/YY"></div>
+            <div class="form-group"><label class="form-label">CVV</label><input class="form-input" placeholder="•••"></div>
+          </div>
+        </div>
+        <!-- Subscription note -->
+        <div id="billSubscriptionNote" style="display:none;margin-top:14px;padding:12px 16px;background:#EEF2FF;border:1.5px solid #C7D2FE;border-radius:8px;font-size:13px;color:#3730A3;">
+          Everlywell360 subscription plan — consultation is covered at $0 cost-share. No additional payment required.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Billing Address</div>
+        <div class="form-group" style="margin-bottom:12px;"><label class="form-label">Street Address</label><input class="form-input" placeholder="123 Main St"></div>
+        <div class="form-grid form-grid-3">
+          <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="City"></div>
+          <div class="form-group"><label class="form-label">State</label><input class="form-input" placeholder="TX"></div>
+          <div class="form-group"><label class="form-label">ZIP</label><input class="form-input" placeholder="78701"></div>
+        </div>
       </div>
     </div>
 
@@ -704,6 +706,7 @@ const npCompleted = new Set();
 let npPath = 'existing'; // 'existing' or 'new'
 let npSteps = []; // ordered step IDs for current path
 
+window.addEventListener('load', function() { selectPatientType('new'); });
 function selectPatientType(type) {
   npPath = type;
   document.getElementById('npTypeSelect').style.display = 'none';
@@ -716,8 +719,8 @@ function selectPatientType(type) {
     npSteps = ['np_step_search','np_step_cp_qa','np_step5'];
     renderStepNav(['Search & Select Patient','Care Product + Intake Q&A','Request Consult']);
   } else {
-    npSteps = ['np_step1','np_step_ins','np_step_bill','np_step2','np_step_cp_qa','np_step5'];
-    renderStepNav(['Demographics','Contact & Insurance','Billing','Health Profile','Care Product + Intake Q&A','Request Consult']);
+    npSteps = ['np_step1','np_step3','np_step_ins','np_step_bill','np_step2','np_step5'];
+    renderStepNav(['Demographics','Care Product','Contact & Insurance','Billing','Health Profile','Request Consult']);
   }
   npCurrent = 0;
   npNextStep();
@@ -746,6 +749,8 @@ function goStep(n) {
   // Show target step
   const newStepEl = document.getElementById(npSteps[n - 1]);
   if (newStepEl) newStepEl.classList.add('active');
+  // Check lab alert when entering Request Consult step
+  if (npSteps[n-1] === 'np_step5') checkLabResultsAlert();
 
   // Update nav
   for (let i = 1; i <= total; i++) {
@@ -828,7 +833,7 @@ function toggleNKDA() {
 // Product card
 const PRODUCT_INFO = {
   'Testosterone': 'Available in 48 states. Requires lab results. MD/NP consult. Async + Video + Phone.',
-  'Weight Management': 'Available in all 50 states. Lab results optional. MD/NP consult. All consult types.',
+  'Weight Loss Program': 'Available in all 50 states. Lab results required before first consult. MD/NP consult. All consult types.',
   'Skincare': 'Available in 45 states. No lab requirements. NP/MD consult. Async preferred.',
   'ED Treatment': 'Available in 49 states. No lab requirements. MD/NP consult. Async.',
   "Women's Health": 'Available in all 50 states. Labs may be required. MD/NP/GC consult. All types.',
@@ -905,7 +910,7 @@ function submitAsync() {
 // Patient search (demo patients)
 var DEMO_PATIENTS = [
   { name: 'Marcus Johnson', id: 'P-00112', meta: 'DOB: Apr 12, 1985 · TX · Testosterone' },
-  { name: 'Emily Chen', id: 'P-00089', meta: 'DOB: Jul 22, 1990 · CA · Weight Management' },
+  { name: 'Emily Chen', id: 'P-00089', meta: 'DOB: Jul 22, 1990 · CA · Weight Loss Program' },
   { name: 'Robert Kim', id: 'P-00201', meta: 'DOB: Mar 5, 1978 · NY · BRCA Counseling' },
 ];
 var selectedPatient = null;
@@ -967,8 +972,8 @@ function showIntakeQ() {
   if (!val) { area.style.display = 'none'; return; }
   area.style.display = '';
   testosterone.style.display = (val === 'Testosterone') ? '' : 'none';
-  weightMgmt.style.display = (val === 'Weight Management') ? '' : 'none';
-  generic.style.display = (val !== 'Testosterone' && val !== 'Weight Management') ? '' : 'none';
+  weightMgmt.style.display = (val === 'Weight Loss Program') ? '' : 'none';
+  generic.style.display = (val !== 'Testosterone' && val !== 'Weight Loss Program') ? '' : 'none';
 }
 
 // Accordion for intake sections
@@ -997,6 +1002,28 @@ function toggleAddr(id, btn) {
   btn.textContent = show ? '− Hide address' : '+ Add Address (optional)';
 }
 
+function selectConsultPath(path) {
+  document.getElementById('scheduledBody').style.display = path === 'scheduled' ? '' : 'none';
+  document.getElementById('realtimeBody').style.display = path === 'realtime' ? '' : 'none';
+}
+
+function showSchedSlots(val) {
+  var ph = document.getElementById('schedSlotsPlaceholder');
+  var gr = document.getElementById('schedSlotsGrid');
+  if (ph && gr) {
+    if (val) { ph.style.display = 'none'; gr.style.display = ''; }
+    else { ph.style.display = ''; gr.style.display = 'none'; }
+  }
+}
+
+function checkLabResultsAlert() {
+  var cp = document.getElementById('careProductSelect');
+  var alertEl = document.getElementById('labResultsAlert');
+  if (!cp || !alertEl) return;
+  var labProducts = ['Weight Loss Program', 'A1C Management'];
+  alertEl.style.display = labProducts.indexOf(cp.value) !== -1 ? 'flex' : 'none';
+}
+
 // Consult type CTA update
 function updateConsultCTA() {
   var val = document.querySelector('input[name="consultType"]:checked');
@@ -1007,6 +1034,26 @@ function updateConsultCTA() {
   } else {
     btn.textContent = 'Schedule & Submit Request →';
   }
+}
+
+// Lab results upload handler
+function handleLabUpload(input) {
+  if (input.files && input.files.length > 0) {
+    document.getElementById('labUploadedBadge').style.display = 'inline-flex';
+    document.getElementById('uploadLabsBtn').style.opacity = '0.6';
+  }
+}
+
+// Billing payment method toggle
+function toggleBillingFields() {
+  var val = document.querySelector('input[name="billPayment"]:checked');
+  var insNote = document.getElementById('billInsNote');
+  var selfPay = document.getElementById('billSelfPayFields');
+  var subNote = document.getElementById('billSubscriptionNote');
+  if (!val) return;
+  insNote.style.display = val.value === 'Insurance' ? '' : 'none';
+  selfPay.style.display = val.value === 'Self-Pay' ? '' : 'none';
+  subNote.style.display = val.value === 'Subscription' ? '' : 'none';
 }
 
 // Insurance fields toggle for new patient path

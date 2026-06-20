@@ -238,8 +238,8 @@ tbody tr:last-child td { border-bottom: none; }
   <!-- ── Patient Search Panel ── -->
   <div class="panel active" id="panelPatient">
     <div class="search-row">
-      <input class="search-input" type="text" placeholder="Search by name, patient ID, or date of birth…" oninput="filterPatients(this.value)">
-      <button class="search-btn">Search</button>
+      <input class="search-input" type="text" id="patientSearchInput" placeholder="Search by name, patient ID, or date of birth…" oninput="filterPatients(this.value)">
+      <button class="search-btn" onclick="filterPatients(document.getElementById('patientSearchInput').value)">Search</button>
     </div>
     <div class="results-card">
       <div class="results-header">Patient Records</div>
@@ -559,18 +559,27 @@ tbody tr:last-child td { border-bottom: none; }
 <script>
 // ─── DATA ───
 const PATIENTS = [
-  { id:'PT-2026-00201', first:'Marcus',  last:'Johnson', dob:'1985-04-12', phone:'(512) 555-0102', email:'marcus.j@email.com', lastConsult:'Jun 12, 2026', status:'Active' },
-  { id:'PT-2026-00188', first:'Amanda',  last:'Rivera',  dob:'1991-08-22', phone:'(310) 555-0188', email:'a.rivera@email.com',  lastConsult:'Jun 10, 2026', status:'Active' },
-  { id:'PT-2026-00174', first:'James',   last:'Park',    dob:'1978-11-05', phone:'(312) 555-0174', email:'j.park@email.com',    lastConsult:'May 28, 2026', status:'Active' },
-  { id:'PT-2026-00155', first:'Sandra',  last:'Nguyen',  dob:'2000-03-17', phone:'(206) 555-0155', email:'s.nguyen@email.com',  lastConsult:'May 14, 2026', status:'Active' },
-  { id:'PT-2026-00140', first:'Robert',  last:'Chen',    dob:'1965-07-30', phone:'(415) 555-0140', email:'r.chen@email.com',    lastConsult:'Apr 29, 2026', status:'Active' },
+  { id:'PT-2026-00201', first:'Marcus',   last:'Johnson',   dob:'1985-04-12', phone:'(512) 555-0102', email:'marcus.j@email.com',    lastConsult:'Jun 12, 2026', status:'Active' },
+  { id:'PT-2026-00188', first:'Amanda',   last:'Rivera',    dob:'1991-08-22', phone:'(310) 555-0188', email:'a.rivera@email.com',     lastConsult:'Jun 10, 2026', status:'Active' },
+  { id:'PT-2026-00174', first:'James',    last:'Park',      dob:'1978-11-05', phone:'(312) 555-0174', email:'j.park@email.com',       lastConsult:'May 28, 2026', status:'Active' },
+  { id:'PT-2026-00155', first:'Sandra',   last:'Nguyen',    dob:'2000-03-17', phone:'(206) 555-0155', email:'s.nguyen@email.com',     lastConsult:'May 14, 2026', status:'Active' },
+  { id:'PT-2026-00140', first:'Robert',   last:'Chen',      dob:'1965-07-30', phone:'(415) 555-0140', email:'r.chen@email.com',       lastConsult:'Apr 29, 2026', status:'Active' },
+  { id:'PT-2026-00132', first:'Priya',    last:'Patel',     dob:'1988-12-03', phone:'(972) 555-0132', email:'p.patel@email.com',      lastConsult:'Jun 5, 2026',  status:'Active' },
+  { id:'PT-2026-00119', first:'Derek',    last:'Williams',  dob:'1973-06-18', phone:'(404) 555-0119', email:'d.williams@email.com',   lastConsult:'Jun 1, 2026',  status:'Active' },
+  { id:'PT-2026-00108', first:'Lisa',     last:'Morales',   dob:'1995-09-27', phone:'(720) 555-0108', email:'l.morales@email.com',    lastConsult:'May 22, 2026', status:'Active' },
+  { id:'PT-2026-00094', first:'Kevin',    last:'Thompson',  dob:'1960-02-14', phone:'(617) 555-0094', email:'k.thompson@email.com',   lastConsult:'May 10, 2026', status:'Active' },
+  { id:'PT-2026-00081', first:'Michelle', last:'Harris',    dob:'1983-07-09', phone:'(202) 555-0081', email:'m.harris@email.com',     lastConsult:'Apr 18, 2026', status:'Active' },
 ];
 
 const MEMBERS = [
-  { id:'MBR-001', memberId:'H61755723', facingId:'H6175572300', first:'Sarah', last:'Thompson', dob:'1988-02-14', phone:'(813) 555-0723', email:'s.thompson@email.com', plan:'Blue Cross Blue Shield FL', eligibility:'Active', priorConsults:0 },
-  { id:'MBR-002', memberId:'H61755724', facingId:'H6175572400', first:'Michael', last:'Davis',   dob:'1975-09-22', phone:'(407) 555-0724', email:'m.davis@email.com',    plan:'UnitedHealthcare', eligibility:'Active', priorConsults:0 },
-  { id:'MBR-003', memberId:'H61755725', facingId:'H6175572500', first:'Jennifer', last:'Wilson', dob:'1993-06-11', phone:'(954) 555-0725', email:'j.wilson@email.com',   plan:'Aetna Florida', eligibility:'Active', priorConsults:0 },
-  { id:'MBR-004', memberId:'H61755726', facingId:'H6175572600', first:'David', last:'Martinez',  dob:'1981-12-30', phone:'(305) 555-0726', email:'d.martinez@email.com', plan:'Cigna', eligibility:'Inactive', priorConsults:1 },
+  { id:'MBR-001', memberId:'H61755723', facingId:'H6175572300', first:'Sarah',    last:'Thompson', dob:'1988-02-14', phone:'(813) 555-0723', email:'s.thompson@email.com', plan:'Blue Cross Blue Shield FL', eligibility:'Active',   priorConsults:0 },
+  { id:'MBR-002', memberId:'H61755724', facingId:'H6175572400', first:'Michael',  last:'Davis',    dob:'1975-09-22', phone:'(407) 555-0724', email:'m.davis@email.com',    plan:'UnitedHealthcare',          eligibility:'Active',   priorConsults:0 },
+  { id:'MBR-003', memberId:'H61755725', facingId:'H6175572500', first:'Jennifer', last:'Wilson',   dob:'1993-06-11', phone:'(954) 555-0725', email:'j.wilson@email.com',   plan:'Aetna Florida',             eligibility:'Active',   priorConsults:0 },
+  { id:'MBR-004', memberId:'H61755726', facingId:'H6175572600', first:'David',    last:'Martinez', dob:'1981-12-30', phone:'(305) 555-0726', email:'d.martinez@email.com', plan:'Cigna',                     eligibility:'Inactive', priorConsults:1 },
+  { id:'MBR-005', memberId:'H61755727', facingId:'H6175572700', first:'Patricia', last:'Adams',    dob:'1970-05-08', phone:'(561) 555-0727', email:'p.adams@email.com',    plan:'Humana',                    eligibility:'Active',   priorConsults:0 },
+  { id:'MBR-006', memberId:'H61755728', facingId:'H6175572800', first:'Carlos',   last:'Reyes',    dob:'1990-11-23', phone:'(786) 555-0728', email:'c.reyes@email.com',    plan:'Blue Cross Blue Shield FL', eligibility:'Active',   priorConsults:2 },
+  { id:'MBR-007', memberId:'H61755729', facingId:'H6175572900', first:'Angela',   last:'Foster',   dob:'1984-03-30', phone:'(321) 555-0729', email:'a.foster@email.com',   plan:'UnitedHealthcare',          eligibility:'Active',   priorConsults:0 },
+  { id:'MBR-008', memberId:'H61755730', facingId:'H6175573000', first:'Thomas',   last:'Kim',      dob:'1967-08-17', phone:'(239) 555-0730', email:'t.kim@email.com',      plan:'Aetna Florida',             eligibility:'Inactive', priorConsults:3 },
 ];
 
 // ─── BOOKING STATE ───
@@ -598,7 +607,7 @@ function renderPatients(data) {
       <td>${p.lastConsult}</td>
       <td><span class="status-pill status-active">${p.status}</span></td>
       <td>
-        <a class="action-link" href="/scheduler/schedule">Reschedule</a>
+        <button class="book-btn" onclick="openPatientBookModal('${p.id}')">Schedule Consult</button>
         <a class="action-link" href="#">View Appts</a>
       </td>
     </tr>`).join('');
@@ -609,6 +618,42 @@ function filterPatients(q) {
   renderPatients(PATIENTS.filter(p =>
     (p.first+' '+p.last+' '+p.id+' '+p.dob).toLowerCase().includes(lq)
   ));
+}
+
+function openPatientBookModal(patientId) {
+  const p = PATIENTS.find(x => x.id === patientId);
+  if (!p) return;
+  // Build a member-shaped object from the patient record
+  const m = {
+    id: p.id,
+    memberId: p.id,
+    facingId: p.id,
+    first: p.first,
+    last: p.last,
+    dob: p.dob,
+    phone: p.phone,
+    email: p.email,
+    plan: 'Everlywell360',
+  };
+  state = { step:1, member:m, apptType:'EverlyCare Treat Visit',
+    provider:{id:'next_available',name:'Next Available Provider'},
+    date:null, time:null, tz:null, visitState:null, consentCall:null, consentText:null };
+
+  document.getElementById('stripMemberName').textContent = p.first + ' ' + p.last;
+  document.getElementById('stripMemberId').textContent = p.id;
+  document.getElementById('stripFacingId').textContent = p.id;
+  document.getElementById('stripPlan').textContent = 'Everlywell360';
+
+  document.getElementById('demoFirst').textContent = p.first;
+  document.getElementById('demoLast').textContent = p.last;
+  document.getElementById('demoDob').textContent = p.dob;
+  document.getElementById('demoState').textContent = 'Texas';
+  document.getElementById('demoPhone').textContent = p.phone;
+  document.getElementById('demoEmail').textContent = p.email;
+
+  renderCalendar();
+  showStep(1);
+  document.getElementById('book-appt-modal').classList.add('open');
 }
 
 // ─── RENDER MEMBER TABLE ───

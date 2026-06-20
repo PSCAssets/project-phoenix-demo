@@ -76,8 +76,9 @@
   .appt-detail-row:last-of-type { border-bottom:none; }
   .appt-detail-key { color:#6B7280; font-weight:500; }
   .appt-detail-val { color:#111827; font-weight:600; }
-  .appt-detail-ft { padding:14px 20px; border-top:1px solid #E5E0D8; display:flex; justify-content:space-between; align-items:center; }
-  .btn-open-chart { background:#6B21A8; color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; text-decoration:none; display:inline-block; }
+  .appt-detail-ft { padding:12px 20px; border-top:1px solid #E5E0D8; display:flex; align-items:center; gap:8px; }
+  .appt-detail-ft-close { font-size:12px; color:#9CA3AF; text-decoration:none; margin-right:auto; white-space:nowrap; }
+  .btn-open-chart { background:#6B21A8; color:#fff; border:none; border-radius:7px; padding:7px 14px; font-size:12px; font-weight:600; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap; }
   .btn-open-chart:hover { background:#5B1898; }
   .appt-title { font-size: 11px; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .appt-sub { font-size: 10px; color: rgba(255,255,255,0.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
@@ -197,7 +198,7 @@
 <div class="sched-page">
   <div class="sched-topbar">
     <h1>Schedule</h1>
-    <div style="font-size:13px;color:#6B7280;">Dr. Sarah Lee, MD</div>
+    <div style="font-size:13px;color:#6B7280;" id="schedProviderName">{{ session.get('display_name', 'Dr. Sarah Lee, MD') }}</div>
     <div style="display:flex;border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;margin-right:8px;">
       <button onclick="setSchedView('day',this)" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#F3F4F6;color:#374151;">Day</button>
       <button onclick="setSchedView('week',this)" id="schedViewWeek" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">Week</button>
@@ -209,7 +210,6 @@
       <button class="sched-nav-btn">&#8250;</button>
     </div>
     <button onclick="openAddTimeModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Time</button>
-    <button id="realTimeQueue" class="real-time-queue" onclick="openRTQueueModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">&#9889; Conduct Consult Now</button>
   </div>
   <div class="sched-legend">
     <span class="legend-item"><span class="legend-dot" style="background:#D1FAE5;border:1.5px dashed #34D399"></span>Available</span>
@@ -343,9 +343,10 @@
       <div style="margin-top:12px;padding:10px;background:#FAF7F2;border-radius:7px;font-size:12px;color:#6B7280;line-height:1.5;" id="apptDetailNotes"></div>
     </div>
     <div class="appt-detail-ft" id="apptDetailFt">
-      <a href="#" onclick="closeApptDetail();return false;" style="font-size:12px;color:#9CA3AF;text-decoration:none;">Close</a>
-      <button onclick="enterApptEditMode()" id="apptEditBtn" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">✎ Edit</button>
+      <a href="#" onclick="closeApptDetail();return false;" class="appt-detail-ft-close">Close</a>
+      <button onclick="enterApptEditMode()" id="apptEditBtn" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">✎ Edit</button>
       <a id="apptDetailChartLink" href="/provider/chart/1" class="btn-open-chart">Open Chart →</a>
+      <button onclick="openRTQueueModal()" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">&#9889; Conduct Consult Now</button>
     </div>
     <!-- Edit mode form (hidden by default) -->
     <div id="apptEditForm" style="display:none;padding:0 16px 14px;">
@@ -558,7 +559,8 @@ function openApptDetail(label, sublabel, type, dur, sh, sm, day) {
   document.getElementById('apptDetailType').textContent = TYPE_LABEL_MAP[type] || label;
   document.getElementById('apptDetailProduct').textContent = product;
   document.getElementById('apptDetailDuration').textContent = dur + ' min · ' + hr + minStr + ' ' + ampm;
-  document.getElementById('apptDetailNotes').textContent = '"' + patient + ' — ' + product + ' consult. Duration: ' + dur + ' min. Provider: Dr. Sarah Lee, MD."';
+  var provName = document.getElementById('schedProviderName') ? document.getElementById('schedProviderName').textContent : 'Dr. Sarah Lee, MD';
+  document.getElementById('apptDetailNotes').textContent = '"' + patient + ' — ' + product + ' consult. Duration: ' + dur + ' min. Provider: ' + provName + '."';
   document.getElementById('apptDetailModal').classList.add('open');
 }
 function closeApptDetail() {
@@ -703,7 +705,7 @@ document.addEventListener('click', function(e) {
 </script>
 
 <!-- Real-Time Queue Modal -->
-<div id="rtQueueModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:800;align-items:center;justify-content:center;">
+<div id="rtQueueModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:2500;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;max-width:480px;width:94%;padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,0.18);position:relative;">
     <button onclick="closeRTQueueModal()" style="position:absolute;top:14px;right:16px;background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">&#x2715;</button>
     <div style="font-size:16px;font-weight:700;color:#111827;margin-bottom:16px;">Add Patient to Real-Time Queue</div>
@@ -728,4 +730,48 @@ document.addEventListener('click', function(e) {
 <div id="rtQueueToast" style="display:none;position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:600;z-index:900;white-space:nowrap;">&#10003; Marcus Johnson added to real-time queue &mdash; providers notified</div>
 
 {% endraw %}
+{% if session.get('role') == 'provider_gc' %}
+<script>
+// GC role: rename appointment titles to genetics test types
+document.addEventListener('DOMContentLoaded', function() {
+  var gcApptMap = {
+    'Annual Visit':       'BRCA Genetic Counseling',
+    'A1C Treat Consult':  'Hereditary Cancer Panel',
+    'Telehealth Consult': 'Carrier Screening Consult',
+    'Phone Consult':      'Prenatal Genetics Consult',
+    'Follow-up':          'Variant of Uncertain Significance Follow-up',
+  };
+  document.querySelectorAll('.day-appt-name').forEach(function(el) {
+    for (var key in gcApptMap) {
+      if (el.textContent.startsWith(key)) {
+        el.textContent = el.textContent.replace(key, gcApptMap[key]);
+        break;
+      }
+    }
+  });
+  // Patch openApptDetail so the modal title also shows genetics names
+  if (typeof openApptDetail === 'function') {
+    var _origOpen = openApptDetail;
+    openApptDetail = function(label, sublabel, type, dur, sh, sm, day) {
+      var mappedLabel = gcApptMap[label] || label;
+      _origOpen(mappedLabel, sublabel, type, dur, sh, sm, day);
+    };
+  }
+  document.querySelectorAll('.day-appt-meta').forEach(function(el) {
+    var metaMap = {
+      'A1C Mgmt':       'GeneDx Panel',
+      "Women's Health": 'Blueprint Genetics',
+      'STI Panel':       'Prenatal Carrier Screen',
+      'Weight Mgmt':     'Hereditary Risk Assessment',
+      'ED Treatment':    'BRCA1/2 Analysis',
+    };
+    for (var key in metaMap) {
+      if (el.textContent.includes(key)) {
+        el.textContent = el.textContent.replace(key, metaMap[key]);
+      }
+    }
+  });
+});
+</script>
+{% endif %}
 {% endblock %}

@@ -552,13 +552,15 @@ function closeModal() {
 
 function confirmBooking() {
   closeModal();
-  const bannerId = 'successBanner' + activeBookingTab;
-  const banner = document.getElementById(bannerId);
-  if (banner) {
-    banner.textContent = '✅ Appointment booked. Confirmation sent to patient.';
-    banner.classList.add('show');
-    setTimeout(() => banner.classList.remove('show'), 5000);
-  }
+  // Show full-page confirmation overlay then redirect to dashboard
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = '<div style="font-size:56px;">✅</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#111827;">Appointment Booked</div>' +
+    '<div style="font-size:14px;color:#6B7280;">Confirmation has been sent to the patient.</div>' +
+    '<div style="font-size:13px;color:#9CA3AF;margin-top:8px;">Returning to dashboard…</div>';
+  document.body.appendChild(overlay);
+  setTimeout(() => { window.location.href = '/scheduler/dashboard'; }, 2200);
 }
 
 function toggleAvailPanel() {

@@ -19,7 +19,8 @@
     gap: 16px;
     flex-shrink: 0;
   }
-  .header-logo { display: flex; align-items: center; gap: 8px; }
+  .header-logo { display: flex; align-items: center; gap: 8px; cursor: pointer; opacity: 1; transition: opacity 0.15s; }
+  .header-logo:hover { opacity: 0.8; }
   .header-logo .icon { font-size: 20px; color: #00BFB3; }
   .header-logo .name { font-size: 18px; font-weight: 700; color: #fff; }
   .header-title { flex: 1; text-align: center; font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.8); }
@@ -63,12 +64,15 @@
     cursor: pointer;
     border-left: 3px solid transparent;
     transition: all 0.1s;
+    user-select: none;
   }
   .nav-item:hover { background: #F9FAFB; color: #0A2F5C; }
   .nav-item.active { border-left-color: #0A2F5C; color: #0A2F5C; font-weight: 700; background: #EFF6FF; }
 
   /* Main */
   .portal-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
   .section-label {
     font-size: 10px;
     font-weight: 700;
@@ -76,6 +80,17 @@
     letter-spacing: 0.1em;
     color: #9CA3AF;
     margin-bottom: 14px;
+  }
+  .section-heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0A2F5C;
+    margin-bottom: 4px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: #6B7280;
+    margin-bottom: 20px;
   }
 
   /* Consult cards */
@@ -97,7 +112,6 @@
   }
   .status-scheduled { background: #DBEAFE; color: #1D4ED8; }
   .status-results   { background: #D1FAE5; color: #065F46; }
-
   .consult-meta { font-size: 12px; color: #6B7280; margin-bottom: 4px; }
   .consult-meta strong { color: #374151; font-weight: 600; }
 
@@ -138,6 +152,90 @@
   }
   .btn-outline-pwn:hover { background: #EFF6FF; }
 
+  /* Lab Results */
+  .lab-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .lab-icon { font-size: 28px; flex-shrink: 0; }
+  .lab-info { flex: 1; }
+  .lab-name { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+  .lab-meta { font-size: 12px; color: #6B7280; }
+  .lab-badge {
+    font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 8px; white-space: nowrap;
+  }
+  .lab-available { background: #D1FAE5; color: #065F46; }
+  .lab-pending   { background: #FEF3C7; color: #92400E; }
+  .lab-actions { display: flex; gap: 8px; }
+
+  /* Messages */
+  .message-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .message-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  .message-header:hover { background: #F9FAFB; }
+  .message-from { font-size: 13px; font-weight: 700; color: #111827; }
+  .message-subject { font-size: 12px; color: #6B7280; margin-top: 2px; }
+  .message-date { font-size: 11px; color: #9CA3AF; white-space: nowrap; }
+  .message-unread-dot { width: 8px; height: 8px; border-radius: 50%; background: #00BFB3; margin-right: 10px; flex-shrink: 0; }
+  .message-body {
+    display: none;
+    padding: 14px 18px;
+    border-top: 1px solid #F3F4F6;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.6;
+    background: #FAFAFA;
+  }
+  .message-body.open { display: block; }
+  .reply-area { margin-top: 12px; }
+  .reply-input { width: 100%; padding: 8px 12px; border: 1.5px solid #D1D5DB; border-radius: 6px; font-size: 13px; resize: vertical; min-height: 70px; outline: none; }
+  .reply-input:focus { border-color: #0A2F5C; }
+  .compose-btn {
+    background: #0A2F5C; color: #fff; border: none;
+    border-radius: 7px; padding: 8px 18px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 16px;
+  }
+  .compose-btn:hover { background: #0c3a70; }
+
+  /* Account Settings */
+  .settings-card {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .settings-title { font-size: 14px; font-weight: 700; color: #0A2F5C; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #F3F4F6; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #F9FAFB; }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-key { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; width: 160px; }
+  .settings-val { font-size: 13px; color: #111827; font-weight: 500; flex: 1; }
+  .settings-edit { font-size: 12px; color: #0A2F5C; font-weight: 600; cursor: pointer; text-decoration: underline; }
+  .notification-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid #F9FAFB; }
+  .notification-row:last-child { border-bottom: none; }
+  .notif-label { font-size: 13px; color: #374151; }
+  .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: #D1D5DB; border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+  .slider:before { content: ''; position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; left: 3px; top: 3px; transition: transform 0.2s; }
+  input:checked + .slider { background: #0A2F5C; }
+  input:checked + .slider:before { transform: translateX(16px); }
+
   /* Footer */
   .portal-footer {
     background: #F9FAFB;
@@ -149,15 +247,21 @@
     flex-shrink: 0;
   }
   .portal-footer a { color: #9CA3AF; text-decoration: underline; margin: 0 8px; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 48px 20px; }
+  .empty-state .es-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state .es-title { font-size: 15px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+  .empty-state .es-sub { font-size: 13px; color: #9CA3AF; }
 </style>
 </head>
 <body>
 
   <header class="portal-header">
-    <div class="header-logo">
+    <a class="header-logo" href="/" style="text-decoration:none;">
       <span class="icon">&#9672;</span>
       <span class="name">PWN Health</span>
-    </div>
+    </a>
     <div class="header-title">Patient Portal</div>
     <div class="header-user">
       <span class="patient-name">Jennifer Adams</span>
@@ -174,94 +278,313 @@
   <div class="portal-body">
 
     <nav class="sidebar">
-      <a class="nav-item active">Dashboard</a>
-      <a class="nav-item">My Consultations</a>
-      <a class="nav-item">Lab Results</a>
-      <a class="nav-item">Messages</a>
-      <a class="nav-item">Account Settings</a>
+      <a class="nav-item active" onclick="showSection('dashboard', this)">Dashboard</a>
+      <a class="nav-item" onclick="showSection('consultations', this)">My Consultations</a>
+      <a class="nav-item" onclick="showSection('labs', this)">Lab Results</a>
+      <a class="nav-item" onclick="showSection('messages', this)">Messages</a>
+      <a class="nav-item" onclick="showSection('settings', this)">Account Settings</a>
     </nav>
 
     <main class="portal-main">
-      <div class="section-label">My Consultations</div>
 
-      <!-- Consult 1: Pre-Test -->
-      <div class="consult-card">
-        <div class="consult-header">
-          <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
-          <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
-        </div>
-        <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
-        <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
-        <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
+      <!-- ── DASHBOARD ── -->
+      <div class="section-panel active" id="panel-dashboard">
+        <div class="section-label">My Consultations</div>
 
-        <div class="care-journey">
-        <div class="journey-label">CARE JOURNEY</div>
-        <div class="journey-track">
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Request<br>Received</div>
+        <!-- Consult 1: Pre-Test -->
+        <div class="consult-card">
+          <div class="consult-header">
+            <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
+            <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
           </div>
-          <div class="journey-connector connector-done"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Intake<br>Complete</div>
+          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+          <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
+          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
+          <div class="journey-label">Care Journey</div>
+          <div class="journey-track">
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-active">&#9679;</div><div class="journey-name">Consultation<br>Scheduled</div></div>
+            <div class="journey-connector connector-pending"></div>
+            <div class="journey-stage"><div class="journey-dot dot-pending">&#9675;</div><div class="journey-name">Results<br>Review</div></div>
           </div>
-          <div class="journey-connector connector-done"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-active">&#9679;</div>
-            <div class="journey-name">Consultation<br>Scheduled</div>
-          </div>
-          <div class="journey-connector connector-pending"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-pending">&#9675;</div>
-            <div class="journey-name">Results<br>Review</div>
+          <div class="card-actions">
+            <button class="btn-primary-pwn" onclick="alert('Launching video consultation...')">Join Video Consultation</button>
+            <button class="btn-outline-pwn" onclick="showSection('consultations', document.querySelector(\'.nav-item:nth-child(2)\'))">View Details</button>
           </div>
         </div>
-        <div style="display:none;">Care Journey</div>
-        </div>
 
-        <div class="card-actions">
-          <button class="btn-primary-pwn">Join Video Consultation</button>
-          <button class="btn-outline-pwn">View Details</button>
+        <!-- Consult 2: Post-Test -->
+        <div class="consult-card">
+          <div class="consult-header">
+            <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
+            <span class="status-pill status-results">&#10003; Results Available</span>
+          </div>
+          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+          <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
+          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
+          <div class="journey-label">Care Journey</div>
+          <div class="journey-track">
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Results<br>Available</div></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-outline-pwn" onclick="showSection('labs', document.querySelector('.nav-item:nth-child(3)'))">View Results</button>
+            <button class="btn-outline-pwn" onclick="downloadReport()">Download Report</button>
+          </div>
         </div>
       </div>
 
-      <!-- Consult 2: Post-Test -->
-      <div class="consult-card">
-        <div class="consult-header">
-          <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
-          <span class="status-pill status-results">&#10003; Results Available</span>
-        </div>
-        <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
-        <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
-        <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
+      <!-- ── MY CONSULTATIONS ── -->
+      <div class="section-panel" id="panel-consultations">
+        <div class="section-heading">My Consultations</div>
+        <div class="section-sub">All consultations associated with your account.</div>
 
-        <div class="journey-label">Care Journey</div>
-        <div class="journey-track">
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Request<br>Received</div>
+        <div class="consult-card">
+          <div class="consult-header">
+            <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
+            <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
           </div>
-          <div class="journey-connector connector-done"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Intake<br>Complete</div>
+          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+          <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
+          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
+          <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+          <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+          <div class="journey-label">Care Journey</div>
+          <div class="journey-track">
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-active">&#9679;</div><div class="journey-name">Consultation<br>Scheduled</div></div>
+            <div class="journey-connector connector-pending"></div>
+            <div class="journey-stage"><div class="journey-dot dot-pending">&#9675;</div><div class="journey-name">Results<br>Review</div></div>
           </div>
-          <div class="journey-connector connector-done"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Consult<br>Complete</div>
-          </div>
-          <div class="journey-connector connector-done"></div>
-          <div class="journey-stage">
-            <div class="journey-dot dot-done">&#10003;</div>
-            <div class="journey-name">Results<br>Available</div>
+          <div class="card-actions">
+            <button class="btn-primary-pwn" onclick="alert('Launching video consultation...')">Join Video Consultation</button>
+            <button class="btn-outline-pwn" onclick="alert('Reschedule flow coming soon.')">Reschedule</button>
           </div>
         </div>
 
-        <div class="card-actions">
-          <button class="btn-outline-pwn">View Results</button>
-          <button class="btn-outline-pwn">Download Report</button>
+        <div class="consult-card">
+          <div class="consult-header">
+            <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
+            <span class="status-pill status-results">&#10003; Results Available</span>
+          </div>
+          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+          <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
+          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
+          <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+          <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+          <div class="journey-label">Care Journey</div>
+          <div class="journey-track">
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+            <div class="journey-connector connector-done"></div>
+            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Results<br>Available</div></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-outline-pwn" onclick="showSection('labs', document.querySelector('.nav-item:nth-child(3)'))">View Results</button>
+            <button class="btn-outline-pwn" onclick="downloadReport()">Download Report</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LAB RESULTS ── -->
+      <div class="section-panel" id="panel-labs">
+        <div class="section-heading">Lab Results</div>
+        <div class="section-sub">Genetic test results and reports associated with your consultations.</div>
+
+        <div class="lab-card">
+          <div class="lab-icon">&#129516;</div>
+          <div class="lab-info">
+            <div class="lab-name">BRCA1/BRCA2 Hereditary Cancer Panel</div>
+            <div class="lab-meta">Ordered: Apr 28, 2026 &nbsp;&middot;&nbsp; Resulted: May 6, 2026 &nbsp;&middot;&nbsp; Lab: GeneDx</div>
+            <div class="lab-meta" style="margin-top:4px;font-weight:600;color:#065F46;">Result: Variant of Uncertain Significance (VUS) — BRCA2</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <span class="lab-badge lab-available">&#10003; Results Available</span>
+            <div class="lab-actions">
+              <button class="btn-outline-pwn" style="font-size:11px;padding:5px 12px;" onclick="alert('Opening lab report...')">View Report</button>
+              <button class="btn-outline-pwn" style="font-size:11px;padding:5px 12px;" onclick="downloadReport()">Download PDF</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-icon">&#129516;</div>
+          <div class="lab-info">
+            <div class="lab-name">Lynch Syndrome Panel (MLH1, MSH2, MSH6, PMS2)</div>
+            <div class="lab-meta">Ordered: May 20, 2026 &nbsp;&middot;&nbsp; Status: Processing &nbsp;&middot;&nbsp; Lab: Blueprint Genetics</div>
+            <div class="lab-meta" style="margin-top:4px;color:#92400E;">Expected results: June 27, 2026</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+            <span class="lab-badge lab-pending">&#9679; Pending</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;padding:14px 16px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;font-size:13px;color:#1E3A5F;">
+          <strong>Questions about your results?</strong> Your genetic counselor, Dr. Sarah Lee, is available via secure message or you can schedule a follow-up consultation.
+          <div style="margin-top:10px;display:flex;gap:10px;">
+            <button class="btn-primary-pwn" onclick="showSection('messages', document.querySelector('.nav-item:nth-child(4)'))">Send a Message</button>
+            <button class="btn-outline-pwn" onclick="alert('Scheduling follow-up...')">Schedule Follow-Up</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MESSAGES ── -->
+      <div class="section-panel" id="panel-messages">
+        <div class="section-heading">Messages</div>
+        <div class="section-sub">Secure messages between you and your care team.</div>
+        <button class="compose-btn" onclick="alert('Compose new message coming soon.')">+ Compose New Message</button>
+
+        <div class="message-card">
+          <div class="message-header" onclick="toggleMessage('msg1')">
+            <div style="display:flex;align-items:center;">
+              <div class="message-unread-dot"></div>
+              <div>
+                <div class="message-from">Dr. Sarah Lee &mdash; Genetic Counselor</div>
+                <div class="message-subject">Pre-test consultation prep — what to expect</div>
+              </div>
+            </div>
+            <div class="message-date">Jun 18, 2026</div>
+          </div>
+          <div class="message-body" id="msg1">
+            Hi Jennifer,<br><br>
+            I wanted to reach out ahead of our June 24th consultation to let you know what to expect. We'll be reviewing your family history and discussing the BRCA1/2 panel results together. The session will take approximately 45 minutes.<br><br>
+            If you have any questions before then, feel free to reply here.<br><br>
+            — Dr. Sarah Lee, MS CGC
+            <div class="reply-area">
+              <textarea class="reply-input" placeholder="Write a reply..."></textarea>
+              <div style="margin-top:8px;"><button class="btn-primary-pwn" onclick="alert('Message sent.')">Send Reply</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-card">
+          <div class="message-header" onclick="toggleMessage('msg2')">
+            <div style="display:flex;align-items:center;">
+              <div>
+                <div class="message-from">PWN Health Care Coordination</div>
+                <div class="message-subject">Your BRCA results are now available</div>
+              </div>
+            </div>
+            <div class="message-date">May 8, 2026</div>
+          </div>
+          <div class="message-body" id="msg2">
+            Hello Jennifer,<br><br>
+            Your BRCA1/BRCA2 genetic test results are now available in your portal under Lab Results. Your genetic counselor has reviewed the report and a summary has been added to your record.<br><br>
+            Please log in to view your results and schedule a follow-up session if you have questions.<br><br>
+            — PWN Health Care Team
+            <div class="reply-area">
+              <textarea class="reply-input" placeholder="Write a reply..."></textarea>
+              <div style="margin-top:8px;"><button class="btn-primary-pwn" onclick="alert('Message sent.')">Send Reply</button></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-card">
+          <div class="message-header" onclick="toggleMessage('msg3')">
+            <div style="display:flex;align-items:center;">
+              <div>
+                <div class="message-from">PWN Health — Intake Team</div>
+                <div class="message-subject">Intake questionnaire complete — next steps</div>
+              </div>
+            </div>
+            <div class="message-date">Apr 30, 2026</div>
+          </div>
+          <div class="message-body" id="msg3">
+            Hi Jennifer,<br><br>
+            Thank you for completing your intake questionnaire. Your genetic counselor will review your responses and reach out to confirm your appointment. Lab collection instructions have been sent separately.<br><br>
+            — PWN Health Intake Team
+            <div class="reply-area">
+              <textarea class="reply-input" placeholder="Write a reply..."></textarea>
+              <div style="margin-top:8px;"><button class="btn-primary-pwn" onclick="alert('Message sent.')">Send Reply</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ACCOUNT SETTINGS ── -->
+      <div class="section-panel" id="panel-settings">
+        <div class="section-heading">Account Settings</div>
+        <div class="section-sub">Manage your profile, contact information, and notification preferences.</div>
+
+        <div class="settings-card">
+          <div class="settings-title">Personal Information</div>
+          <div class="settings-row">
+            <div class="settings-key">Full Name</div>
+            <div class="settings-val">Jennifer Adams</div>
+            <div class="settings-edit" onclick="alert('Edit name coming soon.')">Edit</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-key">Date of Birth</div>
+            <div class="settings-val">03/14/1985</div>
+            <div class="settings-edit"></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-key">Member ID</div>
+            <div class="settings-val">PWN-847291</div>
+            <div class="settings-edit"></div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-key">State</div>
+            <div class="settings-val">Texas</div>
+            <div class="settings-edit" onclick="alert('Edit state coming soon.')">Edit</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-title">Contact Information</div>
+          <div class="settings-row">
+            <div class="settings-key">Email</div>
+            <div class="settings-val">jennifer.adams@email.com</div>
+            <div class="settings-edit" onclick="alert('Edit email coming soon.')">Edit</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-key">Phone</div>
+            <div class="settings-val">(512) 555-0291</div>
+            <div class="settings-edit" onclick="alert('Edit phone coming soon.')">Edit</div>
+          </div>
+          <div class="settings-row">
+            <div class="settings-key">Password</div>
+            <div class="settings-val">••••••••</div>
+            <div class="settings-edit" onclick="alert('Change password coming soon.')">Change</div>
+          </div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-title">Notification Preferences</div>
+          <div class="notification-row">
+            <div class="notif-label">Email — Appointment reminders</div>
+            <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="notification-row">
+            <div class="notif-label">Email — New messages from care team</div>
+            <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="notification-row">
+            <div class="notif-label">Email — Lab results available</div>
+            <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="notification-row">
+            <div class="notif-label">SMS — Appointment reminders</div>
+            <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+          </div>
+          <div class="notification-row">
+            <div class="notif-label">SMS — New messages from care team</div>
+            <label class="toggle"><input type="checkbox"><span class="slider"></span></label>
+          </div>
         </div>
       </div>
 
@@ -274,5 +597,30 @@
     <a href="#">Terms of Use</a>
   </footer>
 
+<script>
+function showSection(id, navEl) {
+  // Hide all panels
+  document.querySelectorAll('.section-panel').forEach(function(p) {
+    p.classList.remove('active');
+  });
+  // Show target panel
+  var panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  // Update nav highlight
+  document.querySelectorAll('.nav-item').forEach(function(n) {
+    n.classList.remove('active');
+  });
+  if (navEl) navEl.classList.add('active');
+}
+
+function toggleMessage(id) {
+  var body = document.getElementById(id);
+  body.classList.toggle('open');
+}
+
+function downloadReport() {
+  alert('Downloading PWN Health report PDF...\n\nIn production, this would generate and download the consultation summary report.');
+}
+</script>
 </body>
 </html>

@@ -15,7 +15,7 @@ ROLE_NAMES = {
     'provider_rn': 'Jordan Patel, RN',
     'provider_ma': 'Alex Kim, MA',
     'provider_gc': 'Taylor Brooks, GC',
-    'scheduler':   'Morgan Hayes',
+    'scheduler':   'David Nguyen',
     'care_team':   'Casey Torres',
     'patient':     'Marcus Johnson',
     'admin':       'Chris Navarro',

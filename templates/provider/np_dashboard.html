@@ -289,12 +289,7 @@
     </svg>
   </div>
   <div class="sidebar-nav">
-    <a href="/provider/np" class="sidebar-back" title="My Dashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-      </svg>
-      <span class="nav-label" style="color:#6B21A8;font-weight:600;">My Dashboard</span>
-    </a>
+
     <div class="nav-item active" title="My Dashboard">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -478,6 +473,7 @@
                 <th style="width:90px">Patient</th>
                 <th class="sortable" data-col="program" data-table="consultsTable" style="width:120px">Care Product <span class="sort-arrow"></span></th>
                 <th class="sortable" data-col="type" data-table="consultsTable" style="width:72px">Type <span class="sort-arrow"></span></th>
+                <th style="width:46px">State</th>
                 <th class="sortable" data-col="wait" data-table="consultsTable" style="width:70px">Wait Time <span class="sort-arrow"></span></th>
                 <th class="sortable" data-col="status" data-table="consultsTable" style="width:90px">Status <span class="sort-arrow"></span></th>
                 <th style="width:52px"></th>
@@ -489,6 +485,7 @@
                 <td><div class="cr-patient">N.K.</div><div class="cr-id">CST-2026-11021</div></td>
                 <td><span class="cr-program">A1C Management</span></td>
                 <td><span class="cr-type">Async</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">TX</td>
                 <td><span class="cr-wait breach">3h 11m</span></td>
                 <td><span class="cr-status escalated">SLA Alert</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
@@ -498,6 +495,7 @@
                 <td><div class="cr-patient">D.M.</div><div class="cr-id">CST-2026-11014</div></td>
                 <td><span class="cr-program">Weight Management</span></td>
                 <td><span class="cr-type">Phone</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">IL</td>
                 <td><span class="cr-wait breach">2h 48m</span></td>
                 <td><span class="cr-status in-progress">In Progress</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=phone'">Open</button></td>
@@ -507,6 +505,7 @@
                 <td><div class="cr-patient">B.A.</div><div class="cr-id">CST-2026-11028</div></td>
                 <td><span class="cr-program">Thyroid</span></td>
                 <td><span class="cr-type">Async</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">TX</td>
                 <td><span class="cr-wait warn">1h 52m</span></td>
                 <td><span class="cr-status in-progress">In Progress</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
@@ -516,6 +515,7 @@
                 <td><div class="cr-patient">F.O.</div><div class="cr-id">CST-2026-11033</div></td>
                 <td><span class="cr-program">Testosterone</span></td>
                 <td><span class="cr-type">AE Review</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">IL</td>
                 <td><span class="cr-wait warn">1h 31m</span></td>
                 <td><span class="cr-status escalated">SLA Alert</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
@@ -525,6 +525,7 @@
                 <td><div class="cr-patient">C.W.</div><div class="cr-id">CST-2026-11041</div></td>
                 <td><span class="cr-program">Weight Management</span></td>
                 <td><span class="cr-type">Video</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">TX</td>
                 <td><span class="cr-wait ok">58m</span></td>
                 <td><span class="cr-status in-progress">In Progress</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=video'">Open</button></td>
@@ -534,6 +535,7 @@
                 <td><div class="cr-patient">S.T.</div><div class="cr-id">CST-2026-11045</div></td>
                 <td><span class="cr-program">Lipid / Cardio</span></td>
                 <td><span class="cr-type">Async</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">IL</td>
                 <td><span class="cr-wait ok">44m</span></td>
                 <td><span class="cr-status pending">Pend. Patient</span></td>
                 <td><button class="cr-btn secondary" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">View</button></td>
@@ -543,6 +545,7 @@
                 <td><div class="cr-patient">L.V.</div><div class="cr-id">CST-2026-11052</div></td>
                 <td><span class="cr-program">Women's Health</span></td>
                 <td><span class="cr-type">Async</span></td>
+                <td style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;">TX</td>
                 <td><span class="cr-wait ok">22m</span></td>
                 <td><span class="cr-status in-progress">In Progress</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>

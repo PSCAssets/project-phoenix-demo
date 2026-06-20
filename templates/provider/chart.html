@@ -172,7 +172,7 @@
 .qa-a { font-size: 13px; color: #374151; line-height: 1.55; }
 
 /* ── Right panel: SOAP / Labs / Messages ── */
-.chart-right { width: 360px; min-width: 360px; background: #fff; border-left: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+.chart-right { width: 420px; min-width: 420px; background: #fff; border-left: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
 .right-tabs { display: flex; border-bottom: 1px solid #E5E0D8; flex-shrink: 0; }
 .right-tab-btn { flex: 1; padding: 10px 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; background: none; color: #6B7280; border-bottom: 2px solid transparent; }
 .right-tab-btn.active { color: #6B21A8; border-bottom-color: #6B21A8; }
@@ -186,10 +186,10 @@
 .right-panel::-webkit-scrollbar-thumb { background: #E5E0D8; border-radius: 3px; }
 /* ── Vertical right-panel icon sidebar ── */
 .chart-right { position: relative; }
-.right-panel { padding-right: 52px !important; }
+.right-panel { padding-left: 52px !important; }
 .rp-vnav {
-  position: absolute; top: 0; right: 0; bottom: 0; width: 44px;
-  background: #F8F6F2; border-left: 1px solid #E5E0D8;
+  position: absolute; top: 0; left: 0; bottom: 0; width: 44px;
+  background: #F8F6F2; border-right: 1px solid #E5E0D8;
   display: flex; flex-direction: column; align-items: center;
   padding: 8px 0; gap: 2px; z-index: 10; overflow: hidden;
 }
@@ -202,9 +202,9 @@
 }
 .rp-vnav-btn:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
 .rp-vnav-btn.active { background: rgba(107,33,168,0.12); color: #6B21A8;
-  border-right: 3px solid #6B21A8; }
+  border-left: 3px solid #6B21A8; }
 .rp-vnav-btn .vnav-tip {
-  display: none; position: absolute; right: 46px; top: 50%;
+  display: none; position: absolute; left: 46px; top: 50%;
   transform: translateY(-50%); background: #1F2937; color: #fff;
   font-size: 11px; font-weight: 500; padding: 4px 8px; border-radius: 5px;
   white-space: nowrap; pointer-events: none; z-index: 200;
@@ -212,9 +212,10 @@
 .rp-vnav-btn:hover .vnav-tip { display: block; }
 .rp-vnav-divider { width: 28px; height: 1px; background: #E5E0D8; margin: 4px 0; }
 .rp-vnav-expand {
-  margin-top: auto; width: 36px; height: 28px; border: 1px solid #E5E0D8;
+  width: 36px; height: 28px; border: 1px solid #E5E0D8;
   border-radius: 6px; background: #fff; color: #6B7280; font-size: 12px;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 6px;
 }
 .rp-vnav-expand:hover { background: #F3F4F6; }
 .event-extra { display:none; margin-top:6px; padding:8px 10px;
@@ -1110,6 +1111,7 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       </div>
       <!-- Vertical right-panel icon nav (replaces horizontal tab bar) -->
       <nav class="rp-vnav" id="rpVnav">
+        <button class="rp-vnav-expand" id="panelExpandBtn" onclick="togglePanelExpand()" title="Expand/collapse panel" style="font-size:14px;">&#9655;</button>
         <button class="rp-vnav-btn active" id="rpVnavBtn0" onclick="switchRightTab(0)">
           📄<span class="vnav-tip">Documentation</span>
         </button>
@@ -1126,7 +1128,6 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
         <button class="rp-vnav-btn" id="rpVnavBtn4" onclick="switchRightTab(4)">
           🔗<span class="vnav-tip">Linked Consults</span>
         </button>
-        <button class="rp-vnav-expand" id="panelExpandBtn" onclick="togglePanelExpand()" title="Expand panel">⤢</button>
       </nav>
 
       <!-- Communication — Activity Composer -->
@@ -2841,11 +2842,11 @@ function togglePanelExpand() {
   if (right.classList.contains('panel-expanded')) {
     right.classList.remove('panel-expanded');
     right.style.width = ''; right.style.minWidth = '';
-    if (btn) btn.textContent = '⤢ Expand';
+    if (btn) btn.innerHTML = '&#9655;'; // ▷ expand
   } else {
     right.classList.add('panel-expanded');
     right.style.width = '65%'; right.style.minWidth = '65%';
-    if (btn) btn.textContent = '⤡ Collapse';
+    if (btn) btn.innerHTML = '&#9665;'; // ◁ collapse
   }
 }
 

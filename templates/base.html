@@ -20,7 +20,7 @@
       </a>
     </div>
     <div class="nav-links">
-      <a href="{{ url_for('provider.dashboard') }}" class="nav-link {% if request.blueprint == 'provider' %}active{% endif %}">
+      <a href="{{ url_for('index') }}" class="nav-link {% if request.blueprint == 'provider' %}active{% endif %}">
         Provider Portal
       </a>
       <a href="{{ url_for('patient.dashboard') }}" class="nav-link {% if request.blueprint == 'patient' %}active{% endif %}">
