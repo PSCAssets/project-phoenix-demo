@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demo Access Log — Project Phoenix</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #F8F7F4;
+      min-height: 100vh;
+    }
+    .top-bar {
+      background: #6B21A8;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top-bar-brand { display: flex; align-items: center; gap: 12px; }
+    .logo-ew { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+    .logo-divider { color: rgba(255,255,255,0.35); font-size: 18px; font-weight: 300; }
+    .logo-phoenix { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); }
+    .demo-badge {
+      background: #dc2626; color: #fff; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+    }
+
+    .page-wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    }
+    .page-header h1 { font-size: 1.4rem; font-weight: 800; color: #111827; letter-spacing: -0.3px; }
+    .page-header p { font-size: 13px; color: #6B7280; margin-top: 4px; }
+    .count-badge {
+      background: #F3E8FF; color: #6B21A8; font-size: 13px; font-weight: 700;
+      padding: 6px 16px; border-radius: 20px;
+    }
+
+    .log-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1.5px solid #E5E0D8;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead tr { background: #F9FAFB; }
+    th {
+      padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
+      color: #6B7280; text-transform: uppercase; letter-spacing: 0.6px;
+      border-bottom: 1.5px solid #E5E7EB;
+    }
+    td {
+      padding: 13px 16px; font-size: 13px; color: #374151;
+      border-bottom: 1px solid #F3F4F6; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAF8; }
+
+    .td-name { font-weight: 600; color: #111827; }
+    .td-email { color: #6B21A8; font-family: monospace; font-size: 12px; }
+    .td-ts { color: #9CA3AF; font-size: 12px; white-space: nowrap; }
+    .td-ip { color: #9CA3AF; font-family: monospace; font-size: 11px; }
+
+    .empty-state {
+      padding: 56px 0; text-align: center;
+      font-size: 14px; color: #9CA3AF; font-style: italic;
+    }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #6B21A8; font-weight: 600;
+      text-decoration: none; margin-bottom: 24px;
+    }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="top-bar-brand">
+      <span class="logo-ew">everlywell</span>
+      <span class="logo-divider">|</span>
+      <span class="logo-phoenix">Project Phoenix</span>
+    </div>
+    <span class="demo-badge">Access Log</span>
+  </div>
+
+  <div class="page-wrap">
+    <a href="/" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Demo
+    </a>
+
+    <div class="page-header">
+      <div>
+        <h1>Demo Access Log</h1>
+        <p>All logins to the Render demo environment — most recent first. Timestamps are UTC.</p>
+      </div>
+      <div class="count-badge">{{ entries|length }} sign-in{{ 's' if entries|length != 1 else '' }}</div>
+    </div>
+
+    <div class="log-card">
+      {% if entries %}
+      <table>
+        <thead>
+          <tr>
+            <th>Date &amp; Time (UTC)</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>IP Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in entries %}
+          <tr>
+            <td class="td-ts">{{ entry.timestamp }}</td>
+            <td class="td-name">{{ entry.name }}</td>
+            <td class="td-email">{{ entry.email }}</td>
+            <td class="td-ip">{{ entry.ip }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">No sign-ins recorded yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+</body>
+</html>
