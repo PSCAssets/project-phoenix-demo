@@ -1802,12 +1802,46 @@ function goToStep(n) {
     if (curStepEl) curStepEl.classList.remove('active');
     if (curSniEl)  curSniEl.classList.remove('active');
   }
+  // ── Shared nav update: mark all completed steps green (numbered + named) ──
+  var NAMED_STEP_DISPLAY = { branding:2, ecosystem:3, eligibility:6, preconsult_chk:15, qa_stage:16 };
+  function refreshNavDone() {
+    // Numbered steps sni1–sni20
+    for (var i = 1; i <= TOTAL; i++) {
+      var el = document.getElementById('sni' + i);
+      if (!el) continue;
+      el.classList.remove('active');
+      var num = el.querySelector('.step-num');
+      if (completed.has(i)) {
+        el.classList.add('done');
+        if (num) num.innerHTML = '&#10003;';
+      } else {
+        el.classList.remove('done');
+        if (num) num.textContent = getDisplayStep(i);
+      }
+    }
+    // Named steps sni_branding, sni_ecosystem, etc.
+    Object.keys(NAMED_STEP_DISPLAY).forEach(function(key) {
+      var el = document.getElementById('sni_' + key);
+      if (!el) return;
+      el.classList.remove('active');
+      var num = el.querySelector('.step-num');
+      if (completed.has(key)) {
+        el.classList.add('done');
+        if (num) num.innerHTML = '&#10003;';
+      } else {
+        el.classList.remove('done');
+        if (num) num.textContent = NAMED_STEP_DISPLAY[key];
+      }
+    });
+  }
+
   // Handle named steps (e.g., 'branding')
   if (typeof n === 'string') {
     var namedPanel = document.getElementById('step_' + n);
     var namedSni   = document.getElementById('sni_' + n);
     if (namedPanel) namedPanel.classList.add('active');
-    if (namedSni)   namedSni.classList.add('active');
+    refreshNavDone();
+    if (namedSni) { namedSni.classList.add('active'); namedSni.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     currentStep = n;
     var dn = getDisplayStep(n);
     document.getElementById('stepCounterLabel').textContent = 'Step ' + dn + ' of ' + DISPLAY_TOTAL;
@@ -1822,20 +1856,8 @@ function goToStep(n) {
   currentStep = n;
   var stepEl = document.getElementById('step' + n);
   if (stepEl) stepEl.classList.add('active');
-  // Update left nav (null-safe)
-  for (let i = 1; i <= TOTAL; i++) {
-    const el = document.getElementById('sni' + i);
-    if (!el) continue;
-    el.classList.remove('active');
-    const num = el.querySelector('.step-num');
-    if (completed.has(i)) {
-      el.classList.add('done');
-      if (num) num.textContent = '✓';
-    } else {
-      el.classList.remove('done');
-      if (num) num.textContent = i;
-    }
-  }
+  // Update entire left nav
+  refreshNavDone();
   var sniN = document.getElementById('sni' + n);
   if (sniN) {
     sniN.classList.add('active');
