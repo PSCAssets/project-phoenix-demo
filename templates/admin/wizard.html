@@ -201,7 +201,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </aside>
 
 <!-- Wizard Shell -->
-<div class="wiz-shell">
+<div class="wiz-shell" id="wizShell">
 
   <!-- Body -->
   <div class="wiz-body">
@@ -211,34 +211,34 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-group-label">Client</div>
       <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
       <div class="step-group-label">Foundation</div>
-      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">★</div><div class="step-name">Portal Branding</div></div>
-      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">&#9670;</div><div class="step-name">Ecosystem</div></div>
-      <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
-      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">2</div><div class="step-name">Provider Type</div></div>
-      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">&#9670;</div><div class="step-name">Provider Eligibility</div></div>
-      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">3</div><div class="step-name">State Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">4</div><div class="step-name">Age &amp; Guardian Rules</div></div>
+      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">2</div><div class="step-name">Portal Branding</div></div>
+      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">3</div><div class="step-name">Ecosystem</div></div>
+      <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">4</div><div class="step-name">Basic Info</div></div>
+      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">5</div><div class="step-name">Provider Type</div></div>
+      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">6</div><div class="step-name">Provider Eligibility</div></div>
+      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">7</div><div class="step-name">State Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">8</div><div class="step-name">Age &amp; Guardian Rules</div></div>
       <div class="step-group-label">Clinical Setup</div>
-      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">5</div><div class="step-name">Appointment Duration</div></div>
-      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">6</div><div class="step-name">Consult Payment Tiers</div></div>
-      <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">7</div><div class="step-name">Health Profile Requirements</div></div>
-      <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">8</div><div class="step-name">Intake Questionnaire</div></div>
-      <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">10</div><div class="step-name">Documentation Template</div></div>
+      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">9</div><div class="step-name">Appointment Duration</div></div>
+      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">10</div><div class="step-name">Consult Payment Tiers</div></div>
+      <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">11</div><div class="step-name">Health Profile Requirements</div></div>
+      <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">12</div><div class="step-name">Intake Questionnaire</div></div>
+      <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">13</div><div class="step-name">Documentation Template</div></div>
       <div class="step-group-label">Workflow &amp; SLA</div>
-      <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">9</div><div class="step-name">Workflow Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep('preconsult_chk')" id="sni_preconsult_chk"><div class="step-num">&#9670;</div><div class="step-name">Pre-Consult Checklist</div></div>
-      <div class="step-nav-item" onclick="goToStep('qa_stage')" id="sni_qa_stage"><div class="step-num">&#9670;</div><div class="step-name">QA Stage Setup</div></div>
-      <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">10</div><div class="step-name">SLA Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">14</div><div class="step-name">Workflow Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep('preconsult_chk')" id="sni_preconsult_chk"><div class="step-num">15</div><div class="step-name">Pre-Consult Checklist</div></div>
+      <div class="step-nav-item" onclick="goToStep('qa_stage')" id="sni_qa_stage"><div class="step-num">16</div><div class="step-name">QA Stage Setup</div></div>
+      <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">17</div><div class="step-name">SLA Configuration</div></div>
       <div class="step-group-label">Configuration</div>
-      <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">11</div><div class="step-name">Lab Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep(14)" id="sni14"><div class="step-num">12</div><div class="step-name">Cancellation Policy</div></div>
-      <div class="step-nav-item" onclick="goToStep(15)" id="sni15"><div class="step-num">13</div><div class="step-name">Documents &amp; Consent</div></div>
-      <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">14</div><div class="step-name">Notification Templates</div></div>
-      <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">15</div><div class="step-name">Patient Onboarding</div></div>
-      <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">16</div><div class="step-name">Linked Consultations</div></div>
-      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">17</div><div class="step-name">Feature Flags</div></div>
+      <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">18</div><div class="step-name">Lab Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(14)" id="sni14"><div class="step-num">19</div><div class="step-name">Cancellation Policy</div></div>
+      <div class="step-nav-item" onclick="goToStep(15)" id="sni15"><div class="step-num">20</div><div class="step-name">Documents &amp; Consent</div></div>
+      <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">21</div><div class="step-name">Notification Templates</div></div>
+      <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">22</div><div class="step-name">Patient Onboarding</div></div>
+      <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">23</div><div class="step-name">Linked Consultations</div></div>
+      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">24</div><div class="step-name">Feature Flags</div></div>
       <div class="step-group-label">Review</div>
-      <div class="step-nav-item" onclick="goToStep(20)" id="sni20"><div class="step-num">18</div><div class="step-name">Review &amp; Submit</div></div>
+      <div class="step-nav-item" onclick="goToStep(20)" id="sni20"><div class="step-num">25</div><div class="step-name">Review &amp; Submit</div></div>
     </div>
 
     <!-- Step Content Panels -->
@@ -1723,7 +1723,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="wiz-bottom">
         <button class="save-exit" onclick="window.location.href='/admin/care-products'">Save &amp; Exit</button>
         <div class="step-counter">
-          <div class="step-counter-label" id="stepCounterLabel">Step 1 of 20</div>
+          <div class="step-counter-label" id="stepCounterLabel">Step 1 of 25</div>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:5.3%"></div></div>
         </div>
         <div class="wiz-nav-btns">
@@ -1735,11 +1735,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div><!-- /wiz-body -->
 
 </div><!-- /wiz-shell -->
+
+<!-- Submit Confirmation Overlay -->
+<div id="submitConfirmOverlay" style="display:none;position:fixed;inset:0;background:#F8F7F4;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:0;">
+  <div style="max-width:560px;width:100%;padding:48px 40px;background:#fff;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.10);text-align:center;">
+    <!-- Checkmark -->
+    <div style="width:72px;height:72px;background:#DCFCE7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="36" height="36"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2 style="font-size:22px;font-weight:800;color:#111827;margin:0 0 10px;">Submitted for Review</h2>
+    <p style="font-size:14px;color:#6B7280;margin:0 0 6px;"><strong id="confirmProductName" style="color:#111827;">New Care Product</strong> for <strong id="confirmClientName" style="color:#111827;">—</strong></p>
+    <p style="font-size:13px;color:#6B7280;margin:0 0 32px;line-height:1.6;">Your care product configuration has been submitted to the compliance team for approval. You'll be notified when it's approved or if changes are needed. The product will not go live until approved.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;background:#F3F4F6;border-radius:8px;padding:12px 18px;font-size:13px;color:#374151;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Status: <strong style="color:#6B21A8;">Pending Compliance Review</strong>
+      </div>
+    </div>
+    <div style="margin-top:32px;display:flex;gap:12px;justify-content:center;">
+      <button onclick="confirmSubmitClose()" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;">Go to Care Products →</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
 <script>
 const TOTAL = 20;
+const DISPLAY_TOTAL = 25;
+// Maps internal step key → visual 1-25 position shown to user
+var DISPLAY_STEP_MAP = { branding:2, ecosystem:3, eligibility:6, preconsult_chk:15, qa_stage:16 };
+function getDisplayStep(n) {
+  if (typeof n === 'string') return DISPLAY_STEP_MAP[n] || n;
+  // Named steps insert 2 before step 2, 1 more before step 4, 2 more before step 12
+  var offset = 0;
+  if (n >= 2)  offset += 2; // branding + ecosystem
+  if (n >= 4)  offset += 1; // eligibility
+  if (n >= 12) offset += 2; // preconsult_chk + qa_stage
+  return n + offset;
+}
 let currentStep = 1;
 const completed = new Set();
 let selectedClientName = '';
@@ -1774,7 +1809,9 @@ function goToStep(n) {
     if (namedPanel) namedPanel.classList.add('active');
     if (namedSni)   namedSni.classList.add('active');
     currentStep = n;
-    document.getElementById('stepCounterLabel').textContent = 'Step ' + n + ' of ' + TOTAL;
+    var dn = getDisplayStep(n);
+    document.getElementById('stepCounterLabel').textContent = 'Step ' + dn + ' of ' + DISPLAY_TOTAL;
+    document.getElementById('progressBar').style.width = ((dn / DISPLAY_TOTAL) * 100) + '%';
     document.getElementById('btnBack').style.display = '';
     document.getElementById('btnContinue').disabled = false;
     document.getElementById('btnContinue').textContent = 'Save & Continue →';
@@ -1805,8 +1842,9 @@ function goToStep(n) {
     sniN.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   // Bottom bar
-  document.getElementById('stepCounterLabel').textContent = 'Step ' + n + ' of ' + TOTAL;
-  document.getElementById('progressBar').style.width = ((n / TOTAL) * 100) + '%';
+  var dn = getDisplayStep(n);
+  document.getElementById('stepCounterLabel').textContent = 'Step ' + dn + ' of ' + DISPLAY_TOTAL;
+  document.getElementById('progressBar').style.width = ((dn / DISPLAY_TOTAL) * 100) + '%';
   document.getElementById('btnBack').style.display = n > 1 ? '' : 'none';
   document.getElementById('btnContinue').textContent = n === TOTAL ? 'Submit for Review →' : 'Save & Continue →';
   document.querySelector('.wiz-panels').scrollTop = 0;
@@ -1830,6 +1868,10 @@ function selectBrandCard(idx) {
 // Named step → next/prev step mapping
 var NAMED_NEXT = { branding:'ecosystem', ecosystem:2, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
 var NAMED_PREV = { branding:1, ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
+// Numbered step → named step override (insert named step before continuing to n+1)
+var STEP_NAMED_NEXT = { 1:'branding', 3:'eligibility', 11:'preconsult_chk' };
+// Numbered step → named step override for Back (reverse of above)
+var STEP_NAMED_PREV = { 2:'ecosystem', 4:'eligibility', 12:'qa_stage' };
 
 function nextStep() {
   completed.add(currentStep);
@@ -1838,6 +1880,9 @@ function nextStep() {
     if (next !== undefined) goToStep(next);
     return;
   }
+  if (currentStep === TOTAL) { submitCareProduct(); return; }
+  var override = STEP_NAMED_NEXT[currentStep];
+  if (override) { goToStep(override); return; }
   if (currentStep < TOTAL) goToStep(currentStep + 1);
 }
 
@@ -1847,6 +1892,8 @@ function prevStep() {
     if (prev !== undefined) goToStep(prev);
     return;
   }
+  var override = STEP_NAMED_PREV[currentStep];
+  if (override) { goToStep(override); return; }
   if (currentStep > 1) goToStep(currentStep - 1);
 }
 
@@ -2270,6 +2317,7 @@ function wfbRenderBuilder() {
     var card = document.createElement('div');
     card.draggable = true;
     card.dataset.idx = i;
+    card.className='wfb-card';
     card.style.cssText='background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:12px 16px;margin-bottom:4px;';
     card.innerHTML =
       '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">' +
@@ -2294,33 +2342,53 @@ function wfbRenderBuilder() {
           '<input type="radio" name="wfbReq' + i + '" value="optional"' + (!stage.required?' checked':'') + ' onchange="wfbToggleRequired(' + i + ',false)" style="accent-color:#6B21A8;"> Optional' +
         '</label>' +
       '</div>';
-    // HTML5 drag-to-reorder
+    // HTML5 drag-to-reorder — border-highlight approach (no DOM insertion mid-drag)
     card.addEventListener('dragstart', function(e) {
       wfbDragSrc = i;
       e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(i));
       setTimeout(function(){ card.style.opacity='0.45'; }, 0);
     });
     card.addEventListener('dragend', function() {
       card.style.opacity='1';
-      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
+      bld.querySelectorAll('.wfb-card').forEach(function(c){
+        c.style.borderTop='1px solid #E5E7EB';
+        c.style.borderBottom='1px solid #E5E7EB';
+      });
+      wfbDragSrc = null;
     });
     card.addEventListener('dragover', function(e) {
       e.preventDefault();
       e.dataTransfer.dropEffect='move';
-      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
-      var ind = document.createElement('div');
-      ind.className='wfb-drop-line';
-      ind.style.cssText='height:3px;background:#6B21A8;border-radius:2px;margin:1px 0;';
-      bld.insertBefore(ind, card);
+      if (wfbDragSrc===null || wfbDragSrc===i) return;
+      bld.querySelectorAll('.wfb-card').forEach(function(c){
+        c.style.borderTop='1px solid #E5E7EB';
+        c.style.borderBottom='1px solid #E5E7EB';
+      });
+      // Show insert-above indicator if dragging from below, insert-below if from above
+      if (i < wfbDragSrc) {
+        card.style.borderTop='3px solid #6B21A8';
+      } else {
+        card.style.borderBottom='3px solid #6B21A8';
+      }
+    });
+    card.addEventListener('dragleave', function(e) {
+      card.style.borderTop='1px solid #E5E7EB';
+      card.style.borderBottom='1px solid #E5E7EB';
     });
     card.addEventListener('drop', function(e) {
       e.preventDefault();
-      document.querySelectorAll('.wfb-drop-line').forEach(function(el){ el.remove(); });
-      if (wfbDragSrc===null || wfbDragSrc===i) return;
-      var moved = wfbWorkflow.splice(wfbDragSrc, 1)[0];
-      var target = (i > wfbDragSrc) ? i-1 : i;
-      wfbWorkflow.splice(target, 0, moved);
+      e.stopPropagation();
+      bld.querySelectorAll('.wfb-card').forEach(function(c){
+        c.style.borderTop='1px solid #E5E7EB';
+        c.style.borderBottom='1px solid #E5E7EB';
+      });
+      var src = wfbDragSrc;
       wfbDragSrc = null;
+      if (src===null || src===i) return;
+      var moved = wfbWorkflow.splice(src, 1)[0];
+      var target = (i > src) ? i-1 : i;
+      wfbWorkflow.splice(target, 0, moved);
       wfbSimIdx = 0;
       wfbRenderAll();
     });
@@ -2420,6 +2488,33 @@ function wfbResetSim() {
   if (document.readyState==='loading') { document.addEventListener('DOMContentLoaded', init); }
   else { init(); }
 })();
+
+// ─── Submit Confirmation ───
+function submitCareProduct() {
+  var overlay = document.getElementById('submitConfirmOverlay');
+  if (!overlay) return;
+  // Populate summary line
+  var nameEl = document.getElementById('confirmProductName');
+  var clientEl = document.getElementById('confirmClientName');
+  var s2name = document.querySelector('#step2 input[placeholder="e.g. Thyroid Complete Panel"]');
+  if (nameEl) nameEl.textContent = (s2name && s2name.value.trim()) ? s2name.value.trim() : 'New Care Product';
+  if (clientEl) clientEl.textContent = selectedClientName || 'Selected Client';
+  // Hide the wizard shell, show overlay
+  document.getElementById('wizShell').style.display = 'none';
+  overlay.style.display = 'flex';
+}
+
+function confirmSubmitClose() {
+  window.location.href = '/admin/care-products';
+}
+
+// Wire up inline submit button in step 20
+document.addEventListener('DOMContentLoaded', function() {
+  var btnSubmit = document.querySelector('.btn-submit');
+  if (btnSubmit) btnSubmit.addEventListener('click', submitCareProduct);
+  var btnDraft  = document.querySelector('.btn-draft');
+  if (btnDraft)  btnDraft.addEventListener('click',  function() { window.location.href = '/admin/care-products'; });
+});
 
 </script>
 {% endraw %}
