@@ -1,5 +1,6 @@
 import os
-import csv
+import time
+import sqlite3
 import logging
 from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, session, redirect, url_for, request
@@ -12,29 +13,50 @@ app.config['SESSION_PERMANENT'] = True
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=8)
 
 # ── Demo Environment Gate ──────────────────────────────────────────────────
-# Only active when DEMO_GATE=true is set (Render only — never local dev).
-# Visitors must enter name + @everlywell.com email before accessing anything.
-DEMO_GATE = os.environ.get('DEMO_GATE', '').lower() == 'true'
-GATE_BYPASS_ROUTES = {'gate_login', 'gate_login_post', 'static'}
+# Enabled on Render (DEMO_GATE=true) OR whenever not running locally.
+# Falls back to checking FLASK_ENV / PORT so local `python app.py` is unaffected.
+_IS_LOCAL = os.environ.get('FLASK_ENV') == 'development' or (
+    not os.environ.get('RENDER') and os.environ.get('PORT', '5000') == '5000'
+    and not os.environ.get('DEMO_GATE')
+)
+DEMO_GATE = not _IS_LOCAL
+GATE_TIMEOUT_SECONDS = 15 * 60   # 15 minutes of inactivity
+GATE_BYPASS_ROUTES   = {'gate_login', 'gate_login_post', 'static'}
 
-# In-memory access log (persists for the lifetime of this server process)
-_gate_access_log = []
-_GATE_LOG_FILE   = os.path.join(os.path.dirname(__file__), 'gate_access_log.csv')
+_DB_PATH = os.path.join(os.path.dirname(__file__), 'project_phoenix.db')
+
+def _gate_db():
+    conn = sqlite3.connect(_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS demo_access_log (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            timestamp  TEXT    NOT NULL,
+            name       TEXT    NOT NULL,
+            email      TEXT    NOT NULL,
+            ip         TEXT,
+            login_num  INTEGER NOT NULL DEFAULT 1
+        )
+    ''')
+    conn.commit()
+    return conn
 
 def _record_gate_access(name, email, ip):
-    """Write one access entry to the in-memory log, CSV file, and server stdout."""
+    """Persist one login to the DB, increment that user's total count."""
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    entry = {'timestamp': ts, 'name': name, 'email': email, 'ip': ip}
-    _gate_access_log.append(entry)
-    # Append to CSV (survives server restarts on persistent-disk Render plans)
-    write_header = not os.path.exists(_GATE_LOG_FILE)
-    with open(_GATE_LOG_FILE, 'a', newline='') as f:
-        w = csv.DictWriter(f, fieldnames=['timestamp', 'name', 'email', 'ip'])
-        if write_header:
-            w.writeheader()
-        w.writerow(entry)
-    # Also emit to stdout so Render's log dashboard captures it
-    logging.info('DEMO_ACCESS | %s | %s | %s | %s', ts, name, email, ip)
+    conn = _gate_db()
+    row  = conn.execute(
+        'SELECT COUNT(*) AS cnt FROM demo_access_log WHERE email = ?', (email,)
+    ).fetchone()
+    login_num = (row['cnt'] or 0) + 1
+    conn.execute(
+        'INSERT INTO demo_access_log (timestamp, name, email, ip, login_num) VALUES (?,?,?,?,?)',
+        (ts, name, email, ip, login_num)
+    )
+    conn.commit()
+    conn.close()
+    logging.info('DEMO_ACCESS | %s | %s | %s | login #%d | ip:%s', ts, name, email, login_num, ip)
+    return ts, login_num
 
 @app.before_request
 def enforce_demo_gate():
@@ -42,14 +64,34 @@ def enforce_demo_gate():
         return
     if request.endpoint in GATE_BYPASS_ROUTES:
         return
+    # Check inactivity timeout — expire gate_verified after 15 min of no activity
     if session.get('gate_verified'):
+        last = session.get('gate_last_activity', 0)
+        if time.time() - last > GATE_TIMEOUT_SECONDS:
+            # Session timed out — clear gate flags but keep name/email for pre-fill
+            _prev_name  = session.get('gate_name', '')
+            _prev_email = session.get('gate_email', '')
+            session.clear()
+            session['gate_prefill_name']  = _prev_name
+            session['gate_prefill_email'] = _prev_email
+            return redirect(url_for('gate_login', next=request.url, timeout='1'))
+        # Refresh activity timestamp on every request
+        session['gate_last_activity'] = time.time()
         return
     return redirect(url_for('gate_login', next=request.url))
 
 @app.route('/demo-access', methods=['GET'])
 def gate_login():
-    error = request.args.get('error', '')
-    return render_template('gate_login.html', error=error, next=request.args.get('next', ''))
+    timeout = request.args.get('timeout', '')
+    # Pre-fill from previous session if they timed out
+    prefill_name  = session.pop('gate_prefill_name',  '')
+    prefill_email = session.pop('gate_prefill_email', '')
+    return render_template('gate_login.html',
+        error   = 'Your session expired after 15 minutes of inactivity. Please sign in again.' if timeout else '',
+        timeout = bool(timeout),
+        name    = prefill_name,
+        email   = prefill_email,
+        next    = request.args.get('next', ''))
 
 @app.route('/demo-access', methods=['POST'])
 def gate_login_post():
@@ -63,30 +105,26 @@ def gate_login_post():
         error = 'Please use your @everlywell.com email address.'
     if error:
         return render_template('gate_login.html', error=error, name=name, email=email, next=next_url)
-    ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
     ip = request.headers.get('X-Forwarded-For', request.remote_addr or 'unknown').split(',')[0].strip()
-    _record_gate_access(name, email, ip)
+    ts, login_num = _record_gate_access(name, email, ip)
     session.permanent = True
-    session['gate_verified']  = True
-    session['gate_name']      = name
-    session['gate_email']     = email
-    session['gate_timestamp'] = ts
+    session['gate_verified']      = True
+    session['gate_name']          = name
+    session['gate_email']         = email
+    session['gate_timestamp']     = ts
+    session['gate_login_num']     = login_num
+    session['gate_last_activity'] = time.time()
     return redirect(next_url or url_for('index'))
 
 @app.route('/demo-access/log')
 def gate_access_log():
-    """Simple access log viewer — readable from in-memory + CSV fallback."""
-    rows = list(_gate_access_log)
-    # Also pull from CSV in case the process restarted
-    if os.path.exists(_GATE_LOG_FILE):
-        seen = {(r['timestamp'], r['email']) for r in rows}
-        with open(_GATE_LOG_FILE, newline='') as f:
-            for row in csv.DictReader(f):
-                if (row['timestamp'], row['email']) not in seen:
-                    rows.append(row)
-                    seen.add((row['timestamp'], row['email']))
-    rows.sort(key=lambda r: r['timestamp'], reverse=True)
-    return render_template('gate_access_log.html', entries=rows)
+    """Access log viewer — reads from DB, shows all logins newest first."""
+    conn = _gate_db()
+    rows = conn.execute(
+        'SELECT timestamp, name, email, ip, login_num FROM demo_access_log ORDER BY id DESC'
+    ).fetchall()
+    conn.close()
+    return render_template('gate_access_log.html', entries=[dict(r) for r in rows])
 # ──────────────────────────────────────────────────────────────────────────
 
 ROLE_NAMES = {

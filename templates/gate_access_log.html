@@ -114,6 +114,7 @@
             <th>Date &amp; Time (UTC)</th>
             <th>Name</th>
             <th>Email</th>
+            <th style="text-align:center;">Session #</th>
             <th>IP Address</th>
           </tr>
         </thead>
@@ -123,6 +124,9 @@
             <td class="td-ts">{{ entry.timestamp }}</td>
             <td class="td-name">{{ entry.name }}</td>
             <td class="td-email">{{ entry.email }}</td>
+            <td style="text-align:center;">
+              <span style="background:#F3E8FF;color:#6B21A8;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;">#{{ entry.login_num }}</span>
+            </td>
             <td class="td-ip">{{ entry.ip }}</td>
           </tr>
           {% endfor %}

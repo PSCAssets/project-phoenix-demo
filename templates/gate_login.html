@@ -141,7 +141,7 @@
       margin-top: 5px;
     }
 
-    /* Error banner */
+    /* Error / timeout banners */
     .error-banner {
       background: #FEF2F2;
       border: 1.5px solid #FECACA;
@@ -149,6 +149,19 @@
       padding: 10px 14px;
       font-size: 13px;
       color: #DC2626;
+      font-weight: 500;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timeout-banner {
+      background: #FFFBEB;
+      border: 1.5px solid #FDE68A;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #92400E;
       font-weight: 500;
       margin-bottom: 18px;
       display: flex;
@@ -222,7 +235,12 @@
         <p>This demo is for internal use only.<br>Enter your name and Everlywell email to continue.</p>
       </div>
 
-      {% if error %}
+      {% if timeout %}
+      <div class="timeout-banner">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Session expired after 15 minutes of inactivity. Please sign in again.
+      </div>
+      {% elif error %}
       <div class="error-banner">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         {{ error }}
