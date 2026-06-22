@@ -118,13 +118,40 @@ def gate_login_post():
 
 @app.route('/demo-access/log')
 def gate_access_log():
-    """Access log viewer — reads from DB, shows all logins newest first."""
+    """Access log dashboard — usage stats + full login history."""
     conn = _gate_db()
-    rows = conn.execute(
+
+    # Full log newest-first
+    rows = [dict(r) for r in conn.execute(
         'SELECT timestamp, name, email, ip, login_num FROM demo_access_log ORDER BY id DESC'
-    ).fetchall()
+    ).fetchall()]
+
+    # Per-user summary: total sessions, first visit, last visit
+    user_rows = [dict(r) for r in conn.execute('''
+        SELECT email, name,
+               COUNT(*)          AS total_sessions,
+               MIN(timestamp)    AS first_seen,
+               MAX(timestamp)    AS last_seen
+        FROM demo_access_log
+        GROUP BY email
+        ORDER BY total_sessions DESC, last_seen DESC
+    ''').fetchall()]
+
+    # Top-line stats
+    total_logins  = len(rows)
+    unique_users  = len(user_rows)
+    most_active   = user_rows[0] if user_rows else None
+    last_login    = rows[0]['timestamp'] if rows else '—'
+
     conn.close()
-    return render_template('gate_access_log.html', entries=[dict(r) for r in rows])
+    return render_template('gate_access_log.html',
+        entries      = rows,
+        users        = user_rows,
+        total_logins = total_logins,
+        unique_users = unique_users,
+        most_active  = most_active,
+        last_login   = last_login,
+    )
 # ──────────────────────────────────────────────────────────────────────────
 
 ROLE_NAMES = {

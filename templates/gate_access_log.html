@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Demo Access Log — Project Phoenix</title>
+  <title>Demo Access Dashboard — Project Phoenix</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
       background: #F8F7F4;
       min-height: 100vh;
+      color: #111827;
     }
+
+    /* ── Top bar ── */
     .top-bar {
       background: #6B21A8;
       padding: 0 32px;
@@ -18,125 +21,263 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
     .top-bar-brand { display: flex; align-items: center; gap: 12px; }
     .logo-ew { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
-    .logo-divider { color: rgba(255,255,255,0.35); font-size: 18px; font-weight: 300; }
+    .logo-divider { color: rgba(255,255,255,0.35); font-size: 18px; }
     .logo-phoenix { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); }
-    .demo-badge {
-      background: #dc2626; color: #fff; font-size: 10px; font-weight: 700;
-      letter-spacing: 0.8px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+    .top-badge {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.25);
     }
 
-    .page-wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; }
+    /* ── Page layout ── */
+    .page-wrap { max-width: 1040px; margin: 0 auto; padding: 36px 24px 72px; }
 
     .page-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    .page-header h1 { font-size: 1.4rem; font-weight: 800; color: #111827; letter-spacing: -0.3px; }
-    .page-header p { font-size: 13px; color: #6B7280; margin-top: 4px; }
-    .count-badge {
-      background: #F3E8FF; color: #6B21A8; font-size: 13px; font-weight: 700;
-      padding: 6px 16px; border-radius: 20px;
+    .page-header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.4px; }
+    .page-header p  { font-size: 13px; color: #6B7280; margin-top: 5px; }
+    .refresh-btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #fff; border: 1.5px solid #E5E0D8; border-radius: 8px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600; color: #374151;
+      text-decoration: none; cursor: pointer; white-space: nowrap;
+      transition: border-color 0.15s;
     }
+    .refresh-btn:hover { border-color: #6B21A8; color: #6B21A8; }
 
-    .log-card {
+    /* ── Stat cards ── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    @media (max-width: 720px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+    .stat-card {
       background: #fff;
-      border-radius: 12px;
       border: 1.5px solid #E5E0D8;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      overflow: hidden;
+      border-radius: 12px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+    }
+    .stat-label { font-size: 11px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: #111827; letter-spacing: -0.5px; line-height: 1; }
+    .stat-sub   { font-size: 12px; color: #6B7280; margin-top: 6px; }
+    .stat-card.purple .stat-value { color: #6B21A8; }
+    .stat-card.green  .stat-value { color: #16A34A; }
+
+    /* ── Section heading ── */
+    .section-label {
+      font-size: 11px; font-weight: 700; color: #9CA3AF;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 12px; margin-top: 36px;
     }
 
+    /* ── Cards / tables ── */
+    .data-card {
+      background: #fff;
+      border: 1.5px solid #E5E0D8;
+      border-radius: 12px;
+      box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
     table { width: 100%; border-collapse: collapse; }
     thead tr { background: #F9FAFB; }
     th {
-      padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 700;
-      color: #6B7280; text-transform: uppercase; letter-spacing: 0.6px;
-      border-bottom: 1.5px solid #E5E7EB;
+      padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700;
+      color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1.5px solid #E5E7EB; white-space: nowrap;
     }
-    td {
-      padding: 13px 16px; font-size: 13px; color: #374151;
-      border-bottom: 1px solid #F3F4F6; vertical-align: middle;
-    }
+    td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: #FAFAF8; }
 
-    .td-name { font-weight: 600; color: #111827; }
-    .td-email { color: #6B21A8; font-family: monospace; font-size: 12px; }
-    .td-ts { color: #9CA3AF; font-size: 12px; white-space: nowrap; }
-    .td-ip { color: #9CA3AF; font-family: monospace; font-size: 11px; }
+    .td-name  { font-weight: 700; color: #111827; }
+    .td-email { color: #6B21A8; font-size: 12px; font-family: 'SF Mono', Menlo, monospace; }
+    .td-ts    { color: #9CA3AF; font-size: 12px; white-space: nowrap; }
+    .td-ip    { color: #9CA3AF; font-size: 11px; font-family: monospace; }
+    .td-num   { text-align: center; }
+
+    .badge-sessions {
+      display: inline-block;
+      background: #F3E8FF; color: #6B21A8;
+      font-size: 12px; font-weight: 700;
+      padding: 2px 10px; border-radius: 10px;
+    }
+    .badge-first {
+      display: inline-block;
+      background: #DCFCE7; color: #15803D;
+      font-size: 11px; font-weight: 600;
+      padding: 1px 8px; border-radius: 8px;
+    }
+
+    /* avatar initials */
+    .avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #EDE9FE; color: #6B21A8;
+      font-size: 11px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-right: 8px;
+    }
+    .name-cell { display: flex; align-items: center; }
 
     .empty-state {
-      padding: 56px 0; text-align: center;
+      padding: 52px 0; text-align: center;
       font-size: 14px; color: #9CA3AF; font-style: italic;
     }
 
     .back-link {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 13px; color: #6B21A8; font-weight: 600;
-      text-decoration: none; margin-bottom: 24px;
+      text-decoration: none; margin-bottom: 28px;
     }
     .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
 
-  <div class="top-bar">
-    <div class="top-bar-brand">
-      <span class="logo-ew">everlywell</span>
-      <span class="logo-divider">|</span>
-      <span class="logo-phoenix">Project Phoenix</span>
-    </div>
-    <span class="demo-badge">Access Log</span>
+<div class="top-bar">
+  <div class="top-bar-brand">
+    <span class="logo-ew">everlywell</span>
+    <span class="logo-divider">|</span>
+    <span class="logo-phoenix">Project Phoenix</span>
   </div>
+  <span class="top-badge">Access Dashboard</span>
+</div>
 
-  <div class="page-wrap">
-    <a href="/" class="back-link">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      Back to Demo
+<div class="page-wrap">
+
+  <a href="/" class="back-link">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Demo
+  </a>
+
+  <div class="page-header">
+    <div>
+      <h1>Demo Access Dashboard</h1>
+      <p>Login activity for the Project Phoenix external demo — all times UTC.</p>
+    </div>
+    <a href="/demo-access/log" class="refresh-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      Refresh
     </a>
+  </div>
 
-    <div class="page-header">
-      <div>
-        <h1>Demo Access Log</h1>
-        <p>All logins to the Render demo environment — most recent first. Timestamps are UTC.</p>
-      </div>
-      <div class="count-badge">{{ entries|length }} sign-in{{ 's' if entries|length != 1 else '' }}</div>
+  <!-- Stat cards -->
+  <div class="stat-grid">
+    <div class="stat-card purple">
+      <div class="stat-label">Total Sign-ins</div>
+      <div class="stat-value">{{ total_logins }}</div>
+      <div class="stat-sub">All sessions recorded</div>
     </div>
-
-    <div class="log-card">
-      {% if entries %}
-      <table>
-        <thead>
-          <tr>
-            <th>Date &amp; Time (UTC)</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th style="text-align:center;">Session #</th>
-            <th>IP Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for entry in entries %}
-          <tr>
-            <td class="td-ts">{{ entry.timestamp }}</td>
-            <td class="td-name">{{ entry.name }}</td>
-            <td class="td-email">{{ entry.email }}</td>
-            <td style="text-align:center;">
-              <span style="background:#F3E8FF;color:#6B21A8;font-size:12px;font-weight:700;padding:2px 10px;border-radius:10px;">#{{ entry.login_num }}</span>
-            </td>
-            <td class="td-ip">{{ entry.ip }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <div class="empty-state">No sign-ins recorded yet.</div>
-      {% endif %}
+    <div class="stat-card green">
+      <div class="stat-label">Unique Users</div>
+      <div class="stat-value">{{ unique_users }}</div>
+      <div class="stat-sub">Distinct @everlywell.com emails</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Most Active</div>
+      <div class="stat-value" style="font-size:1.1rem;margin-top:4px;">
+        {% if most_active %}{{ most_active.name.split()[0] }}{% else %}—{% endif %}
+      </div>
+      <div class="stat-sub">
+        {% if most_active %}{{ most_active.total_sessions }} session{{ 's' if most_active.total_sessions != 1 else '' }}{% else %}No data yet{% endif %}
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Last Sign-in</div>
+      <div class="stat-value" style="font-size:0.85rem;line-height:1.4;margin-top:4px;">
+        {% if last_login != '—' %}{{ last_login[:10] }}<br><span style="font-size:0.75rem;color:#6B7280;">{{ last_login[11:] }}</span>{% else %}—{% endif %}
+      </div>
     </div>
   </div>
 
+  <!-- Per-user breakdown -->
+  <div class="section-label">Users ({{ unique_users }} total)</div>
+  <div class="data-card">
+    {% if users %}
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th style="text-align:center;">Sessions</th>
+          <th>First Visit</th>
+          <th>Last Visit</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>
+            <div class="name-cell">
+              <div class="avatar">{{ (u.name.split()[0][0] + u.name.split()[-1][0]) | upper if u.name.split()|length > 1 else u.name[:2]|upper }}</div>
+              <span class="td-name">{{ u.name }}</span>
+            </div>
+          </td>
+          <td class="td-email">{{ u.email }}</td>
+          <td class="td-num"><span class="badge-sessions">{{ u.total_sessions }}</span></td>
+          <td class="td-ts">{{ u.first_seen }}</td>
+          <td class="td-ts">{{ u.last_seen }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No users have signed in yet.</div>
+    {% endif %}
+  </div>
+
+  <!-- Full login log -->
+  <div class="section-label">Full Login History ({{ total_logins }} total)</div>
+  <div class="data-card">
+    {% if entries %}
+    <table>
+      <thead>
+        <tr>
+          <th>Date &amp; Time (UTC)</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th style="text-align:center;">Session #</th>
+          <th>IP Address</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for e in entries %}
+        <tr>
+          <td class="td-ts">{{ e.timestamp }}</td>
+          <td class="td-name">{{ e.name }}</td>
+          <td class="td-email">{{ e.email }}</td>
+          <td class="td-num"><span class="badge-sessions">#{{ e.login_num }}</span></td>
+          <td class="td-ip">{{ e.ip }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">No sign-ins recorded yet.</div>
+    {% endif %}
+  </div>
+
+</div>
 </body>
 </html>
