@@ -71,6 +71,18 @@ def _record_gate_access(name, email, ip):
             logging.info('Supabase write OK — %s login #%d', email, login_num)
         except Exception as e:
             logging.warning('Supabase insert failed: %s', e)
+
+    # Send email notification via Resend
+    try:
+        import requests as _req
+        _req.post('https://api.resend.com/emails', 
+            headers={'Authorization': 'Bearer re_8PxamR2S_LnumH7ac2B4EmDqeHTKzpWxe', 'Content-Type': 'application/json'},
+            json={'from': 'onboarding@resend.dev', 'to': ['justin.woller@everlywell.com'],
+                  'subject': f'Phoenix Demo Login — {name}',
+                  'html': f'<p><b>Name:</b> {name}</p><p><b>Email:</b> {email}</p><p><b>IP:</b> {ip}</p><p><b>Login #:</b> {login_num}</p><p><b>Time:</b> {ts}</p>'},
+            timeout=5)
+    except Exception as _e:
+        logging.warning('Resend email failed: %s', _e)
     logging.info('DEMO_ACCESS | %s | %s | %s | login #%d | ip:%s', ts, name, email, login_num, ip)
     return ts, login_num
 
