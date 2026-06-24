@@ -237,9 +237,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">21</div><div class="step-name">Notification Templates</div></div>
       <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">22</div><div class="step-name">Patient Onboarding</div></div>
       <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">23</div><div class="step-name">Linked Consultations</div></div>
-      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">24</div><div class="step-name">Feature Flags</div></div>
       <div class="step-group-label">Review</div>
-      <div class="step-nav-item" onclick="goToStep(20)" id="sni20"><div class="step-num">25</div><div class="step-name">Review &amp; Submit</div></div>
+      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">24</div><div class="step-name">Review &amp; Submit</div></div>
     </div>
 
     <!-- Step Content Panels -->
@@ -1688,31 +1687,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
 
-      <!-- STEP 24: Feature Flags — INACTIVE (items configured in dedicated wizard steps or platform settings) -->
+      <!-- STEP 24: Review & Submit -->
       <div class="step-panel" id="step19">
-        <div class="step-heading">Step 24 — Feature Flags</div>
-        <div class="step-sub">Feature toggles for this care product. Items below are currently inactive — each is configured within its dedicated wizard step or managed in platform-level settings.</div>
-        <div style="background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#713F12;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:16px;">⚠️</span>
-          <span><strong>Under Review:</strong> All flags below have been deactivated pending configuration review. Feature toggles will be re-evaluated and mapped to the appropriate wizard steps or platform settings.</span>
-        </div>
-        <table class="wiz-table">
-          <thead><tr><th>Feature</th><th>Status</th><th>Description</th></tr></thead>
-          <tbody>
-            <tr class="flag-row-locked"><td>Patient Messaging <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Allow patients to message the care team — configured in Notification Templates</td></tr>
-            <tr class="flag-row-locked"><td>Lab Order Integration <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Enable in-platform lab ordering — configured in Lab Configuration (Step 18)</td></tr>
-            <tr class="flag-row-locked"><td>Prescription Routing <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Route prescriptions via integrated pharmacy — under review for placement</td></tr>
-            <tr class="flag-row-locked"><td>Video Consult Recording <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Record video consults with patient consent — under review for placement</td></tr>
-            <tr class="flag-row-locked"><td>Patient-Facing SLA Display <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Show patients estimated response time — configured in SLA Configuration (Step 17)</td></tr>
-            <tr class="flag-row-locked"><td>Linked Appointments <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Allow follow-up appointments to link to initial consult — configured in Linked Consultations (Step 23)</td></tr>
-            <tr class="flag-row-locked"><td>Prior Authorization <span class="flag-badge">V2 — Coming Soon</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Prior auth management — not yet available</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- STEP 18: Review & Submit -->
-      <div class="step-panel" id="step20">
-        <div class="step-heading">Step 25 — Review &amp; Submit</div>
+        <div class="step-heading">Step 24 — Review &amp; Submit</div>
         <div class="step-sub">Review your complete care product configuration before submitting for compliance approval.</div>
 
         <div id="reviewSections"></div>
@@ -1770,8 +1747,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 {% block scripts %}
 {% raw %}
 <script>
-const TOTAL = 20;
-const DISPLAY_TOTAL = 25;
+const TOTAL = 19;
+const DISPLAY_TOTAL = 24;
 // Maps internal step key → visual 1-25 position shown to user
 var DISPLAY_STEP_MAP = { branding:3, ecosystem:4, eligibility:6, preconsult_chk:15, qa_stage:16 };
 function getDisplayStep(n) {
@@ -1794,7 +1771,7 @@ const STEP_NAMES = [
   'Intake Questionnaire', 'Documentation Template', 'Workflow Configuration', 'SLA Configuration',
   'Lab Configuration', 'Cancellation Policy', 'Documents & Consent',
   'Notification Templates', 'Patient Onboarding', 'Linked Consultations',
-  'Feature Flags', 'Review & Submit'
+  'Review & Submit'
 ];
 
 function goToStep(n) {
@@ -2069,10 +2046,6 @@ function buildReview() {
     { n:18, name:'Linked Consultations', rows:[
       ['Episode Reference ID', document.getElementById('s16_episode').checked ? 'Enabled' : 'Disabled'],
       ['Format', 'Auto-generated'],
-    ]},
-    { n:19, name:'Feature Flags', rows:[
-      ['Enabled', 'Patient Messaging, Lab Order Integration, Patient SLA Display, Linked Appointments'],
-      ['Disabled', 'Prescription Routing, Video Recording, Prior Auth V2'],
     ]},
   ];
 
