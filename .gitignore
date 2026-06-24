@@ -1,0 +1,5 @@
+
+# SQLite DB — managed separately, not tracked by git
+project_phoenix.db
+*.db-shm
+*.db-wal

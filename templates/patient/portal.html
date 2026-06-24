@@ -48,13 +48,23 @@
     border: 1px solid #E5E7EB;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-    min-width: 280px;
+    min-width: 300px;
     z-index: 100;
     overflow: hidden;
   }
   .switcher-dropdown.open { display: block; }
+  .dropdown-section-label {
+    padding: 8px 16px 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #9CA3AF;
+    background: #F9FAFB;
+    border-bottom: 1px solid #F3F4F6;
+  }
   .dropdown-option {
-    padding: 12px 16px;
+    padding: 11px 16px;
     font-size: 13px;
     color: #374151;
     cursor: pointer;
@@ -110,6 +120,8 @@
 
   /* Main */
   .portal-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .section-panel { display: none; }
+  .section-panel.active { display: block; }
   .section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #9CA3AF; margin-bottom: 14px; }
 
   /* Consult card */
@@ -145,6 +157,44 @@
 
   .humana-note { margin-top: 14px; background: #D1FAE5; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #065F46; display: none; line-height: 1.5; }
 
+  /* Lab Results */
+  .lab-card { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 18px 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .lab-info { flex: 1; }
+  .lab-name { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+  .lab-meta { font-size: 12px; color: #6B7280; }
+  .lab-status-available { background: #D1FAE5; color: #065F46; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+  .lab-status-pending   { background: #FEF3C7; color: #92400E; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 10px; white-space: nowrap; }
+
+  /* Messages */
+  .message-thread { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+  .message-header { padding: 14px 18px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .message-header:hover { background: #F9FAFB; }
+  .message-subject { font-size: 13px; font-weight: 700; color: #111827; }
+  .message-preview { font-size: 12px; color: #6B7280; margin-top: 2px; }
+  .message-date { font-size: 11px; color: #9CA3AF; white-space: nowrap; margin-left: 12px; }
+  .message-body { display: none; border-top: 1px solid #F3F4F6; padding: 16px 18px; }
+  .message-body.open { display: block; }
+  .message-text { font-size: 13px; color: #374151; line-height: 1.6; margin-bottom: 14px; }
+  .reply-area { width: 100%; border: 1px solid #D1D5DB; border-radius: 6px; padding: 10px 12px; font-size: 13px; font-family: inherit; resize: vertical; min-height: 70px; outline: none; }
+  .reply-area:focus { border-color: #6B21A8; }
+  .compose-btn { background: #6B21A8; color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 12px; font-weight: 600; cursor: pointer; margin-bottom: 16px; }
+
+  /* Account Settings */
+  .settings-section { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .settings-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 14px; border-bottom: 1px solid #F3F4F6; padding-bottom: 10px; }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F9FAFB; }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-key { font-size: 12px; color: #6B7280; }
+  .settings-val { font-size: 13px; color: #111827; font-weight: 500; }
+  .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+  .toggle { position: relative; width: 36px; height: 20px; cursor: pointer; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-slider { position: absolute; inset: 0; background: #D1D5DB; border-radius: 20px; transition: background 0.2s; }
+  .toggle input:checked + .toggle-slider { background: #6B21A8; }
+  .toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+  .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+  .toggle-label { font-size: 12px; color: #374151; }
+
   .portal-footer { background: #F9FAFB; border-top: 1px solid #E5E7EB; padding: 12px 24px; font-size: 11px; color: #9CA3AF; text-align: center; flex-shrink: 0; }
 </style>
 </head>
@@ -155,12 +205,14 @@
 
     <div class="switcher-wrap">
       <button class="switcher-btn" id="switcherBtn" onclick="toggleDropdown()">
-        <span id="switcherLabel">Everlywell Direct &mdash; Men's Health</span>
+        <span id="switcherLabel">Everlywell Direct &mdash; Annual Wellness Visit</span>
         <span class="arrow">&#9660;</span>
       </button>
       <div class="switcher-dropdown" id="switcherDropdown">
-        <div class="dropdown-option active" data-program="mens-health" onclick="switchProgram('mens-health', this)">Everlywell Direct &mdash; Men's Health</div>
-        <div class="dropdown-option" data-program="weight" onclick="switchProgram('weight', this)">Everlywell Direct &mdash; Weight Management</div>
+        <div class="dropdown-section-label">Everlywell Direct</div>
+        <div class="dropdown-option active" data-program="wellness" onclick="switchProgram('wellness', this)">Annual Wellness Visit</div>
+        <div class="dropdown-option" data-program="weight" onclick="switchProgram('weight', this)">Weight Loss Program</div>
+        <div class="dropdown-section-label">Health Plan</div>
         <div class="dropdown-option" data-program="humana" onclick="switchProgram('humana', this)">Humana A1C Program</div>
       </div>
     </div>
@@ -172,25 +224,223 @@
   </header>
 
   <div class="sub-banner" id="subBanner" style="background:#EDE9FE;color:#6B21A8;">
-    <span id="subBannerText">Men's Testosterone Program</span>
+    <span id="subBannerText">Annual Wellness Visit</span>
   </div>
 
   <div class="portal-body">
 
     <nav class="sidebar">
-      <a class="nav-item active">Dashboard</a>
-      <a class="nav-item">My Consultations</a>
-      <a class="nav-item">Lab Results</a>
-      <a class="nav-item">Messages</a>
-      <a class="nav-item">Account Settings</a>
+      <a class="nav-item active" onclick="showSection('dashboard', this)">Dashboard</a>
+      <a class="nav-item" onclick="showSection('consultations', this)">My Consultations</a>
+      <a class="nav-item" onclick="showSection('labs', this)">Lab Results</a>
+      <a class="nav-item" onclick="showSection('messages', this)">Messages</a>
+      <a class="nav-item" onclick="showSection('settings', this)">Account Settings</a>
     </nav>
 
     <main class="portal-main">
-      <div class="section-label" id="mainSectionLabel">Active Consultation</div>
-      <div id="consultCard"></div>
-      <div class="humana-note" id="humanaNoteBox">
-        This program is provided through your Humana health plan benefit. Contact Humana Member Services for coverage questions.
+
+      <!-- Dashboard -->
+      <div class="section-panel active" id="panel-dashboard">
+        <div class="section-label" id="mainSectionLabel">Active Consultation</div>
+        <div id="consultCard"></div>
+        <div class="humana-note" id="humanaNoteBox">
+          This program is provided through your Humana health plan benefit. Contact Humana Member Services for coverage questions.
+        </div>
       </div>
+
+      <!-- My Consultations -->
+      <div class="section-panel" id="panel-consultations">
+        <div class="section-label">My Consultations</div>
+
+        <div class="consult-card">
+          <div class="consult-top">
+            <div class="consult-title" id="chistTitle">Annual Wellness Visit</div>
+            <span class="status-pill status-in-progress">● In Progress</span>
+          </div>
+          <div class="meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+          <div class="meta"><strong>Consult ID:</strong> CST-2026-10849</div>
+          <div class="meta"><strong>Care Program:</strong> <span id="chistProgram">Everlywell Direct</span></div>
+          <div class="meta"><strong>Scheduled:</strong> June 22, 2026 at 10:00 AM CST</div>
+          <div class="journey-label">Care Journey</div>
+          <div class="journey-track">
+            <div class="j-stage"><div class="j-dot j-done">✓</div><div class="j-name">Intake</div></div>
+            <div class="j-line j-line-done"></div>
+            <div class="j-stage"><div class="j-dot j-done">✓</div><div class="j-name">MA Review</div></div>
+            <div class="j-line j-line-done"></div>
+            <div class="j-stage"><div class="j-dot j-active">●</div><div class="j-name">Provider Consult</div></div>
+            <div class="j-line j-line-pending"></div>
+            <div class="j-stage"><div class="j-dot j-pending">○</div><div class="j-name">Documentation</div></div>
+            <div class="j-line j-line-pending"></div>
+            <div class="j-stage"><div class="j-dot j-pending">○</div><div class="j-name">Complete</div></div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-primary">View Chart Details</button>
+            <button class="btn-outline">Reschedule</button>
+            <button class="btn-outline">Message Provider</button>
+          </div>
+        </div>
+
+        <div class="consult-card" style="opacity:0.75;">
+          <div class="consult-top">
+            <div class="consult-title">Annual Wellness Visit</div>
+            <span class="status-pill status-complete">✓ Completed</span>
+          </div>
+          <div class="meta"><strong>Provider:</strong> Dr. Marcus Webb</div>
+          <div class="meta"><strong>Consult ID:</strong> CST-2025-08841</div>
+          <div class="meta"><strong>Completed:</strong> November 14, 2025</div>
+          <div class="card-actions">
+            <button class="btn-outline">View Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lab Results -->
+      <div class="section-panel" id="panel-labs">
+        <div class="section-label">Lab Results</div>
+
+        <div class="lab-card">
+          <div class="lab-info">
+            <div class="lab-name">Comprehensive Metabolic Panel (CMP)</div>
+            <div class="lab-meta">Ordered June 10, 2026 · Quest Diagnostics</div>
+          </div>
+          <span class="lab-status-available">Results Available</span>
+          <div class="card-actions" style="margin-top:0;">
+            <button class="btn-primary" style="padding:6px 12px;font-size:11px;">View Results</button>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-info">
+            <div class="lab-name">Lipid Panel</div>
+            <div class="lab-meta">Ordered June 10, 2026 · Quest Diagnostics</div>
+          </div>
+          <span class="lab-status-available">Results Available</span>
+          <div class="card-actions" style="margin-top:0;">
+            <button class="btn-primary" style="padding:6px 12px;font-size:11px;">View Results</button>
+          </div>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-info">
+            <div class="lab-name">Hemoglobin A1C</div>
+            <div class="lab-meta">Ordered June 17, 2026 · Quest Diagnostics</div>
+          </div>
+          <span class="lab-status-pending">Pending</span>
+        </div>
+
+        <div class="lab-card">
+          <div class="lab-info">
+            <div class="lab-name">Thyroid Stimulating Hormone (TSH)</div>
+            <div class="lab-meta">Ordered June 17, 2026 · Quest Diagnostics</div>
+          </div>
+          <span class="lab-status-pending">Pending</span>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="section-panel" id="panel-messages">
+        <div class="section-label">Messages</div>
+        <button class="compose-btn" onclick="alert('Compose new message')">+ Compose Message</button>
+
+        <div class="message-thread">
+          <div class="message-header" onclick="toggleMessage(this)">
+            <div>
+              <div class="message-subject">Pre-visit lab instructions</div>
+              <div class="message-preview">Please fast for 8 hours before your blood draw...</div>
+            </div>
+            <span class="message-date">Jun 10</span>
+          </div>
+          <div class="message-body">
+            <div class="message-text">Hi Marcus,<br><br>Please fast for 8 hours before your scheduled blood draw on June 10th. You may drink water. Bring your insurance card and a valid photo ID to the lab.<br><br>— Care Team</div>
+            <textarea class="reply-area" placeholder="Reply to this message…"></textarea>
+            <div class="card-actions" style="margin-top:10px;">
+              <button class="btn-primary" style="font-size:12px;padding:7px 14px;">Send Reply</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-thread">
+          <div class="message-header" onclick="toggleMessage(this)">
+            <div>
+              <div class="message-subject">Your appointment is confirmed</div>
+              <div class="message-preview">Your Annual Wellness Visit is scheduled for June 22...</div>
+            </div>
+            <span class="message-date">Jun 15</span>
+          </div>
+          <div class="message-body">
+            <div class="message-text">Hi Marcus,<br><br>Your Annual Wellness Visit with Dr. Sarah Lee is confirmed for June 22, 2026 at 10:00 AM CST. You will receive a video link 15 minutes before your appointment.<br><br>— Everlywell Care Team</div>
+            <textarea class="reply-area" placeholder="Reply to this message…"></textarea>
+            <div class="card-actions" style="margin-top:10px;">
+              <button class="btn-primary" style="font-size:12px;padding:7px 14px;">Send Reply</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="message-thread">
+          <div class="message-header" onclick="toggleMessage(this)">
+            <div>
+              <div class="message-subject">Question about my results</div>
+              <div class="message-preview">I noticed my CMP shows slightly elevated...</div>
+            </div>
+            <span class="message-date">Jun 18</span>
+          </div>
+          <div class="message-body">
+            <div class="message-text">Hi — I noticed my CMP shows slightly elevated ALT. Should I be concerned before my consult? Thanks, Marcus</div>
+            <div class="message-text" style="background:#F9FAFB;border-radius:6px;padding:10px;margin-top:8px;color:#6B7280;">
+              <strong style="color:#374151;">Dr. Sarah Lee replied:</strong> Hi Marcus, slightly elevated ALT can have many benign causes. We'll discuss this during your consult on the 22nd. No need to worry — it's in our chart for review.
+            </div>
+            <textarea class="reply-area" placeholder="Reply to this message…"></textarea>
+            <div class="card-actions" style="margin-top:10px;">
+              <button class="btn-primary" style="font-size:12px;padding:7px 14px;">Send Reply</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Settings -->
+      <div class="section-panel" id="panel-settings">
+        <div class="section-label">Account Settings</div>
+
+        <div class="settings-section">
+          <div class="settings-title">Personal Information</div>
+          <div class="settings-row"><span class="settings-key">Full Name</span><span class="settings-val">Marcus Johnson</span></div>
+          <div class="settings-row"><span class="settings-key">Date of Birth</span><span class="settings-val">March 12, 1985</span></div>
+          <div class="settings-row"><span class="settings-key">Sex</span><span class="settings-val">Male</span></div>
+          <div class="settings-row"><span class="settings-key">State of Residence</span><span class="settings-val">Texas</span></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-title">Contact Information</div>
+          <div class="settings-row"><span class="settings-key">Email</span><span class="settings-val">marcus.johnson@email.com</span></div>
+          <div class="settings-row"><span class="settings-key">Phone</span><span class="settings-val">(512) 555-0182</span></div>
+          <div class="settings-row"><span class="settings-key">Preferred Pharmacy</span><span class="settings-val">CVS — Austin, TX</span></div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-title">Notification Preferences</div>
+          <div class="settings-row">
+            <span class="settings-key">Email notifications</span>
+            <label class="toggle"><input type="checkbox" checked onchange=""><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <span class="settings-key">SMS / text reminders</span>
+            <label class="toggle"><input type="checkbox" checked onchange=""><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <span class="settings-key">Lab result alerts</span>
+            <label class="toggle"><input type="checkbox" checked onchange=""><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <span class="settings-key">Appointment reminders</span>
+            <label class="toggle"><input type="checkbox" checked onchange=""><span class="toggle-slider"></span></label>
+          </div>
+          <div class="settings-row">
+            <span class="settings-key">Marketing communications</span>
+            <label class="toggle"><input type="checkbox" onchange=""><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -199,17 +449,34 @@
   </footer>
 
 <script>
+/* ── Section nav ── */
+function showSection(id, navEl) {
+  document.querySelectorAll('.section-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
+  document.getElementById('panel-' + id).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+}
+
+/* ── Message threads ── */
+function toggleMessage(header) {
+  var body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+/* ── Product switcher ── */
 const programs = {
-  'mens-health': {
-    label: "Everlywell Direct — Men's Health",
-    subheaderText: "Men's Testosterone Program",
+  'wellness': {
+    label: 'Everlywell Direct — Annual Wellness Visit',
+    subheaderText: 'Annual Wellness Visit',
     subheaderBg: '#EDE9FE', subheaderColor: '#6B21A8',
     statusClass: 'status-in-progress', statusText: '● In Progress',
-    title: 'Testosterone Care Consultation',
+    title: 'Annual Wellness Visit',
+    consultTitle: 'Annual Wellness Visit',
+    program: 'Everlywell Direct',
     meta: [
       ['Provider', 'Dr. Sarah Lee'],
       ['Consult ID', 'CST-2026-10849'],
-      ['Last Updated', 'Today']
+      ['Scheduled', 'June 22, 2026']
     ],
     journey: [
       {label:'Intake', state:'done'},
@@ -222,11 +489,13 @@ const programs = {
     humana: false
   },
   'weight': {
-    label: 'Everlywell Direct — Weight Management',
-    subheaderText: 'GLP-1 Weight Management Program',
+    label: 'Everlywell Direct — Weight Loss Program',
+    subheaderText: 'Weight Loss Program',
     subheaderBg: '#CFFAFE', subheaderColor: '#0891B2',
     statusClass: 'status-awaiting', statusText: '● Awaiting Provider Review',
-    title: 'GLP-1 / Weight Management Consultation',
+    title: 'Weight Loss Program Consultation',
+    consultTitle: 'Weight Loss Program Consultation',
+    program: 'Everlywell Direct',
     meta: [
       ['Provider', 'Assigned upon review'],
       ['Consult ID', 'CST-2026-11203'],
@@ -234,7 +503,7 @@ const programs = {
     ],
     journey: [
       {label:'Intake', state:'done'},
-      {label:'MA Review', state:'active'},
+      {label:'Lab Review', state:'active'},
       {label:'Provider Review', state:'pending'},
       {label:'Prescription', state:'pending'},
       {label:'Complete', state:'pending'}
@@ -248,6 +517,8 @@ const programs = {
     subheaderBg: '#D1FAE5', subheaderColor: '#047857',
     statusClass: 'status-complete', statusText: '✓ Completed',
     title: 'Hemoglobin A1C Care Consultation',
+    consultTitle: 'Hemoglobin A1C Care Consultation',
+    program: 'Humana Health Plan',
     meta: [
       ['Provider', 'Dr. Marcus Webb'],
       ['Consult ID', 'HMN-2026-00847'],
@@ -265,7 +536,7 @@ const programs = {
   }
 };
 
-let currentProgram = 'mens-health';
+let currentProgram = 'wellness';
 
 function toggleDropdown() {
   var btn = document.getElementById('switcherBtn');
@@ -278,17 +549,14 @@ function switchProgram(key, el) {
   currentProgram = key;
   var p = programs[key];
 
-  // Update switcher button
   document.getElementById('switcherLabel').textContent = p.label;
   document.getElementById('switcherBtn').classList.remove('open');
   document.getElementById('switcherDropdown').classList.remove('open');
 
-  // Mark active option
   document.querySelectorAll('.dropdown-option').forEach(function(opt) {
     opt.classList.toggle('active', opt.dataset.program === key);
   });
 
-  // Update sub-banner
   var banner = document.getElementById('subBanner');
   banner.style.background = p.subheaderBg;
   banner.style.color = p.subheaderColor;
@@ -299,10 +567,14 @@ function switchProgram(key, el) {
     bannerText.textContent = p.subheaderText;
   }
 
-  // Humana note
   document.getElementById('humanaNoteBox').style.display = p.humana ? 'block' : 'none';
 
-  // Render card
+  // Update consultations panel title/program
+  if (document.getElementById('chistTitle')) {
+    document.getElementById('chistTitle').textContent = p.consultTitle;
+    document.getElementById('chistProgram').textContent = p.program;
+  }
+
   renderCard(p);
 }
 
@@ -315,12 +587,6 @@ function dotContent(state) {
   if (state === 'done') return '&#10003;';
   if (state === 'active') return '&#9679;';
   return '&#9675;';
-}
-function lineClass(idx, journey) {
-  if (idx >= journey.length - 1) return '';
-  var thisState = journey[idx].state;
-  var nextState = journey[idx+1].state;
-  return (thisState === 'done') ? 'j-line j-line-done' : 'j-line j-line-pending';
 }
 
 function renderCard(p) {
@@ -356,7 +622,7 @@ function renderCard(p) {
 }
 
 // Init
-renderCard(programs['mens-health']);
+renderCard(programs['wellness']);
 
 // Close dropdown on outside click
 document.addEventListener('click', function(e) {
