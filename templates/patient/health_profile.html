@@ -122,14 +122,24 @@
         </div>
       </div>
 
-      <!-- Medical History -->
+      <!-- Past Medical History -->
       <div class="profile-card">
-        <div class="profile-card-hd" onclick="toggleAccordion('medhistory')" style="cursor:pointer"><span class="profile-card-icon">🏥</span><span class="profile-card-title">Medical History</span><span id="medhistory_chev" class="acc-chevron">▸</span></div>
-        <div class="accordion-body" id="medhistory">
+        <div class="profile-card-hd" onclick="toggleAccordion('pastmedhistory')" style="cursor:pointer"><span class="profile-card-icon">🏥</span><span class="profile-card-title">Past Medical History</span><span id="pastmedhistory_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="pastmedhistory">
           <div class="profile-rows">
-            <div class="profile-row"><span class="row-label">Active Conditions</span><span class="row-value">Pre-diabetes, Overweight (BMI 25.8)</span></div>
             <div class="profile-row"><span class="row-label">Past Surgeries</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
             <div class="profile-row"><span class="row-label">Hospitalizations</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+            <div class="profile-row"><span class="row-label">Prior Diagnoses</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Problem List -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('currentproblems')" style="cursor:pointer"><span class="profile-card-icon">📋</span><span class="profile-card-title">Current Problem List</span><span id="currentproblems_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="currentproblems">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Active Conditions</span><span class="row-value">Pre-diabetes, Overweight (BMI 25.8)</span></div>
           </div>
         </div>
       </div>

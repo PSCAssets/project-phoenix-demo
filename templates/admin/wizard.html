@@ -193,6 +193,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <a href="/admin/care-products" class="sn-item active"><span class="sn-icon">🧬</span> Care Products</a>
     <a href="/admin/clients" class="sn-item"><span class="sn-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
     <a href="/admin/providers" class="sn-item"><span class="sn-icon">👩‍⚕️</span> Providers</a>
+    <a href="/admin/provider-oversight" class="sn-item"><span class="sn-icon">🔗</span> Provider Oversight</a>
     <a href="/admin/patients" class="sn-item"><span class="sn-icon">👥</span> Patients</a>
     <a href="/admin/reports" class="sn-item"><span class="sn-icon">📈</span> Reports</a>
     <a href="/admin/settings" class="sn-item"><span class="sn-icon">⚙️</span> Settings</a>
@@ -403,7 +404,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 2: Basic Info -->
       <div class="step-panel" id="step2">
-        <div class="step-heading">Step 2 — Basic Info</div>
+        <div class="step-heading">Step 4 — Basic Info</div>
         <div class="step-sub">Define the core identity of this care product.</div>
         <div class="form-group">
           <label class="form-label">Product Name <span class="req">*</span></label>
@@ -444,7 +445,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 2: Provider Type -->
       <div class="step-panel" id="step3">
-        <div class="step-heading">Step 3 — Provider Type</div>
+        <div class="step-heading">Step 5 — Provider Type</div>
         <div class="step-sub">Define which provider credential types are eligible to deliver this care product.</div>
         <div class="form-group">
           <label class="form-label">Eligible Provider Types <span class="req">*</span></label>
@@ -457,16 +458,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Supervision Required</label>
-          <div class="toggle-row">
-            <label class="toggle"><input type="checkbox" id="s2_supervision"><span class="toggle-slider"></span></label>
-            <span class="toggle-label">Supervising Physician required per NP/PA</span>
+          <!-- Supervising physician oversight moved to Admin Portal → Provider Oversight Configuration menu -->
+          <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;font-size:12px;color:#1E40AF;">
+            ℹ️ <strong>Supervising physician / oversight configuration</strong> is managed separately under <strong>Admin Portal → Provider Oversight</strong>, where oversight providers are assigned and state-level NP/PA ratio limits are enforced.
           </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Max Providers Per State <span style="font-weight:400;color:#9CA3AF">(optional)</span></label>
-          <input type="number" class="form-input" id="s2_max" placeholder="No limit" style="max-width:180px">
-        </div>
       </div>
 
 
@@ -478,7 +473,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="form-group" style="max-width:480px;">
           <label class="form-label">Program Type <span class="req">*</span></label>
           <div class="radio-group">
-            <label class="radio-opt"><input type="radio" name="progType" value="commercial" checked onchange="onProgTypeChange(this.value)"> Commercial <span style="font-size:11px;color:#9CA3AF;">(default — all licensed providers eligible)</span></label>
+            <label class="radio-opt"><input type="radio" name="progType" value="cash_pay" checked onchange="onProgTypeChange(this.value)"> Cash Pay <span style="font-size:11px;color:#9CA3AF;">— patient pays directly, no insurance billed</span></label>
+            <label class="radio-opt"><input type="radio" name="progType" value="payer" onchange="onProgTypeChange(this.value)"> Payer <span style="font-size:11px;color:#9CA3AF;">— billed to commercial insurance / employer plan</span></label>
             <label class="radio-opt"><input type="radio" name="progType" value="medicare" onchange="onProgTypeChange(this.value)"> Medicare Program</label>
             <label class="radio-opt"><input type="radio" name="progType" value="medicaid" onchange="onProgTypeChange(this.value)"> Medicaid Program</label>
           </div>
@@ -530,7 +526,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 3: State Configuration -->
       <div class="step-panel" id="step4">
-        <div class="step-heading">Step 4 — State Configuration</div>
+        <div class="step-heading">Step 7 — State Configuration</div>
         <div class="step-sub">Configure which consult modalities are allowed per state. Check each modality your care product supports in that state.</div>
         <div style="display:flex;gap:20px;margin-bottom:10px;flex-wrap:wrap;">
           <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">Per-column actions:</div>
@@ -923,7 +919,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 4: Age & Guardian Rules -->
       <div class="step-panel" id="step5">
-        <div class="step-heading">Step 5 — Age &amp; Guardian Rules</div>
+        <div class="step-heading">Step 8 — Age &amp; Guardian Rules</div>
         <div class="step-sub">Set patient age eligibility requirements for this care product.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:440px;">
           <div class="form-group">
@@ -953,7 +949,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 5: Appointment Duration -->
       <div class="step-panel" id="step6">
-        <div class="step-heading">Step 6 — Appointment Duration</div>
+        <div class="step-heading">Step 9 — Appointment Duration</div>
         <div class="step-sub">Set appointment slot durations for each scheduled consult type. Initial and follow-up visits can have different lengths.</div>
         <div style="overflow:hidden;border:1px solid #E5E7EB;border-radius:10px;background:#fff;margin-bottom:14px;">
           <table style="width:100%;border-collapse:collapse;">
@@ -1021,7 +1017,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 6: Consult Classification & Billing Tiers -->
       <div class="step-panel" id="step7">
-        <div class="step-heading">Step 7 — Consult Classification &amp; Billing Tiers</div>
+        <div class="step-heading">Step 10 — Consult Classification &amp; Billing Tiers</div>
         <div class="step-sub">Consultation rates are managed in provider agreements and tracked externally. Configure consult tier categories here for reporting.</div>
         <div class="form-group">
           <label class="form-label">Billing Model</label>
@@ -1040,13 +1036,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
               <tr><td>Refill Request</td><td><select><option>Simple</option><option>Moderate</option><option>Complex</option><option>Extended</option></select></td><td><select><option>No</option><option>Yes</option></select></td></tr>
             </tbody>
           </table>
-          <div style="margin-top:10px"><a href="#" style="font-size:13px;color:#1D4ED8;font-weight:600;text-decoration:none;">+ Add tier</a></div>
+          <div style="margin-top:10px"><button onclick="addConsultTier()" style="background:#fff;border:1px solid #1D4ED8;border-radius:7px;padding:6px 16px;font-size:12px;font-weight:600;color:#1D4ED8;cursor:pointer;">+ Add Tier</button></div>
+          <script>
+          function addConsultTier() {
+            var tbody = document.querySelector('#step7 .wiz-table tbody');
+            var row = document.createElement('tr');
+            row.innerHTML = '<td><input type="text" placeholder="Tier name" style="border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;width:100%;"></td><td><select style="border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;"><option>Simple</option><option>Moderate</option><option>Complex</option><option>Extended</option></select></td><td><select style="border:1px solid #E5E0D8;border-radius:6px;padding:5px 8px;font-size:12px;"><option>Yes</option><option>No</option></select></td>';
+            tbody.appendChild(row);
+          }
+          </script>
         </div>
       </div>
 
       <!-- STEP 7: Health Profile Requirements -->
       <div class="step-panel" id="step8">
-        <div class="step-heading">Step 8 — Health Profile Requirements</div>
+        <div class="step-heading">Step 11 — Health Profile Requirements</div>
         <div class="step-sub">Configure which health profile sections patients must complete for this care product.</div>
         <table class="wiz-table">
           <thead><tr><th>Section</th><th>Required</th><th>Optional</th><th>Hidden</th></tr></thead>
@@ -1064,7 +1068,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 8: Intake Questionnaire -->
       <div class="step-panel" id="step9">
-        <div class="step-heading">Step 9 — Intake Questionnaire</div>
+        <div class="step-heading">Step 12 — Intake Questionnaire</div>
         <div class="step-sub">Configure the intake questionnaire patients complete when enrolling in this care product.</div>
         <div class="form-group">
           <div class="radio-group" style="flex-direction:column;gap:8px;">
@@ -1143,7 +1147,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 10: Documentation Template -->
       <div class="step-panel" id="step10">
-        <div class="step-heading">Step 10 — Documentation Template</div>
+        <div class="step-heading">Step 13 — Documentation Template</div>
         <div class="step-sub">Select the provider documentation template for this care product.</div>
         <div id="docTplBanner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400E;margin-bottom:14px;">&#10022; Template auto-suggested based on care product name. Confirm or change below.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
@@ -1195,7 +1199,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 9: Workflow Configuration -->
       <div class="step-panel" id="step11">
-        <div class="step-heading">Step 11 — Workflow Configuration</div>
+        <div class="step-heading">Step 14 — Workflow Configuration</div>
         <div class="step-sub">Define the clinical workflow stages for this care product.</div>
 
         <!-- Mode toggle cards -->
@@ -1404,7 +1408,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 10: SLA Configuration -->
       <div class="step-panel" id="step12">
-        <div class="step-heading">Step 12 — SLA Configuration</div>
+        <div class="step-heading">Step 17 — SLA Configuration</div>
         <div class="step-sub">Set response time commitments and escalation rules for each workflow stage.</div>
         <table class="wiz-table">
           <thead><tr><th>Workflow Stage</th><th>SLA Time Limit</th><th>Warning At</th><th>Escalation Action</th></tr></thead>
@@ -1419,7 +1423,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 11: Lab Configuration -->
       <div class="step-panel" id="step13">
-        <div class="step-heading">Step 13 — Lab Configuration</div>
+        <div class="step-heading">Step 18 — Lab Configuration</div>
         <div class="step-sub">Define lab requirements for patient enrollment and consult eligibility.</div>
         <div class="form-group">
           <label class="form-label">Lab Requirement</label>
@@ -1459,7 +1463,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 12: Cancellation Policy -->
       <div class="step-panel" id="step14">
-        <div class="step-heading">Step 14 — Cancellation Policy</div>
+        <div class="step-heading">Step 19 — Cancellation Policy</div>
         <div class="step-sub">Define the cancellation and no-show rules for appointments in this care product.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:520px;">
           <div class="form-group">
@@ -1496,7 +1500,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 13: Documents & Consent -->
       <div class="step-panel" id="step15">
-        <div class="step-heading">Step 15 — Documents &amp; Consent</div>
+        <div class="step-heading">Step 20 — Documents &amp; Consent</div>
         <div class="step-sub">Assign required consent documents and define when they are presented to the patient.</div>
         <table class="wiz-table">
           <thead><tr><th>Document</th><th>Presentation Point</th><th>Required</th><th>Actions</th></tr></thead>
@@ -1526,7 +1530,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 14: Notification Templates -->
       <div class="step-panel" id="step16">
-        <div class="step-heading">Step 16 — Notification Templates</div>
+        <div class="step-heading">Step 21 — Notification Templates</div>
         <div class="step-sub">Configure automated patient and provider notifications for key workflow events.</div>
         <table class="wiz-table">
           <thead><tr><th>Event</th><th>Channels</th><th>Template Preview</th><th>Status</th><th></th></tr></thead>
@@ -1545,7 +1549,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 15: Patient Onboarding -->
       <div class="step-panel" id="step17">
-        <div class="step-heading">Step 17 — Patient Onboarding</div>
+        <div class="step-heading">Step 22 — Patient Onboarding</div>
         <div class="step-sub">Define the Getting Started checklist shown to patients after enrollment. All required steps must be complete before a consult can be submitted.</div>
         <div class="form-card">
           <div style="display:flex;flex-direction:column;gap:8px;">
@@ -1587,7 +1591,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 16: Linked Consultations -->
       <div class="step-panel" id="step18">
-        <div class="step-heading">Step 18 — Linked Consultations</div>
+        <div class="step-heading">Step 23 — Linked Consultations</div>
         <div class="step-sub">Configure how consultations link together for longitudinal care tracking — episode grouping, pre-test/post-test sequences, and research study enrollment.</div>
 
         <!-- Episode Reference ID -->
@@ -1684,27 +1688,31 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
 
-      <!-- STEP 17: Feature Flags -->
+      <!-- STEP 24: Feature Flags — INACTIVE (items configured in dedicated wizard steps or platform settings) -->
       <div class="step-panel" id="step19">
-        <div class="step-heading">Step 19 — Feature Flags</div>
-        <div class="step-sub">Enable or disable platform features for this care product.</div>
+        <div class="step-heading">Step 24 — Feature Flags</div>
+        <div class="step-sub">Feature toggles for this care product. Items below are currently inactive — each is configured within its dedicated wizard step or managed in platform-level settings.</div>
+        <div style="background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#713F12;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:16px;">⚠️</span>
+          <span><strong>Under Review:</strong> All flags below have been deactivated pending configuration review. Feature toggles will be re-evaluated and mapped to the appropriate wizard steps or platform settings.</span>
+        </div>
         <table class="wiz-table">
-          <thead><tr><th>Feature</th><th>Enabled</th><th>Description</th></tr></thead>
+          <thead><tr><th>Feature</th><th>Status</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td>Patient Messaging</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Allow patients to message the care team</td></tr>
-            <tr><td>Lab Order Integration</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Enable in-platform lab ordering</td></tr>
-            <tr><td>Prescription Routing</td><td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Route prescriptions via integrated pharmacy</td></tr>
-            <tr><td>Video Consult Recording</td><td><label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Record video consults with patient consent</td></tr>
-            <tr><td>Patient-Facing SLA Display</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Show patients estimated response time</td></tr>
-            <tr><td>Linked Appointments</td><td><label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Allow follow-up appointments to link to initial consult</td></tr>
-            <tr class="flag-row-locked"><td>Prior Authorization (V2) <span class="flag-badge">V2 — Coming Soon</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#6B7280">Prior auth management — not yet available</td></tr>
+            <tr class="flag-row-locked"><td>Patient Messaging <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Allow patients to message the care team — configured in Notification Templates</td></tr>
+            <tr class="flag-row-locked"><td>Lab Order Integration <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Enable in-platform lab ordering — configured in Lab Configuration (Step 18)</td></tr>
+            <tr class="flag-row-locked"><td>Prescription Routing <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Route prescriptions via integrated pharmacy — under review for placement</td></tr>
+            <tr class="flag-row-locked"><td>Video Consult Recording <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Record video consults with patient consent — under review for placement</td></tr>
+            <tr class="flag-row-locked"><td>Patient-Facing SLA Display <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Show patients estimated response time — configured in SLA Configuration (Step 17)</td></tr>
+            <tr class="flag-row-locked"><td>Linked Appointments <span class="flag-badge" style="background:#F3F4F6;color:#6B7280;">Inactive</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Allow follow-up appointments to link to initial consult — configured in Linked Consultations (Step 23)</td></tr>
+            <tr class="flag-row-locked"><td>Prior Authorization <span class="flag-badge">V2 — Coming Soon</span></td><td><label class="toggle"><input type="checkbox" disabled><span class="toggle-slider"></span></label></td><td style="font-size:12px;color:#9CA3AF">Prior auth management — not yet available</td></tr>
           </tbody>
         </table>
       </div>
 
       <!-- STEP 18: Review & Submit -->
       <div class="step-panel" id="step20">
-        <div class="step-heading">Step 20 — Review &amp; Submit</div>
+        <div class="step-heading">Step 25 — Review &amp; Submit</div>
         <div class="step-sub">Review your complete care product configuration before submitting for compliance approval.</div>
 
         <div id="reviewSections"></div>

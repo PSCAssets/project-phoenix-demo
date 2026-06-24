@@ -47,7 +47,7 @@
 .demo-avatar { width: 52px; height: 52px; border-radius: 50%; background: #C8DDF5; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .demo-avatar svg { width: 28px; height: 28px; }
 .demo-info { flex: 1; min-width: 0; }
-.demo-program { font-size: 12px; color: #6B21A8; font-weight: 600; margin-bottom: 1px; }
+.demo-program { font-size: 16px; color: #6B21A8; font-weight: 800; margin-bottom: 3px; letter-spacing: -0.01em; }
 .demo-record { font-size: 10px; color: #1a1a1a; margin-bottom: 2px; }
 .demo-name { font-size: 17px; font-weight: 600; color: #111827; margin-bottom: 3px; }
 .demo-meta { display: flex; align-items: center; font-size: 11px; color: #6B7280; }
@@ -583,7 +583,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="#3B6EA8" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     </div>
     <div class="demo-info">
-      <div class="demo-program">Testosterone Care</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+        <div class="demo-program">Testosterone Care</div>
+        <span style="background:#EDE9FE;color:#6B21A8;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:0.05em;text-transform:uppercase;">Care Product</span>
+      </div>
       <div class="demo-record">{{ consult_type }} consult · Follow-up · CST-2026-10849</div>
       <div class="demo-name">Marcus Johnson</div>
       <div class="demo-meta">
@@ -612,6 +615,24 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <button class="btn btn-outline" onclick="toggleVideoPopover(event)">🎥 Video</button>
       <button class="btn btn-outline" onclick="openScheduleModal()">📅 Schedule</button>
       <button class="btn btn-outline" onclick="openRouteModal()">Route ↗</button>
+      <button class="btn btn-outline" onclick="toggleLabRecommendPopover(event)">🧪 Lab Rec</button>
+      <button class="btn btn-outline" onclick="alert('Translation feature is Under Design.\n\nThis functionality will allow one-click translation during consultations.\n\nAvailability: TBD — pending HIPAA compliance review of translation platform.')" style="opacity:0.6;cursor:default;" title="Under Design">🌐 Translation</button>
+      <!-- Lab Recommendation popover -->
+      <div class="action-popover" id="labRecPopover" style="top:100%;right:80px;margin-top:6px;min-width:260px;">
+        <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">🧪 Recommend Lab / Kit</div>
+        <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">Select a lab or kit to recommend. Patient will receive an email with a purchase link.</div>
+        <select id="labRecSelect" style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:7px 10px;font-size:13px;margin-bottom:12px;">
+          <option value="">— Select —</option>
+          <option value="ew360">Everlywell360</option>
+          <option value="sti">STI Test</option>
+          <option value="thyroid">Thyroid Test</option>
+        </select>
+        <div style="display:flex;gap:8px;">
+          <button onclick="sendLabRec()" style="flex:1;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Send to Patient</button>
+          <button onclick="closeLabRecPopover()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
+        </div>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:10px;">v1.0: Notification routed to marketing team to send manually.</div>
+      </div>
       <!-- Call popover -->
       <div class="action-popover" id="callPopover" style="top:100%;right:200px;margin-top:6px;">
         <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">📞 Call Patient</div>
@@ -779,6 +800,21 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
               <span class="pmh-tag">Prediabetes</span>
               <span class="pmh-tag">Obesity class I</span>
               <span class="pmh-tag">Hypertension</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Problem List -->
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc('accCpl','accCplChev')">
+            <span class="acc-title">Current Problem List</span>
+            <span class="acc-chevron" id="accCplChev">▸</span>
+          </div>
+          <div class="acc-body closed" id="accCpl">
+            <div class="pmh-tags">
+              <span class="pmh-tag" style="background:#FEE2E2;color:#991B1B;">Active — Prediabetes</span>
+              <span class="pmh-tag" style="background:#FEE2E2;color:#991B1B;">Active — Hypertension</span>
+              <span class="pmh-tag" style="background:#FEF3C7;color:#92400E;">Monitoring — Low Testosterone</span>
             </div>
           </div>
         </div>
@@ -2965,7 +3001,22 @@ function toggleVideoPopover(e) {
   if (vp) vp.classList.toggle('open');
 }
 function closeVideoPopover() { var el = document.getElementById('videoPopover'); if (el) el.classList.remove('open'); }
-document.addEventListener('click', function() { closeCallPopover(); closeVideoPopover(); });
+function toggleLabRecommendPopover(e) {
+  e.stopPropagation();
+  var el = document.getElementById('labRecPopover');
+  if (el) el.classList.toggle('open');
+  closeCallPopover(); closeVideoPopover();
+}
+function closeLabRecPopover() { var el = document.getElementById('labRecPopover'); if (el) el.classList.remove('open'); }
+function sendLabRec() {
+  var sel = document.getElementById('labRecSelect');
+  if (!sel.value) { alert('Please select a lab or kit first.'); return; }
+  var names = { ew360: 'Everlywell360', sti: 'STI Test', thyroid: 'Thyroid Test' };
+  closeLabRecPopover();
+  alert('Lab recommendation sent!\n\n' + names[sel.value] + ' recommendation has been queued.\n\nMarketing will send the purchase link to Marcus Johnson at the email on file.\n\n(v1.0 — manual marketing send)');
+  sel.value = '';
+}
+document.addEventListener('click', function() { closeCallPopover(); closeVideoPopover(); closeLabRecPopover(); });
 
 // AI context summary toggle
 function toggleAISummary() {
