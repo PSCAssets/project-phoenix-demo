@@ -212,9 +212,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-group-label">Client</div>
       <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
       <div class="step-group-label">Foundation</div>
-      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">2</div><div class="step-name">Portal Branding</div></div>
-      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">3</div><div class="step-name">Ecosystem</div></div>
-      <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">4</div><div class="step-name">Basic Info</div></div>
+      <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
+      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">3</div><div class="step-name">Portal Branding</div></div>
+      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">4</div><div class="step-name">Ecosystem</div></div>
       <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">5</div><div class="step-name">Provider Type</div></div>
       <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">6</div><div class="step-name">Provider Eligibility</div></div>
       <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">7</div><div class="step-name">State Configuration</div></div>
@@ -404,7 +404,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 2: Basic Info -->
       <div class="step-panel" id="step2">
-        <div class="step-heading">Step 4 — Basic Info</div>
+        <div class="step-heading">Step 2 — Basic Info</div>
         <div class="step-sub">Define the core identity of this care product.</div>
         <div class="form-group">
           <label class="form-label">Product Name <span class="req">*</span></label>
@@ -454,7 +454,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <label class="check-opt"><input type="checkbox" id="pt_np" checked> NP</label>
             <label class="check-opt"><input type="checkbox" id="pt_pa"> PA</label>
             <label class="check-opt"><input type="checkbox" id="pt_gc"> Genetic Counselor (GC)</label>
-            <label class="check-opt"><input type="checkbox" id="pt_rn"> RN</label>
           </div>
         </div>
         <div class="form-group">
@@ -462,6 +461,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;font-size:12px;color:#1E40AF;">
             ℹ️ <strong>Supervising physician / oversight configuration</strong> is managed separately under <strong>Admin Portal → Provider Oversight</strong>, where oversight providers are assigned and state-level NP/PA ratio limits are enforced.
           </div>
+        </div>
       </div>
 
 
@@ -1773,12 +1773,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 const TOTAL = 20;
 const DISPLAY_TOTAL = 25;
 // Maps internal step key → visual 1-25 position shown to user
-var DISPLAY_STEP_MAP = { branding:2, ecosystem:3, eligibility:6, preconsult_chk:15, qa_stage:16 };
+var DISPLAY_STEP_MAP = { branding:3, ecosystem:4, eligibility:6, preconsult_chk:15, qa_stage:16 };
 function getDisplayStep(n) {
   if (typeof n === 'string') return DISPLAY_STEP_MAP[n] || n;
-  // Named steps insert 2 before step 2, 1 more before step 4, 2 more before step 12
+  // Named steps: branding+ecosystem insert before step 3; eligibility inserts before step 4; preconsult_chk+qa_stage before step 12
   var offset = 0;
-  if (n >= 2)  offset += 2; // branding + ecosystem
+  if (n >= 3)  offset += 2; // branding + ecosystem (Basic Info is step 2, now position 2 with no offset)
   if (n >= 4)  offset += 1; // eligibility
   if (n >= 12) offset += 2; // preconsult_chk + qa_stage
   return n + offset;
@@ -1811,7 +1811,7 @@ function goToStep(n) {
     if (curSniEl)  curSniEl.classList.remove('active');
   }
   // ── Shared nav update: mark all completed steps green (numbered + named) ──
-  var NAMED_STEP_DISPLAY = { branding:2, ecosystem:3, eligibility:6, preconsult_chk:15, qa_stage:16 };
+  var NAMED_STEP_DISPLAY = { branding:3, ecosystem:4, eligibility:6, preconsult_chk:15, qa_stage:16 };
   function refreshNavDone() {
     // Numbered steps sni1–sni20
     for (var i = 1; i <= TOTAL; i++) {
@@ -1896,12 +1896,14 @@ function selectBrandCard(idx) {
 }
 
 // Named step → next/prev step mapping
-var NAMED_NEXT = { branding:'ecosystem', ecosystem:2, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
-var NAMED_PREV = { branding:1, ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
+var NAMED_NEXT = { branding:'ecosystem', ecosystem:3, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
+var NAMED_PREV = { branding:2, ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
 // Numbered step → named step override (insert named step before continuing to n+1)
-var STEP_NAMED_NEXT = { 1:'branding', 3:'eligibility', 11:'preconsult_chk' };
-// Numbered step → named step override for Back (reverse of above)
-var STEP_NAMED_PREV = { 2:'ecosystem', 4:'eligibility', 12:'qa_stage' };
+// Step 1 → 2 (Basic Info) numerically; Step 2 (Basic Info) → branding; Step 3 (Provider Type) → eligibility
+var STEP_NAMED_NEXT = { 2:'branding', 3:'eligibility', 11:'preconsult_chk' };
+// Numbered step → named step override for Back
+// Step 2 back → step 1 numerically; Step 3 back → ecosystem; Step 4 back → eligibility
+var STEP_NAMED_PREV = { 3:'ecosystem', 4:'eligibility', 12:'qa_stage' };
 
 function nextStep() {
   completed.add(currentStep);
@@ -1999,7 +2001,7 @@ function buildReview() {
       ['Consult Types', ['Async','Video','Phone','Lab Review'].filter((_,i)=>[document.getElementById('ct_async'),document.getElementById('ct_video'),document.getElementById('ct_phone'),document.getElementById('ct_lab')][i].checked).join(', ') || '—'],
     ]},
     { n:3,  name:'Provider Type', rows:[
-      ['Eligible Types', ['MD/DO','NP','PA','GC','RN'].filter((_,i)=>[document.getElementById('pt_md'),document.getElementById('pt_np'),document.getElementById('pt_pa'),document.getElementById('pt_gc'),document.getElementById('pt_rn')][i].checked).join(', ') || '—'],
+      ['Eligible Types', ['MD/DO','NP','PA','GC'].filter((_,i)=>[document.getElementById('pt_md'),document.getElementById('pt_np'),document.getElementById('pt_pa'),document.getElementById('pt_gc')][i].checked).join(', ') || '—'],
       ['Supervision Required', document.getElementById('s2_supervision').checked ? 'Yes' : 'No'],
     ]},
     { n:4,  name:'State Configuration', rows:[
