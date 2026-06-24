@@ -2,8 +2,14 @@ import os
 import time
 import sqlite3
 import logging
+import requests
 from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, session, redirect, url_for, request
+from supabase import create_client
+
+_SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
+_SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+_supabase = create_client(_SUPABASE_URL, _SUPABASE_KEY) if _SUPABASE_URL and _SUPABASE_KEY else None
 from modules import provider, patient, admin, care_team, scheduler
 import workflow_config
 
@@ -25,36 +31,46 @@ GATE_BYPASS_ROUTES   = {'gate_login', 'gate_login_post', 'static'}
 
 _DB_PATH = os.path.join(os.path.dirname(__file__), 'project_phoenix.db')
 
-def _gate_db():
-    conn = sqlite3.connect(_DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS demo_access_log (
-            id         INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp  TEXT    NOT NULL,
-            name       TEXT    NOT NULL,
-            email      TEXT    NOT NULL,
-            ip         TEXT,
-            login_num  INTEGER NOT NULL DEFAULT 1
-        )
-    ''')
-    conn.commit()
-    return conn
+# ── Supabase access log (persists across Render restarts) ─────────────────────
+_SUPABASE_URL = os.environ.get('SUPABASE_URL', '').rstrip('/')
+_SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+
+def _sb_headers():
+    return {
+        'apikey':        _SUPABASE_KEY,
+        'Authorization': f'Bearer {_SUPABASE_KEY}',
+        'Content-Type':  'application/json',
+    }
 
 def _record_gate_access(name, email, ip):
-    """Persist one login to the DB, increment that user's total count."""
+    """Persist one login to Supabase, increment that user's total count."""
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    conn = _gate_db()
-    row  = conn.execute(
-        'SELECT COUNT(*) AS cnt FROM demo_access_log WHERE email = ?', (email,)
-    ).fetchone()
-    login_num = (row['cnt'] or 0) + 1
-    conn.execute(
-        'INSERT INTO demo_access_log (timestamp, name, email, ip, login_num) VALUES (?,?,?,?,?)',
-        (ts, name, email, ip, login_num)
-    )
-    conn.commit()
-    conn.close()
+    try:
+        resp = requests.get(
+            f'{_SUPABASE_URL}/rest/v1/access_log',
+            params={'email': f'eq.{email}', 'select': 'id'},
+            headers=_sb_headers(), timeout=5
+        )
+        login_num = len(resp.json()) + 1 if resp.ok else 1
+        requests.post(
+            f'{_SUPABASE_URL}/rest/v1/access_log',
+            json={'timestamp': ts, 'name': name, 'email': email, 'ip': ip, 'login_num': login_num},
+            headers={**_sb_headers(), 'Prefer': 'return=minimal'}, timeout=5
+        )
+    except Exception as e:
+        logging.error('DEMO_ACCESS write failed: %s', e)
+        login_num = 1
+    if _supabase:
+        try:
+            _supabase.table('access_log').insert({
+                'timestamp': ts,
+                'email':     email,
+                'ip':        ip,
+                'login_num': login_num,
+            }).execute()
+            logging.info('Supabase write OK — %s login #%d', email, login_num)
+        except Exception as e:
+            logging.warning('Supabase insert failed: %s', e)
     logging.info('DEMO_ACCESS | %s | %s | %s | login #%d | ip:%s', ts, name, email, login_num, ip)
     return ts, login_num
 
@@ -118,32 +134,39 @@ def gate_login_post():
 
 @app.route('/demo-access/log')
 def gate_access_log():
-    """Access log dashboard — usage stats + full login history."""
-    conn = _gate_db()
+    """Access log dashboard — usage stats + full login history (Supabase-backed)."""
+    try:
+        resp = requests.get(
+            f'{_SUPABASE_URL}/rest/v1/access_log',
+            params={'select': '*', 'order': 'id.desc'},
+            headers=_sb_headers(), timeout=10
+        )
+        rows = resp.json() if resp.ok else []
+    except Exception as e:
+        logging.error('DEMO_ACCESS read failed: %s', e)
+        rows = []
 
-    # Full log newest-first
-    rows = [dict(r) for r in conn.execute(
-        'SELECT timestamp, name, email, ip, login_num FROM demo_access_log ORDER BY id DESC'
-    ).fetchall()]
+    # Build per-user summary in Python (iterate oldest→newest)
+    user_map = {}
+    for r in reversed(rows):
+        e = r['email']
+        if e not in user_map:
+            user_map[e] = {
+                'email':          e,
+                'name':           r['name'],
+                'total_sessions': 0,
+                'first_seen':     r['timestamp'],
+                'last_seen':      r['timestamp'],
+            }
+        user_map[e]['total_sessions'] += 1
+        user_map[e]['last_seen'] = r['timestamp']
 
-    # Per-user summary: total sessions, first visit, last visit
-    user_rows = [dict(r) for r in conn.execute('''
-        SELECT email, name,
-               COUNT(*)          AS total_sessions,
-               MIN(timestamp)    AS first_seen,
-               MAX(timestamp)    AS last_seen
-        FROM demo_access_log
-        GROUP BY email
-        ORDER BY total_sessions DESC, last_seen DESC
-    ''').fetchall()]
+    user_rows    = sorted(user_map.values(), key=lambda x: (-x['total_sessions'], x['last_seen']))
+    total_logins = len(rows)
+    unique_users = len(user_rows)
+    most_active  = user_rows[0] if user_rows else None
+    last_login   = rows[0]['timestamp'] if rows else '—'
 
-    # Top-line stats
-    total_logins  = len(rows)
-    unique_users  = len(user_rows)
-    most_active   = user_rows[0] if user_rows else None
-    last_login    = rows[0]['timestamp'] if rows else '—'
-
-    conn.close()
     return render_template('gate_access_log.html',
         entries      = rows,
         users        = user_rows,
