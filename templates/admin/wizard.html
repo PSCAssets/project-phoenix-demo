@@ -7,7 +7,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .main-content { flex: 1; overflow: hidden; min-height: 0; }
 
 /* ── ADMIN SIDENAV ── */
-.sidenav { width: 240px; background: #1D4ED8; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 200; }
+.sidenav { width: 240px; background: #1D4ED8; display: flex; flex-direction: column; position: fixed; top: 60px; left: 56px; bottom: 0; z-index: 200; }
 .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
 .nav-logo-sub  { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
@@ -466,23 +466,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP: Provider Eligibility -->
       <div class="step-panel" id="step_eligibility">
-        <div class="step-heading">Provider Eligibility Configuration</div>
+        <div class="step-heading">Step 6 — Provider Eligibility Configuration</div>
         <div class="step-sub">Define which providers are eligible to deliver this care product and configure program-type-specific assignment rules.</div>
 
-        <div class="form-group" style="max-width:480px;">
+        <div class="form-group" style="max-width:520px;">
           <label class="form-label">Program Type <span class="req">*</span></label>
-          <div class="radio-group">
-            <label class="radio-opt"><input type="radio" name="progType" value="cash_pay" checked onchange="onProgTypeChange(this.value)"> Cash Pay <span style="font-size:11px;color:#9CA3AF;">— patient pays directly, no insurance billed</span></label>
-            <label class="radio-opt"><input type="radio" name="progType" value="payer" onchange="onProgTypeChange(this.value)"> Payer <span style="font-size:11px;color:#9CA3AF;">— billed to commercial insurance / employer plan</span></label>
-            <label class="radio-opt"><input type="radio" name="progType" value="medicare" onchange="onProgTypeChange(this.value)"> Medicare Program</label>
-            <label class="radio-opt"><input type="radio" name="progType" value="medicaid" onchange="onProgTypeChange(this.value)"> Medicaid Program</label>
+          <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Select the primary billing type. Medicare and Medicaid can be added as additional government programs.</div>
+          <div class="radio-group" style="margin-bottom:12px;">
+            <label class="radio-opt"><input type="radio" name="progType" value="cash_pay" checked onchange="onProgTypeChange()"> Cash Pay <span style="font-size:11px;color:#9CA3AF;">— patient pays directly, no insurance billed</span></label>
+            <label class="radio-opt"><input type="radio" name="progType" value="payer" onchange="onProgTypeChange()"> Payer <span style="font-size:11px;color:#9CA3AF;">— billed to commercial insurance / employer plan</span></label>
+          </div>
+          <label class="form-label" style="margin-top:4px;">Government Programs <span style="font-size:11px;font-weight:400;color:#9CA3AF;">(optional — select one or both)</span></label>
+          <div style="display:flex;gap:16px;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:9px 16px;transition:border-color 0.15s;">
+              <input type="checkbox" id="chkMedicare" value="medicare" onchange="onProgTypeChange()" style="width:15px;height:15px;accent-color:#6B21A8;cursor:pointer;">
+              Medicare Program
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;cursor:pointer;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:9px 16px;transition:border-color 0.15s;">
+              <input type="checkbox" id="chkMedicaid" value="medicaid" onchange="onProgTypeChange()" style="width:15px;height:15px;accent-color:#6B21A8;cursor:pointer;">
+              Medicaid Program
+            </label>
           </div>
         </div>
 
-        <!-- Medicare/Medicaid assignment table (hidden for Commercial) -->
+        <!-- Medicare/Medicaid assignment table (shown when a government program is checked) -->
         <div id="providerAssignmentSection" style="display:none;margin-bottom:24px;">
           <div style="height:1px;background:#E5E7EB;margin:16px 0;"></div>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:10px;" id="assignmentSectionLabel">Medicare Program — Provider Assignment</div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;margin-bottom:10px;" id="assignmentSectionLabel">CMS Program — Provider Assignment</div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
             <div style="font-size:13px;font-weight:600;color:#374151;">Assigned Providers</div>
             <button style="font-size:12px;font-weight:600;color:#6B21A8;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:6px;padding:5px 12px;cursor:pointer;">+ Add Provider</button>
@@ -2090,17 +2100,24 @@ function selectEcoCard(idx) {
 }
 
 // Provider Eligibility program type toggle
-function onProgTypeChange(val) {
+function onProgTypeChange() {
+  var medicare = document.getElementById('chkMedicare') && document.getElementById('chkMedicare').checked;
+  var medicaid = document.getElementById('chkMedicaid') && document.getElementById('chkMedicaid').checked;
   var assignSection = document.getElementById('providerAssignmentSection');
   var exclSection = document.getElementById('exclusionSection');
   var label = document.getElementById('assignmentSectionLabel');
-  if (val === 'commercial') {
-    if (assignSection) assignSection.style.display = 'none';
-    if (exclSection)   exclSection.style.display = '';
+
+  var govPrograms = [];
+  if (medicare) govPrograms.push('Medicare');
+  if (medicaid) govPrograms.push('Medicaid');
+
+  if (govPrograms.length > 0) {
+    if (assignSection) assignSection.style.display = '';
+    if (label) label.textContent = govPrograms.join(' & ') + ' Program — Provider Assignment';
+    if (exclSection) exclSection.style.display = 'none';
   } else {
-    if (assignSection) { assignSection.style.display = ''; }
-    if (label) label.textContent = (val === 'medicare' ? 'Medicare' : 'Medicaid') + ' Program — Provider Assignment';
-    if (exclSection)   exclSection.style.display = 'none';
+    if (assignSection) assignSection.style.display = 'none';
+    if (exclSection) exclSection.style.display = '';
   }
 }
 
