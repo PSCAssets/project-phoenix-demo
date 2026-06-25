@@ -185,7 +185,14 @@
 <div class="sched-page">
   <div class="sched-topbar">
     <h1>Schedule</h1>
-    <div style="font-size:13px;color:#6B7280;" id="schedProviderName">{{ session.get('display_name', 'Dr. Sarah Lee, MD') }}</div>
+    <select id="schedProviderSelect" onchange="changeSchedProvider(this.value)" style="border:1.5px solid #E5E0D8;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;color:#374151;background:#fff;cursor:pointer;outline:none;min-width:200px;">
+      <option value="Dr. Sarah Lee, MD">Dr. Sarah Lee, MD</option>
+      <option value="Dr. James Wilson, MD">Dr. James Wilson, MD</option>
+      <option value="Dr. Maria Chen, NP">Dr. Maria Chen, NP</option>
+      <option value="Dr. Robert Patel, MD">Dr. Robert Patel, MD</option>
+      <option value="Dr. Lisa Thompson, NP">Dr. Lisa Thompson, NP</option>
+      <option value="Dr. Kevin Martinez, MD">Dr. Kevin Martinez, MD</option>
+    </select>
     <div style="display:flex;border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;margin-right:8px;">
       <button onclick="setSchedView('day',this)" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#F3F4F6;color:#374151;">Day</button>
       <button onclick="setSchedView('week',this)" id="schedViewWeek" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">Week</button>
@@ -357,6 +364,16 @@
 {% block scripts %}
 {% raw %}
 <script>
+}
+function changeSchedProvider(name) {
+  var el = document.getElementById('schedProviderSelect');
+  if (el) el.value = name;
+  // Update any visible provider label in day view header
+  var hdr = document.querySelector('.day-view-header');
+  if (hdr && hdr.dataset.base) hdr.textContent = hdr.dataset.base + ' — ' + name;
+  // Flash topbar to give visual feedback
+  var topbar = document.querySelector('.sched-topbar');
+  if (topbar) { topbar.style.background = '#F5F0FA'; setTimeout(function(){ topbar.style.background=''; }, 400); }
 }
 function setSchedView(view, btn) {
   document.querySelectorAll('.sched-topbar button[onclick^="setSchedView"]').forEach(function(b) {
