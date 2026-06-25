@@ -3,3 +3,5 @@
 project_phoenix.db
 *.db-shm
 *.db-wal
+.fuse_hidden*
+__pycache__/
