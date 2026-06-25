@@ -3,12 +3,11 @@
 {% block head %}
 <style>
 .sidebar {
-  position: fixed; top: 60px; left: 0; width: 48px; height: calc(100vh - 60px);
+  position: fixed; top: 60px; left: 0; width: 56px; height: calc(100vh - 60px);
   background: #F2EDE4; display: flex; flex-direction: column;
   align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
   transition: width 0.22s ease; overflow: hidden;
 }
-.sidebar.expanded { width: 200px !important; }
 .sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
 .sidebar-logo svg { width: 32px; height: 32px; }
 .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
@@ -22,14 +21,9 @@
 .sib-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
 .sib-item svg { width: 18px; height: 18px; flex-shrink: 0; }
 .sib-badge { position: absolute; top: 6px; right: 8px; background: #EF4444; color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px; padding: 1px 5px; min-width: 16px; text-align: center; }
-.sib-label { display: none; font-size: 12px; font-weight: 500; color: #6B7280; }
-.sidebar.expanded .sib-label { display: inline; }
-.sidebar.expanded .sib-item { flex-direction: row !important; justify-content: flex-start !important; padding: 9px 14px !important; gap: 12px !important; font-size: 0 !important; }
-.sidebar.expanded .sib-item.active .sib-label { color: #6B21A8; }
+.sib-label { font-size: 9px; font-weight: 500; text-align: center; line-height: 1; color: inherit; }
+
 .sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
-.sib-avatar { width: 32px; height: 32px; border-radius: 50%; background: #00A67E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
-.sib-toggle { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #E5E0D8; background: #F2EDE4; cursor: pointer; color: #6B7280; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
-.sib-toggle svg { width: 14px; height: 14px; }
 .ov-topbar {
   position: fixed; top: 60px; left: 0; right: 0; height: 52px;
   background: #fff; border-bottom: 1px solid #E5E0D8;
@@ -131,20 +125,16 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#00A67E"/><path d="M10 16l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </div>
   <div class="sidebar-nav">
-    <div class="sib-item" title="Dashboard" onclick="window.location.href='/provider/home'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="sib-label">Dashboard</span></div>
-    <div class="sib-item active" title="Queue" onclick="window.location.href='/provider/queue'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span class="sib-label">Queue</span></div>
-    <div class="sib-item" title="Schedule" onclick="window.location.href='/provider/schedule'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sib-label">Schedule</span></div>
-    <div class="sib-item" title="Messages" onclick="window.location.href='/provider/messages'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="sib-label">Messages</span></div>
-    <div class="sib-item" title="Alerts" onclick="window.location.href='/provider/notifications'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="sib-label">Alerts</span></div>
-    <div class="sib-item" title="Settings" onclick="window.location.href='/provider/settings'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sib-label">Settings</span></div>
-  </div>
-  <div class="sidebar-footer">
-    <div class="sib-avatar">SL</div>
-    <button class="sib-toggle" onclick="toggleOvSidebar()" id="ovToggleBtn" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+    <a class="sib-item" href="/provider/home" title="Dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg><span class="sib-label">Dashboard</span></a>
+    <a class="sib-item active" href="/provider/queue" title="Queue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg><span class="sib-label">Queue</span></a>
+    <a class="sib-item" href="/provider/schedule" title="Schedule"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="sib-label">Schedule</span></a>
+    <a class="sib-item" href="/provider/messages" title="Messages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="sib-label">Messages</span></a>
+    <a class="sib-item" href="/provider/notifications" title="Alerts"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg><span class="sib-label">Alerts</span></a>
+    <a class="sib-item" href="/provider/settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sib-label">Settings</span></a>
   </div>
 </nav>
 
-<div class="page-wrap" style="margin-left: 48px;">
+<div class="page-wrap" style="margin-left: 56px;">
   <div class="page-title">Provider Oversight</div>
   <div class="page-sub">Dr. Sarah Lee, MD — Supervising Physician</div>
 
@@ -869,12 +859,6 @@ function executeBulkAuthorize() {
     updateBulkCount();
   }, 200);
 }
-
-function toggleOvSidebar() {
-  var s = document.getElementById('ovSidebar');
-  var t = document.getElementById('ovToggleBtn');
-  if (s) s.classList.toggle('expanded');
-  if (t) { var exp = s&&s.classList.contains('expanded'); t.innerHTML = exp ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>'; }
 }
 </script>
 {% endraw %}
