@@ -38,7 +38,7 @@
 <body>
 
   {% set _role = session.get('role', '') %}
-  {% set _nav_bg = '#2D5C2E' if _role == 'patient' else '#1D4ED8' if _role == 'admin' else '#6B21A8' %}
+  {% set _nav_bg = '#2D5C2E' if request.blueprint == 'patient' else '#1D4ED8' if request.blueprint == 'admin' else '#6B21A8' %}
   <nav class="nav" style="background: {{ _nav_bg }};">
     <div class="nav-brand">
       <a href="{{ url_for('index') }}" class="nav-logo">
