@@ -848,19 +848,12 @@ function populateConfirmation() {
 }
 
 function confirmBooking() {
-  alert('✅ Appointment booked!
-
-Member: ' + state.member.first + ' ' + state.member.last +
-    '
-Provider: ' + state.provider.name +
-    '
-Type: ' + state.apptType +
-    '
-Date: ' + (state.date ? MONTH_LABELS[calMonth]+' '+state.date+', '+calYear : '—') +
+  alert('✅ Appointment booked!\n\nMember: ' + state.member.first + ' ' + state.member.last +
+    '\nProvider: ' + state.provider.name +
+    '\nType: ' + state.apptType +
+    '\nDate: ' + (state.date ? MONTH_LABELS[calMonth]+' '+state.date+', '+calYear : '—') +
     (state.time ? ' at '+state.time : '') +
-    '
-
-The member has been registered as a patient and an intake notification has been sent.');
+    '\n\nThe member has been registered as a patient and an intake notification has been sent.');
   closeModal();
 }
 
