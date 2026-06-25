@@ -577,13 +577,17 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <div class="action-popover" id="labRecPopover" style="top:100%;right:80px;margin-top:6px;min-width:260px;">
         <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">🧪 Recommend Lab / Kit</div>
         <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">Select a lab or kit to recommend. Patient will receive an email with a purchase link.</div>
-        <div id="labRecOptions" style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
-          <div class="lab-rec-opt" data-val="" onclick="selectLabRec(this)" style="padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;color:#9CA3AF;cursor:pointer;background:#F9FAFB;">— Select a lab or kit —</div>
-          <div class="lab-rec-opt" data-val="ew360" onclick="selectLabRec(this)" style="padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;cursor:pointer;background:#fff;">Everlywell360</div>
-          <div class="lab-rec-opt" data-val="sti" onclick="selectLabRec(this)" style="padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;cursor:pointer;background:#fff;">STI Test</div>
-          <div class="lab-rec-opt" data-val="thyroid" onclick="selectLabRec(this)" style="padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;cursor:pointer;background:#fff;">Thyroid Test</div>
-        </div>
-        <input type="hidden" id="labRecSelect" value="">
+        <select id="labRecSelect" style="width:100%;padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;color:#374151;background:#fff;margin-bottom:12px;appearance:auto;cursor:pointer;">
+          <option value="">— Select a lab or kit —</option>
+          <option value="ew360">Everlywell360</option>
+          <option value="a1c">A1C Recheck Kit</option>
+          <option value="womens">Women's Health Panel</option>
+          <option value="sti">STI Test</option>
+          <option value="thyroid">Thyroid Test</option>
+          <option value="quest_basic">Quest — Basic Metabolic Panel</option>
+          <option value="quest_lipid">Quest — Lipid Panel</option>
+          <option value="quest_hba1c">Quest — HbA1c</option>
+        </select>
         <div style="display:flex;gap:8px;">
           <button onclick="sendLabRec()" style="flex:1;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Send to Patient</button>
           <button onclick="closeLabRecPopover()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
@@ -2953,26 +2957,15 @@ function toggleLabRecommendPopover(e) {
   closeCallPopover(); closeVideoPopover();
 }
 function selectLabRec(el) {
-  document.querySelectorAll('.lab-rec-opt').forEach(function(o) {
-    o.style.background = '#fff'; o.style.border = '1px solid #E5E0D8'; o.style.color = '';
-  });
-  el.style.background = '#F5F3FF'; el.style.border = '1px solid #6B21A8'; el.style.color = '#6B21A8';
-  document.getElementById('labRecSelect').value = el.getAttribute('data-val');
-}
 function closeLabRecPopover() {
   var el = document.getElementById('labRecPopover');
   if (el) el.classList.remove('open');
-  document.querySelectorAll('.lab-rec-opt').forEach(function(o) {
-    o.style.background = o.getAttribute('data-val') ? '#fff' : '#F9FAFB';
-    o.style.border = '1px solid #E5E0D8'; o.style.color = '';
-  });
-  var h = document.getElementById('labRecSelect'); if (h) h.value = '';
+  var sel = document.getElementById('labRecSelect'); if (sel) sel.value = '';
 }
 function sendLabRec() {
   var sel = document.getElementById('labRecSelect');
-  if (!sel.value) { alert('Please select a lab or kit first.'); return; }
-  var names = { ew360: 'Everlywell360', sti: 'STI Test', thyroid: 'Thyroid Test' };
-  var chosen = names[sel.value];
+  if (!sel || !sel.value) { alert('Please select a lab or kit first.'); return; }
+  var chosen = sel.options[sel.selectedIndex].text;
   closeLabRecPopover();
   alert('Lab recommendation sent!\n\n' + chosen + ' recommendation has been queued.\n\nMarketing will send the purchase link to Marcus Johnson at the email on file.\n\n(v1.0 — manual marketing send)');
 }

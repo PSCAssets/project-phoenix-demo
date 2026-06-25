@@ -237,9 +237,9 @@
       <div class="filter-divider"></div>
       <span class="filter-label">Providers (up to 5)</span>
       <div class="chip-list" id="providerChips"></div>
-      <div class="chip-actions">
-        <button class="chip-btn" onclick="selectAllProviders()">Select All</button>
-        <button class="chip-btn" onclick="clearAllProviders()">Clear All</button>
+      <div class="chip-actions" style="position:relative;">
+        <button class="chip-btn chip-btn-add" onclick="toggleAddProviderDropdown(event)">+ Add Provider</button>
+        <div id="addProviderDropdown" style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #E5E0D8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:500;min-width:220px;padding:6px 0;margin-top:4px;"></div>
       </div>
     </div>
   </div>
@@ -472,24 +472,26 @@ function getVisibleProviders() {
 function renderChips() {
   var list = document.getElementById('providerChips');
   if (!list) return;
-  var visible = getVisibleProviders();
-  var atMax = selectedProviders.length >= 5;
   list.innerHTML = '';
-  visible.forEach(function(p) {
-    var isActive = selectedProviders.indexOf(p.id) !== -1;
-    var ci = isActive ? assignColor(p.id) : null;
-    var col = ci !== null ? PROV_COLORS[ci] : null;
+  // Only show selected (active) providers as chips, each with × remove
+  selectedProviders.forEach(function(pid) {
+    var p = PROVIDERS.find(function(x){ return x.id === pid; });
+    if (!p) return;
+    var ci = assignColor(pid);
+    var col = PROV_COLORS[ci];
     var chip = document.createElement('span');
-    chip.className = 'prov-chip' + (isActive ? ' chip-active' : '') + (!isActive && atMax ? ' chip-max' : '');
-    if (isActive && col) {
-      chip.style.background = col.bg;
-      chip.style.borderColor = col.border;
-      chip.style.color = col.text;
-    }
-    chip.innerHTML = '<span class="prov-dot" style="background:' + (col ? col.dot : '#D1D5DB') + '"></span>' + p.name + ' <span style="font-size:10px;opacity:0.7;">· ' + p.state + '</span>';
-    chip.onclick = function() { toggleProvider(p.id); };
+    chip.className = 'prov-chip chip-active';
+    chip.style.background = col.bg;
+    chip.style.borderColor = col.border;
+    chip.style.color = col.text;
+    chip.innerHTML = '<span class="prov-dot" style="background:' + col.dot + '"></span>' +
+      p.name + ' <span style="font-size:10px;opacity:0.7;">· ' + p.state + '</span>' +
+      '<button onclick="removeProvider(' + pid + ');event.stopPropagation();" style="margin-left:6px;background:none;border:none;cursor:pointer;color:' + col.text + ';font-size:14px;line-height:1;padding:0 2px;opacity:0.7;" title="Remove">&times;</button>';
     list.appendChild(chip);
   });
+
+  // Update add-provider dropdown options
+  refreshAddProviderDropdown();
 
   // Update topbar label
   var lbl = document.getElementById('schedProviderLabel');
@@ -542,6 +544,61 @@ function toggleProvider(pid) {
   }
   renderChips();
 }
+
+function removeProvider(pid) {
+  var idx = selectedProviders.indexOf(pid);
+  if (idx !== -1) {
+    selectedProviders.splice(idx, 1);
+    delete colorAssignments[pid];
+    var remaining = Object.keys(colorAssignments).map(Number);
+    colorAssignments = {};
+    remaining.forEach(function(id, i) { colorAssignments[id] = i; });
+  }
+  renderChips();
+}
+
+function refreshAddProviderDropdown() {
+  var dd = document.getElementById('addProviderDropdown');
+  if (!dd) return;
+  var visible = getVisibleProviders();
+  var unselected = visible.filter(function(p){ return selectedProviders.indexOf(p.id) === -1; });
+  var atMax = selectedProviders.length >= 5;
+  dd.innerHTML = '';
+  if (atMax) {
+    dd.innerHTML = '<div style="padding:10px 14px;font-size:12px;color:#9CA3AF;">Max 5 providers reached.<br>Remove one to add another.</div>';
+    return;
+  }
+  if (unselected.length === 0) {
+    dd.innerHTML = '<div style="padding:10px 14px;font-size:12px;color:#9CA3AF;">All filtered providers are on schedule.</div>';
+    return;
+  }
+  unselected.forEach(function(p) {
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:8px 14px;font-size:13px;color:#374151;cursor:pointer;display:flex;align-items:center;gap:8px;';
+    item.innerHTML = '<span style="font-size:11px;font-weight:600;background:#F3F4F6;border-radius:10px;padding:1px 7px;color:#6B7280;">' + p.state + '</span>' + p.name;
+    item.onmouseover = function(){ this.style.background='#F5F3FF'; };
+    item.onmouseout  = function(){ this.style.background=''; };
+    item.onclick = function(e) {
+      e.stopPropagation();
+      toggleProvider(p.id);
+      document.getElementById('addProviderDropdown').style.display = 'none';
+    };
+    dd.appendChild(item);
+  });
+}
+
+function toggleAddProviderDropdown(e) {
+  e.stopPropagation();
+  var dd = document.getElementById('addProviderDropdown');
+  if (!dd) return;
+  refreshAddProviderDropdown();
+  dd.style.display = dd.style.display === 'none' ? '' : 'none';
+}
+
+document.addEventListener('click', function() {
+  var dd = document.getElementById('addProviderDropdown');
+  if (dd) dd.style.display = 'none';
+});
 
 function filterByState(state) {
   filteredState = state;
