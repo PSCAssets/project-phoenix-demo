@@ -149,6 +149,10 @@ def lab_orders():
 def oversight():
     return render_template("provider/oversight.html")
 
+@bp.route("/lab-auth")
+def lab_auth():
+    return render_template("provider/lab_auth.html")
+
 @bp.route("/future-visits")
 def future_visits():
     return render_template("provider/future_visits.html")
