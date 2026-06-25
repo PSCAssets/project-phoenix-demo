@@ -262,7 +262,7 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
         <option value="HIGH">High</option>
         <option value="NORMAL">Normal</option>
       </select>
-      <span class="filter-label">Assigned MA</span>
+      <span class="filter-label">Assigned</span>
       <select id="f-ma" onchange="renderRows()">
         <option value="">All</option>
         <option value="AM">AM</option>
@@ -283,7 +283,7 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
           <th>Type</th>
           <th onclick="sortBy('program')">Care Product <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('urgency')">Urgency <span class="sort-arrow">&#8597;</span></th>
-          <th onclick="sortBy('ma')">Assigned MA <span class="sort-arrow">&#8597;</span></th>
+          <th onclick="sortBy('ma')">Assigned <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('wait')">Wait Time <span class="sort-arrow">&#8597;</span></th>
           <th>Action</th>
         </tr>
@@ -332,12 +332,13 @@ function sortBy(key) {
 function urgencyOrder(u) { return u === 'CRITICAL' ? 0 : u === 'HIGH' ? 1 : 2; }
 
 function actionBtn(row) {
-  if (row.cat === 'pa' && row.urgency === 'CRITICAL') return '<button class="action-btn btn-red">Resubmit PA</button>';
-  if (row.cat === 'pa') return '<button class="action-btn btn-amber">Submit PA</button>';
-  if (row.cat === 'intake') return '<button class="action-btn btn-green">Complete</button>';
-  if (row.cat === 'reminder') return '<button class="action-btn btn-blue">Send Reminder</button>';
-  if (row.cat === 'doc') return '<button class="action-btn btn-gray">Request Docs</button>';
-  return '';
+  if (row.ma === 'Unassigned') {
+    return '<button class="action-btn btn-green" onclick="takeTask(this)">Take</button><button class="action-btn btn-blue" onclick="routeTask()">Route</button><button class="action-btn btn-gray" onclick="viewTask()">View</button>';
+  }
+  if (row.ma === 'You' || row.ma === 'MT') {
+    return '<button class="action-btn btn-amber" onclick="closeTask(this)">Close Task</button><button class="action-btn btn-gray" onclick="viewTask()">View</button>';
+  }
+  return '<button class="action-btn btn-gray" onclick="viewTask()">View Chart</button>';
 }
 
 function renderRows() {
@@ -391,6 +392,10 @@ function renderRows() {
   }
 }
 
+function takeTask(btn) { var row = btn.closest('tr'); row.querySelector('.ma-chip').textContent = 'You'; row.querySelector('.ma-chip').className = 'ma-chip ma-assigned'; btn.parentElement.innerHTML = '<button class="action-btn btn-amber" onclick="closeTask(this)">Close Task</button><button class="action-btn btn-gray" onclick="viewTask()">View</button>'; }
+function routeTask() { alert('Route task…\n\n(In production this opens a routing modal to reassign to another team member or escalate to provider.)'); }
+function closeTask(btn) { if (confirm('Close this task?\n\nNote: Close Task marks the task closed — separate from the consultation being marked Complete.')) { btn.closest('tr').remove(); } }
+function viewTask() { alert('Opening chart…\n\n(In production this navigates to the patient chart.)'); }
 renderRows();
 </script>
 {% endraw %}

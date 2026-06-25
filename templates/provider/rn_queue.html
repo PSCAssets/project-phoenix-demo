@@ -573,7 +573,7 @@
               <th onclick="sortTable(4)">Type <span class="sort-arrow">↕</span></th>
               <th onclick="sortTable(5)">Care Product <span class="sort-arrow">↕</span></th>
               <th onclick="sortTable(6)">Urgency <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(7)">Assigned RN <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable(7)">Assigned <span class="sort-arrow">↕</span></th>
               <th onclick="sortTable(8)">Wait Time <span class="sort-arrow">↕</span></th>
               <th>Action</th>
             </tr>
@@ -646,9 +646,12 @@ function waitHtml(mins) {
 
 function actionsHtml(row) {
   if (row.assigned === 'Unassigned') {
-    return `<div class="actions"><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button><button class="btn-claim" onclick="claimRow('${row.consultId}')">Claim</button></div>`;
+    return `<div class="actions"><button class="btn-claim" onclick="claimRow('${row.consultId}')">Take</button><button class="btn-resolve" onclick="routeRow('${row.consultId}')">Route</button><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button></div>`;
   }
-  return `<div class="actions"><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button><button class="btn-resolve" onclick="resolveRow('${row.consultId}')">Resolve</button></div>`;
+  if (row.assigned === 'You') {
+    return `<div class="actions"><button class="btn-resolve" onclick="closeTask('${row.consultId}')">Close Task</button><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button></div>`;
+  }
+  return `<div class="actions"><button class="btn-view" onclick="viewRow('${row.consultId}')">View Chart</button></div>`;
 }
 
 function renderRows(data) {
@@ -720,9 +723,13 @@ function setTab(key, el) {
 
 function viewRow(id) { alert('Opening consult ' + id + '…\n(In production this opens the consult detail panel.)'); }
 function claimRow(id) { const r = rows.find(x => x.consultId === id); if (r) { r.assigned = 'You'; applyFilters(); } }
-function resolveRow(id) {
+function routeRow(id) { alert('Route task ' + id + '…\n(In production this opens a routing modal to reassign to another team member or escalate to provider.)'); }
+function closeTask(id) {
   const r = rows.find(x => x.consultId === id);
-  if (r && confirm('Mark ' + id + ' as resolved?')) { rows.splice(rows.indexOf(r), 1); applyFilters(); }
+  if (r && confirm('Close task ' + id + '?\n\nNote: Close Task marks the task as closed — this is separate from the consultation being marked Complete.')) {
+    rows.splice(rows.indexOf(r), 1);
+    applyFilters();
+  }
 }
 
 renderRows(rows);

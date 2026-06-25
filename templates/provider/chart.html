@@ -569,7 +569,6 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <button class="btn btn-outline" onclick="openSignModal()">Sign &amp; Close Chart</button>
       <button class="btn btn-outline" onclick="toggleCallPopover(event)">📞 Call</button>
       <button class="btn btn-outline" onclick="toggleVideoPopover(event)">🎥 Video</button>
-      <button class="btn btn-outline" onclick="openScheduleModal()">📅 Schedule</button>
       <button class="btn btn-outline" onclick="openRouteModal()">Route ↗</button>
       <button class="btn btn-outline" onclick="toggleLabRecommendPopover(event)">🧪 Lab Rec</button>
       <button class="btn btn-outline" onclick="alert('Translation feature is Under Design.\n\nThis functionality will allow one-click translation during consultations.\n\nAvailability: TBD — pending HIPAA compliance review of translation platform.')" style="opacity:0.6;cursor:default;" title="Under Design">🌐 Translation</button>
@@ -613,7 +612,6 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
         <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">🎥 Video Consult</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
           <button onclick="closeVideoPopover();alert('Launching Zoom video session...')" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;">▶ Start Now</button>
-          <button onclick="closeVideoPopover();openScheduleModal()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;">📅 Schedule Video</button>
           <button onclick="closeVideoPopover()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;color:#9CA3AF;">Cancel</button>
         </div>
       </div>
@@ -2333,41 +2331,6 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
   </div>
 </div>
 
-<!-- SCHEDULE MODAL (Fix 7) -->
-<div class="modal-backdrop" id="scheduleModal">
-  <div class="modal" style="width:460px;">
-    <div class="modal-header">
-      <h3>📅 Schedule Appointment</h3>
-      <button class="modal-close" onclick="closeScheduleModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Care Product</label>
-        <select class="form-select"><option>Testosterone Care</option><option>Weight Management</option><option>ED Treatment</option></select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Consult Type</label>
-        <div style="display:flex;gap:8px;">
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="schedType" value="Phone" checked> 📞 Phone</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="schedType" value="Video"> 🎥 Video</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="radio" name="schedType" value="Async"> 📋 Async</label>
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input" value="2026-06-18"></div>
-        <div class="form-group"><label class="form-label">Time</label><input type="time" class="form-input" value="10:00"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Duration</label>
-        <select class="form-select"><option>15 min</option><option>30 min</option><option>45 min</option><option>60 min</option></select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeScheduleModal()">Cancel</button>
-      <button class="btn btn-primary" onclick="closeScheduleModal();alert('Appointment scheduled for Jun 18 at 10:00 AM')">Confirm Appointment →</button>
-    </div>
-  </div>
-</div>
 
 <!-- Stage/status bar (SLA tracking) -->
 <div class="status-bar stage-bar" id="stageBar" style="display:none;">Stage: Active</div>
@@ -2933,9 +2896,6 @@ function showRouteToast(msg) {
 }
 
 // Schedule modal (Fix 7)
-function openScheduleModal() { document.getElementById('scheduleModal').classList.add('open'); }
-function closeScheduleModal() { document.getElementById('scheduleModal').classList.remove('open'); }
-document.getElementById('scheduleModal').addEventListener('click', function(e) { if (e.target === this) closeScheduleModal(); });
 
 // Call/Video popovers (Fix 7)
 function toggleCallPopover(e) {
