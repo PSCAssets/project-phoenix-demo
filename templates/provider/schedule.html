@@ -32,6 +32,39 @@
   .sched-week-label { font-size: 14px; font-weight: 600; color: #374151; min-width: 200px; text-align: center; }
   .sched-nav-btn { width: 32px; height: 32px; border-radius: 6px; border: 1px solid #E5E0D8; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #6B7280; font-size: 16px; }
   .sched-nav-btn:hover { background: #FAF7F2; color: #111827; }
+  /* Multi-provider filter panel */
+  .sched-filter-panel { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 18px; margin-bottom: 14px; }
+  .filter-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .filter-divider { width: 1px; height: 24px; background: #E5E0D8; flex-shrink: 0; }
+  .filter-group { display: flex; align-items: center; gap: 8px; }
+  .filter-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .state-select { border: 1.5px solid #E5E0D8; border-radius: 7px; padding: 5px 10px; font-size: 13px; font-weight: 600; color: #374151; background: #fff; cursor: pointer; outline: none; }
+  .state-select:focus { border-color: #6B21A8; }
+  .chip-list { display: flex; gap: 7px; flex-wrap: wrap; flex: 1; }
+  .prov-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; border: 1.5px solid #E5E0D8; background: #F9FAFB; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; transition: all 0.15s; white-space: nowrap; user-select: none; }
+  .prov-chip:hover:not(.chip-max) { border-color: #9CA3AF; color: #374151; }
+  .prov-chip.chip-active { border-width: 2px; }
+  .prov-chip.chip-max { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+  .prov-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .chip-actions { display: flex; gap: 8px; margin-left: auto; flex-shrink: 0; }
+  .chip-btn { border: 1.5px solid #E5E0D8; background: #fff; border-radius: 6px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; white-space: nowrap; }
+  .chip-btn:hover { background: #F3F4F6; }
+  /* Avail summary bar */
+  .sched-avail-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+  .avail-bar-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
+  .avail-pill { display: inline-flex; align-items: center; gap: 7px; padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid; }
+  .avail-pill-name { opacity: 0.9; }
+  .avail-pill-slots { font-weight: 800; }
+  /* Multi-provider day view */
+  .day-multi-wrap { display: flex; border: 1px solid #E5E0D8; border-radius: 8px; overflow: hidden; }
+  .day-multi-time { width: 56px; flex-shrink: 0; background: #F9FAFB; border-right: 1px solid #E5E0D8; }
+  .day-multi-col { flex: 1; border-right: 1px solid #E5E0D8; min-width: 0; }
+  .day-multi-col:last-child { border-right: none; }
+  .day-multi-head { padding: 8px 10px; font-size: 11px; font-weight: 700; text-align: center; border-bottom: 1px solid #E5E0D8; }
+  .day-multi-body { position: relative; }
+  .day-multi-slot { height: 44px; border-bottom: 1px solid #F2EDE4; }
+  .day-multi-slot.half { border-bottom: 1px dashed #F2EDE4; }
+  .day-multi-appt { position: absolute; left: 3px; right: 3px; border-radius: 5px; padding: 4px 6px; font-size: 11px; font-weight: 600; z-index: 3; overflow: hidden; cursor: pointer; }
   .sched-legend { display: flex; gap: 16px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
@@ -185,14 +218,7 @@
 <div class="sched-page">
   <div class="sched-topbar">
     <h1>Schedule</h1>
-    <select id="schedProviderSelect" onchange="changeSchedProvider(this.value)" style="border:1.5px solid #E5E0D8;border-radius:8px;padding:6px 10px;font-size:13px;font-weight:600;color:#374151;background:#fff;cursor:pointer;outline:none;min-width:200px;">
-      <option value="Dr. Sarah Lee, MD">Dr. Sarah Lee, MD</option>
-      <option value="Dr. James Wilson, MD">Dr. James Wilson, MD</option>
-      <option value="Dr. Maria Chen, NP">Dr. Maria Chen, NP</option>
-      <option value="Dr. Robert Patel, MD">Dr. Robert Patel, MD</option>
-      <option value="Dr. Lisa Thompson, NP">Dr. Lisa Thompson, NP</option>
-      <option value="Dr. Kevin Martinez, MD">Dr. Kevin Martinez, MD</option>
-    </select>
+    <span id="schedProviderLabel" style="font-size:13px;font-weight:600;color:#6B7280;"></span>
     <div style="display:flex;border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;margin-right:8px;">
       <button onclick="setSchedView('day',this)" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#F3F4F6;color:#374151;">Day</button>
       <button onclick="setSchedView('week',this)" id="schedViewWeek" style="padding:6px 14px;font-size:12px;font-weight:600;border:none;cursor:pointer;background:#6B21A8;color:#fff;">Week</button>
@@ -205,6 +231,32 @@
     </div>
     <button onclick="openAddTimeModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Time</button>
   </div>
+  <!-- Multi-provider filter panel -->
+  <div class="sched-filter-panel">
+    <div class="filter-row">
+      <div class="filter-group">
+        <span class="filter-label">State</span>
+        <select class="state-select" id="stateFilter" onchange="filterByState(this.value)">
+          <option value="">All States</option>
+          <option value="CA">California (CA)</option>
+          <option value="FL">Florida (FL)</option>
+          <option value="NY">New York (NY)</option>
+          <option value="TX">Texas (TX)</option>
+        </select>
+      </div>
+      <div class="filter-divider"></div>
+      <span class="filter-label">Providers (up to 5)</span>
+      <div class="chip-list" id="providerChips"></div>
+      <div class="chip-actions">
+        <button class="chip-btn" onclick="selectAllProviders()">Select All</button>
+        <button class="chip-btn" onclick="clearAllProviders()">Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avail summary bar -->
+  <div class="sched-avail-bar" id="availBar"></div>
+
   <div class="sched-legend">
     <span class="legend-item"><span class="legend-dot" style="background:#D1FAE5;border:1.5px dashed #34D399"></span>Available</span>
     <span class="legend-item"><span class="legend-dot" style="background:#E5E0D8"></span>Unavailable</span>
@@ -233,7 +285,8 @@
 
   <!-- DAY VIEW (Fix 10) -->
   <div id="viewDay" style="display:none;">
-  <div class="cal-wrap">
+  <div id="dayMultiView"></div>
+  <div class="cal-wrap" id="daySingleWrap">
     <div class="day-view-header">Wednesday, June 11 — 4 appointments · 2 open slots</div>
     <div class="day-view-row">
       <div class="day-view-time">8:00 AM</div>
@@ -365,16 +418,278 @@
 {% raw %}
 <script>
 }
-function changeSchedProvider(name) {
-  var el = document.getElementById('schedProviderSelect');
-  if (el) el.value = name;
-  // Update any visible provider label in day view header
-  var hdr = document.querySelector('.day-view-header');
-  if (hdr && hdr.dataset.base) hdr.textContent = hdr.dataset.base + ' — ' + name;
-  // Flash topbar to give visual feedback
-  var topbar = document.querySelector('.sched-topbar');
-  if (topbar) { topbar.style.background = '#F5F0FA'; setTimeout(function(){ topbar.style.background=''; }, 400); }
+// ── Provider data ──────────────────────────────────────────────
+var PROVIDERS = [
+  { id:0, name:'Dr. Sarah Lee, MD',      state:'TX', role:'MD', slots:4 },
+  { id:1, name:'Dr. James Wilson, MD',   state:'CA', role:'MD', slots:2 },
+  { id:2, name:'Dr. Maria Chen, NP',     state:'FL', role:'NP', slots:6 },
+  { id:3, name:'Dr. Robert Patel, MD',   state:'NY', role:'MD', slots:1 },
+  { id:4, name:'Dr. Lisa Thompson, NP',  state:'TX', role:'NP', slots:3 },
+  { id:5, name:'Dr. Kevin Martinez, MD', state:'CA', role:'MD', slots:0 },
+  { id:6, name:'Dr. Amanda Foster, NP',  state:'FL', role:'NP', slots:5 },
+  { id:7, name:'Dr. Chris Rogers, MD',   state:'NY', role:'MD', slots:2 },
+];
+
+var PROV_COLORS = [
+  { bg:'#EDE9FE', border:'#7C3AED', text:'#5B21B6', dot:'#6B21A8', apptBg:'rgba(107,33,168,0.12)', apptBorder:'#6B21A8', apptText:'#3B0764' },
+  { bg:'#DBEAFE', border:'#3B82F6', text:'#1D4ED8', dot:'#2563EB', apptBg:'rgba(37,99,235,0.12)',  apptBorder:'#3B82F6', apptText:'#1E3A8A' },
+  { bg:'#D1FAE5', border:'#10B981', text:'#065F46', dot:'#059669', apptBg:'rgba(5,150,105,0.12)',  apptBorder:'#10B981', apptText:'#064E3B' },
+  { bg:'#FEF3C7', border:'#F59E0B', text:'#92400E', dot:'#D97706', apptBg:'rgba(217,119,6,0.12)',  apptBorder:'#F59E0B', apptText:'#78350F' },
+  { bg:'#FCE7F3', border:'#EC4899', text:'#9D174D', dot:'#DB2777', apptBg:'rgba(219,39,119,0.12)', apptBorder:'#EC4899', apptText:'#831843' },
+];
+
+// Each provider's appointment data [day, sh, sm, dur, type, label, sublabel]
+var APPTS_BY_PROV = [
+  // Provider 0: Dr. Sarah Lee, MD
+  [[0,8,0,45,'annual','Annual Visit','Marcus J. · Testosterone'],[0,9,0,15,'a1c','A1C Consult','Sandra G.'],[0,9,15,15,'telehealth','Telehealth','Patricia W.'],[0,12,0,60,'unavail','Lunch Break','Unavailable'],[0,13,30,15,'phone','Phone Consult','Rachel L.'],[1,9,0,45,'annual','Annual Visit','Camille D.'],[1,10,0,15,'a1c','A1C Consult','Michael G.'],[1,12,0,60,'unavail','Lunch Break','Unavailable'],[1,14,0,15,'telehealth','Telehealth','Henry O.'],[2,8,0,45,'annual','Annual Visit','Aisha N.'],[2,9,0,15,'phone','Phone Consult','James R.'],[2,9,15,15,'a1c','A1C Consult','Sandra G.'],[2,12,0,60,'unavail','Lunch Break','Unavailable'],[2,13,0,15,'followup','Follow-up','David K.'],[3,9,0,15,'a1c','A1C Consult','Camille D.'],[3,9,15,15,'phone','Phone Consult','Henry O.'],[3,12,0,60,'unavail','Lunch Break','Unavailable'],[4,9,0,45,'annual','Annual Visit','Marcus J.'],[4,10,0,15,'followup','Follow-up','Brianna M.'],[4,12,0,60,'unavail','Lunch Break','Unavailable']],
+  // Provider 1: Dr. James Wilson, MD
+  [[0,9,0,45,'annual','Annual Visit','Leo M.'],[0,12,0,60,'unavail','Lunch','Unavailable'],[0,13,0,30,'telehealth','Telehealth','Nina R.'],[1,10,0,30,'phone','Phone Consult','Oscar T.'],[2,9,30,30,'a1c','A1C Consult','Grace L.'],[2,12,0,60,'unavail','Lunch','Unavailable'],[3,10,0,45,'annual','Annual Visit','Sam P.'],[3,12,0,60,'unavail','Lunch','Unavailable'],[4,9,0,30,'followup','Follow-up','Eva W.']],
+  // Provider 2: Dr. Maria Chen, NP
+  [[0,8,30,30,'phone','Phone Consult','Eli F.'],[1,9,0,30,'telehealth','Telehealth','Maya J.'],[1,12,0,60,'unavail','Lunch','Unavailable'],[1,14,30,30,'followup','Follow-up','Liam K.'],[2,10,0,45,'annual','Annual Visit','Zoe M.'],[3,8,0,30,'phone','Phone Consult','Noah A.'],[3,9,30,30,'a1c','A1C Consult','Isla B.'],[3,12,0,60,'unavail','Lunch','Unavailable'],[4,10,0,30,'telehealth','Telehealth','Mia C.']],
+  // Provider 3: Dr. Robert Patel, MD
+  [[0,10,0,45,'annual','Annual Visit','Ava D.'],[1,9,0,30,'a1c','A1C Consult','Ethan F.'],[2,10,30,30,'phone','Phone Consult','Lily G.'],[3,11,0,45,'annual','Annual Visit','Jack H.'],[4,13,0,30,'followup','Follow-up','Ella I.']],
+  // Provider 4: Dr. Lisa Thompson, NP
+  [[0,13,0,30,'telehealth','Telehealth','Ryan J.'],[1,13,30,30,'phone','Phone Consult','Chloe K.'],[2,14,0,45,'annual','Annual Visit','Luke L.'],[3,14,30,30,'a1c','A1C Consult','Nora M.'],[4,15,0,30,'followup','Follow-up','Miles N.']],
+  // Provider 5: Dr. Kevin Martinez, MD
+  [[0,9,0,30,'phone','Phone Consult','Aria O.'],[1,10,30,30,'telehealth','Telehealth','Finn P.'],[2,9,0,45,'annual','Annual Visit','Stella Q.'],[3,9,0,30,'a1c','A1C Consult','Owen R.'],[4,10,0,45,'annual','Annual Visit','Violet S.']],
+  // Provider 6: Dr. Amanda Foster, NP
+  [[0,8,0,30,'a1c','A1C Consult','Xena T.'],[1,9,30,30,'followup','Follow-up','Yara U.'],[2,11,0,45,'annual','Annual Visit','Zane V.'],[3,10,30,30,'phone','Phone Consult','Abe W.'],[4,9,0,30,'telehealth','Telehealth','Bea X.']],
+  // Provider 7: Dr. Chris Rogers, MD
+  [[0,10,30,30,'followup','Follow-up','Cal Y.'],[1,13,0,30,'phone','Phone Consult','Deb Z.'],[2,10,0,45,'annual','Annual Visit','Ed A.'],[3,13,30,30,'telehealth','Telehealth','Faye B.'],[4,14,0,30,'a1c','A1C Consult','Gil C.']],
+];
+
+var selectedProviders = [0]; // Start with provider 0 selected
+var colorAssignments  = {};  // providerId -> colorIndex
+var filteredState = '';
+
+function assignColor(pid) {
+  if (colorAssignments[pid] !== undefined) return colorAssignments[pid];
+  var used = Object.values(colorAssignments);
+  for (var i = 0; i < PROV_COLORS.length; i++) {
+    if (used.indexOf(i) === -1) { colorAssignments[pid] = i; return i; }
+  }
+  return 0;
 }
+
+function getVisibleProviders() {
+  return PROVIDERS.filter(function(p) {
+    return (!filteredState || p.state === filteredState);
+  });
+}
+
+function renderChips() {
+  var list = document.getElementById('providerChips');
+  if (!list) return;
+  var visible = getVisibleProviders();
+  var atMax = selectedProviders.length >= 5;
+  list.innerHTML = '';
+  visible.forEach(function(p) {
+    var isActive = selectedProviders.indexOf(p.id) !== -1;
+    var ci = isActive ? assignColor(p.id) : null;
+    var col = ci !== null ? PROV_COLORS[ci] : null;
+    var chip = document.createElement('span');
+    chip.className = 'prov-chip' + (isActive ? ' chip-active' : '') + (!isActive && atMax ? ' chip-max' : '');
+    if (isActive && col) {
+      chip.style.background = col.bg;
+      chip.style.borderColor = col.border;
+      chip.style.color = col.text;
+    }
+    chip.innerHTML = '<span class="prov-dot" style="background:' + (col ? col.dot : '#D1D5DB') + '"></span>' + p.name + ' <span style="font-size:10px;opacity:0.7;">· ' + p.state + '</span>';
+    chip.onclick = function() { toggleProvider(p.id); };
+    list.appendChild(chip);
+  });
+
+  // Update topbar label
+  var lbl = document.getElementById('schedProviderLabel');
+  if (lbl) {
+    if (selectedProviders.length === 0) lbl.textContent = 'No provider selected';
+    else if (selectedProviders.length === 1) lbl.textContent = PROVIDERS.find(function(p){ return p.id===selectedProviders[0]; }).name;
+    else lbl.textContent = selectedProviders.length + ' providers selected';
+  }
+  renderAvailBar();
+  renderCalendar();
+}
+
+function renderAvailBar() {
+  var bar = document.getElementById('availBar');
+  if (!bar) return;
+  bar.innerHTML = '';
+  if (selectedProviders.length === 0) return;
+  var label = document.createElement('span');
+  label.className = 'avail-bar-label';
+  label.textContent = 'Open Slots This Week:';
+  bar.appendChild(label);
+  selectedProviders.forEach(function(pid) {
+    var p = PROVIDERS.find(function(x){ return x.id===pid; });
+    var ci = assignColor(pid);
+    var col = PROV_COLORS[ci];
+    var pill = document.createElement('span');
+    pill.className = 'avail-pill';
+    pill.style.background = col.bg;
+    pill.style.borderColor = col.border;
+    pill.style.color = col.text;
+    pill.innerHTML = '<span class="avail-pill-name">' + p.name.split(' ')[1] + '</span>' +
+      '<span class="avail-pill-slots">' + p.slots + ' open</span>';
+    bar.appendChild(pill);
+  });
+}
+
+function toggleProvider(pid) {
+  var idx = selectedProviders.indexOf(pid);
+  if (idx !== -1) {
+    selectedProviders.splice(idx, 1);
+    delete colorAssignments[pid];
+    // Reassign remaining colors to keep them compact
+    var remaining = Object.keys(colorAssignments).map(Number);
+    colorAssignments = {};
+    remaining.forEach(function(id, i) { colorAssignments[id] = i; });
+  } else {
+    if (selectedProviders.length >= 5) return;
+    selectedProviders.push(pid);
+    assignColor(pid);
+  }
+  renderChips();
+}
+
+function filterByState(state) {
+  filteredState = state;
+  renderChips();
+}
+
+function selectAllProviders() {
+  var visible = getVisibleProviders().slice(0, 5);
+  selectedProviders = [];
+  colorAssignments = {};
+  visible.forEach(function(p, i) { selectedProviders.push(p.id); colorAssignments[p.id] = i; });
+  renderChips();
+}
+
+function clearAllProviders() {
+  selectedProviders = [];
+  colorAssignments = {};
+  renderChips();
+}
+
+function renderCalendar() {
+  // Clear all appointment elements (keep slot backgrounds)
+  document.querySelectorAll('.appt, .avail-block').forEach(function(el){ el.remove(); });
+
+  // Re-render week view appointments for each selected provider
+  selectedProviders.forEach(function(pid) {
+    var ci = assignColor(pid);
+    var col = PROV_COLORS[ci];
+    var appts = APPTS_BY_PROV[pid] || [];
+    appts.forEach(function(appt) {
+      var day=appt[0], sh=appt[1], sm=appt[2], dur=appt[3], type=appt[4], label=appt[5], sublabel=appt[6];
+      var col2 = document.getElementById('col'+day);
+      if (!col2) return;
+      var topOffset = ((sh-START_HOUR)*2 + sm/30)*SLOT_H;
+      var height = (dur/30)*SLOT_H - 4;
+      var el = document.createElement('div');
+      el.className = 'appt';
+      el.style.top = topOffset+'px';
+      el.style.height = height+'px';
+      el.style.zIndex = '3';
+      el.style.left = '3px';
+      el.style.right = '3px';
+      if (type === 'unavail') {
+        el.style.background = 'repeating-linear-gradient(45deg,#F3F4F6,#F3F4F6 5px,#E5E0D8 5px,#E5E0D8 10px)';
+        el.style.border = '1px solid #E5E0D8';
+        el.innerHTML = '<div class="appt-title" style="color:#6B7280;">'+label+'</div>';
+      } else {
+        el.style.background = col.apptBg;
+        el.style.border = '1.5px solid '+col.apptBorder;
+        el.style.borderLeft = '3px solid '+col.apptBorder;
+        el.style.borderRadius = '5px';
+        el.style.cursor = 'pointer';
+        el.innerHTML = '<div class="appt-title" style="color:'+col.apptText+';font-size:11px;font-weight:700;">'+label+'</div>'+
+          '<div class="appt-sub" style="font-size:10px;color:'+col.apptText+';opacity:0.75;">'+sublabel+'</div>'+
+          '<div style="font-size:9px;font-weight:600;opacity:0.6;color:'+col.apptText+';">'+dur+' min</div>';
+      }
+      col2.appendChild(el);
+    });
+  });
+
+  // Render day view (multi-column when multiple providers)
+  renderDayView();
+}
+
+function renderDayView() {
+  var wrap = document.getElementById('dayMultiView');
+  var singleWrap = document.getElementById('daySingleWrap');
+  if (!wrap) return;
+  if (selectedProviders.length <= 1) {
+    wrap.style.display = 'none';
+    if (singleWrap) singleWrap.style.display = '';
+    return;
+  }
+  wrap.style.display = 'block';
+  if (singleWrap) singleWrap.style.display = 'none';
+
+  var html = '<div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;margin-bottom:16px;">';
+  // Header row
+  html += '<div style="display:flex;border-bottom:2px solid #E5E0D8;">';
+  html += '<div style="width:56px;flex-shrink:0;padding:10px 6px;font-size:10px;font-weight:700;color:#9CA3AF;text-align:center;border-right:1px solid #E5E0D8;">TIME</div>';
+  selectedProviders.forEach(function(pid) {
+    var ci = assignColor(pid);
+    var col = PROV_COLORS[ci];
+    var p = PROVIDERS.find(function(x){return x.id===pid;});
+    html += '<div style="flex:1;padding:8px 10px;text-align:center;border-right:1px solid #E5E0D8;background:'+col.bg+';min-width:0;">';
+    html += '<div style="font-size:11px;font-weight:700;color:'+col.text+';">'+p.name+'</div>';
+    html += '<div style="font-size:10px;color:'+col.text+';opacity:0.7;">'+p.state+' · '+p.role+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Body: time slots + provider columns (day = Wednesday = index 2)
+  var DAY_IDX = 2;
+  var hours = [];
+  for (var h = START_HOUR; h < END_HOUR; h++) hours.push(h);
+
+  html += '<div style="display:flex;position:relative;">';
+  // Time column
+  html += '<div style="width:56px;flex-shrink:0;border-right:1px solid #E5E0D8;">';
+  hours.forEach(function(h) {
+    var ampm = h < 12 ? 'AM' : 'PM'; var h12 = h>12?h-12:h;
+    html += '<div style="height:88px;border-bottom:1px solid #E5E0D8;padding:4px 6px 0;font-size:10px;color:#9CA3AF;text-align:right;">'+h12+':00 '+ampm+'</div>';
+  });
+  html += '</div>';
+
+  // Provider columns
+  selectedProviders.forEach(function(pid) {
+    var ci = assignColor(pid);
+    var col = PROV_COLORS[ci];
+    var appts = (APPTS_BY_PROV[pid]||[]).filter(function(a){ return a[0]===DAY_IDX; });
+    html += '<div style="flex:1;position:relative;border-right:1px solid #E5E0D8;min-width:0;">';
+    // Slot backgrounds
+    hours.forEach(function(h) {
+      html += '<div style="height:88px;border-bottom:1px solid #F2EDE4;"></div>';
+    });
+    // Appointments overlay
+    appts.forEach(function(appt) {
+      var sh=appt[1],sm=appt[2],dur=appt[3],type=appt[4],label=appt[5],sublabel=appt[6];
+      var top = ((sh-START_HOUR)*2 + sm/30)*44;
+      var height = (dur/30)*44 - 3;
+      if (type==='unavail') {
+        html += '<div style="position:absolute;top:'+top+'px;height:'+height+'px;left:2px;right:2px;background:repeating-linear-gradient(45deg,#F3F4F6,#F3F4F6 5px,#E5E0D8 5px,#E5E0D8 10px);border:1px solid #E5E0D8;border-radius:4px;padding:4px 6px;font-size:10px;color:#6B7280;font-weight:600;overflow:hidden;">'+label+'</div>';
+      } else {
+        html += '<div style="position:absolute;top:'+top+'px;height:'+height+'px;left:2px;right:2px;background:'+col.apptBg+';border:1.5px solid '+col.apptBorder+';border-left:3px solid '+col.apptBorder+';border-radius:4px;padding:4px 6px;overflow:hidden;cursor:pointer;">';
+        html += '<div style="font-size:11px;font-weight:700;color:'+col.apptText+';line-height:1.2;">'+label+'</div>';
+        html += '<div style="font-size:10px;color:'+col.apptText+';opacity:0.75;">'+sublabel+'</div>';
+        html += '</div>';
+      }
+    });
+    html += '</div>';
+  });
+  html += '</div></div>';
+  wrap.innerHTML = html;
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+  assignColor(0);
+  renderChips();
+});
 function setSchedView(view, btn) {
   document.querySelectorAll('.sched-topbar button[onclick^="setSchedView"]').forEach(function(b) {
     b.style.background = '#F3F4F6'; b.style.color = '#374151';
@@ -513,28 +828,8 @@ AVAIL_BLOCKS.forEach(function(entry) {
   col.appendChild(frame);
 });
 
-var DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-APPTS.forEach(function(appt) {
-  var day = appt[0], sh = appt[1], sm = appt[2], dur = appt[3], type = appt[4], label = appt[5], sublabel = appt[6];
-  var col = document.getElementById('col' + day);
-  var topOffset = ((sh - START_HOUR) * 2 + sm / 30) * SLOT_H;
-  var height = (dur / 30) * SLOT_H - 4;
-  var el = document.createElement('div');
-  var cssType = type.startsWith('avail-') ? 'available appt-' + type : type;
-  el.className = 'appt appt-' + cssType;
-  el.style.top = topOffset + 'px';
-  el.style.height = height + 'px';
-  el.style.zIndex = '3';
-  el.innerHTML = '<div class="appt-title">' + label + '</div><div class="appt-sub">' + sublabel + '</div><div class="appt-dur">' + dur + ' min</div>';
-  // Fix 14: clickable appointment detail
-  if (!type.startsWith('avail-') && type !== 'unavail') {
-    el.addEventListener('click', function(e) {
-      e.stopPropagation();
-      openApptDetail(label, sublabel, type, dur, sh, sm, day);
-    });
-  }
-  col.appendChild(el);
-});
+// Calendar rendered by renderCalendar() via provider chip selection
+// Called after DOMContentLoaded in provider JS above
 
 // Fix 14: Appointment detail modal
 var TYPE_LABEL_MAP = {
