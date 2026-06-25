@@ -230,6 +230,14 @@
       <button class="sched-nav-btn">&#8250;</button>
     </div>
     <button onclick="openAddTimeModal()" style="margin-left:8px;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Add Time</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <div style="position:relative;">
+        <input type="text" id="patientSearchInput" placeholder="Search patient…" oninput="searchPatient(this.value)" onfocus="showPatientSearch()" style="padding:6px 10px 6px 30px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:12px;width:180px;outline:none;background:#FAF7F2;" />
+        <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div id="patientSearchDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E5E0D8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:500;overflow:hidden;"></div>
+      </div>
+      <a href="/provider/new-patient" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">+ New Patient</a>
+    </div>
   </div>
   <!-- Multi-provider filter panel -->
   <div class="sched-filter-panel">
@@ -711,6 +719,48 @@ function renderDayView() {
   html += '</div></div>';
   wrap.innerHTML = html;
 }
+
+// ── Patient search ─────────────────────────────────────────────
+var DEMO_PATIENTS = [
+  { id:1, name:'Marcus Johnson',   dob:'04/12/1985', product:'Testosterone' },
+  { id:2, name:'Sandra Garcia',    dob:'07/23/1978', product:'A1C Management' },
+  { id:3, name:'Patricia Wells',   dob:'09/14/1962', product:"Women's Health" },
+  { id:4, name:'Owen Torres',      dob:'01/30/1991', product:'A1C Management' },
+  { id:5, name:'Rachel Lopez',     dob:'11/20/1990', product:'STI Treatment' },
+  { id:6, name:'Camille Durant',   dob:'03/08/1985', product:'Weight Management' },
+  { id:7, name:'Michael Grant',    dob:'12/03/1959', product:'A1C Management' },
+  { id:8, name:'Henry Osei',       dob:'06/17/1988', product:'ED Treatment' },
+  { id:9, name:'Brianna Miller',   dob:'08/25/1992', product:"Women's Health" },
+  { id:10, name:'James Rivera',    dob:'05/11/1979', product:'STI Treatment' },
+  { id:11, name:'David Kim',       dob:'10/04/1986', product:'Weight Management' },
+  { id:12, name:'Aisha Nwosu',     dob:'02/19/1983', product:"Women's Health" },
+];
+function showPatientSearch() {
+  var inp = document.getElementById('patientSearchInput');
+  if (inp && !inp.value.trim()) searchPatient('');
+}
+function searchPatient(q) {
+  var dd = document.getElementById('patientSearchDropdown');
+  if (!dd) return;
+  var term = q.toLowerCase().trim();
+  var results = term ? DEMO_PATIENTS.filter(function(p){ return p.name.toLowerCase().indexOf(term) !== -1; }) : DEMO_PATIENTS.slice(0, 6);
+  if (results.length === 0) {
+    dd.innerHTML = '<div style="padding:12px 14px;font-size:12px;color:#9CA3AF;">No patients found</div>';
+  } else {
+    dd.innerHTML = results.map(function(p) {
+      return '<a href="/provider/chart/'+p.id+'" style="display:flex;align-items:center;gap:10px;padding:9px 14px;text-decoration:none;border-bottom:1px solid #F2EDE4;" onmouseover="this.style.background=\'#FAF7F2\'" onmouseout="this.style.background=\'\'">'+
+        '<div style="width:28px;height:28px;background:#EDE9FE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6B21A8;flex-shrink:0;">'+p.name.split(' ').map(function(w){return w[0];}).join('')+'</div>'+
+        '<div><div style="font-size:12px;font-weight:600;color:#111827;">'+p.name+'</div><div style="font-size:11px;color:#6B7280;">'+p.product+' · DOB '+p.dob+'</div></div>'+
+        '</a>';
+    }).join('');
+  }
+  dd.style.display = 'block';
+}
+document.addEventListener('click', function(e) {
+  var inp = document.getElementById('patientSearchInput');
+  var dd = document.getElementById('patientSearchDropdown');
+  if (dd && inp && !inp.contains(e.target) && !dd.contains(e.target)) dd.style.display = 'none';
+});
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', function() {
