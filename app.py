@@ -94,6 +94,10 @@ def inject_sidebar_nav():
     role  = session.get('role', '')
     _path = _req.path
 
+    # Admin and patient portals have their own sidebars — never show the global g-sidebar
+    if _req.blueprint in ('admin', 'patient'):
+        return dict(sidebar_nav=[])
+
     ICONS = {
         'home':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>',
         'clipboard': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>',
