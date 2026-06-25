@@ -579,14 +579,18 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
         <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">Select a lab or kit to recommend. Patient will receive an email with a purchase link.</div>
         <select id="labRecSelect" style="width:100%;padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;color:#374151;background:#fff;margin-bottom:12px;appearance:auto;cursor:pointer;">
           <option value="">— Select a lab or kit —</option>
-          <option value="ew360">Everlywell360</option>
-          <option value="a1c">A1C Recheck Kit</option>
-          <option value="womens">Women's Health Panel</option>
-          <option value="sti">STI Test</option>
-          <option value="thyroid">Thyroid Test</option>
-          <option value="quest_basic">Quest — Basic Metabolic Panel</option>
-          <option value="quest_lipid">Quest — Lipid Panel</option>
-          <option value="quest_hba1c">Quest — HbA1c</option>
+          <optgroup label="Everlycare360">
+            <option value="ew360_testosterone">Men's Testosterone Kit</option>
+            <option value="ew360_weightloss">Weight Loss Kit</option>
+          </optgroup>
+          <optgroup label="Humana">
+            <option value="humana_a1c">A1C Consult &amp; Recheck Kit</option>
+          </optgroup>
+          <optgroup label="Quest Labs">
+            <option value="quest_basic">Basic Metabolic Panel</option>
+            <option value="quest_lipid">Lipid Panel</option>
+            <option value="quest_hba1c">HbA1c</option>
+          </optgroup>
         </select>
         <div style="display:flex;gap:8px;">
           <button onclick="sendLabRec()" style="flex:1;background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Send to Patient</button>

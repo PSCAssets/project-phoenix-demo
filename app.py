@@ -110,12 +110,13 @@ def inject_sidebar_nav():
 
     RAW = {
         'provider_md': [
-            ('Dashboard',     '/provider/',            'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
-            ('Queue',         '/provider/queue',        'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',     'calendar',  ['/provider/schedule']),
-            ('Messages',      '/provider/messages',     'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications','bell',      ['/provider/notifications', '/provider/alerts']),
-            ('Settings',      '/provider/settings',     'settings',  ['/provider/settings']),
+            ('Dashboard',     '/provider/',              'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
+            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
+            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
+            ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
+            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_np': [
             ('Dashboard',     '/provider/np',           'home',      ['/provider/np']),
