@@ -281,11 +281,10 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
           <th onclick="sortBy('id')">Consult ID <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('catLabel')">Category <span class="sort-arrow">&#8597;</span></th>
           <th>Type</th>
-          <th onclick="sortBy('program')">Program <span class="sort-arrow">&#8597;</span></th>
+          <th onclick="sortBy('program')">Care Product <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('urgency')">Urgency <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('ma')">Assigned MA <span class="sort-arrow">&#8597;</span></th>
           <th onclick="sortBy('wait')">Wait Time <span class="sort-arrow">&#8597;</span></th>
-          <th>Tech Check</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -386,12 +385,6 @@ function renderRows() {
         <td><span class="urgency-tag urgency-${r.urgency.toLowerCase()}">${r.urgency}</span></td>
         <td><span class="ma-chip ${maClass}">${r.ma}</span></td>
         <td style="${waitStyle}">${r.wait}m</td>
-        <td>${r.tc === 'fail'
-          ? '<span style=\"font-size:10px;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;padding:2px 7px;border-radius:10px;font-weight:600;\">❌ Tech Check Failed</span><button onclick=\"alert(\'Tech check link re-sent to patient.\');\" style=\"background:none;border:1px solid #DC2626;color:#DC2626;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:block;margin-top:3px;\">Re-send Tech Link</button>'
-          : r.tc === 'pending'
-            ? '<span style=\"font-size:10px;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:10px;font-weight:600;\">⏳ Pending</span>'
-            : '<span style=\"font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;\">✅ Passed</span>'
-        }</td>
         <td>${actionBtn(r)}</td>
       </tr>`;
     }).join('');
