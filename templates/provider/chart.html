@@ -574,7 +574,7 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <button class="btn btn-outline" onclick="toggleLabRecommendPopover(event)">🧪 Lab Rec</button>
       <button class="btn btn-outline" onclick="alert('Translation feature is Under Design.\n\nThis functionality will allow one-click translation during consultations.\n\nAvailability: TBD — pending HIPAA compliance review of translation platform.')" style="opacity:0.6;cursor:default;" title="Under Design">🌐 Translation</button>
       <!-- Lab Recommendation popover -->
-      <div class="action-popover" id="labRecPopover" style="top:100%;right:80px;margin-top:6px;min-width:260px;">
+      <div class="action-popover" id="labRecPopover" onclick="event.stopPropagation()" style="top:100%;right:80px;margin-top:6px;min-width:260px;">
         <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:10px;">🧪 Recommend Lab / Kit</div>
         <div style="font-size:12px;color:#6B7280;margin-bottom:10px;">Select a lab or kit to recommend. Patient will receive an email with a purchase link.</div>
         <select id="labRecSelect" style="width:100%;padding:8px 12px;border:1px solid #E5E0D8;border-radius:7px;font-size:13px;color:#374151;background:#fff;margin-bottom:12px;appearance:auto;cursor:pointer;">
