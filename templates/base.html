@@ -6,6 +6,34 @@
   <title>{% block title %}Project Phoenix{% endblock %} — Everlywell Telehealth</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   {% block head %}{% endblock %}
+
+  <!-- Global sidebar CSS -->
+  <style>
+  .g-sidebar {
+    position: fixed; top: 60px; left: 0; width: 56px;
+    height: calc(100vh - 60px);
+    background: #F2EDE4; border-right: 1px solid #E5E0D8;
+    z-index: 300; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .g-sidebar-logo {
+    width: 56px; height: 48px; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0;
+  }
+  .g-sidebar-logo svg { width: 22px; height: 22px; color: #6B21A8; }
+  .g-sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 4px 0; overflow: hidden; }
+  .g-sib-item {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 52px; width: 48px;
+    gap: 2px; cursor: pointer; border-radius: 8px;
+    margin: 0 4px; color: #6B7280; transition: background 0.15s;
+    text-decoration: none;
+  }
+  .g-sib-item:hover { background: #E8E3DA; color: #374151; }
+  .g-sib-item.active { background: #EDE9FE; color: #6B21A8; }
+  .g-sib-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .g-sib-label { font-size: 9px; font-weight: 500; text-align: center; line-height: 1; color: inherit; }
+  </style>
 </head>
 <body>
 
@@ -57,6 +85,22 @@
   </div>
   {% endif %}
 
+
+  {% if sidebar_nav %}
+  <nav class="g-sidebar" aria-label="Main navigation">
+    <div class="g-sidebar-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <div class="g-sidebar-nav">
+      {% for item in sidebar_nav %}
+      <a class="g-sib-item{% if item.active %} active{% endif %}" href="{{ item.href }}" title="{{ item.label }}">
+        {{ item.icon | safe }}
+        <span class="g-sib-label">{{ item.label }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </nav>
+  {% endif %}
   <main class="main-content">
     {% block content %}{% endblock %}
   </main>
