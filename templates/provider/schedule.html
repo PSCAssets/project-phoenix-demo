@@ -245,6 +245,20 @@
         </select>
       </div>
       <div class="filter-divider"></div>
+      <div class="filter-group">
+        <span class="filter-label">Care Product</span>
+        <select class="state-select" id="careProductFilter" onchange="filterByCareProduct(this.value)">
+          <option value="">All Products</option>
+          <option value="Testosterone">Testosterone</option>
+          <option value="A1C Management">A1C Management</option>
+          <option value="Women's Health">Women's Health</option>
+          <option value="ED Treatment">ED Treatment</option>
+          <option value="STI Treatment">STI Treatment</option>
+          <option value="Weight Management">Weight Management</option>
+          <option value="Thyroid">Thyroid</option>
+        </select>
+      </div>
+      <div class="filter-divider"></div>
       <span class="filter-label">Providers (up to 5)</span>
       <div class="chip-list" id="providerChips"></div>
       <div class="chip-actions">
@@ -417,17 +431,16 @@
 {% block scripts %}
 {% raw %}
 <script>
-}
 // ── Provider data ──────────────────────────────────────────────
 var PROVIDERS = [
-  { id:0, name:'Dr. Sarah Lee, MD',      state:'TX', role:'MD', slots:4 },
-  { id:1, name:'Dr. James Wilson, MD',   state:'CA', role:'MD', slots:2 },
-  { id:2, name:'Dr. Maria Chen, NP',     state:'FL', role:'NP', slots:6 },
-  { id:3, name:'Dr. Robert Patel, MD',   state:'NY', role:'MD', slots:1 },
-  { id:4, name:'Dr. Lisa Thompson, NP',  state:'TX', role:'NP', slots:3 },
-  { id:5, name:'Dr. Kevin Martinez, MD', state:'CA', role:'MD', slots:0 },
-  { id:6, name:'Dr. Amanda Foster, NP',  state:'FL', role:'NP', slots:5 },
-  { id:7, name:'Dr. Chris Rogers, MD',   state:'NY', role:'MD', slots:2 },
+  { id:0, name:'Dr. Sarah Lee, MD',      state:'TX', role:'MD', slots:4, products:['Testosterone','A1C Management','Weight Management'] },
+  { id:1, name:'Dr. James Wilson, MD',   state:'CA', role:'MD', slots:2, products:['ED Treatment','STI Treatment','A1C Management'] },
+  { id:2, name:'Dr. Maria Chen, NP',     state:'FL', role:'NP', slots:6, products:["Women's Health",'Thyroid','Weight Management'] },
+  { id:3, name:'Dr. Robert Patel, MD',   state:'NY', role:'MD', slots:1, products:['A1C Management','Testosterone','ED Treatment'] },
+  { id:4, name:'Dr. Lisa Thompson, NP',  state:'TX', role:'NP', slots:3, products:["Women's Health",'STI Treatment','Weight Management'] },
+  { id:5, name:'Dr. Kevin Martinez, MD', state:'CA', role:'MD', slots:0, products:['A1C Management','Testosterone','Thyroid'] },
+  { id:6, name:'Dr. Amanda Foster, NP',  state:'FL', role:'NP', slots:5, products:["Women's Health",'A1C Management','STI Treatment'] },
+  { id:7, name:'Dr. Chris Rogers, MD',   state:'NY', role:'MD', slots:2, products:['ED Treatment','Testosterone','Thyroid'] },
 ];
 
 var PROV_COLORS = [
@@ -461,6 +474,7 @@ var APPTS_BY_PROV = [
 var selectedProviders = [0]; // Start with provider 0 selected
 var colorAssignments  = {};  // providerId -> colorIndex
 var filteredState = '';
+var filteredProduct = '';
 
 function assignColor(pid) {
   if (colorAssignments[pid] !== undefined) return colorAssignments[pid];
@@ -473,7 +487,9 @@ function assignColor(pid) {
 
 function getVisibleProviders() {
   return PROVIDERS.filter(function(p) {
-    return (!filteredState || p.state === filteredState);
+    var stateOk = !filteredState || p.state === filteredState;
+    var productOk = !filteredProduct || (p.products && p.products.indexOf(filteredProduct) !== -1);
+    return stateOk && productOk;
   });
 }
 
@@ -553,6 +569,17 @@ function toggleProvider(pid) {
 
 function filterByState(state) {
   filteredState = state;
+  // Remove any selected providers not in new visible set
+  var visible = getVisibleProviders().map(function(p){ return p.id; });
+  selectedProviders = selectedProviders.filter(function(id){ return visible.indexOf(id) !== -1; });
+  renderChips();
+}
+
+function filterByCareProduct(product) {
+  filteredProduct = product;
+  // Remove any selected providers not in new visible set
+  var visible = getVisibleProviders().map(function(p){ return p.id; });
+  selectedProviders = selectedProviders.filter(function(id){ return visible.indexOf(id) !== -1; });
   renderChips();
 }
 
