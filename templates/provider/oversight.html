@@ -130,9 +130,6 @@
     <button class="main-tab active" id="tab_attest" onclick="switchMainTab('attest')">
       Attestation Board <span class="tab-badge" id="attest_badge">4</span>
     </button>
-    <button class="main-tab" id="tab_lab" onclick="switchMainTab('lab')">
-      Lab Order Authorization <span class="tab-badge" id="lab_badge">7</span>
-    </button>
   </div>
 
   <!-- ══════════════════ TAB 1: ATTESTATION BOARD ══════════════════ -->
@@ -296,254 +293,6 @@
     </div>
   </div>
 
-  <!-- ══════════════════ TAB 2: LAB ORDER AUTHORIZATION ══════════════════ -->
-  <div class="tab-content" id="content_lab">
-
-    <div class="bulk-confirm-banner" id="bulkBanner"></div>
-    <div class="bulk-action-bar">
-      <span id="bulkSelectedLabel" style="display:none;">0 selected</span>
-      <button class="btn-authorize-selected" id="btnAuthorizeSelected" onclick="bulkAuthorize()" disabled>Authorize Selected (0)</button>
-    </div>
-    <div class="section-header">
-      <span class="section-title">Lab Order Authorization</span>
-      <span class="section-count" id="lab_count_label">7 pending orders</span>
-      <div class="filter-bar">
-        <select id="lab_state_filter" onchange="filterLab()"><option>All States</option><option>TX</option><option>NY</option><option>CA</option><option>OH</option></select>
-        <select id="lab_product_filter" onchange="filterLab()"><option>All Care Products</option><option>Testosterone</option><option>ED Treatment</option><option>Skincare</option><option>Weight Management</option><option>A1C Management</option></select>
-        <select id="lab_test_filter" onchange="filterLab()"><option>All Test Types</option><option>Testosterone Panel</option><option>Metabolic Panel</option><option>HbA1c</option><option>Allergy Panel</option><option>Patch Test Panel</option></select>
-        <button class="btn-clear" onclick="clearLabFilters()">Clear</button>
-      </div>
-    </div>
-
-    <table class="ov-table" id="labTable">
-      <thead>
-        <tr>
-          <th style="width:36px;"><input type="checkbox" class="lab-checkbox" id="selectAllLab" onclick="toggleSelectAll(this)" title="Select all"></th>
-          <th>Patient</th><th>Ordering Provider</th><th>State</th><th>Care Product</th><th>Test Ordered</th><th>Ordered</th><th>SLA</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="labBody">
-
-        <!-- Lab Row 1: M.J. -->
-        <tr data-state="TX" data-product="Testosterone" data-test="Testosterone Panel" id="lab_row1">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row1" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">M.J.</td>
-          <td>Jennifer Martinez, NP</td>
-          <td>TX</td>
-          <td>Testosterone</td>
-          <td>Testosterone Panel <span style="font-size:11px;color:#9CA3AF;">(Total, Free, LH)</span></td>
-          <td style="color:#6B7280;font-size:12px;">2h ago</td>
-          <td><span class="sla-orange">🟡 2h left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row1','lab_success1','lab_expand1','M.J.','Testosterone Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand1','lab_row1')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand1">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select id="lab_reason1"><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select id="lab_route1" style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand1','lab_row1')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row1','lab_success1','lab_expand1','M.J.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success1"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 2: T.C. -->
-        <tr data-state="NY" data-product="ED Treatment" data-test="Metabolic Panel" id="lab_row2">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row2" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">T.C.</td>
-          <td>Dr. Sarah Lee, MD</td>
-          <td>NY</td>
-          <td>ED Treatment</td>
-          <td>Metabolic Panel</td>
-          <td style="color:#6B7280;font-size:12px;">1h 45m ago</td>
-          <td><span class="sla-orange">🟡 2h 15m left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row2','lab_success2','lab_expand2','T.C.','Metabolic Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand2','lab_row2')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand2">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select id="lab_reason2"><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select id="lab_route2" style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand2','lab_row2')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row2','lab_success2','lab_expand2','T.C.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success2"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 3: G.O. -->
-        <tr data-state="CA" data-product="Testosterone" data-test="Testosterone Panel" id="lab_row3">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row3" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">G.O.</td>
-          <td>Maria Rodriguez, NP</td>
-          <td>CA</td>
-          <td>Testosterone</td>
-          <td>Testosterone Panel</td>
-          <td style="color:#6B7280;font-size:12px;">3h ago</td>
-          <td><span class="sla-red">🔴 1h left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row3','lab_success3','lab_expand3','G.O.','Testosterone Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand3','lab_row3')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand3">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand3','lab_row3')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row3','lab_success3','lab_expand3','G.O.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success3"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 4: F.H. -->
-        <tr data-state="NY" data-product="Skincare" data-test="Allergy Panel" id="lab_row4">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row4" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">F.H.</td>
-          <td>Jennifer Martinez, NP</td>
-          <td>NY</td>
-          <td>Skincare</td>
-          <td>Allergy Panel</td>
-          <td style="color:#6B7280;font-size:12px;">45m ago</td>
-          <td><span class="sla-green">🟢 3h 15m left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row4','lab_success4','lab_expand4','F.H.','Allergy Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand4','lab_row4')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand4">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand4','lab_row4')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row4','lab_success4','lab_expand4','F.H.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success4"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 5: P.S. -->
-        <tr data-state="TX" data-product="Weight Management" data-test="Metabolic Panel" id="lab_row5">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row5" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">P.S.</td>
-          <td>Dr. Sarah Lee, MD</td>
-          <td>TX</td>
-          <td>Weight Management</td>
-          <td>HbA1c + Metabolic</td>
-          <td style="color:#6B7280;font-size:12px;">20m ago</td>
-          <td><span class="sla-green">🟢 3h 40m left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row5','lab_success5','lab_expand5','P.S.','HbA1c + Metabolic')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand5','lab_row5')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand5">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand5','lab_row5')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row5','lab_success5','lab_expand5','P.S.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success5"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 6: O.T. -->
-        <tr data-state="OH" data-product="A1C Management" data-test="HbA1c" id="lab_row6">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row6" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">O.T.</td>
-          <td>Michael Torres, MA</td>
-          <td>OH</td>
-          <td>A1C Management</td>
-          <td>HbA1c Panel</td>
-          <td style="color:#6B7280;font-size:12px;">1h ago</td>
-          <td><span class="sla-green">🟢 3h left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row6','lab_success6','lab_expand6','O.T.','HbA1c Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand6','lab_row6')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand6">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand6','lab_row6')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row6','lab_success6','lab_expand6','O.T.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success6"><td colspan="9"></td></tr>
-
-        <!-- Lab Row 7: A.R. -->
-        <tr data-state="TX" data-product="Skincare" data-test="Patch Test Panel" id="lab_row7">
-          <td><input type="checkbox" class="lab-checkbox row-check" data-row="lab_row7" onchange="updateBulkCount()"></td>
-          <td style="font-weight:600">A.R.</td>
-          <td>Maria Rodriguez, NP</td>
-          <td>TX</td>
-          <td>Skincare</td>
-          <td>Patch Test Panel</td>
-          <td style="color:#6B7280;font-size:12px;">30m ago</td>
-          <td><span class="sla-green">🟢 3h 30m left</span></td>
-          <td>
-            <div class="action-cell">
-              <button class="btn-authorize" onclick="doAuthorize('lab_row7','lab_success7','lab_expand7','A.R.','Patch Test Panel')">Authorize</button>
-              <button class="btn-reject" onclick="toggleLabExpand('lab_expand7','lab_row7')">Reject</button>
-            </div>
-          </td>
-        </tr>
-        <tr class="inline-expand" id="lab_expand7">
-          <td colspan="9"><div class="inline-form">
-            <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Rejection Details</label>
-            <select><option>Medical necessity not met</option><option>Duplicate order</option><option>Wrong patient</option><option>Missing clinical context</option><option>Other</option></select>
-            <select style="margin-top:6px;"><option>Care Team Queue</option><option>Auto-cancel with patient notification</option></select>
-            <textarea placeholder="Notes (optional)..." style="margin-top:8px;"></textarea>
-            <div class="inline-form-row">
-              <button class="btn-cancel-inline" onclick="toggleLabExpand('lab_expand7','lab_row7')">Cancel</button>
-              <button class="btn-send" onclick="doReject('lab_row7','lab_success7','lab_expand7','A.R.')">Submit Rejection →</button>
-            </div>
-          </div></td>
-        </tr>
-        <tr class="inline-success" id="lab_success7"><td colspan="9"></td></tr>
-
-      </tbody>
-    </table>
-  </div>
 </div>
 
 <!-- Bulk Authorize Confirm Modal -->
@@ -566,7 +315,7 @@
 <script>
 // ── MAIN TAB SWITCHING ──
 function switchMainTab(tab) {
-  ['attest','lab'].forEach(t => {
+  ['attest'].forEach(t => {
     document.getElementById('tab_' + t).classList.toggle('active', t === tab);
     document.getElementById('content_' + t).classList.toggle('active', t === tab);
   });
@@ -681,7 +430,6 @@ function updateAttestCount() {
 }
 
 // ── LAB FILTERS ──
-let labPending = 7;
 const labRows = ['lab_row1','lab_row2','lab_row3','lab_row4','lab_row5','lab_row6','lab_row7'];
 
 function filterLab() {
@@ -718,9 +466,6 @@ function doAuthorize(rowId, successId, expandId, patient, test) {
     setTimeout(() => {
       mainRow.style.display = 'none';
       successRow.style.display = 'none';
-      labPending = Math.max(0, labPending - 1);
-      document.getElementById('lab_badge').textContent = labPending;
-      document.getElementById('lab_count_label').textContent = labPending + ' pending order' + (labPending === 1 ? '' : 's');
     }, 500);
   }, 2000);
 }
@@ -742,9 +487,6 @@ function doReject(rowId, successId, expandId, patient) {
     setTimeout(() => {
       mainRow.style.display = 'none';
       successRow.style.display = 'none';
-      labPending = Math.max(0, labPending - 1);
-      document.getElementById('lab_badge').textContent = labPending;
-      document.getElementById('lab_count_label').textContent = labPending + ' pending order' + (labPending === 1 ? '' : 's');
     }, 500);
   }, 2000);
 }
@@ -830,9 +572,6 @@ function executeBulkAuthorize() {
     }, 1500);
   });
 
-  labPending = Math.max(0, labPending - n);
-  document.getElementById('lab_badge').textContent = labPending;
-  document.getElementById('lab_count_label').textContent = labPending + ' pending order' + (labPending === 1 ? '' : 's');
 
   var banner = document.getElementById('bulkBanner');
   banner.textContent = '✅ ' + n + ' lab order' + (n === 1 ? '' : 's') + ' authorized successfully.';
