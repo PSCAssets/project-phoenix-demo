@@ -109,6 +109,7 @@ def inject_sidebar_nav():
         'check':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
         'flask':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6m-3 0v7l-4 8a1 1 0 00.9 1.5h8.2a1 1 0 00.9-1.5l-4-8V3"/></svg>',
         'clock':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>',
+        'pill':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 20.5l10-10a4.95 4.95 0 00-7.07-7.07l-10 10a4.95 4.95 0 007.07 7.07z"/><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"/></svg>',
         'chart-bar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>',
     }
 
@@ -117,6 +118,7 @@ def inject_sidebar_nav():
             ('Dashboard',     '/provider/',              'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
             ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
             ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
             ('Lab Auth',      '/provider/lab-auth',       'flask',     ['/provider/lab-auth']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
@@ -124,12 +126,13 @@ def inject_sidebar_nav():
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_np': [
-            ('Dashboard',     '/provider/np',           'home',      ['/provider/np']),
-            ('Queue',         '/provider/queue',         'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',      'calendar',  ['/provider/schedule']),
-            ('Messages',      '/provider/messages',      'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications', 'bell',      ['/provider/notifications', '/provider/alerts']),
-            ('Settings',      '/provider/settings',      'settings',  ['/provider/settings']),
+            ('Dashboard',     '/provider/np',            'home',      ['/provider/np']),
+            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
+            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
+            ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
+            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_rn': [
             ('My Dashboard',  '/provider/rn',            'home',      ['/provider/rn']),
