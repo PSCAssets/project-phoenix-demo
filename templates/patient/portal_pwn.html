@@ -345,58 +345,198 @@
       <!-- ── MY CONSULTATIONS ── -->
       <div class="section-panel" id="panel-consultations">
         <div class="section-heading">My Consultations</div>
-        <div class="section-sub">All consultations associated with your account.</div>
+        <div class="section-sub">Full consultation history associated with your account.</div>
 
-        <div class="consult-card">
-          <div class="consult-header">
-            <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
-            <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
+        <!-- Summary row -->
+        <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;min-width:110px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:4px;">Total</div>
+            <div style="font-size:24px;font-weight:800;color:#0A2F5C;">5</div>
           </div>
-          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
-          <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
-          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
-          <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
-          <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
-          <div class="journey-label">Care Journey</div>
-          <div class="journey-track">
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
-            <div class="journey-connector connector-done"></div>
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
-            <div class="journey-connector connector-done"></div>
-            <div class="journey-stage"><div class="journey-dot dot-active">&#9679;</div><div class="journey-name">Consultation<br>Scheduled</div></div>
-            <div class="journey-connector connector-pending"></div>
-            <div class="journey-stage"><div class="journey-dot dot-pending">&#9675;</div><div class="journey-name">Results<br>Review</div></div>
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;min-width:110px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:4px;">Upcoming</div>
+            <div style="font-size:24px;font-weight:800;color:#1D4ED8;">1</div>
           </div>
-          <div class="card-actions">
-            <button class="btn-primary-pwn" onclick="alert('Launching video consultation...')">Join Video Consultation</button>
-            <button class="btn-outline-pwn" onclick="alert('Reschedule flow coming soon.')">Reschedule</button>
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;min-width:110px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:4px;">Completed</div>
+            <div style="font-size:24px;font-weight:800;color:#065F46;">4</div>
+          </div>
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;min-width:110px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:4px;">Programs</div>
+            <div style="font-size:24px;font-weight:800;color:#0A2F5C;">2</div>
           </div>
         </div>
 
-        <div class="consult-card">
-          <div class="consult-header">
-            <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
-            <span class="status-pill status-results">&#10003; Results Available</span>
+        <!-- Filter bar -->
+        <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+          <select style="border:1px solid #E5E7EB;border-radius:6px;padding:7px 12px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:#374151;cursor:pointer;" onchange="filterConsults()" id="csFilter">
+            <option value="all">All Consultations</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="completed">Completed</option>
+          </select>
+          <select style="border:1px solid #E5E7EB;border-radius:6px;padding:7px 12px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:#374151;cursor:pointer;" onchange="filterConsults()" id="csProgram">
+            <option value="all">All Programs</option>
+            <option value="brca">BRCA Panel</option>
+            <option value="lynch">Lynch Syndrome</option>
+          </select>
+          <select style="border:1px solid #E5E7EB;border-radius:6px;padding:7px 12px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:#374151;cursor:pointer;" onchange="filterConsults()" id="csYear">
+            <option value="all">All Years</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+
+        <div id="cs-list">
+
+          <!-- 1. Pre-Test UPCOMING -->
+          <div class="consult-card" data-status="upcoming" data-program="brca" data-year="2026">
+            <div class="consult-header">
+              <div class="consult-title">&#129518; Genetic Counseling &mdash; Pre-Test</div>
+              <span class="status-pill status-scheduled">&#9679; Consultation Scheduled</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;margin-bottom:12px;">
+              <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+              <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00481</div>
+              <div class="consult-meta"><strong>Scheduled:</strong> June 24, 2026 at 2:00 PM EST</div>
+              <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+              <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+            </div>
+            <div class="journey-label">Care Journey</div>
+            <div class="journey-track">
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-active">&#9679;</div><div class="journey-name">Consultation<br>Scheduled</div></div>
+              <div class="journey-connector connector-pending"></div>
+              <div class="journey-stage"><div class="journey-dot dot-pending">&#9675;</div><div class="journey-name">Results<br>Review</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-primary-pwn" onclick="alert('Launching video consultation...')">Join Video Consultation</button>
+              <button class="btn-outline-pwn" onclick="alert('Reschedule flow coming soon.')">Reschedule</button>
+            </div>
           </div>
-          <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
-          <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
-          <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
-          <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
-          <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
-          <div class="journey-label">Care Journey</div>
-          <div class="journey-track">
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
-            <div class="journey-connector connector-done"></div>
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
-            <div class="journey-connector connector-done"></div>
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
-            <div class="journey-connector connector-done"></div>
-            <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Results<br>Available</div></div>
+
+          <!-- 2. Post-Test COMPLETED -->
+          <div class="consult-card" data-status="completed" data-program="brca" data-year="2026">
+            <div class="consult-header">
+              <div class="consult-title">&#129518; Genetic Counseling &mdash; Post-Test</div>
+              <span class="status-pill status-results">&#10003; Results Available</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;margin-bottom:12px;">
+              <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+              <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00312</div>
+              <div class="consult-meta"><strong>Completed:</strong> May 10, 2026</div>
+              <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+              <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+              <div class="consult-meta"><strong>Duration:</strong> 52 minutes</div>
+            </div>
+            <div class="journey-label">Care Journey</div>
+            <div class="journey-track">
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Results<br>Available</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-outline-pwn" onclick="showSection('labs', document.querySelector('.nav-item:nth-child(3)'))">View Results</button>
+              <button class="btn-outline-pwn" onclick="downloadReport()">Download Report</button>
+            </div>
           </div>
-          <div class="card-actions">
-            <button class="btn-outline-pwn" onclick="showSection('labs', document.querySelector('.nav-item:nth-child(3)'))">View Results</button>
-            <button class="btn-outline-pwn" onclick="downloadReport()">Download Report</button>
+
+          <!-- 3. Lynch Syndrome — Initial COMPLETED -->
+          <div class="consult-card" data-status="completed" data-program="lynch" data-year="2026">
+            <div class="consult-header">
+              <div class="consult-title">&#129518; Genetic Counseling &mdash; Lynch Syndrome Evaluation</div>
+              <span class="status-pill status-results">&#10003; Complete</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;margin-bottom:12px;">
+              <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+              <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2026-00398</div>
+              <div class="consult-meta"><strong>Completed:</strong> May 22, 2026</div>
+              <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+              <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — Lynch Syndrome Panel</div>
+              <div class="consult-meta"><strong>Duration:</strong> 38 minutes</div>
+            </div>
+            <div class="journey-label">Care Journey</div>
+            <div class="journey-track">
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+              <div class="journey-connector connector-pending"></div>
+              <div class="journey-stage"><div class="journey-dot dot-active">&#9679;</div><div class="journey-name">Results<br>Pending</div></div>
+            </div>
+            <div class="card-actions">
+              <div style="font-size:12px;color:#92400E;background:#FEF3C7;border:1px solid #FDE68A;border-radius:6px;padding:6px 12px;">&#9679; Lab results expected June 27, 2026</div>
+            </div>
           </div>
+
+          <!-- 4. 2025 — Initial BRCA Consult COMPLETED -->
+          <div class="consult-card" data-status="completed" data-program="brca" data-year="2025">
+            <div class="consult-header">
+              <div class="consult-title">&#129518; Genetic Counseling &mdash; BRCA Risk Assessment</div>
+              <span class="status-pill status-results">&#10003; Complete</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;margin-bottom:12px;">
+              <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+              <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2025-00817</div>
+              <div class="consult-meta"><strong>Completed:</strong> Nov 14, 2025</div>
+              <div class="consult-meta"><strong>Consult Type:</strong> Video</div>
+              <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+              <div class="consult-meta"><strong>Duration:</strong> 45 minutes</div>
+            </div>
+            <div class="journey-label">Care Journey</div>
+            <div class="journey-track">
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Results<br>Available</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-outline-pwn" onclick="downloadReport()">Download Report</button>
+              <button class="btn-outline-pwn" onclick="alert('Session notes are available for download.')">Session Notes</button>
+            </div>
+          </div>
+
+          <!-- 5. 2025 — Family History Review COMPLETED -->
+          <div class="consult-card" data-status="completed" data-program="brca" data-year="2025">
+            <div class="consult-header">
+              <div class="consult-title">&#129518; Genetic Counseling &mdash; Family History Review</div>
+              <span class="status-pill status-results">&#10003; Complete</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 24px;margin-bottom:12px;">
+              <div class="consult-meta"><strong>Provider:</strong> Dr. Sarah Lee</div>
+              <div class="consult-meta"><strong>Consult ID:</strong> PWN-CST-2025-00601</div>
+              <div class="consult-meta"><strong>Completed:</strong> Aug 3, 2025</div>
+              <div class="consult-meta"><strong>Consult Type:</strong> Phone</div>
+              <div class="consult-meta"><strong>Care Program:</strong> Hereditary Cancer — BRCA Panel</div>
+              <div class="consult-meta"><strong>Duration:</strong> 30 minutes</div>
+            </div>
+            <div class="journey-label">Care Journey</div>
+            <div class="journey-track">
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Request<br>Received</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Intake<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Consult<br>Complete</div></div>
+              <div class="journey-connector connector-done"></div>
+              <div class="journey-stage"><div class="journey-dot dot-done">&#10003;</div><div class="journey-name">Summary<br>Sent</div></div>
+            </div>
+            <div class="card-actions">
+              <button class="btn-outline-pwn" onclick="downloadReport()">Download Summary</button>
+            </div>
+          </div>
+
+          <div id="cs-empty" style="display:none;text-align:center;padding:40px 20px;color:#9CA3AF;font-size:14px;">No consultations match the selected filters.</div>
+
         </div>
       </div>
 
@@ -620,6 +760,22 @@ function toggleMessage(id) {
 
 function downloadReport() {
   alert('Downloading PWN Health report PDF...\n\nIn production, this would generate and download the consultation summary report.');
+}
+
+function filterConsults() {
+  var status  = document.getElementById('csFilter').value;
+  var program = document.getElementById('csProgram').value;
+  var year    = document.getElementById('csYear').value;
+  var cards   = document.querySelectorAll('#cs-list .consult-card');
+  var anyVisible = false;
+  cards.forEach(function(c) {
+    var match = (status  === 'all' || c.dataset.status  === status) &&
+                (program === 'all' || c.dataset.program === program) &&
+                (year    === 'all' || c.dataset.year    === year);
+    c.style.display = match ? '' : 'none';
+    if (match) anyVisible = true;
+  });
+  document.getElementById('cs-empty').style.display = anyVisible ? 'none' : '';
 }
 </script>
 </body>
