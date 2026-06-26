@@ -1088,7 +1088,7 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
             <div style="display:flex;gap:5px;">
               <button style="font-size:11px;padding:4px 8px;border-radius:5px;border:1px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">📎 Attach</button>
               <button style="font-size:11px;padding:4px 8px;border-radius:5px;border:1px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">🧪 Order Lab</button>
-              <button style="font-size:11px;padding:4px 8px;border-radius:5px;border:1px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">💊 Prescribe</button>
+              <button onclick="switchRightTab(5)" style="font-size:11px;padding:4px 8px;border-radius:5px;border:1px solid #6B21A8;background:#F5F3FF;color:#6B21A8;cursor:pointer;font-weight:600;">💊 Prescribe</button>
             </div>
             <button style="font-size:12px;font-weight:600;padding:7px 16px;border-radius:7px;border:none;background:#6B21A8;color:#fff;cursor:pointer;align-self:flex-end;">➤ Send</button>
           </div>
@@ -1126,6 +1126,10 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
         </button>
         <button class="rp-vnav-btn" id="rpVnavBtn4" onclick="switchRightTab(4)">
           🔗<span class="vnav-tip">Linked Consults</span>
+        </button>
+        <div class="rp-vnav-divider"></div>
+        <button class="rp-vnav-btn" id="rpVnavBtn5" onclick="switchRightTab(5)">
+          💊<span class="vnav-tip">Prescriptions</span>
         </button>
       </nav>
 
@@ -2267,6 +2271,74 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
 {% endif %}
       </div><!-- /rightPanel0 -->
 
+      <!-- RIGHT PANEL 5: Prescriptions / Dosespot -->
+      <div class="right-panel" id="rightPanel5" style="padding:14px 16px;overflow-y:auto;display:none;flex-direction:column;gap:12px;">
+
+        <!-- Dosespot launch -->
+        <div style="background:#EDE9FE;border:1px solid #DDD6FE;border-radius:10px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="font-size:13px;font-weight:800;color:#5B21B6;">Dosespot</span>
+            <span style="font-size:11px;color:#6B7280;">e-Prescribe Integration</span>
+          </div>
+          <div style="font-size:12px;color:#374151;margin-bottom:12px;">Open Dosespot for this patient — pre-authenticated via SSO with patient context (name, DOB, state, preferred pharmacy) loaded automatically.</div>
+          <button onclick="openDosespotChart()" style="width:100%;background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Open Dosespot for This Patient ↗</button>
+        </div>
+
+        <!-- Current Rx for this patient -->
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:8px;">Current Medications</div>
+
+          <div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+            <div style="padding:9px 12px;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#111827;">Metformin HCl 500mg</div>
+                <div style="font-size:11px;color:#6B7280;">500 mg BID with meals &middot; 30d supply</div>
+              </div>
+              <span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;">Active</span>
+            </div>
+            <div style="padding:9px 12px;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#111827;">Lisinopril 10mg</div>
+                <div style="font-size:11px;color:#6B7280;">10 mg daily &middot; 30d supply</div>
+              </div>
+              <span style="font-size:11px;font-weight:600;background:#DBEAFE;color:#1E40AF;padding:2px 8px;border-radius:8px;">Filled</span>
+            </div>
+            <div style="padding:9px 12px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#111827;">Atorvastatin 20mg</div>
+                <div style="font-size:11px;color:#6B7280;">20 mg at bedtime &middot; 30d supply</div>
+              </div>
+              <span style="font-size:11px;font-weight:600;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;">Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Refill request for this patient -->
+        <div>
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:8px;">Refill Requests</div>
+          <div id="chartRefillList">
+            <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;" id="chartRefillItem">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#111827;">Metformin HCl 500mg</div>
+                  <div style="font-size:11px;color:#6B7280;">Requested Jun 24, 2026 &middot; CVS #4402</div>
+                </div>
+                <span style="font-size:11px;font-weight:600;color:#92400E;">Pending</span>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button onclick="approveChartRefill()" style="flex:1;background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Approve &amp; Send to Pharmacy</button>
+                <button onclick="declineChartRefill()" style="flex:1;background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:6px;padding:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Decline</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Link to full Prescriptions page -->
+        <div style="text-align:center;padding-top:4px;">
+          <a href="/provider/prescriptions" style="font-size:12px;color:#6B21A8;font-weight:600;text-decoration:none;">View all prescriptions across all patients →</a>
+        </div>
+
+      </div><!-- /rightPanel5 -->
 
     </div><!-- /chart-right -->
 
@@ -2566,11 +2638,23 @@ function toggleAcc(bodyId, chevId) {
 
 // Right panel tabs — targets by ID so DOM order doesn't matter
 // Panel map: 0=Documentation(flex), 1=Communication(flex), 2=Zendesk(flex), 3=ClinicalResources(flex), 4=LinkedConsults(flex)
-var RIGHT_PANEL_FLEX = {0: true, 1: true, 2: true, 3: true, 4: true};
+var RIGHT_PANEL_FLEX = {0: true, 1: true, 2: true, 3: true, 4: true, 5: true};
 document.addEventListener('DOMContentLoaded', function() { switchRightTab(0); });
+function openDosespotChart() {
+  alert('Dosespot — Patient Context Launch\n\nIn the full system, this opens Dosespot pre-authenticated via SSO with this patient\'s information pre-loaded:\n• Patient name, DOB, state\n• Preferred pharmacy\n• Current medication list\n\nNo separate Dosespot login is required.');
+}
+function approveChartRefill() {
+  var item = document.getElementById('chartRefillItem');
+  if (item) { item.innerHTML = '<div style="font-size:12px;font-weight:600;color:#059669;">&#10003; Refill approved — sent to CVS #4402 via Dosespot</div>'; }
+}
+function declineChartRefill() {
+  var item = document.getElementById('chartRefillItem');
+  if (item) { item.innerHTML = '<div style="font-size:12px;font-weight:600;color:#6B7280;">Refill request declined.</div>'; }
+}
+
 function switchRightTab(idx) {
   document.querySelectorAll('.rp-vnav-btn').forEach(function(b, i) { b.classList.toggle('active', i === idx); });
-  for (var i = 0; i < 5; i++) {
+  for (var i = 0; i < 6; i++) {
     var p = document.getElementById('rightPanel' + i);
     if (!p) continue;
     var isActive = (i === idx);
