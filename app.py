@@ -108,6 +108,8 @@ def inject_sidebar_nav():
         'settings':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
         'check':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
         'flask':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6m-3 0v7l-4 8a1 1 0 00.9 1.5h8.2a1 1 0 00.9-1.5l-4-8V3"/></svg>',
+        'clock':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>',
+        'chart-bar': '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9"/><rect x="10" y="7" width="4" height="14"/><rect x="17" y="3" width="4" height="18"/></svg>',
     }
 
     RAW = {
@@ -134,6 +136,7 @@ def inject_sidebar_nav():
             ('Task Queue',    '/provider/rn/queue',       'clipboard', ['/provider/rn/queue']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
             ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Timesheet',     '/provider/timesheet',      'clock',     ['/provider/timesheet']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
@@ -143,9 +146,17 @@ def inject_sidebar_nav():
             ('Task Queue',    '/provider/ma/queue',       'clipboard', ['/provider/ma/queue']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
             ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Timesheet',     '/provider/timesheet',      'clock',     ['/provider/timesheet']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
+        ],
+        'provider_manager': [
+            ('Dashboard',     '/provider/manager',           'home',      ['/provider/manager']),
+            ('Timekeeping',   '/provider/manager/timekeeping','clock',     ['/provider/manager/timekeeping']),
+            ('Messages',      '/provider/messages',           'message',   ['/provider/messages']),
+            ('Alerts',        '/provider/notifications',      'bell',      ['/provider/notifications']),
+            ('Settings',      '/provider/settings',           'settings',  ['/provider/settings']),
         ],
         'provider_gc': [
             ('Dashboard',     '/provider/gc',            'home',      ['/provider/gc']),
@@ -288,31 +299,33 @@ def gate_access_log():
 # ──────────────────────────────────────────────────────────────────────────
 
 ROLE_NAMES = {
-    'provider_md': 'Dr. Sarah Lee, MD',
-    'provider_np': 'Jamie Rivera, NP',
-    'provider_rn': 'Jordan Patel, RN',
-    'provider_ma': 'Alex Kim, MA',
-    'provider_gc': 'Taylor Brooks, GC',
-    'scheduler':   'David Nguyen',
-    'care_team':   'Casey Torres',
-    'patient':     'Marcus Johnson',
-    'admin':       'Chris Navarro',
-    'qa_reviewer': 'Rachel Chen, QA Reviewer',
-    'gc_admin':    'Dana Cooper, GC Admin',
+    'provider_md':      'Dr. Sarah Lee, MD',
+    'provider_np':      'Jamie Rivera, NP',
+    'provider_rn':      'Jordan Patel, RN',
+    'provider_ma':      'Alex Kim, MA',
+    'provider_gc':      'Taylor Brooks, GC',
+    'scheduler':        'David Nguyen',
+    'care_team':        'Casey Torres',
+    'patient':          'Marcus Johnson',
+    'admin':            'Chris Navarro',
+    'qa_reviewer':      'Rachel Chen, QA Reviewer',
+    'gc_admin':         'Dana Cooper, GC Admin',
+    'provider_manager': 'Riley Perrone, Team Manager',
 }
 
 ROLE_DESTINATIONS = {
-    'provider_md': 'provider.dashboard',
-    'provider_np': 'provider.np_dashboard',
-    'provider_rn': 'provider.rn_dashboard',
-    'provider_ma': 'provider.ma_dashboard',
-    'provider_gc': 'provider.gc_dashboard',
-    'scheduler':   'scheduler.dashboard',
-    'care_team':   'care_team.dashboard',
-    'admin':       'admin.dashboard',
-    'qa_reviewer': 'provider.qa_reviewer_dashboard',
-    'gc_admin':    'provider.gc_admin_dashboard',
-    'patient':     'patient.dashboard',
+    'provider_md':      'provider.dashboard',
+    'provider_np':      'provider.np_dashboard',
+    'provider_rn':      'provider.rn_dashboard',
+    'provider_ma':      'provider.ma_dashboard',
+    'provider_gc':      'provider.gc_dashboard',
+    'scheduler':        'scheduler.dashboard',
+    'care_team':        'care_team.dashboard',
+    'admin':            'admin.dashboard',
+    'qa_reviewer':      'provider.qa_reviewer_dashboard',
+    'gc_admin':         'provider.gc_admin_dashboard',
+    'patient':          'patient.dashboard',
+    'provider_manager': 'provider.manager_dashboard',
 }
 
 @app.route("/")

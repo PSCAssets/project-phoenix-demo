@@ -193,3 +193,15 @@ def qa_reviewer_dashboard():
 @bp.route("/gc-admin")
 def gc_admin_dashboard():
     return render_template("provider/gc_admin_dashboard.html")
+
+@bp.route("/timesheet")
+def timesheet():
+    return render_template("provider/timesheet.html")
+
+@bp.route("/manager")
+def manager_dashboard():
+    return render_template("provider/manager_dashboard.html")
+
+@bp.route("/manager/timekeeping")
+def manager_timekeeping():
+    return render_template("provider/manager_timekeeping.html")

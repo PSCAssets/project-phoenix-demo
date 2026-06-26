@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}My Timesheet{% endblock %}
+{% block head %}
+<style>
+.page-wrap { padding: 32px 28px; margin-left: 56px; }
+.page-title { font-size: 22px; font-weight: 800; color: #111827; }
+.page-sub { font-size: 13px; color: #6B7280; margin-top: 3px; margin-bottom: 28px; }
+
+.week-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.week-label { font-size: 15px; font-weight: 700; color: #111827; min-width: 200px; text-align: center; }
+.week-btn { background: #fff; border: 1px solid #E5E0D8; border-radius: 7px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; font-family: inherit; }
+.week-btn:hover { border-color: #6B21A8; color: #6B21A8; }
+
+.summary-row { display: flex; gap: 16px; margin-bottom: 28px; flex-wrap: wrap; }
+.sum-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; padding: 16px 22px; min-width: 130px; }
+.sum-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.sum-val { font-size: 26px; font-weight: 800; color: #111827; }
+.sum-val.green { color: #059669; }
+.sum-val.amber { color: #D97706; }
+
+.status-banner { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 10px; margin-bottom: 24px; font-size: 13px; font-weight: 600; }
+.status-open { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+.status-submitted { background: #DBEAFE; color: #1E40AF; border: 1px solid #BFDBFE; }
+.status-approved { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+
+.table-wrap { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: #FAF7F2; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; color: #374151; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #FAF7F2; }
+
+.day-name { font-weight: 700; color: #111827; }
+.day-date { font-size: 11px; color: #9CA3AF; }
+.duration { font-weight: 700; color: #059669; }
+.duration.zero { color: #9CA3AF; font-weight: 400; }
+.note-field { font-size: 12px; color: #6B7280; font-style: italic; }
+
+.btn-submit { background: #6B21A8; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-submit:hover { background: #5B1898; }
+.btn-submit:disabled { background: #C4B5FD; cursor: not-allowed; }
+.btn-outline { background: #fff; color: #6B21A8; border: 1.5px solid #6B21A8; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; margin-right: 8px; }
+.btn-outline:hover { background: #F5F3FF; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-title">My Timesheet</div>
+  <div class="page-sub">Michael Torres, MA &mdash; Weekly time log</div>
+
+  <!-- Week navigation -->
+  <div class="week-nav">
+    <button class="week-btn" onclick="changeWeek(-1)">&#8592; Prev</button>
+    <div class="week-label" id="weekLabel">Jun 23 &ndash; Jun 29, 2026</div>
+    <button class="week-btn" onclick="changeWeek(1)">Next &#8594;</button>
+  </div>
+
+  <!-- Status banner -->
+  <div class="status-banner status-open" id="statusBanner">
+    <span>&#9679;</span> <span id="statusText">Week Status: Open — entries are editable until submitted</span>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-row">
+    <div class="sum-card">
+      <div class="sum-label">Total Hours</div>
+      <div class="sum-val green" id="totalHours">32.5h</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Regular</div>
+      <div class="sum-val" id="regularHours">32.5h</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Overtime</div>
+      <div class="sum-val amber" id="overtimeHours">0.0h</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Days Worked</div>
+      <div class="sum-val" id="daysWorked">5</div>
+    </div>
+  </div>
+
+  <!-- Time entries table -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Day</th>
+          <th>Clock In</th>
+          <th>Clock Out</th>
+          <th>Break</th>
+          <th>Shift Total</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody id="timeEntries">
+        <tr>
+          <td><div class="day-name">Monday</div><div class="day-date">Jun 23, 2026</div></td>
+          <td>8:02 AM</td>
+          <td>4:35 PM</td>
+          <td>30 min</td>
+          <td class="duration">8.05h</td>
+          <td class="note-field">—</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Tuesday</div><div class="day-date">Jun 24, 2026</div></td>
+          <td>7:58 AM</td>
+          <td>4:30 PM</td>
+          <td>30 min</td>
+          <td class="duration">8.03h</td>
+          <td class="note-field">—</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Wednesday</div><div class="day-date">Jun 25, 2026</div></td>
+          <td>8:10 AM</td>
+          <td>4:15 PM</td>
+          <td>30 min</td>
+          <td class="duration">7.42h</td>
+          <td class="note-field">—</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Thursday</div><div class="day-date">Jun 26, 2026</div></td>
+          <td>8:00 AM</td>
+          <td>4:31 PM</td>
+          <td>30 min</td>
+          <td class="duration">8.02h</td>
+          <td class="note-field">—</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Friday</div><div class="day-date">Jun 27, 2026</div></td>
+          <td>8:05 AM</td>
+          <td>—</td>
+          <td>—</td>
+          <td class="duration amber" style="color:#D97706;">Shift open</td>
+          <td class="note-field">—</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Saturday</div><div class="day-date">Jun 28, 2026</div></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td class="duration zero">0.0h</td>
+          <td class="note-field">Not scheduled</td>
+        </tr>
+        <tr>
+          <td><div class="day-name">Sunday</div><div class="day-date">Jun 29, 2026</div></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td class="duration zero">0.0h</td>
+          <td class="note-field">Not scheduled</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="btn-outline" onclick="addNote()">Add Note</button>
+    <button class="btn-submit" id="btnSubmit" onclick="submitTimesheet()">Submit Timesheet</button>
+    <span style="font-size:12px;color:#9CA3AF;margin-left:8px;">You have an open shift on Friday — close it before submitting.</span>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var weekOffset = 0;
+var weeks = [
+  'Jun 23 – Jun 29, 2026',
+  'Jun 16 – Jun 22, 2026',
+  'Jun 9 – Jun 15, 2026',
+];
+
+function changeWeek(dir) {
+  weekOffset = Math.max(0, Math.min(2, weekOffset - dir));
+  document.getElementById('weekLabel').textContent = weeks[weekOffset];
+}
+
+function addNote() {
+  alert('In the full system, you can add a note to any time entry (e.g., to explain a discrepancy).');
+}
+
+function submitTimesheet() {
+  if (!confirm('Submit this timesheet for manager approval?\n\nNote: You have an open shift on Friday. Submitting will mark that entry as incomplete.')) return;
+  var banner = document.getElementById('statusBanner');
+  banner.className = 'status-banner status-submitted';
+  document.getElementById('statusText').textContent = 'Week Status: Submitted — awaiting manager approval';
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').textContent = 'Submitted';
+}
+</script>
+{% endblock %}

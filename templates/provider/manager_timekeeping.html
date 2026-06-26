@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+{% block title %}Timekeeping — Manager Report{% endblock %}
+{% block head %}
+<style>
+.page-wrap { padding: 32px 28px; margin-left: 56px; }
+.page-title { font-size: 22px; font-weight: 800; color: #111827; }
+.page-sub { font-size: 13px; color: #6B7280; margin-top: 3px; margin-bottom: 28px; }
+
+.tab-row { display: flex; gap: 4px; margin-bottom: 28px; border-bottom: 2px solid #E5E0D8; }
+.tab-btn { padding: 10px 20px; font-size: 13px; font-weight: 700; color: #6B7280; background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: inherit; margin-bottom: -2px; }
+.tab-btn.active { color: #6B21A8; border-bottom-color: #6B21A8; }
+.tab-btn:hover:not(.active) { color: #374151; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Shared form controls */
+.filter-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-group { display: flex; flex-direction: column; gap: 4px; }
+.filter-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; }
+.filter-input { border: 1px solid #E5E0D8; border-radius: 7px; padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none; background: #fff; color: #374151; }
+.filter-input:focus { border-color: #6B21A8; }
+select.filter-input { cursor: pointer; }
+
+.btn-primary { background: #6B21A8; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-primary:hover { background: #5B1898; }
+.btn-export { background: #fff; color: #6B21A8; border: 1.5px solid #6B21A8; border-radius: 8px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; margin-left: 8px; }
+.btn-export:hover { background: #F5F3FF; }
+
+.table-wrap { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: #FAF7F2; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #FAF7F2; }
+
+.chip { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+.chip-ma { background: #EDE9FE; color: #5B21B6; }
+.chip-rn { background: #D1FAE5; color: #065F46; }
+.chip-approved { background: #D1FAE5; color: #065F46; }
+.chip-pending { background: #FEF3C7; color: #92400E; }
+.chip-draft { background: #F3F4F6; color: #374151; }
+
+.ot-flag { color: #DC2626; font-weight: 700; }
+
+/* After-hours section */
+.daytype-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.daytype-btn { padding: 7px 18px; border-radius: 8px; border: 1.5px solid #E5E0D8; background: #fff; font-size: 12px; font-weight: 700; cursor: pointer; color: #6B7280; font-family: inherit; }
+.daytype-btn.active { border-color: #6B21A8; color: #6B21A8; background: #F5F3FF; }
+
+.export-bar { display: flex; gap: 10px; align-items: center; margin-top: 16px; }
+.export-label { font-size: 13px; font-weight: 600; color: #374151; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+  <div class="page-title">Timekeeping</div>
+  <div class="page-sub">Riley Perrone &mdash; MA / RN Team Manager</div>
+
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('approvals', this)">Approval Queue <span style="background:#FEF3C7;color:#92400E;border-radius:8px;padding:1px 7px;font-size:11px;margin-left:4px;">4</span></button>
+    <button class="tab-btn" onclick="switchTab('report', this)">Team Report</button>
+    <button class="tab-btn" onclick="switchTab('afterhours', this)">After-Hours Export</button>
+  </div>
+
+  <!-- TAB 1: Approval Queue -->
+  <div class="tab-content active" id="tab-approvals">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Team Member</th>
+            <th>Role</th>
+            <th>Week</th>
+            <th>Total Hours</th>
+            <th>Submitted</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="approvalTable">
+          <tr>
+            <td style="font-weight:600;">Michael Torres</td>
+            <td><span class="chip chip-ma">MA</span></td>
+            <td>Jun 16 – Jun 22</td>
+            <td>40.5h</td>
+            <td>Jun 22</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Michael Torres')">Approve</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Jennifer Martinez</td>
+            <td><span class="chip chip-rn">RN</span></td>
+            <td>Jun 16 – Jun 22</td>
+            <td>38.0h</td>
+            <td>Jun 22</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Jennifer Martinez')">Approve</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Carla Ruiz</td>
+            <td><span class="chip chip-ma">MA</span></td>
+            <td>Jun 16 – Jun 22</td>
+            <td>37.5h</td>
+            <td>Jun 23</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Carla Ruiz')">Approve</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">David Park</td>
+            <td><span class="chip chip-rn">RN</span></td>
+            <td>Jun 16 – Jun 22</td>
+            <td>42.0h <span class="ot-flag">+2h OT</span></td>
+            <td>Jun 23</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'David Park')">Approve</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="approvalEmpty" style="display:none;text-align:center;padding:40px;color:#9CA3AF;font-size:14px;">All timesheets reviewed — no pending approvals.</div>
+  </div>
+
+  <!-- TAB 2: Team Report -->
+  <div class="tab-content" id="tab-report">
+    <div class="filter-row">
+      <div class="filter-group">
+        <div class="filter-label">Start Date</div>
+        <input type="date" class="filter-input" id="reportStart" value="2026-06-01">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">End Date</div>
+        <input type="date" class="filter-input" id="reportEnd" value="2026-06-22">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Team Member</div>
+        <select class="filter-input" id="reportMember">
+          <option>All Members</option>
+          <option>Michael Torres (MA)</option>
+          <option>Jennifer Martinez (RN)</option>
+          <option>Carla Ruiz (MA)</option>
+          <option>David Park (RN)</option>
+          <option>Ana Morales (MA)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Role</div>
+        <select class="filter-input">
+          <option>All Roles</option>
+          <option>MA Only</option>
+          <option>RN Only</option>
+          <option>CT Only</option>
+        </select>
+      </div>
+      <div class="filter-group" style="justify-content:flex-end;">
+        <div class="filter-label">&nbsp;</div>
+        <button class="btn-primary" onclick="runReport()">Generate Report</button>
+      </div>
+    </div>
+
+    <div class="table-wrap" id="reportTable">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Total Hours</th>
+            <th>Regular</th>
+            <th>Overtime</th>
+            <th>Weeks</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Michael Torres</td>
+            <td><span class="chip chip-ma">MA</span></td>
+            <td>160.5h</td>
+            <td>156.0h</td>
+            <td><span class="ot-flag">4.5h</span></td>
+            <td>4</td>
+            <td><span class="chip chip-approved">Approved</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Jennifer Martinez</td>
+            <td><span class="chip chip-rn">RN</span></td>
+            <td>152.0h</td>
+            <td>152.0h</td>
+            <td>0.0h</td>
+            <td>4</td>
+            <td><span class="chip chip-approved">Approved</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Carla Ruiz</td>
+            <td><span class="chip chip-ma">MA</span></td>
+            <td>148.5h</td>
+            <td>148.5h</td>
+            <td>0.0h</td>
+            <td>4</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">David Park</td>
+            <td><span class="chip chip-rn">RN</span></td>
+            <td>164.0h</td>
+            <td>154.0h</td>
+            <td><span class="ot-flag">10.0h</span></td>
+            <td>4</td>
+            <td><span class="chip chip-pending">Pending</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Ana Morales</td>
+            <td><span class="chip chip-ma">MA</span></td>
+            <td>140.0h</td>
+            <td>140.0h</td>
+            <td>0.0h</td>
+            <td>4</td>
+            <td><span class="chip chip-draft">Draft</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="export-bar">
+      <span class="export-label">Export report:</span>
+      <button class="btn-primary" onclick="exportReport('xlsx')">&#8595; Download Excel (.xlsx)</button>
+      <button class="btn-export" onclick="exportReport('pdf')">&#8595; Download PDF</button>
+    </div>
+  </div>
+
+  <!-- TAB 3: After-Hours Export -->
+  <div class="tab-content" id="tab-afterhours">
+    <div style="font-size:13px;color:#6B7280;margin-bottom:20px;">Export the scheduled availability for your MA/RN team for any date range. This report is sent to the after-hours support vendor each week.</div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <div class="filter-label">Start Date</div>
+        <input type="date" class="filter-input" id="ahStart" value="2026-06-30">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">End Date</div>
+        <input type="date" class="filter-input" id="ahEnd" value="2026-07-06">
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Role</div>
+        <select class="filter-input" id="ahRole">
+          <option>All Roles</option>
+          <option>RN Only</option>
+          <option>MA Only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-label" style="margin-bottom:8px;">Day Type</div>
+    <div class="daytype-row">
+      <button class="daytype-btn active" onclick="setDayType(this,'all')">All Days</button>
+      <button class="daytype-btn" onclick="setDayType(this,'weekdays')">Weekdays Only</button>
+      <button class="daytype-btn" onclick="setDayType(this,'weekends')">Weekends Only</button>
+    </div>
+
+    <div class="table-wrap">
+      <table id="ahTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Day</th>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Shift Start</th>
+            <th>Shift End</th>
+            <th>Contact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jun 30, 2026</td><td>Monday</td><td style="font-weight:600;">Jennifer Martinez</td><td><span class="chip chip-rn">RN</span></td><td>7:00 AM</td><td>3:30 PM</td><td>(512) 555-0142</td>
+          </tr>
+          <tr>
+            <td>Jun 30, 2026</td><td>Monday</td><td style="font-weight:600;">Michael Torres</td><td><span class="chip chip-ma">MA</span></td><td>8:00 AM</td><td>4:30 PM</td><td>(512) 555-0198</td>
+          </tr>
+          <tr>
+            <td>Jul 1, 2026</td><td>Tuesday</td><td style="font-weight:600;">Carla Ruiz</td><td><span class="chip chip-ma">MA</span></td><td>8:00 AM</td><td>4:30 PM</td><td>(512) 555-0167</td>
+          </tr>
+          <tr>
+            <td>Jul 1, 2026</td><td>Tuesday</td><td style="font-weight:600;">David Park</td><td><span class="chip chip-rn">RN</span></td><td>9:00 AM</td><td>5:30 PM</td><td>(512) 555-0211</td>
+          </tr>
+          <tr>
+            <td>Jul 2, 2026</td><td>Wednesday</td><td style="font-weight:600;">Jennifer Martinez</td><td><span class="chip chip-rn">RN</span></td><td>7:00 AM</td><td>3:30 PM</td><td>(512) 555-0142</td>
+          </tr>
+          <tr>
+            <td>Jul 5, 2026</td><td>Saturday</td><td style="font-weight:600;">Ana Morales</td><td><span class="chip chip-ma">MA</span></td><td>8:00 AM</td><td>12:00 PM</td><td>(512) 555-0189</td>
+          </tr>
+          <tr>
+            <td>Jul 6, 2026</td><td>Sunday</td><td style="font-weight:600;">David Park</td><td><span class="chip chip-rn">RN</span></td><td>9:00 AM</td><td>1:00 PM</td><td>(512) 555-0211</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="export-bar">
+      <span class="export-label">Export schedule:</span>
+      <button class="btn-primary" onclick="exportAH('xlsx')">&#8595; Download Excel (.xlsx)</button>
+      <button class="btn-export" onclick="exportAH('pdf')">&#8595; Download PDF</button>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function approveRow(btn, name) {
+  if (!confirm('Approve timesheet for ' + name + '?')) return;
+  var row = btn.closest('tr');
+  row.querySelector('.chip-pending').className = 'chip chip-approved';
+  row.querySelector('.chip-approved').textContent = 'Approved';
+  row.querySelector('td:last-child').innerHTML = '<span style="font-size:12px;font-weight:600;color:#059669;">&#10003; Approved</span>';
+  checkEmpty();
+}
+
+function returnRow(btn) {
+  var reason = prompt('Enter a reason to return this timesheet:');
+  if (!reason) return;
+  var row = btn.closest('tr');
+  row.querySelector('td:last-child').innerHTML = '<span style="font-size:12px;font-weight:600;color:#D97706;">&#8617; Returned</span>';
+  checkEmpty();
+}
+
+function checkEmpty() {
+  var rows = document.querySelectorAll('#approvalTable tr');
+  var anyPending = false;
+  rows.forEach(function(r) { if (r.querySelector('.chip-pending')) anyPending = true; });
+  if (!anyPending) {
+    document.querySelector('.table-wrap').style.display = 'none';
+    document.getElementById('approvalEmpty').style.display = 'block';
+  }
+}
+
+function runReport() {
+  alert('In the full system, this generates a live report for the selected date range and filters. The demo shows static sample data.');
+}
+
+function exportReport(fmt) {
+  alert('Export as .' + fmt + ' — In the full system, a formatted ' + fmt.toUpperCase() + ' file would download with columns: Name, Role, Date, Clock In, Clock Out, Shift Duration, Notes, Week Total, Approval Status.');
+}
+
+function setDayType(btn, type) {
+  document.querySelectorAll('.daytype-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var rows = document.querySelectorAll('#ahTable tbody tr');
+  rows.forEach(function(row) {
+    var day = row.querySelector('td:nth-child(2)').textContent;
+    var isWeekend = day === 'Saturday' || day === 'Sunday';
+    if (type === 'all') row.style.display = '';
+    else if (type === 'weekdays') row.style.display = isWeekend ? 'none' : '';
+    else if (type === 'weekends') row.style.display = isWeekend ? '' : 'none';
+  });
+}
+
+function exportAH(fmt) {
+  alert('Export as .' + fmt + ' — In the full system, a formatted after-hours schedule would download, ready to send to the after-hours support vendor.');
+}
+</script>
+{% endblock %}
