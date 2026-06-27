@@ -105,6 +105,10 @@ def ma_dashboard():
 def ma_queue():
     return render_template("provider/ma_queue.html")
 
+@bp.route("/ma/referrals")
+def ma_referrals():
+    return render_template("provider/ma_referrals.html")
+
 @bp.route("/np")
 def np_dashboard():
     return render_template("provider/np_dashboard.html")
