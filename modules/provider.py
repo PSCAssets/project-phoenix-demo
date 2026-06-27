@@ -209,3 +209,15 @@ def manager_dashboard():
 @bp.route("/manager/timekeeping")
 def manager_timekeeping():
     return render_template("provider/manager_timekeeping.html")
+
+@bp.route("/staff-schedule")
+def staff_schedule():
+    return render_template("provider/staff_schedule.html")
+
+@bp.route("/gca")
+def gca_dashboard():
+    return render_template("provider/gca_dashboard.html")
+
+@bp.route("/gca/consult-prep")
+def gca_consult_prep_queue():
+    return render_template("provider/gca_consult_prep.html")
