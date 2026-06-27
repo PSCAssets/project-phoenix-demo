@@ -65,22 +65,6 @@ tbody tr.selected-row { background:#F0FDFA; }
 
 input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var(--teal); }
 
-/* Help icon */
-.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
-.help-btn:hover { background:rgba(255,255,255,0.28); }
-.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
-.help-overlay.open { display:flex; }
-.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
-.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
-.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
-.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
-.help-modal-body { padding:20px 22px 24px; }
-.help-section { margin-bottom:16px; }
-.help-section:last-child { margin-bottom:0; }
-.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
-.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
-.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
-.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -333,38 +317,6 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
   </div>
 </div>
 
-<!-- Help Modal -->
-<div class="help-overlay" id="helpOverlay">
-  <div class="help-modal">
-    <div class="help-modal-header" style="background:#0F766E;">
-      <div class="help-modal-title">&#8505; DOH Report Queue — How This Works</div>
-      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
-    </div>
-    <div class="help-modal-body">
-      <div class="help-section">
-        <div class="help-label">What this screen does</div>
-        <div class="help-item"><span class="help-icon">&#128203;</span><span>Full list of all open DOH reports waiting for submission. Every record was auto-created when a qualifying lab result was finalized — no manual entry.</span></div>
-        <div class="help-item"><span class="help-icon">&#127372;</span><span>Filter by state, condition, or status to work in batches. Overdue records appear at the top with a red row background.</span></div>
-        <div class="help-item"><span class="help-icon">&#128231;</span><span>Select multiple records and bulk-fax them in one action — each goes to its individually configured state/county fax number via the platform's e-fax integration.</span></div>
-      </div>
-      <hr class="help-divider">
-      <div class="help-section">
-        <div class="help-label">Workflows this solves</div>
-        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: no queue view. Coordinators worked from emails or spreadsheets to track what needed to be sent.</span></div>
-        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: every open obligation is in one place, sortable and filterable, with SLA status visible at a glance.</span></div>
-        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: faxing required a physical machine and had no confirmation logging.</span></div>
-        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: e-fax sends electronically within the platform. Confirmation is logged automatically on each record.</span></div>
-      </div>
-      <hr class="help-divider">
-      <div class="help-section">
-        <div class="help-label">Key design decisions</div>
-        <div class="help-item"><span class="help-icon">&#9888;</span><span>Overdue rows show in red and sort to the top — prioritize these first.</span></div>
-        <div class="help-item"><span class="help-icon">&#128275;</span><span>Patient column shows masked ID only (PT-••••-XXXX) — no name or DOB in the queue list.</span></div>
-        <div class="help-item"><span class="help-icon">&#9989;</span><span>Bulk fax uses each record's own configured destination — not a shared number.</span></div>
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock %}
 
 {% block scripts %}

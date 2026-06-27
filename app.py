@@ -87,6 +87,33 @@ def _record_gate_access(name, email, ip):
     return ts, login_num
 
 
+# ── Page guide (Phoenix icon help modal) ──────────────────────────────────
+@app.context_processor
+def inject_page_guide():
+    import json
+    endpoint = request.endpoint or ''
+    try:
+        conn = sqlite3.connect(_DB_PATH)
+        row = conn.execute(
+            '''SELECT title, header_color, section_what, section_solves, section_key
+               FROM page_guides WHERE page_key = ? AND is_active = 1''',
+            [endpoint]
+        ).fetchone()
+        conn.close()
+        if row:
+            guide = {
+                'title':        row[0],
+                'header_color': row[1],
+                'section_what':    json.loads(row[2]) if row[2] else [],
+                'section_solves':  json.loads(row[3]) if row[3] else [],
+                'section_key':     json.loads(row[4]) if row[4] else [],
+            }
+            return dict(page_guide=guide)
+    except Exception:
+        pass
+    return dict(page_guide=None)
+
+
 # ── Role-based sidebar nav (injected into every template) ──────────────────
 @app.context_processor
 def inject_sidebar_nav():
