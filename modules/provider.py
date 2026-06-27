@@ -210,6 +210,10 @@ def manager_dashboard():
 def manager_timekeeping():
     return render_template("provider/manager_timekeeping.html")
 
+@bp.route("/ma/followup")
+def ma_followup():
+    return render_template("provider/ma_followup.html")
+
 @bp.route("/staff-schedule")
 def staff_schedule():
     return render_template("provider/staff_schedule.html")

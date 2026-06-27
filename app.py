@@ -148,6 +148,7 @@ def inject_sidebar_nav():
         'provider_ma': [
             ('My Dashboard',  '/provider/ma',              'home',      ['/provider/ma']),
             ('Task Queue',    '/provider/ma/queue',         'clipboard', ['/provider/ma/queue']),
+            ('PCP Follow-Up', '/provider/ma/followup',      'clipboard', ['/provider/ma/followup']),
             ('Patient Queue', '/provider/queue',            'users',     ['/provider/queue']),
             ('Schedule',      '/provider/schedule',         'calendar',  ['/provider/schedule']),
             ('My Schedule',   '/provider/staff-schedule',   'calendar',  ['/provider/staff-schedule']),
