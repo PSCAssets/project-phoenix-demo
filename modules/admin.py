@@ -139,3 +139,7 @@ def coordinator():
 @bp.route("/members-db")
 def members_db():
     return render_template("admin/members_db.html")
+
+@bp.route("/doh-config")
+def doh_config():
+    return render_template("admin/doh_config.html")

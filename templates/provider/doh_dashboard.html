@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% block title %}DOH Reporting Dashboard — Crystal Veliz{% endblock %}
+{% block head %}
+<style>
+:root { --teal:#0F766E; --teal-light:#CCFBF1; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; --purple:#6B21A8; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+
+.topbar { position:fixed; top:0; left:56px; right:0; height:56px; background:var(--teal); display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar { top:60px !important; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#0D5F58; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+
+.main { margin-left:56px; margin-top:116px; padding:28px; }
+
+/* Stats */
+.stat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px; }
+.stat-card { background:#fff; border-radius:12px; border:1px solid var(--border); padding:18px 20px; position:relative; overflow:hidden; }
+.stat-card .bar { position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px; }
+.stat-label { font-size:11px; color:#6B7280; font-weight:600; margin-bottom:6px; padding-left:10px; }
+.stat-val   { font-size:28px; font-weight:800; padding-left:10px; line-height:1; }
+.stat-sub   { font-size:11px; color:#9CA3AF; padding-left:10px; margin-top:3px; }
+
+/* State queue grid */
+.section-header { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.section-title { font-size:15px; font-weight:700; color:#111827; }
+.badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; }
+.badge-red    { background:#FEE2E2; color:#991B1B; }
+.badge-amber  { background:#FEF3C7; color:#92400E; }
+.badge-teal   { background:var(--teal-light); color:#134E4A; }
+.section-link { margin-left:auto; font-size:12px; font-weight:700; color:var(--teal); text-decoration:none; }
+.section-link:hover { text-decoration:underline; }
+
+.state-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:28px; }
+.state-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; cursor:pointer; text-decoration:none; display:block; transition:border-color 0.12s; }
+.state-card:hover { border-color:var(--teal); }
+.state-card.has-overdue { border-left:3px solid var(--red); }
+.state-card.has-new { border-left:3px solid var(--amber); }
+.state-name { font-size:13px; font-weight:700; color:#111827; margin-bottom:6px; }
+.state-counts { display:flex; gap:8px; flex-wrap:wrap; }
+.sc { font-size:11px; font-weight:600; padding:2px 7px; border-radius:6px; }
+.sc-new      { background:#FEF3C7; color:#92400E; }
+.sc-prog     { background:#DBEAFE; color:#1E40AF; }
+.sc-done     { background:#D1FAE5; color:#065F46; }
+.sc-overdue  { background:#FEE2E2; color:#991B1B; }
+
+/* Condition breakdown */
+.widget { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.widget-header { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+.widget-title { font-size:14px; font-weight:700; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:9px 14px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); }
+tbody td { padding:11px 14px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F0FDFA; }
+
+.condition-dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:7px; }
+.c-sti  { background:#6B21A8; }
+.c-hiv  { background:#DC2626; }
+.c-tb   { background:#D97706; }
+.c-lyme { background:#059669; }
+.c-lead { background:#0F766E; }
+
+.btn-sm { padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; border:1px solid var(--border); background:#fff; cursor:pointer; color:#374151; font-family:inherit; }
+.btn-sm:hover { border-color:var(--teal); color:var(--teal); }
+.btn-sm.primary { background:var(--teal); color:#fff; border-color:var(--teal); }
+.btn-sm.primary:hover { background:#0D5F58; }
+
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">DOH Reporting Dashboard</div>
+    <div class="topbar-sub">Department of Health — Mandatory Reporting</div>
+  </div>
+  <div class="topbar-right">
+    <span>Crystal Veliz, DOH Coordinator</span>
+    <div class="avatar">CV</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- Summary stats -->
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="bar" style="background:var(--amber);"></div>
+      <div class="stat-label">Open Reports</div>
+      <div class="stat-val" style="color:var(--amber);">47</div>
+      <div class="stat-sub">across 18 states</div>
+    </div>
+    <div class="stat-card">
+      <div class="bar" style="background:var(--red);"></div>
+      <div class="stat-label">Overdue</div>
+      <div class="stat-val" style="color:var(--red);">6</div>
+      <div class="stat-sub">&gt; 24h SLA</div>
+    </div>
+    <div class="stat-card">
+      <div class="bar" style="background:#1D4ED8;"></div>
+      <div class="stat-label">In Progress</div>
+      <div class="stat-val" style="color:#1D4ED8;">14</div>
+      <div class="stat-sub">being worked</div>
+    </div>
+    <div class="stat-card">
+      <div class="bar" style="background:var(--green);"></div>
+      <div class="stat-label">Submitted Today</div>
+      <div class="stat-val" style="color:var(--green);">11</div>
+      <div class="stat-sub">via fax &amp; email</div>
+    </div>
+    <div class="stat-card">
+      <div class="bar" style="background:var(--teal);"></div>
+      <div class="stat-label">This Week</div>
+      <div class="stat-val" style="color:var(--teal);">58</div>
+      <div class="stat-sub">total closed</div>
+    </div>
+  </div>
+
+  <!-- State queue overview -->
+  <div class="section-header">
+    <div class="section-title">Queue by State</div>
+    <span class="badge badge-amber">18 states active</span>
+    <a href="/provider/doh/queue" class="section-link">Open Full Queue &rarr;</a>
+  </div>
+  <div class="state-grid">
+    <a href="/provider/doh/queue?state=FL" class="state-card has-overdue" style="text-decoration:none;">
+      <div class="state-name">Florida (FL)</div>
+      <div class="state-counts">
+        <span class="sc sc-overdue">3 overdue</span>
+        <span class="sc sc-new">5 new</span>
+        <span class="sc sc-prog">2 in progress</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=CA" class="state-card has-new" style="text-decoration:none;">
+      <div class="state-name">California (CA)</div>
+      <div class="state-counts">
+        <span class="sc sc-new">7 new</span>
+        <span class="sc sc-prog">3 in progress</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=TX" class="state-card has-overdue" style="text-decoration:none;">
+      <div class="state-name">Texas (TX)</div>
+      <div class="state-counts">
+        <span class="sc sc-overdue">2 overdue</span>
+        <span class="sc sc-new">4 new</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=NY" class="state-card has-new" style="text-decoration:none;">
+      <div class="state-name">New York (NY)</div>
+      <div class="state-counts">
+        <span class="sc sc-new">3 new</span>
+        <span class="sc sc-prog">1 in progress</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=GA" class="state-card has-new" style="text-decoration:none;">
+      <div class="state-name">Georgia (GA)</div>
+      <div class="state-counts">
+        <span class="sc sc-new">4 new</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=VA" class="state-card" style="text-decoration:none;">
+      <div class="state-name">Virginia (VA)</div>
+      <div class="state-counts">
+        <span class="sc sc-new">2 new</span>
+        <span class="sc sc-prog">1 in progress</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=WA" class="state-card" style="text-decoration:none;">
+      <div class="state-name">Washington (WA)</div>
+      <div class="state-counts">
+        <span class="sc sc-new">2 new</span>
+      </div>
+    </a>
+    <a href="/provider/doh/queue?state=MI" class="state-card has-overdue" style="text-decoration:none;">
+      <div class="state-name">Michigan (MI)</div>
+      <div class="state-counts">
+        <span class="sc sc-overdue">1 overdue</span>
+        <span class="sc sc-new">2 new</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="two-col">
+
+    <!-- Condition breakdown -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">Open Reports by Condition</div>
+        <a href="/provider/doh/queue" class="section-link" style="margin-left:auto;">View All &rarr;</a>
+      </div>
+      <table>
+        <thead><tr><th>Condition</th><th>Open</th><th>Overdue</th><th>Trigger Rule</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="condition-dot c-sti"></span>STI (Gonorrhea / Chlamydia / Syphilis)</td>
+            <td style="font-weight:700;">28</td>
+            <td style="color:var(--red);font-weight:700;">4</td>
+            <td><span style="font-size:11px;color:#6B7280;">Positive result</span></td>
+          </tr>
+          <tr>
+            <td><span class="condition-dot c-hiv"></span>HIV</td>
+            <td style="font-weight:700;">6</td>
+            <td style="color:var(--red);font-weight:700;">1</td>
+            <td><span style="font-size:11px;color:#6B7280;">Positive result</span></td>
+          </tr>
+          <tr>
+            <td><span class="condition-dot c-tb"></span>Tuberculosis</td>
+            <td style="font-weight:700;">4</td>
+            <td>—</td>
+            <td><span style="font-size:11px;color:#6B7280;">Positive result</span></td>
+          </tr>
+          <tr>
+            <td><span class="condition-dot c-lyme"></span>Lyme Disease</td>
+            <td style="font-weight:700;">3</td>
+            <td>—</td>
+            <td><span style="font-size:11px;color:#6B7280;">Positive result</span></td>
+          </tr>
+          <tr>
+            <td><span class="condition-dot c-lead"></span>Lead Poisoning</td>
+            <td style="font-weight:700;">6</td>
+            <td style="color:var(--red);font-weight:700;">1</td>
+            <td><span style="font-size:11px;color:#6B7280;">≥ 5.0 μg/dL</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="widget">
+      <div class="widget-header">
+        <div class="widget-title">Recent Submissions — Today</div>
+        <a href="/provider/doh/history" class="section-link" style="margin-left:auto;">Full History &rarr;</a>
+      </div>
+      <table>
+        <thead><tr><th>Record ID</th><th>State</th><th>Condition</th><th>Method</th><th>Time</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">DOH-2026-0441</td>
+            <td>FL</td><td>Gonorrhea</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--teal);">&#128231; Fax</span></td>
+            <td style="font-size:11px;color:#9CA3AF;">8:14 AM</td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">DOH-2026-0440</td>
+            <td>CA</td><td>HIV</td>
+            <td><span style="font-size:11px;font-weight:600;color:#1D4ED8;">&#9993; Email</span></td>
+            <td style="font-size:11px;color:#9CA3AF;">8:02 AM</td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">DOH-2026-0439</td>
+            <td>TX</td><td>Chlamydia</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--teal);">&#128231; Fax</span></td>
+            <td style="font-size:11px;color:#9CA3AF;">7:51 AM</td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">DOH-2026-0438</td>
+            <td>GA</td><td>Syphilis</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--amber);">&#9990; Phone</span></td>
+            <td style="font-size:11px;color:#9CA3AF;">7:44 AM</td>
+          </tr>
+          <tr>
+            <td style="font-family:monospace;font-size:12px;">DOH-2026-0437</td>
+            <td>MI</td><td>Lead (6.2 μg/dL)</td>
+            <td><span style="font-size:11px;font-weight:600;color:var(--teal);">&#128231; Fax</span></td>
+            <td style="font-size:11px;color:#9CA3AF;">7:38 AM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</main>
+{% endblock %}

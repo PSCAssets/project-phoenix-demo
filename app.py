@@ -164,6 +164,12 @@ def inject_sidebar_nav():
             ('Messages',       '/provider/messages',         'message',   ['/provider/messages']),
             ('Settings',       '/provider/settings',         'settings',  ['/provider/settings']),
         ],
+        'provider_doh': [
+            ('Dashboard',      '/provider/doh',              'home',      ['/provider/doh']),
+            ('Report Queue',   '/provider/doh/queue',        'clipboard', ['/provider/doh/queue', '/provider/doh/report']),
+            ('History',        '/provider/doh/history',      'clock',     ['/provider/doh/history']),
+            ('Settings',       '/provider/settings',         'settings',  ['/provider/settings']),
+        ],
         'provider_manager': [
             ('Dashboard',     '/provider/manager',              'home',      ['/provider/manager']),
             ('MA Queue',      '/provider/ma/queue',             'users',     ['/provider/ma/queue']),
@@ -321,6 +327,7 @@ ROLE_NAMES = {
     'provider_ma':      'Alex Kim, MA',
     'provider_gc':      'Taylor Brooks, GC',
     'provider_gca':     'Priya Sharma, GCA',
+    'provider_doh':     'Crystal Veliz, DOH Coordinator',
     'scheduler':        'David Nguyen',
     'care_team':        'Casey Torres',
     'patient':          'Marcus Johnson',
@@ -337,6 +344,7 @@ ROLE_DESTINATIONS = {
     'provider_ma':      'provider.ma_dashboard',
     'provider_gc':      'provider.gc_dashboard',
     'provider_gca':     'provider.gca_dashboard',
+    'provider_doh':     'provider.doh_dashboard',
     'scheduler':        'scheduler.dashboard',
     'care_team':        'care_team.dashboard',
     'admin':            'admin.dashboard',

@@ -225,3 +225,19 @@ def gca_dashboard():
 @bp.route("/gca/consult-prep")
 def gca_consult_prep_queue():
     return render_template("provider/gca_consult_prep.html")
+
+@bp.route("/doh")
+def doh_dashboard():
+    return render_template("provider/doh_dashboard.html")
+
+@bp.route("/doh/queue")
+def doh_queue():
+    return render_template("provider/doh_queue.html")
+
+@bp.route("/doh/report/<record_id>")
+def doh_report(record_id):
+    return render_template("provider/doh_report.html", record_id=record_id)
+
+@bp.route("/doh/history")
+def doh_history():
+    return render_template("provider/doh_history.html")
