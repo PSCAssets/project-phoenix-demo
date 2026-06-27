@@ -129,6 +129,10 @@ def np_dashboard():
 def gc_dashboard():
     return render_template("provider/gc_dashboard.html")
 
+@bp.route("/gc/queue")
+def gc_queue():
+    return render_template("provider/gc_queue.html")
+
 @bp.route("/schedule")
 def schedule():
     return render_template("provider/schedule.html")

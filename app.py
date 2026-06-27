@@ -212,7 +212,7 @@ def inject_sidebar_nav():
         ],
         'provider_gc': [
             ('Dashboard',     '/provider/gc',            'home',      ['/provider/gc']),
-            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
+            ('GC Queue',      '/provider/gc/queue',       'users',     ['/provider/gc/queue']),
             ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
@@ -225,6 +225,14 @@ def inject_sidebar_nav():
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
+        ],
+        'provider_psr': [
+            ('Dashboard',     '/care-team/psr',          'home',      ['/care-team/psr']),
+            ('Call Queue',    '/care-team/psr/queue',    'phone',     ['/care-team/psr/queue']),
+            ('Link Generator','/care-team/psr/link-generator','link', ['/care-team/psr/link-generator']),
+            ('Team Dashboard','/provider/manager',       'users',     ['/provider/manager']),
+            ('Messages',      '/provider/messages',      'message',   ['/provider/messages']),
+            ('Settings',      '/provider/settings',      'settings',  ['/provider/settings']),
         ],
         'scheduler': [
             ('Dashboard',     '/scheduler/',             'home',      ['/scheduler/']),
@@ -365,6 +373,7 @@ ROLE_NAMES = {
     'qa_reviewer':      'Rachel Chen, QA Reviewer',
     'gc_admin':         'Dana Cooper, GC Admin',
     'provider_manager': 'Riley Perrone, Team Manager',
+    'provider_psr':     'Melanie Marmo, PSR Manager',
 }
 
 ROLE_DESTINATIONS = {
@@ -382,6 +391,7 @@ ROLE_DESTINATIONS = {
     'gc_admin':         'provider.gc_admin_dashboard',
     'patient':          'patient.dashboard',
     'provider_manager': 'provider.manager_dashboard',
+    'provider_psr':     'care_team.psr_dashboard',
 }
 
 @app.route("/")

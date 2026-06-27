@@ -177,6 +177,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .iq-num-t { background:#D1FAE5; color:#065F46; }
 .iq-date { background:#FEF3C7; color:#92400E; }
 .iq-yn { background:#FCE7F3; color:#9D174D; }
+/* Phoenix Help info box (per-step) */
+.step-help-box { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px; display: flex; gap: 14px; align-items: flex-start; }
+.step-help-icon { font-size: 22px; flex-shrink: 0; }
+.step-help-content .step-help-title { font-size: 13px; font-weight: 700; color: #1D4ED8; margin-bottom: 6px; }
+.step-help-content .step-help-body { font-size: 12px; color: #374151; line-height: 1.65; }
+.step-help-content .step-help-body ul { padding-left: 16px; margin: 4px 0 0; }
+.step-help-content .step-help-body li { margin-bottom: 3px; }
 </style>
 {% endblock %}
 {% block content %}
@@ -213,32 +220,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
       <div class="step-group-label">Foundation</div>
       <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
-      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">3</div><div class="step-name">Portal Branding</div></div>
-      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">4</div><div class="step-name">Ecosystem</div></div>
-      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">5</div><div class="step-name">Provider Type</div></div>
-      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">6</div><div class="step-name">Provider Eligibility</div></div>
-      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">7</div><div class="step-name">State Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">8</div><div class="step-name">Age &amp; Guardian Rules</div></div>
+      <div class="step-nav-item" onclick="goToStep('team_assign')" id="sni_team_assign"><div class="step-num">3</div><div class="step-name">Team Assignment</div></div>
+      <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">4</div><div class="step-name">Portal Branding</div></div>
+      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">5</div><div class="step-name">Ecosystem</div></div>
+      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">6</div><div class="step-name">Provider Type</div></div>
+      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">7</div><div class="step-name">Provider Eligibility</div></div>
+      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">8</div><div class="step-name">State Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">9</div><div class="step-name">Age &amp; Guardian Rules</div></div>
       <div class="step-group-label">Clinical Setup</div>
-      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">9</div><div class="step-name">Appointment Duration</div></div>
-      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">10</div><div class="step-name">Consult Payment Tiers</div></div>
-      <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">11</div><div class="step-name">Health Profile Requirements</div></div>
-      <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">12</div><div class="step-name">Intake Questionnaire</div></div>
-      <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">13</div><div class="step-name">Documentation Template</div></div>
+      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">10</div><div class="step-name">Appointment Duration</div></div>
+      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">11</div><div class="step-name">Consult Payment Tiers</div></div>
+      <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">12</div><div class="step-name">Health Profile Requirements</div></div>
+      <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">13</div><div class="step-name">Intake Questionnaire</div></div>
+      <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">14</div><div class="step-name">Documentation Template</div></div>
       <div class="step-group-label">Workflow &amp; SLA</div>
-      <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">14</div><div class="step-name">Workflow Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep('preconsult_chk')" id="sni_preconsult_chk"><div class="step-num">15</div><div class="step-name">Pre-Consult Checklist</div></div>
-      <div class="step-nav-item" onclick="goToStep('qa_stage')" id="sni_qa_stage"><div class="step-num">16</div><div class="step-name">QA Stage Setup</div></div>
-      <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">17</div><div class="step-name">SLA Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(11)" id="sni11"><div class="step-num">15</div><div class="step-name">Workflow Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep('preconsult_chk')" id="sni_preconsult_chk"><div class="step-num">16</div><div class="step-name">Pre-Consult Checklist</div></div>
+      <div class="step-nav-item" onclick="goToStep('qa_stage')" id="sni_qa_stage"><div class="step-num">17</div><div class="step-name">QA Stage Setup</div></div>
+      <div class="step-nav-item" onclick="goToStep(12)" id="sni12"><div class="step-num">18</div><div class="step-name">SLA Configuration</div></div>
       <div class="step-group-label">Configuration</div>
-      <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">18</div><div class="step-name">Lab Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep(14)" id="sni14"><div class="step-num">19</div><div class="step-name">Cancellation Policy</div></div>
-      <div class="step-nav-item" onclick="goToStep(15)" id="sni15"><div class="step-num">20</div><div class="step-name">Documents &amp; Consent</div></div>
-      <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">21</div><div class="step-name">Notification Templates</div></div>
-      <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">22</div><div class="step-name">Patient Onboarding</div></div>
-      <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">23</div><div class="step-name">Linked Consultations</div></div>
+      <div class="step-nav-item" onclick="goToStep(13)" id="sni13"><div class="step-num">19</div><div class="step-name">Lab Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(14)" id="sni14"><div class="step-num">20</div><div class="step-name">Cancellation Policy</div></div>
+      <div class="step-nav-item" onclick="goToStep(15)" id="sni15"><div class="step-num">21</div><div class="step-name">Documents &amp; Consent</div></div>
+      <div class="step-nav-item" onclick="goToStep(16)" id="sni16"><div class="step-num">22</div><div class="step-name">Notification Templates</div></div>
+      <div class="step-nav-item" onclick="goToStep(17)" id="sni17"><div class="step-num">23</div><div class="step-name">Patient Onboarding</div></div>
+      <div class="step-nav-item" onclick="goToStep(18)" id="sni18"><div class="step-num">24</div><div class="step-name">Linked Consultations</div></div>
       <div class="step-group-label">Review</div>
-      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">24</div><div class="step-name">Review &amp; Submit</div></div>
+      <div class="step-nav-item" onclick="goToStep(19)" id="sni19"><div class="step-num">25</div><div class="step-name">Review &amp; Submit</div></div>
     </div>
 
     <!-- Step Content Panels -->
@@ -255,6 +263,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-panel active" id="step1">
         <div class="step-heading">Step 1 — Select Client</div>
         <div class="step-sub">All care products must be associated with a client. Select the client this care product will be built for.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Every care product belongs to a client (health plan, employer, or lab partner). Selecting the client first ensures all downstream configuration — branding, eligibility rules, state licensing, and billing — is tied to the correct contract. You cannot proceed without a client selection.
+            </div>
+          </div>
+        </div>
         <div class="form-group" style="max-width:480px;">
           <label class="form-label">Client <span class="req">*</span></label>
           <select class="form-input" id="s0_client" onchange="onClientSelect(this)">
@@ -270,10 +286,85 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
 
+      <!-- STEP: Team Assignment -->
+      <div class="step-panel" id="step_team_assign">
+        <div class="step-heading">Step 3 — Team Assignment</div>
+        <div class="step-sub">Assign which care team(s) will handle this product. This determines which queues and dashboards are activated.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">
+              Everlywell has two distinct care team groups — PSR (Melanie Marmo's team, EverlyCare + DXS) and PCC (Missy Lemieux's team, Gaps in Care). This assignment controls which team's queue receives tasks for this care product. Workflow stages within this product can be routed to different teams, enabling cross-team handoffs. Getting this right is the foundation of all routing logic.
+              <ul>
+                <li><strong>PSR team</strong> — outbound alert calls, scheduling link generation, consult offers (EverlyCare + DXS products)</li>
+                <li><strong>PCC team</strong> — Gaps in Care outbound follow-up calls, patient chart creation</li>
+                <li>Users with access to both teams see a toggle button in the portal top-right to switch views</li>
+                <li>Activity and statistics always roll up to the correct manager's dashboard based on team assignment</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Primary Care Team</div>
+          <div class="form-group">
+            <label class="form-label">Which team(s) own this care product? <span class="req">*</span></label>
+            <div class="check-group">
+              <label class="check-opt"><input type="checkbox" name="team_psr" value="psr"> PSR Team — EverlyCare &amp; DXS (Melanie Marmo)</label>
+              <label class="check-opt"><input type="checkbox" name="team_pcc" value="pcc"> PCC Team — Gaps in Care (Missy Lemieux)</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Proactive Consult Offer</label>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:8px;">When enabled, care team members may proactively offer a scheduling link during alert calls. When disabled, the link is only sent if the patient asks.</p>
+            <div class="toggle-row">
+              <label class="toggle"><input type="checkbox" id="s_proactive_offer"><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Enable proactive consult offer for eligible patients</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">Result Hold &amp; Release</div>
+          <div class="form-group">
+            <label class="form-label">Result hold release rule</label>
+            <p style="font-size:12px;color:#6B7280;margin-bottom:8px;">Controls when lab results are released to the patient portal. The platform enforces this automatically — no manual GCA action required.</p>
+            <div class="radio-group" style="flex-direction:column;gap:8px;">
+              <label class="radio-opt" style="width:100%;max-width:500px;"><input type="radio" name="result_hold" value="immediate"> <span><strong>Immediate</strong> — released as soon as result is received (after physician sign-off if required)</span></label>
+              <label class="radio-opt" style="width:100%;max-width:500px;"><input type="radio" name="result_hold" value="day_n"> <span><strong>Release on Day N</strong> — held for a configured number of days</span></label>
+              <label class="radio-opt" style="width:100%;max-width:500px;"><input type="radio" name="result_hold" value="post_gc"> <span><strong>Hold until post-GC consult</strong> — released only after Genetic Counselor consult is completed</span></label>
+              <label class="radio-opt" style="width:100%;max-width:500px;"><input type="radio" name="result_hold" value="physician_approval"> <span><strong>Hold until physician approval</strong> — requires explicit MD/DO sign-off before release</span></label>
+            </div>
+          </div>
+          <div class="form-group" id="hold_day_config" style="display:none;">
+            <label class="form-label">Hold duration (days)</label>
+            <input type="number" class="form-input" style="max-width:120px;" placeholder="14" min="1" max="90">
+            <p style="font-size:11px;color:#6B7280;margin-top:4px;">Results are also released early if the patient schedules a consult before this threshold.</p>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-card-title">28-Day Outreach Protocol</div>
+          <div class="form-group">
+            <div class="toggle-row">
+              <label class="toggle"><input type="checkbox" id="s_28day" checked><span class="toggle-slider"></span></label>
+              <span class="toggle-label">Enable 28-day outreach tracking and auto-closure</span>
+            </div>
+            <p style="font-size:12px;color:#6B7280;margin-top:8px;">When enabled, the platform tracks outreach attempt days from first contact. Alerts fire at Days 5, 10, 14, and 21. At day 28, an automated certified letter is sent and the order is closed. The GCA dashboard shows current day count for each open case.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- STEP: Portal Branding -->
       <div class="step-panel" id="step_branding">
         <div class="step-heading">Portal Branding Configuration</div>
         <div class="step-sub">Configure how patients experience this care product's portal. Controls branding at login and throughout their session.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Portal Branding controls how this care product appears to patients in the portal. Clients can display their own logo and color scheme (white-label) or use the Everlywell default. Consistent branding builds patient trust and reduces confusion across multiple care products from the same client.
+            </div>
+          </div>
+        </div>
 
         <div style="margin-bottom:24px;">
           <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:10px;">Branding Type</div>
@@ -374,6 +465,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-panel" id="step_ecosystem">
         <div class="step-heading">Ecosystem Classification</div>
         <div class="step-sub">Configure how this care product's patient portal is managed. This setting cannot be changed once patients are enrolled.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Ecosystem Classification determines how this care product is delivered — Telehealth (async, phone, or video), Genetics, Wellness, or a hybrid. This drives which provider types are available, which intake templates apply, and how results are processed. Misclassifying the ecosystem can cause incorrect routing and billing.
+            </div>
+          </div>
+        </div>
 
         <div style="display:flex;flex-direction:column;gap:12px;max-width:560px;margin-bottom:20px;">
 
@@ -405,6 +504,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-panel" id="step2">
         <div class="step-heading">Step 2 — Basic Info</div>
         <div class="step-sub">Define the core identity of this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Basic Info defines the product's identity — its name, code, description, and care category. This information appears in provider queues, patient communications, and billing reports. The care category drives downstream defaults for intake templates and SLA benchmarks.
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label class="form-label">Product Name <span class="req">*</span></label>
           <input type="text" class="form-input" id="s1_name" value="A1C Management" placeholder="e.g. Testosterone Replacement Therapy">
@@ -444,8 +551,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 2: Provider Type -->
       <div class="step-panel" id="step3">
-        <div class="step-heading">Step 5 — Provider Type</div>
+        <div class="step-heading">Step 6 — Provider Type</div>
         <div class="step-sub">Define which provider credential types are eligible to deliver this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Provider Type defines who delivers the care — MD, NP, GC, RN, or a combination. This controls which provider pool receives consult assignments for this product. Some products require a physician (MD/DO) by state law; others can be handled by NPs or GCs. This setting enforces the correct clinical staffing model.
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label class="form-label">Eligible Provider Types <span class="req">*</span></label>
           <div class="check-group">
@@ -466,8 +581,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP: Provider Eligibility -->
       <div class="step-panel" id="step_eligibility">
-        <div class="step-heading">Step 6 — Provider Eligibility Configuration</div>
+        <div class="step-heading">Step 7 — Provider Eligibility Configuration</div>
         <div class="step-sub">Define which providers are eligible to deliver this care product and configure program-type-specific assignment rules.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Provider Eligibility configures which specific providers or provider groups are allowed to see consults for this care product. This supports client-specific panels (e.g., only in-network providers), specialty restrictions, and experience requirements. Without this configuration, any provider in the pool could be assigned — which may violate client contracts.
+            </div>
+          </div>
+        </div>
 
         <div class="form-group" style="max-width:520px;">
           <label class="form-label">Program Type <span class="req">*</span></label>
@@ -535,8 +658,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 3: State Configuration -->
       <div class="step-panel" id="step4">
-        <div class="step-heading">Step 7 — State Configuration</div>
+        <div class="step-heading">Step 8 — State Configuration</div>
         <div class="step-sub">Configure which consult modalities are allowed per state. Check each modality your care product supports in that state.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">State Configuration maps which states this care product is available in, and what consultation modalities (on-demand, scheduled, async) are permitted per state. Telehealth laws vary significantly by state — some states prohibit async-only prescribing, others require in-state licensure. This step is the legal guardrail that prevents out-of-compliance consults from being created.
+            </div>
+          </div>
+        </div>
         <div style="display:flex;gap:20px;margin-bottom:10px;flex-wrap:wrap;">
           <div style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">Per-column actions:</div>
           <div><span style="font-size:12px;font-weight:600;color:#6B7280;">On-Demand:</span> <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-od',true);return false;">Select All</a> · <a href="#" style="color:#6B21A8;font-size:12px;font-weight:600;" onclick="bulkCol('cb-od',false);return false;">Clear All</a></div>
@@ -928,8 +1059,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 4: Age & Guardian Rules -->
       <div class="step-panel" id="step5">
-        <div class="step-heading">Step 8 — Age &amp; Guardian Rules</div>
+        <div class="step-heading">Step 9 — Age &amp; Guardian Rules</div>
         <div class="step-sub">Set patient age eligibility requirements for this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Age &amp; Guardian Rules define the minimum patient age for this product and whether parental or guardian consent is required for minors. Some genetics products (newborn screening, pediatric panels) have different age thresholds than adult telehealth products. This step prevents under-age patients from accessing products without the proper consent workflow.
+            </div>
+          </div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:440px;">
           <div class="form-group">
             <label class="form-label">Minimum Patient Age <span class="req">*</span></label>
@@ -958,8 +1097,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 5: Appointment Duration -->
       <div class="step-panel" id="step6">
-        <div class="step-heading">Step 9 — Appointment Duration</div>
+        <div class="step-heading">Step 10 — Appointment Duration</div>
         <div class="step-sub">Set appointment slot durations for each scheduled consult type. Initial and follow-up visits can have different lengths.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Appointment Duration sets the time blocks available for each consultation type within this product. For genetics, different service types (Results Delivery 30, Pre-Test 45, ExomeDx 60) have different durations that drive both scheduling slot generation and the 4-tier compensation model. Correct duration configuration ensures providers are paid correctly and patients get the right time allocation.
+            </div>
+          </div>
+        </div>
         <div style="overflow:hidden;border:1px solid #E5E7EB;border-radius:10px;background:#fff;margin-bottom:14px;">
           <table style="width:100%;border-collapse:collapse;">
             <thead>
@@ -1026,8 +1173,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 6: Consult Classification & Billing Tiers -->
       <div class="step-panel" id="step7">
-        <div class="step-heading">Step 10 — Consult Classification &amp; Billing Tiers</div>
+        <div class="step-heading">Step 11 — Consult Classification &amp; Billing Tiers</div>
         <div class="step-sub">Consultation rates are managed in provider agreements and tracked externally. Configure consult tier categories here for reporting.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Consult Payment Tiers configure the four-tier provider compensation model (15 / 30 / 45 / 60 min). Each tier maps to a rate defined in the provider's contract. The platform automatically categorizes completed consults by duration and generates billing records by tier. This replaces the manual simple/moderate/complex classification and eliminates billing errors.
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label class="form-label">Billing Model</label>
           <div class="radio-group">
@@ -1059,8 +1214,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 7: Health Profile Requirements -->
       <div class="step-panel" id="step8">
-        <div class="step-heading">Step 11 — Health Profile Requirements</div>
+        <div class="step-heading">Step 12 — Health Profile Requirements</div>
         <div class="step-sub">Configure which health profile sections patients must complete for this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Health Profile Requirements define which patient health data fields must be completed before a consult can proceed. Products that involve prescribing (e.g., UTI, thyroid) need medication history and allergy information. Genetics products may need family history. Incomplete health profiles are the most common cause of consult delays — this configuration enforces completion upfront.
+            </div>
+          </div>
+        </div>
         <table class="wiz-table">
           <thead><tr><th>Section</th><th>Required</th><th>Optional</th><th>Hidden</th></tr></thead>
           <tbody>
@@ -1077,8 +1240,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 8: Intake Questionnaire -->
       <div class="step-panel" id="step9">
-        <div class="step-heading">Step 12 — Intake Questionnaire</div>
+        <div class="step-heading">Step 13 — Intake Questionnaire</div>
         <div class="step-sub">Configure the intake questionnaire patients complete when enrolling in this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">The Intake Questionnaire is the structured set of questions a patient answers before their consult. It can be selected from the library of pre-approved templates or built custom. The intake feeds directly into the provider's chart view and drives clinical documentation. Using an unapproved or incomplete intake is a compliance risk.
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <div class="radio-group" style="flex-direction:column;gap:8px;">
             <label class="radio-opt"><input type="radio" name="iqMode" value="library" onchange="toggleIQLibrary()"> Select from Library</label>
@@ -1156,8 +1327,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 10: Documentation Template -->
       <div class="step-panel" id="step10">
-        <div class="step-heading">Step 13 — Documentation Template</div>
+        <div class="step-heading">Step 14 — Documentation Template</div>
         <div class="step-sub">Select the provider documentation template for this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">The Documentation Template defines the structure of the clinical note the provider completes after the consult. Standardized templates ensure all required clinical elements are captured, support regulatory audits, and enable consistent quality review. For genetics, documentation templates include sections for variant interpretation, patient education, and follow-up recommendations.
+            </div>
+          </div>
+        </div>
         <div id="docTplBanner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400E;margin-bottom:14px;">&#10022; Template auto-suggested based on care product name. Confirm or change below.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
           <label id="docTplCard1" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
@@ -1208,8 +1387,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 9: Workflow Configuration -->
       <div class="step-panel" id="step11">
-        <div class="step-heading">Step 14 — Workflow Configuration</div>
+        <div class="step-heading">Step 15 — Workflow Configuration</div>
         <div class="step-sub">Define the clinical workflow stages for this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Workflow Configuration is the core of how a care product operates — it defines every stage a patient moves through, who owns each stage (PSR, PCC, GCA, MD, GC), what tasks must be completed, and how handoffs work. This is the routing engine: tasks appear in the correct team's queue because of what is configured here. Stage-to-team assignment here acts as a check on the Team Assignment step.
+            </div>
+          </div>
+        </div>
 
         <!-- Mode toggle cards -->
         <div style="display:flex;gap:12px;margin-bottom:20px;">
@@ -1291,6 +1478,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-panel" id="step_preconsult_chk">
         <div class="step-heading">Pre-Consult Checklist Configuration</div>
         <div class="step-sub">Define mandatory pre-consult checklist items that care team members must complete before a consult enters the provider queue. Items are role-scoped and can be marked as required or advisory.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">The Pre-Consult Checklist defines mandatory tasks that must be completed before a consult is released to the provider queue. Common items include: HIPAA consent signed, health profile complete, lab results attached, insurance verified, guardian documentation on file. The platform blocks provider assignment until all items are checked — this prevents incomplete cases from reaching providers.
+            </div>
+          </div>
+        </div>
         <div class="form-card" style="margin-bottom:16px;">
           <div class="form-card-title">Enable Pre-Consult Checklist</div>
           <div class="toggle-row" style="margin-bottom:12px;">
@@ -1360,6 +1555,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-panel" id="step_qa_stage">
         <div class="step-heading">QA Stage Setup</div>
         <div class="step-sub">Configure quality assurance review requirements for this care product. When enabled, a QA Reviewer must approve each consult before it proceeds to chart close. Consults that fail QA route to the GC Administrator queue for resolution.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">QA Stage Setup configures an optional quality review gate within the consult workflow — typically used for genetics products where a Lead RN or QA reviewer audits consult notes before they are released to the patient. This step defines the QA criteria, who performs the review, and how flagged consults are escalated. For DXS audits, this is the stage Riley Perrone's team manages.
+            </div>
+          </div>
+        </div>
         <div class="form-card" style="margin-bottom:16px;">
           <div class="form-card-title">Enable QA Review Stage</div>
           <div class="toggle-row" style="margin-bottom:12px;">
@@ -1417,8 +1620,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 10: SLA Configuration -->
       <div class="step-panel" id="step12">
-        <div class="step-heading">Step 17 — SLA Configuration</div>
+        <div class="step-heading">Step 18 — SLA Configuration</div>
         <div class="step-sub">Set response time commitments and escalation rules for each workflow stage.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">SLA Configuration sets the time targets for each stage of this care product's workflow. SLAs drive automatic alerts when cases are approaching or past their target — for example, a referral review SLA of 15 minutes means PCC is alerted if a new referral sits unreviewed for more than 15 minutes. Missing SLAs consistently is a leading indicator of client dissatisfaction and is tracked in the Reports module.
+            </div>
+          </div>
+        </div>
         <table class="wiz-table">
           <thead><tr><th>Workflow Stage</th><th>SLA Time Limit</th><th>Warning At</th><th>Escalation Action</th></tr></thead>
           <tbody>
@@ -1432,8 +1643,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 11: Lab Configuration -->
       <div class="step-panel" id="step13">
-        <div class="step-heading">Step 18 — Lab Configuration</div>
+        <div class="step-heading">Step 19 — Lab Configuration</div>
         <div class="step-sub">Define lab requirements for patient enrollment and consult eligibility.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Lab Configuration connects this care product to the correct lab partner(s), defines the result ingestion method (HL7, API, manual upload), and sets which result types trigger care team workflows. For genetics, this also configures the on-hold bucket behavior per lab partner (e.g., Invitae results release immediately; Quest results hold for 14 days). Incorrect lab configuration is the most common cause of results not appearing in the platform.
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label class="form-label">Lab Requirement</label>
           <div class="toggle-row">
@@ -1472,8 +1691,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 12: Cancellation Policy -->
       <div class="step-panel" id="step14">
-        <div class="step-heading">Step 19 — Cancellation Policy</div>
+        <div class="step-heading">Step 20 — Cancellation Policy</div>
         <div class="step-sub">Define the cancellation and no-show rules for appointments in this care product.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Cancellation Policy defines the rules for patient and provider cancellations — how far in advance is allowed, whether a fee applies, how late cancellations affect provider billing (late cancellations within 24 hours count against the provider's billing report). These rules protect both provider capacity and client contractual commitments.
+            </div>
+          </div>
+        </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:520px;">
           <div class="form-group">
             <label class="form-label">No-Charge Cancellation Window</label>
@@ -1509,8 +1736,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 13: Documents & Consent -->
       <div class="step-panel" id="step15">
-        <div class="step-heading">Step 20 — Documents &amp; Consent</div>
+        <div class="step-heading">Step 21 — Documents &amp; Consent</div>
         <div class="step-sub">Assign required consent documents and define when they are presented to the patient.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Documents &amp; Consent specifies which consent forms, patient agreements, and informational documents are required for this care product. HIPAA authorization, telehealth consent, and product-specific informed consent (e.g., genetics pre-test counseling consent) are configured here. The platform blocks consult initiation if required consents are not on file — this is a core HIPAA compliance control.
+            </div>
+          </div>
+        </div>
         <table class="wiz-table">
           <thead><tr><th>Document</th><th>Presentation Point</th><th>Required</th><th>Actions</th></tr></thead>
           <tbody>
@@ -1539,8 +1774,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 14: Notification Templates -->
       <div class="step-panel" id="step16">
-        <div class="step-heading">Step 21 — Notification Templates</div>
+        <div class="step-heading">Step 22 — Notification Templates</div>
         <div class="step-sub">Configure automated patient and provider notifications for key workflow events.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Notification Templates define all automated patient communications for this care product — appointment confirmations, result ready alerts, consult reminders, and the day-28 outreach closure letter. Each template is linked to a workflow trigger so notifications fire at the right moment. Correct templates prevent patients from receiving generic or incorrect messages that erode trust.
+            </div>
+          </div>
+        </div>
         <table class="wiz-table">
           <thead><tr><th>Event</th><th>Channels</th><th>Template Preview</th><th>Status</th><th></th></tr></thead>
           <tbody>
@@ -1558,8 +1801,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 15: Patient Onboarding -->
       <div class="step-panel" id="step17">
-        <div class="step-heading">Step 22 — Patient Onboarding</div>
+        <div class="step-heading">Step 23 — Patient Onboarding</div>
         <div class="step-sub">Define the Getting Started checklist shown to patients after enrollment. All required steps must be complete before a consult can be submitted.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Patient Onboarding configures the experience a new patient has when first accessing this care product — account creation flow, identity verification, insurance collection, and welcome content. A smooth onboarding flow directly reduces support ticket volume and improves consult conversion rates. Clients often have specific onboarding requirements that differ from the Everlywell default.
+            </div>
+          </div>
+        </div>
         <div class="form-card">
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div style="display:flex;align-items:center;gap:12px;padding:10px;background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;">
@@ -1600,8 +1851,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 16: Linked Consultations -->
       <div class="step-panel" id="step18">
-        <div class="step-heading">Step 23 — Linked Consultations</div>
+        <div class="step-heading">Step 24 — Linked Consultations</div>
         <div class="step-sub">Configure how consultations link together for longitudinal care tracking — episode grouping, pre-test/post-test sequences, and research study enrollment.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Linked Consultations configures when and how this care product can trigger a follow-on consult in another care product — for example, a positive genetics result automatically offering a GC consult, or a thyroid lab result triggering a physician follow-up. This step is what makes the platform proactive rather than reactive, and is a key differentiator for Everlywell's genetics product suite.
+            </div>
+          </div>
+        </div>
 
         <!-- Episode Reference ID -->
         <div class="form-card" style="margin-bottom:16px;">
@@ -1699,8 +1958,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 24: Review & Submit -->
       <div class="step-panel" id="step19">
-        <div class="step-heading">Step 24 — Review &amp; Submit</div>
+        <div class="step-heading">Step 25 — Review &amp; Submit</div>
         <div class="step-sub">Review your complete care product configuration before submitting for compliance approval.</div>
+        <div class="step-help-box">
+          <div class="step-help-icon">🔥</div>
+          <div class="step-help-content">
+            <div class="step-help-title">Why this step exists</div>
+            <div class="step-help-body">Review &amp; Submit shows a complete summary of every configuration choice made across all 25 steps. Before submitting, verify that team assignments, state configurations, result hold rules, and SLA targets match the client contract. Once submitted, the care product goes to the compliance team for review — it will not go live until approved. Use the Edit links to correct any step without losing your other settings.
+            </div>
+          </div>
+        </div>
 
         <div id="reviewSections"></div>
 
@@ -1719,7 +1986,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <button class="save-exit" onclick="window.location.href='/admin/care-products'">Save &amp; Exit</button>
         <div class="step-counter">
           <div class="step-counter-label" id="stepCounterLabel">Step 1 of 25</div>
-          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:5.3%"></div></div>
+          <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:4%"></div></div>
         </div>
         <div class="wiz-nav-btns">
           <button class="btn-back" id="btnBack" onclick="prevStep()" style="display:none">← Back</button>
@@ -1758,14 +2025,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 {% raw %}
 <script>
 const TOTAL = 19;
-const DISPLAY_TOTAL = 24;
+const DISPLAY_TOTAL = 25;
 // Maps internal step key → visual 1-25 position shown to user
-var DISPLAY_STEP_MAP = { branding:3, ecosystem:4, eligibility:6, preconsult_chk:15, qa_stage:16 };
+var DISPLAY_STEP_MAP = { team_assign:3, branding:4, ecosystem:5, eligibility:7, preconsult_chk:16, qa_stage:17 };
 function getDisplayStep(n) {
   if (typeof n === 'string') return DISPLAY_STEP_MAP[n] || n;
-  // Named steps: branding+ecosystem insert before step 3; eligibility inserts before step 4; preconsult_chk+qa_stage before step 12
+  // Named steps: team_assign+branding+ecosystem insert before step 3; eligibility inserts before step 4; preconsult_chk+qa_stage before step 12
   var offset = 0;
-  if (n >= 3)  offset += 2; // branding + ecosystem (Basic Info is step 2, now position 2 with no offset)
+  if (n >= 3)  offset += 3; // team_assign + branding + ecosystem
   if (n >= 4)  offset += 1; // eligibility
   if (n >= 12) offset += 2; // preconsult_chk + qa_stage
   return n + offset;
@@ -1798,7 +2065,7 @@ function goToStep(n) {
     if (curSniEl)  curSniEl.classList.remove('active');
   }
   // ── Shared nav update: mark all completed steps green (numbered + named) ──
-  var NAMED_STEP_DISPLAY = { branding:3, ecosystem:4, eligibility:6, preconsult_chk:15, qa_stage:16 };
+  var NAMED_STEP_DISPLAY = { team_assign:3, branding:4, ecosystem:5, eligibility:7, preconsult_chk:16, qa_stage:17 };
   function refreshNavDone() {
     // Numbered steps sni1–sni20
     for (var i = 1; i <= TOTAL; i++) {
@@ -1883,13 +2150,13 @@ function selectBrandCard(idx) {
 }
 
 // Named step → next/prev step mapping
-var NAMED_NEXT = { branding:'ecosystem', ecosystem:3, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
-var NAMED_PREV = { branding:2, ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
+var NAMED_NEXT = { team_assign:'branding', branding:'ecosystem', ecosystem:3, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
+var NAMED_PREV = { team_assign:2, branding:'team_assign', ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
 // Numbered step → named step override (insert named step before continuing to n+1)
-// Step 1 → 2 (Basic Info) numerically; Step 2 (Basic Info) → branding; Step 3 (Provider Type) → eligibility
-var STEP_NAMED_NEXT = { 2:'branding', 3:'eligibility', 11:'preconsult_chk' };
+// Step 1 → 2 (Basic Info) numerically; Step 2 (Basic Info) → team_assign; Step 3 (Provider Type) → eligibility
+var STEP_NAMED_NEXT = { 2:'team_assign', 3:'eligibility', 11:'preconsult_chk' };
 // Numbered step → named step override for Back
-// Step 2 back → step 1 numerically; Step 3 back → ecosystem; Step 4 back → eligibility
+// Step 3 back → ecosystem; Step 4 back → eligibility; Step 12 back → qa_stage
 var STEP_NAMED_PREV = { 3:'ecosystem', 4:'eligibility', 12:'qa_stage' };
 
 function nextStep() {
@@ -1955,6 +2222,16 @@ function updateIQPreview() {
 function toggleLabConfig() {
   document.getElementById('lab_config').style.display = document.getElementById('s11_req').checked ? '' : 'none';
 }
+
+// Result hold release toggle (Team Assignment step)
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('input[name="result_hold"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+      var dayConf = document.getElementById('hold_day_config');
+      if (dayConf) dayConf.style.display = (this.value === 'day_n') ? '' : 'none';
+    });
+  });
+});
 
 // Episode toggle
 function toggleEpisode() {

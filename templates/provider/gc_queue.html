@@ -1,0 +1,557 @@
+{% extends "base.html" %}
+{% block title %}GC Consult Queue — Taylor Brooks | Project Phoenix{% endblock %}
+{% block head %}
+<style>
+:root {
+  --gc: #7C3AED;
+  --gc-dark: #5B21B6;
+  --gc-light: #EDE9FE;
+  --gc-border: #C4B5FD;
+  --asap: #DC2626;
+  --asap-bg: #FEF2F2;
+  --asap-border: #FCA5A5;
+  --amber: #D97706;
+  --amber-bg: #FFFBEB;
+  --sidebar-w: 64px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; background: #FAF7F2; display: flex; height: 100vh; overflow: hidden; }
+
+.sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: #F2EDE4; display: flex; flex-direction: column; align-items: center; padding: 12px 0; z-index: 100; height: 100vh; }
+.sidebar-logo { margin-bottom: 24px; padding: 8px; }
+.sidebar-logo svg { width: 32px; height: 32px; }
+.sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 0; border-radius: 8px; cursor: pointer; color: #9CA3AF; text-decoration: none; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; transition: background .15s, color .15s; }
+.nav-item:hover { background: #E5E0D8; color: #374151; }
+.nav-item.active { background: var(--gc-light); color: var(--gc); }
+.nav-item svg { width: 20px; height: 20px; }
+.sidebar-bottom { padding: 8px 6px; }
+
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.topbar { height: 56px; background: #fff; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; }
+.topbar-title { font-size: 16px; font-weight: 700; color: #111827; }
+.topbar-sub { font-size: 12px; color: #6B7280; margin-left: 4px; }
+.topbar-badge { background: var(--gc-light); color: var(--gc); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--gc-border); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.state-pill { background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #374151; }
+
+.body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Stats strip */
+.stats-strip { display: flex; gap: 12px; }
+.stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 20px; flex: 1; min-width: 0; }
+.stat-num { font-size: 24px; font-weight: 800; color: #111827; }
+.stat-label { font-size: 11px; color: #6B7280; margin-top: 2px; font-weight: 500; }
+.stat-card.asap .stat-num { color: var(--asap); }
+.stat-card.gc .stat-num { color: var(--gc); }
+
+/* Section */
+.section { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.section-header { padding: 14px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; }
+.section-title { font-size: 14px; font-weight: 700; color: #111827; }
+.section-count { background: #F3F4F6; border-radius: 12px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: #374151; }
+.asap-indicator { width: 8px; height: 8px; background: var(--asap); border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+.filter-row { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.filter-btn { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1.5px solid #E5E0D8; background: #fff; color: #374151; cursor: pointer; transition: all .15s; }
+.filter-btn.active { border-color: var(--gc); background: var(--gc-light); color: var(--gc); }
+
+/* Table */
+.q-table { width: 100%; border-collapse: collapse; }
+.q-table th { padding: 9px 14px; text-align: left; font-size: 10px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: .05em; background: #F9FAFB; border-bottom: 1px solid #E5E0D8; }
+.q-table td { padding: 12px 14px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+.q-table tr:last-child td { border-bottom: none; }
+.q-table tr.asap-row { background: var(--asap-bg); }
+.q-table tr.asap-row td { border-bottom-color: #FEE2E2; }
+
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+.badge-asap { background: var(--asap-bg); color: var(--asap); border: 1px solid var(--asap-border); }
+.badge-new { background: #EDE9FE; color: #5B21B6; border: 1px solid #C4B5FD; }
+.badge-assigned { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
+.badge-inprog { background: #DBEAFE; color: #1D4ED8; border: 1px solid #93C5FD; }
+.badge-state { background: #F3F4F6; color: #374151; border: 1px solid #D1D5DB; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+.wait-warn { color: var(--amber); font-weight: 700; }
+
+/* Buttons */
+.btn-primary { background: var(--gc); color: #fff; border: none; border-radius: 7px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary:hover { background: var(--gc-dark); }
+.btn-secondary { background: #fff; color: #374151; border: 1px solid #E5E0D8; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.btn-secondary:hover { background: #F9FAFB; }
+.btn-asap { background: var(--asap); color: #fff; border: none; border-radius: 7px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-asap:hover { background: #B91C1C; }
+
+/* Empty state */
+.empty { text-align: center; padding: 40px; color: #9CA3AF; }
+.empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+/* Modal */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1000; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 12px; width: 520px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 8px 40px rgba(0,0,0,.18); }
+.modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: flex-start; gap: 12px; }
+.modal-title { font-size: 16px; font-weight: 700; color: #111827; }
+.modal-sub { font-size: 12px; color: #6B7280; margin-top: 2px; }
+.modal-close { margin-left: auto; background: none; border: none; font-size: 20px; color: #9CA3AF; cursor: pointer; line-height: 1; }
+.modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #E5E0D8; display: flex; gap: 10px; justify-content: flex-end; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 700; color: #374151; }
+.form-select, .form-input { border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 10px; font-size: 13px; font-family: inherit; color: #111827; background: #fff; }
+.form-select:focus, .form-input:focus { outline: none; border-color: var(--gc); box-shadow: 0 0 0 2px rgba(124,58,237,.12); }
+.info-box { background: var(--gc-light); border: 1px solid var(--gc-border); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #5B21B6; line-height: 1.6; }
+.info-box strong { color: var(--gc-dark); }
+
+/* Consult detail card (modal) */
+.consult-detail { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 14px 16px; }
+.consult-detail-row { display: flex; gap: 8px; margin-bottom: 6px; font-size: 12px; }
+.consult-detail-row:last-child { margin-bottom: 0; }
+.consult-detail-label { width: 120px; color: #6B7280; font-weight: 600; flex-shrink: 0; }
+.consult-detail-val { color: #111827; font-weight: 500; }
+
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
+{% block content %}
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="40" height="40" rx="10" fill="#00A67E"/>
+      <path d="M20 8C20 8 12 14 12 22C12 26.418 15.582 30 20 30C24.418 30 28 26.418 28 22C28 14 20 8 20 8Z" fill="white" opacity="0.9"/>
+      <path d="M20 30V20M20 20L15 25M20 20L25 25" stroke="#00A67E" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <nav class="sidebar-nav">
+    <a href="/provider/gc" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </a>
+    <a href="/provider/gc/queue" class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Queue
+    </a>
+    <a href="/provider/schedule" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Schedule
+    </a>
+    <a href="/provider/messages" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+    </a>
+    <a href="/provider/settings" class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <a href="/provider/settings" class="nav-item" style="flex-direction:column;align-items:center;gap:3px;padding:6px 0;">
+      <div style="width:30px;height:30px;border-radius:50%;background:var(--gc);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">TB</div>
+    </a>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">GC Consult Queue</div>
+    </div>
+    <span class="topbar-sub">Taylor Brooks, MS CGC</span>
+    <span class="topbar-badge">Genetic Counselor</span>
+    <div class="topbar-right">
+      <span class="state-pill">📍 Licensed: NY · NJ · CT · PA · FL · TX · CA</span>
+      <button class="btn-secondary" onclick="openAvailModal()">Set Availability</button>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Stats -->
+    <div class="stats-strip">
+      <div class="stat-card asap">
+        <div class="stat-num" id="statAsap">2</div>
+        <div class="stat-label">ASAP Consults</div>
+      </div>
+      <div class="stat-card gc">
+        <div class="stat-num" id="statMine">3</div>
+        <div class="stat-label">Assigned to Me</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">8</div>
+        <div class="stat-label">Queue — Unassigned</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">5</div>
+        <div class="stat-label">Completed Today</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">32 min</div>
+        <div class="stat-label">Avg Turnaround Today</div>
+      </div>
+    </div>
+
+    <!-- ASAP Queue -->
+    <div class="section">
+      <div class="section-header">
+        <div class="asap-indicator"></div>
+        <span class="section-title" style="color:var(--asap);">ASAP Consult Queue</span>
+        <span class="section-count" style="background:#FEE2E2;color:var(--asap);" id="asapCount">2</span>
+        <span style="font-size:11px;color:#6B7280;margin-left:4px;">— Urgent. Self-assign now or GCA will assign.</span>
+      </div>
+      <table class="q-table">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Care Product</th>
+            <th>Service Type</th>
+            <th>State</th>
+            <th>Partner / Client</th>
+            <th>Waiting</th>
+            <th>Ordered</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="asapTbody">
+          <tr class="asap-row">
+            <td><span class="badge badge-asap">🚨 ASAP</span><br><span style="font-size:12px;color:#374151;margin-top:4px;display:block;">M.R. · 52F</span></td>
+            <td>Galleri Multi-Cancer</td>
+            <td><span class="badge badge-new">Results Delivery 45</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Grail / Elevance</td>
+            <td><span class="wait-warn">47 min</span></td>
+            <td>Results Delivery</td>
+            <td><button class="btn-asap" onclick="selfAssign(this,'M.R., 52F','Galleri Multi-Cancer','Results Delivery 45','NY')">Self-Assign</button></td>
+          </tr>
+          <tr class="asap-row">
+            <td><span class="badge badge-asap">🚨 ASAP</span><br><span style="font-size:12px;color:#374151;margin-top:4px;display:block;">K.O. · 38F</span></td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
+            <td><span class="badge-state">NJ</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="wait-warn">22 min</span></td>
+            <td>Pre-Test Genetic Counseling</td>
+            <td><button class="btn-asap" onclick="selfAssign(this,'K.O., 38F','Hereditary Cancer Panel','Pre-Test Consult 45','NJ')">Self-Assign</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Regular Queue -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">My Assigned Consults</span>
+        <span class="section-count" id="mineCount">3</span>
+        <div class="filter-row">
+          <select class="form-select" style="font-size:11px;padding:4px 8px;" onchange="filterQueue(this.value)">
+            <option value="all">All service types</option>
+            <option>Results Delivery 30</option>
+            <option>Results Delivery 45</option>
+            <option>Results Delivery PGx</option>
+            <option>Pre-Test Consult 45</option>
+            <option>Pre-Test Consult 60 (ExomeDx)</option>
+          </select>
+        </div>
+      </div>
+      <table class="q-table" id="assignedTable">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Care Product</th>
+            <th>Service Type</th>
+            <th>State</th>
+            <th>Partner</th>
+            <th>Consult Time</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>D.W. · 61M</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-inprog">Results Delivery 45</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Quest Diagnostics</td>
+            <td>Today 10:30 AM</td>
+            <td><span class="badge badge-inprog">In Progress</span></td>
+            <td><button class="btn-primary" onclick="openConsultDetail('D.W., 61M','Results Delivery 45','Quest Diagnostics','NY')">Open Chart</button></td>
+          </tr>
+          <tr>
+            <td>A.M. · 44F</td>
+            <td>Pharmacogenomics Panel</td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;border:1px solid #86EFAC;">Results Delivery PGx</span></td>
+            <td><span class="badge-state">FL</span></td>
+            <td>Fulgent Genetics</td>
+            <td>Today 1:00 PM</td>
+            <td><span class="badge badge-assigned">Scheduled</span></td>
+            <td><button class="btn-primary" onclick="openConsultDetail('A.M., 44F','Results Delivery PGx','Fulgent Genetics','FL')">Open Chart</button></td>
+          </tr>
+          <tr>
+            <td>L.C. · 29F</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
+            <td><span class="badge-state">CT</span></td>
+            <td>MyHeritage Health</td>
+            <td>Today 3:15 PM</td>
+            <td><span class="badge badge-assigned">Scheduled</span></td>
+            <td><button class="btn-primary" onclick="openConsultDetail('L.C., 29F','Pre-Test Consult 45','MyHeritage Health','CT')">Open Chart</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Open Queue (Unassigned) -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Open Queue — Unassigned</span>
+        <span class="section-count">8</span>
+        <span style="font-size:11px;color:#6B7280;margin-left:4px;">— Only showing states you are licensed in</span>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setStateFilter('all',this)">All States</button>
+          <button class="filter-btn" onclick="setStateFilter('NY',this)">NY</button>
+          <button class="filter-btn" onclick="setStateFilter('NJ',this)">NJ</button>
+          <button class="filter-btn" onclick="setStateFilter('FL',this)">FL</button>
+        </div>
+      </div>
+      <table class="q-table" id="openQueue">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Care Product</th>
+            <th>Service Type</th>
+            <th>State</th>
+            <th>Partner</th>
+            <th>Waiting</th>
+            <th>Preferred Time</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-state="NY">
+            <td>S.P. · 47F</td>
+            <td>Galleri Multi-Cancer</td>
+            <td><span class="badge badge-new">Results Delivery 45</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Grail / Elevance</td>
+            <td>1h 12m</td>
+            <td>ASAP</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'S.P., 47F','Galleri Multi-Cancer','Results Delivery 45')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="NJ">
+            <td>R.T. · 55M</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Results Delivery 30</span></td>
+            <td><span class="badge-state">NJ</span></td>
+            <td>Quest Diagnostics</td>
+            <td>38m</td>
+            <td>Flexible</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'R.T., 55M','Hereditary Cancer Panel','Results Delivery 30')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="FL">
+            <td>B.K. · 33F</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;border:1px solid #C4B5FD;">Pre-Test Consult 60 (ExomeDx)</span></td>
+            <td><span class="badge-state">FL</span></td>
+            <td>Probably Genetic</td>
+            <td>2h 5m</td>
+            <td>Afternoon</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'B.K., 33F','Hereditary Cancer Panel','Pre-Test Consult 60')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="NY">
+            <td>T.O. · 68M</td>
+            <td>Pharmacogenomics Panel</td>
+            <td><span class="badge" style="background:#F0FDF4;color:#15803D;border:1px solid #86EFAC;">Results Delivery PGx</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Fulgent Genetics</td>
+            <td>54m</td>
+            <td>Morning</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'T.O., 68M','Pharmacogenomics Panel','Results Delivery PGx')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="NJ">
+            <td>C.H. · 41F</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
+            <td><span class="badge-state">NJ</span></td>
+            <td>Invitae / Eli Lilly</td>
+            <td>1h 30m</td>
+            <td>ASAP</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'C.H., 41F','Hereditary Cancer Panel','Pre-Test Consult 45')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="FL">
+            <td>M.G. · 58F</td>
+            <td>Galleri Multi-Cancer</td>
+            <td><span class="badge badge-new">Results Delivery 45</span></td>
+            <td><span class="badge-state">FL</span></td>
+            <td>Grail / Humana</td>
+            <td>28m</td>
+            <td>Flexible</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'M.G., 58F','Galleri Multi-Cancer','Results Delivery 45')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="NY">
+            <td>J.R. · 45M</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Results Delivery 30</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Color Genomics</td>
+            <td>15m</td>
+            <td>ASAP</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'J.R., 45M','Hereditary Cancer Panel','Results Delivery 30')">Self-Assign</button></td>
+          </tr>
+          <tr data-state="FL">
+            <td>P.N. · 52F</td>
+            <td>Viome Full Body Intelligence</td>
+            <td><span class="badge badge-new">Results Delivery 30</span></td>
+            <td><span class="badge-state">FL</span></td>
+            <td>Viome Life Sciences</td>
+            <td>3h 10m</td>
+            <td>Afternoon</td>
+            <td><button class="btn-primary" onclick="selfAssignOpen(this,'P.N., 52F','Viome Full Body Intelligence','Results Delivery 30')">Self-Assign</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Consult Detail Modal -->
+<div class="overlay" id="consultModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="consultModalTitle">Consult Detail</div>
+        <div class="modal-sub" id="consultModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('consultModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="consult-detail" id="consultDetailBlock"></div>
+      <div class="info-box">
+        <strong>Next step:</strong> Open the patient chart to review results, then conduct the consult and complete the clinical note. The note will route to GCA for review before release to the patient.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Add note before opening chart (optional)</label>
+        <textarea class="form-input" rows="2" placeholder="Optional pre-consult note..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('consultModal')">Cancel</button>
+      <button class="btn-primary" onclick="openChart()">Open Patient Chart →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Availability Modal -->
+<div class="overlay" id="availModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title">Set Weekly Availability</div>
+        <div class="modal-sub">Taylor Brooks, MS CGC — affects GCA scheduling and queue assignment</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('availModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="info-box">Set your available hours per state. GCA uses this to schedule ASAP and scheduled consults. Hours logged here flow to the <strong>GC Billing Report</strong> for hourly tracking.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group"><label class="form-label">Monday</label><select class="form-select"><option>Available 9am–5pm</option><option>Available 12pm–6pm</option><option>Unavailable</option></select></div>
+        <div class="form-group"><label class="form-label">Tuesday</label><select class="form-select"><option>Available 9am–5pm</option><option>Available 12pm–6pm</option><option>Unavailable</option></select></div>
+        <div class="form-group"><label class="form-label">Wednesday</label><select class="form-select"><option>Unavailable</option><option>Available 9am–5pm</option><option>Available 12pm–6pm</option></select></div>
+        <div class="form-group"><label class="form-label">Thursday</label><select class="form-select"><option>Available 9am–5pm</option><option>Available 12pm–6pm</option><option>Unavailable</option></select></div>
+        <div class="form-group"><label class="form-label">Friday</label><select class="form-select"><option>Available 9am–12pm</option><option>Available 9am–5pm</option><option>Unavailable</option></select></div>
+        <div class="form-group"><label class="form-label">Weekend</label><select class="form-select"><option>Unavailable</option><option>Available on-call</option></select></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Active State Licenses (for routing)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="badge badge-assigned">NY ✓</span>
+          <span class="badge badge-assigned">NJ ✓</span>
+          <span class="badge badge-assigned">CT ✓</span>
+          <span class="badge badge-assigned">PA ✓</span>
+          <span class="badge badge-assigned">FL ✓</span>
+          <span class="badge badge-assigned">TX ✓</span>
+          <span class="badge badge-assigned">CA ✓</span>
+          <span class="badge" style="background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E0D8;">+ Add State</span>
+        </div>
+        <p style="font-size:11px;color:#6B7280;margin-top:6px;">Only patients in your licensed states appear in your queue. Contact GCA to update licensure.</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('availModal')">Cancel</button>
+      <button class="btn-primary" onclick="saveAvail()">Save Availability</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openAvailModal() { document.getElementById('availModal').classList.add('open'); }
+function saveAvail() { closeModal('availModal'); showToast('Availability updated — GCA notified'); }
+
+function selfAssign(btn, patient, product, svc, state) {
+  btn.disabled = true;
+  btn.textContent = '✓ Assigned';
+  btn.style.background = '#15803D';
+  var count = parseInt(document.getElementById('asapCount').textContent) - 1;
+  document.getElementById('asapCount').textContent = count;
+  document.getElementById('statAsap').textContent = count;
+  var mine = parseInt(document.getElementById('statMine').textContent) + 1;
+  document.getElementById('statMine').textContent = mine;
+  document.getElementById('mineCount').textContent = mine;
+  showToast('ASAP consult assigned — ' + patient + ' · ' + svc);
+}
+
+function selfAssignOpen(btn, patient, product, svc) {
+  btn.disabled = true;
+  btn.textContent = '✓ Assigned';
+  btn.style.background = '#059669';
+  var mine = parseInt(document.getElementById('statMine').textContent) + 1;
+  document.getElementById('statMine').textContent = mine;
+  document.getElementById('mineCount').textContent = mine;
+  showToast('Consult assigned — ' + patient + ' · ' + svc);
+}
+
+function openConsultDetail(patient, svc, partner, state) {
+  document.getElementById('consultModalTitle').textContent = 'Consult — ' + patient;
+  document.getElementById('consultModalSub').textContent = svc + ' · ' + partner + ' · ' + state;
+  document.getElementById('consultDetailBlock').innerHTML =
+    '<div class="consult-detail-row"><span class="consult-detail-label">Patient</span><span class="consult-detail-val">' + patient + '</span></div>' +
+    '<div class="consult-detail-row"><span class="consult-detail-label">Service Type</span><span class="consult-detail-val">' + svc + '</span></div>' +
+    '<div class="consult-detail-row"><span class="consult-detail-label">Partner / Client</span><span class="consult-detail-val">' + partner + '</span></div>' +
+    '<div class="consult-detail-row"><span class="consult-detail-label">State</span><span class="consult-detail-val">' + state + '</span></div>' +
+    '<div class="consult-detail-row"><span class="consult-detail-label">Compensation Tier</span><span class="consult-detail-val">Tier 2 — 30 min ($XX)</span></div>' +
+    '<div class="consult-detail-row"><span class="consult-detail-label">Pre-Checklist</span><span class="consult-detail-val" style="color:#15803D;font-weight:700;">✓ Complete</span></div>';
+  document.getElementById('consultModal').classList.add('open');
+}
+
+function openChart() {
+  closeModal('consultModal');
+  showToast('Opening patient chart…');
+  setTimeout(function(){ window.location.href = '/provider/chart/1?type=async'; }, 800);
+}
+
+function setStateFilter(state, btn) {
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('#openQueue tbody tr').forEach(function(row){
+    if (state === 'all' || row.dataset.state === state) row.style.display = '';
+    else row.style.display = 'none';
+  });
+}
+
+function filterQueue(val) { /* service type filter placeholder */ }
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+</script>
+{% endraw %}
+{% endblock %}
