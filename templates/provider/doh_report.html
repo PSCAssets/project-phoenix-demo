@@ -120,6 +120,23 @@ tbody tr:last-child td { border-bottom:none; }
 
 .success-banner { display:none; background:#D1FAE5; border:1px solid #6EE7B7; border-radius:10px; padding:12px 16px; margin-bottom:14px; font-size:13px; font-weight:600; color:#065F46; align-items:center; gap:8px; }
 .success-banner.visible { display:flex; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -137,6 +154,7 @@ tbody tr:last-child td { border-bottom:none; }
     <span>Crystal Veliz, DOH Coordinator</span>
     <div class="avatar">CV</div>
   </div>
+  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -417,6 +435,39 @@ tbody tr:last-child td { border-bottom:none; }
     </div>
   </div>
 </div>
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#0F766E;">
+      <div class="help-modal-title">&#8505; DOH Report Detail — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#128203;</span><span>Everything needed to submit a single DOH report in one screen. Patient demographics and the triggering lab result are pre-populated from Athena — no manual re-entry.</span></div>
+        <div class="help-item"><span class="help-icon">&#128231;</span><span>Submit via Fax (e-fax), Email, or log a Phone submission. Each method opens a confirmation modal. After submission, action buttons lock and the record moves to History.</span></div>
+        <div class="help-item"><span class="help-icon">&#128203;</span><span>Submission History at the bottom logs every attempt on this record — method, timestamp, confirmation number, and coordinator name. The log is immutable.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: coordinators transcribed patient demographics and lab values by hand into a state form, then faxed from a physical machine.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: demographics and lab data are pulled directly from the patient record. Coordinator reviews and clicks submit.</span></div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: no submission confirmation or audit trail.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: every submission is logged with method, destination, confirmation number, coordinator identity, and timestamp — HIPAA-compliant audit trail.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#128274;</span><span>Demographics are read-only and masked (initials, not full name). DOH Coordinators cannot access clinical charts from this screen.</span></div>
+        <div class="help-item"><span class="help-icon">&#9888;</span><span>Minor patient alert banner shows state-specific legal requirements (e.g., same-day reporting, parental notification).</span></div>
+        <div class="help-item"><span class="help-icon">&#9201;</span><span>SLA deadline and days-open counter are calculated from the lab result finalized timestamp, not the record creation time.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -505,5 +556,12 @@ function updateChar() {
   document.getElementById('charCount').textContent = v.length + ' / 500';
   if (v.length > 500) document.getElementById('coordNotes').value = v.slice(0, 500);
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var o = document.getElementById('helpOverlay');
+    if (o) o.classList.remove('open');
+  }
+});
 </script>
 {% endblock %}

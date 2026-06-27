@@ -86,6 +86,23 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .btn-secondary { background:#fff; color:#374151; border:1px solid var(--border); border-radius:8px; padding:11px 20px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
 .btn-secondary:hover { border-color:var(--purple); color:var(--purple); }
 .btn-back { background:#fff; color:var(--purple); border:1.5px solid var(--purple); border-radius:8px; padding:11px 20px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -99,6 +116,7 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
     <span>Priya Sharma, GCA</span>
     <div class="avatar">PS</div>
   </div>
+  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -339,6 +357,38 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
   </div>
 
 </div>
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#BE185D;">
+      <div class="help-modal-title">&#8505; GCA Consult Prep — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>4-section checklist: Results Verification, Reason for Consult, State Eligibility, and Blurb Confirmed. Each section tracks completion independently.</span></div>
+        <div class="help-item"><span class="help-icon">&#128218;</span><span>Blurb Library tab lets Priya search and select the correct genetic counseling blurb. Selecting a blurb auto-checks the 'Blurb Confirmed' checklist item.</span></div>
+        <div class="help-item"><span class="help-icon">&#128196;</span><span>Zendesk Case tab shows the linked support ticket. Prep Notes tab captures any session-specific context for the GC.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: GCAs and GCs both independently reviewed results and eligibility, sometimes catching errors only in the session itself.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: a structured checklist ensures all 4 prep areas are verified before the GC sees the case — errors caught earlier, sessions run smoother.</span></div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: blurb selection was done by memory or searching a separate document.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: searchable blurb library integrated into prep — one click selects and auto-checks the item.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#128202;</span><span>Progress bar at the top shows overall prep completion across all 4 sections.</span></div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>'Mark Prep Complete' sends a notification to the GC and updates the Zendesk case — no separate follow-up needed.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -419,5 +469,12 @@ function markPrepComplete() {
   statusEl.textContent = '✓ Prep Complete';
   alert('✓ Consult prep marked complete for PT-2026-00142.\n\nDr. Taylor Brooks has been notified and the consult brief is now available in their queue.\n\nZendesk case ZD-2026-004421 has been updated.');
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var o = document.getElementById('helpOverlay');
+    if (o) o.classList.remove('open');
+  }
+});
 </script>
 {% endblock %}

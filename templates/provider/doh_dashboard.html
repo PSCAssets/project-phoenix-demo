@@ -69,7 +69,57 @@ tbody tr:hover { background:#F0FDFA; }
 .btn-sm.primary:hover { background:#0D5F58; }
 
 .two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#0F766E;">
+      <div class="help-modal-title">&#8505; DOH Reporting Dashboard — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#9201;</span><span>Your home base for mandatory DOH reporting. Shows all open report records across every state, organized by overdue status, state, and condition.</span></div>
+        <div class="help-item"><span class="help-icon">&#128202;</span><span>5 stat cards at the top give you an instant read: total open, overdue (SLA breached), in progress, submitted today, and this week's total.</span></div>
+        <div class="help-item"><span class="help-icon">&#127759;</span><span>State grid highlights which states have overdue or high-volume records — red border means something needs your attention now.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: no centralized view of DOH reporting status. Coordinators tracked obligations in spreadsheets or email.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: every open obligation surfaces automatically the moment a lab result is finalized in Athena. Nothing falls through the cracks.</span></div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: no SLA visibility until a report was already late.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: overdue records are surfaced in red with a days-open counter. Business-day SLA runs automatically.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#9889;</span><span>Records are auto-created by the DOH Rule Engine — you never manually enter a report.</span></div>
+        <div class="help-item"><span class="help-icon">&#128231;</span><span>Click any state card to jump to the queue filtered for that state.</span></div>
+        <div class="help-item"><span class="help-icon">&#9208;</span><span>SLA counts business days only — weekends and holidays are excluded.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block content %}
@@ -82,6 +132,7 @@ tbody tr:hover { background:#F0FDFA; }
     <span>Crystal Veliz, DOH Coordinator</span>
     <div class="avatar">CV</div>
   </div>
+  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <main class="main">

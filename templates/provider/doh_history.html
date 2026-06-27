@@ -62,6 +62,23 @@ tbody tr:hover { background:#F0FDFA; }
 .sla-missed { font-size:11px; font-weight:700; color:var(--red); }
 
 .who { font-size:11px; color:#6B7280; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -75,6 +92,7 @@ tbody tr:hover { background:#F0FDFA; }
     <span>Crystal Veliz, DOH Coordinator</span>
     <div class="avatar">CV</div>
   </div>
+  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -352,6 +370,39 @@ tbody tr:hover { background:#F0FDFA; }
     </table>
   </div>
 </div>
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#0F766E;">
+      <div class="help-modal-title">&#8505; DOH Submission History — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#128203;</span><span>Immutable audit log of every DOH report submitted. Records cannot be edited or deleted — this is the legal record of your compliance activity.</span></div>
+        <div class="help-item"><span class="help-icon">&#128202;</span><span>SLA performance stats at the top show how many submissions were within SLA vs. missed — key metric for Compliance and leadership reviews.</span></div>
+        <div class="help-item"><span class="help-icon">&#128190;</span><span>Filter by state, condition, method, or SLA status and export as CSV for state audits, internal compliance reviews, or reporting to leadership.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: no centralized submission history. Proving compliance required searching email threads and physical fax confirmation sheets.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: every submission is logged automatically with full detail — method, confirmation number, coordinator, SLA status — searchable and exportable in seconds.</span></div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: SLA performance was unknown until a state agency flagged a late report.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: SLA Met vs. Missed is tracked automatically. You can see your weekly compliance rate at a glance.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#128275;</span><span>Records are append-only. If a submission was logged in error, Admin can annotate it — but the original entry is permanent.</span></div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>CSV export includes all fields including confirmation numbers and submission timestamps — ready for compliance documentation.</span></div>
+        <div class="help-item"><span class="help-icon">&#128231;</span><span>'Fax Failed' records show in the history so retry attempts and eventual success are both captured in sequence.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -376,5 +427,12 @@ function filterHistory() {
   });
   document.getElementById('histCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var o = document.getElementById('helpOverlay');
+    if (o) o.classList.remove('open');
+  }
+});
 </script>
 {% endblock %}

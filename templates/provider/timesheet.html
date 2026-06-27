@@ -71,6 +71,23 @@ tbody tr:hover { background: #FAF7F2; }
 .btn-modal-save { background: #6B21A8; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .btn-modal-save:hover { background: #5B1898; }
 .modal-notes { display: none; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -244,6 +261,39 @@ tbody tr:hover { background: #FAF7F2; }
   </div>
 </div>
 
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#445D7A;">
+      <div class="help-modal-title">&#8505; Timesheet — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#9201;</span><span>Weekly timesheet view for the current pay period. Each day shows clock-in, clock-out, total hours, and approval status.</span></div>
+        <div class="help-item"><span class="help-icon">&#9999;</span><span>Edit button on open entries lets you correct a time with a required reason. The change is logged and the entry moves to Pending Review status for manager approval.</span></div>
+        <div class="help-item"><span class="help-icon">&#128203;</span><span>Status chips show where each entry stands: Approved (locked), Pending Review (awaiting manager), Open (editable), Not Scheduled.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: time corrections required emailing a manager or HR, with no audit trail of what changed or why.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: edit modal captures the original time, new time, and a required reason. Manager sees the change in the timekeeping approval queue.</span></div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: approved entries could be accidentally edited.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: Approved entries are locked — no edit button shown. Only Open entries can be modified.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#9888;</span><span>Reason is required to save an edit — cannot submit without selecting a reason from the picklist.</span></div>
+        <div class="help-item"><span class="help-icon">&#128203;</span><span>Edited entries show a visual indicator in the row so the manager can see which times were modified.</span></div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>Pending Review entries are surfaced in the Manager Timekeeping view for approval or rejection.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -352,6 +402,13 @@ function to12h(t) {
 // Close modal on overlay click
 document.getElementById('editModal').addEventListener('click', function(e) {
   if (e.target === this) closeEditModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var o = document.getElementById('helpOverlay');
+    if (o) o.classList.remove('open');
+  }
 });
 </script>
 {% endblock %}

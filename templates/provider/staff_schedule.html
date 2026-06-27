@@ -66,6 +66,23 @@ input.time-input:disabled { background: #F9FAFB; color: #9CA3AF; cursor: not-all
 .avail-val.amber { color: #D97706; }
 
 .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9CA3AF; margin-bottom: 10px; }
+
+/* Help icon */
+.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; font-family:inherit; }
+.help-btn:hover { background:rgba(255,255,255,0.28); }
+.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.help-overlay.open { display:flex; }
+.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; }
+.help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; }
+.help-modal-title { color:#fff; font-size:15px; font-weight:700; }
+.help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+.help-modal-body { padding:20px 22px 24px; }
+.help-section { margin-bottom:16px; }
+.help-section:last-child { margin-bottom:0; }
+.help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+.help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+.help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 </style>
 {% endblock %}
 
@@ -239,6 +256,36 @@ input.time-input:disabled { background: #F9FAFB; color: #9CA3AF; cursor: not-all
   </div>
 
 </div>
+
+<!-- Help Modal -->
+<div class="help-overlay" id="helpOverlay">
+  <div class="help-modal">
+    <div class="help-modal-header" style="background:#445D7A;">
+      <div class="help-modal-title">&#8505; My Schedule — How This Works</div>
+      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="help-modal-body">
+      <div class="help-section">
+        <div class="help-label">What this screen does</div>
+        <div class="help-item"><span class="help-icon">&#128197;</span><span>Weekly availability entry for RN and MA staff. Set your shift type (Regular, On-Call, After-Hours, or Day Off) and start/end times for each day of the week.</span></div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>Submit for Approval sends the week's schedule to your manager for review. Copy Last Week populates this week from the previous week's entries.</span></div>
+        <div class="help-item"><span class="help-icon">&#128202;</span><span>Each day shows an approval status: Approved (locked), Pending (submitted), or Unsaved (in progress).</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Workflows this solves</div>
+        <div class="help-item"><span class="help-icon">&#128308;</span><span><strong>Previously:</strong> Previously: schedule requests were handled via email or verbal agreement with no structured visibility for managers.</span></div>
+        <div class="help-item"><span class="help-icon">&#128994;</span><span><strong>Now:</strong> Now: staff submit availability in a structured format. Managers see all submissions in the Team Schedule view.</span></div>
+      </div>
+      <hr class="help-divider">
+      <div class="help-section">
+        <div class="help-label">Key design decisions</div>
+        <div class="help-item"><span class="help-icon">&#9201;</span><span>Day Off selection disables start/end time fields automatically.</span></div>
+        <div class="help-item"><span class="help-icon">&#9989;</span><span>Copy Last Week saves time for staff with consistent schedules.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -300,5 +347,12 @@ function saveSchedule() {
 function copyLastWeek() {
   alert('In the full system, this copies your previous week\'s schedule as a starting point for the current week.');
 }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var o = document.getElementById('helpOverlay');
+    if (o) o.classList.remove('open');
+  }
+});
 </script>
 {% endblock %}
