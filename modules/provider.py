@@ -97,6 +97,18 @@ def rn_dashboard():
 def rn_queue():
     return render_template("provider/rn_queue.html")
 
+@bp.route("/rn/titers")
+def rn_titers():
+    return render_template("provider/rn_titers.html")
+
+@bp.route("/rn/oncall")
+def rn_oncall():
+    return render_template("provider/rn_oncall.html")
+
+@bp.route("/rn/audit")
+def rn_audit():
+    return render_template("provider/rn_audit.html")
+
 @bp.route("/ma")
 def ma_dashboard():
     return render_template("provider/ma_dashboard.html")

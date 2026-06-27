@@ -1,740 +1,448 @@
 {% extends "base.html" %}
-{% block title %}RN Queue{% endblock %}
+{% block title %}Critical Result Queue{% endblock %}
 {% block head %}
 <style>
+:root { --navy:#445D7A; --navy-light:#EEF2F7; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; --purple:#7C3AED; --teal:#0F766E; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--navy); display:flex; align-items:center; padding:0 24px; z-index:99; gap:14px; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#2E4563; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
 
-  :root {
-    --ew-green: #00A67E;
-    --ew-green-dark: #007A5C;
-    --ew-green-light: #E1F5EE;
-    --navy: #6B21A8;
-    --amber: #D97706;
-    --amber-light: #FEF3C7;
-    --blue: #2563EB;
-    --blue-light: #EFF6FF;
-    --red: #DC2626;
-    --red-light: #FEF2F2;
-    --purple: #7C3AED;
-    --bg: #FAF7F2;
-    --white: #FFFFFF;
-    --border: #E2E8F0;
-    --text: #1F2937;
-    --text-muted: #64748B;
-    --text-light: #94A3B8;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    display: flex;
-    min-height: 100vh;
-    font-size: 14px;
-  }
+/* Stats */
+.stats-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:22px; }
+.strip-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9CA3AF; margin-bottom:4px; }
+.strip-val { font-size:22px; font-weight:800; line-height:1; }
+.strip-sub { font-size:11px; color:#9CA3AF; margin-top:2px; }
 
-  /* SIDEBAR */
-  .sidebar {
-    width: 56px;
-    background: #F2EDE4;
-    border-right: 1px solid #E5E0D8;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 0;
-    z-index: 100;
-    gap: 4px;
-  }
-  .sidebar-logo {
-    width: 32px; height: 32px;
-    background: #6B21A8;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px;
-    font-weight: 700;
-    font-size: 12px;
-    color: #fff;
-  }
-  .sidebar-nav {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    width: 100%;
-    padding: 0 4px;
-  }
-  .nav-item {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 8px 4px;
-    border-radius: 8px;
-    color: #6B7280;
-    text-decoration: none;
-    font-size: 9px; font-weight: 600;
-    gap: 3px;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    position: relative;
-    text-align: center; line-height: 1.1;
-  }
-  .nav-item:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
-  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
-  .nav-item svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-  .nav-badge {
-    position: absolute;
-    top: 6px; right: 6px;
-    width: 8px; height: 8px;
-    background: var(--red);
-    border-radius: 50%;
-    border: 1.5px solid #F2EDE4;
-  }
-  .sidebar-footer {
-    font-size: 9px;
-    color: #9CA3AF;
-    text-align: center;
-    padding: 0 4px;
-    line-height: 1.5;
-  }
+/* Filter bar */
+.filter-bar { display:flex; gap:8px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+.filter-bar select, .filter-bar input { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.filter-bar input { min-width:200px; }
+.filter-bar select:focus, .filter-bar input:focus { border-color:var(--navy); }
+.row-count { font-size:12px; font-weight:600; color:#6B7280; margin-left:auto; }
 
-  /* MAIN LAYOUT */
-  .main {
-    margin-left: 56px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+/* Table */
+.table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+tbody td { padding:10px 12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F5F7FA; }
+tbody tr.er-row { background:#FFF5F5; border-left:3px solid var(--red); }
+tbody tr.overdue-row { background:#FFFBF0; }
 
-  /* TOPBAR */
-  .topbar {
-    height: 56px;
-    background: var(--navy);
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    gap: 12px;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-  }
-  .topbar-title {
-    font-size: 17px;
-    font-weight: 600;
-    color: #fff;
-  }
-  .topbar-subtitle {
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-    margin-top: 1px;
-  }
-  .topbar-divider {
-    width: 1px;
-    height: 28px;
-    background: rgba(255,255,255,0.15);
-    margin: 0 4px;
-  }
-  .topbar-spacer { flex: 1; }
-  .rn-team-badge {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    color: rgba(255,255,255,0.85);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .live-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--ew-green);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .live-label {
-    font-size: 11px;
-    color: var(--ew-green);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
-  }
+.athena-id { font-family:monospace; font-size:12px; font-weight:700; color:var(--navy); }
+.result-type { font-size:12px; font-weight:700; color:#111827; }
+.result-value { font-size:11px; color:var(--red); font-weight:700; margin-top:1px; }
+.source-text { font-size:11px; color:#6B7280; }
 
-  /* CONTENT */
-  .content {
-    padding: 24px;
-    flex: 1;
-  }
+/* Priority badge */
+.pri { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:700; }
+.pri-critical { background:#FEE2E2; color:#991B1B; }
+.pri-high     { background:#FEF3C7; color:#92400E; }
+.pri-standard { background:#F3F4F6; color:#374151; }
 
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-  .stat-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-  }
-  .stat-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 6px;
-  }
-  .stat-number {
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .stat-number.green { color: var(--ew-green); }
-  .stat-number.amber { color: var(--amber); }
-  .stat-number.red { color: var(--red); }
-  .stat-number.blue { color: var(--blue); }
+/* Attempt badge */
+.att-badge { font-size:11px; font-weight:700; }
+.att-0 { color:#9CA3AF; }
+.att-1 { color:#6B7280; }
+.att-2 { color:var(--amber); }
+.att-3 { color:var(--red); }
 
-  /* TABS */
-  .tabs-bar {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 0;
-    background: var(--white);
-    border-radius: 10px 10px 0 0;
-    padding: 0 16px;
-  }
-  .tab {
-    padding: 12px 16px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-    transition: color 0.15s;
-  }
-  .tab:hover { color: var(--text); }
-  .tab.active { color: var(--ew-green); border-bottom-color: var(--ew-green); }
-  .tab-count {
-    background: #F1F5F9;
-    color: var(--text-muted);
-    border-radius: 10px;
-    padding: 1px 7px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .tab.active .tab-count {
-    background: var(--ew-green-light);
-    color: var(--ew-green-dark);
-  }
-  .tab-count.red-count {
-    background: var(--red-light);
-    color: var(--red);
-  }
-  .tab-count.amber-count {
-    background: var(--amber-light);
-    color: var(--amber);
-  }
+/* ER flag */
+.er-flag { display:inline-flex; align-items:center; gap:4px; background:#FEE2E2; color:#991B1B; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; }
+.fu-flag { display:inline-flex; align-items:center; gap:4px; background:#FEF3C7; color:#92400E; font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px; }
+.overdue-note { font-size:10px; color:var(--red); font-weight:700; display:block; margin-top:2px; }
 
-  /* FILTER BAR */
-  .filter-bar {
-    background: var(--white);
-    padding: 12px 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    flex-wrap: wrap;
-  }
-  .filter-bar select, .filter-bar input {
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    color: var(--text);
-    background: var(--white);
-    outline: none;
-    font-family: inherit;
-  }
-  .filter-bar select { cursor: pointer; }
-  .filter-bar select:focus, .filter-bar input:focus {
-    border-color: var(--ew-green);
-    box-shadow: 0 0 0 2px rgba(0,166,126,0.12);
-  }
-  .filter-bar input { flex: 1; min-width: 160px; }
+/* Buttons */
+.btn-log { border:1px solid var(--border); background:#fff; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:var(--navy); }
+.btn-log:hover { border-color:var(--navy); background:var(--navy-light); }
+.btn-close { border:1px solid #E5E7EB; background:#F9FAFB; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:#6B7280; }
 
-  /* TABLE WRAPPER */
-  .table-wrapper {
-    background: var(--white);
-    border-radius: 0 0 10px 10px;
-    overflow-x: auto;
-    border: 1px solid var(--border);
-    border-top: none;
-  }
-
-  /* TABLE */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-  }
-  colgroup col:nth-child(1)  { width: 72px; }
-  colgroup col:nth-child(2)  { width: 130px; }
-  colgroup col:nth-child(3)  { width: 110px; }
-  colgroup col:nth-child(4)  { width: 140px; }
-  colgroup col:nth-child(5)  { width: 90px; }
-  colgroup col:nth-child(6)  { width: 110px; }
-  colgroup col:nth-child(7)  { width: 90px; }
-  colgroup col:nth-child(8)  { width: 100px; }
-  colgroup col:nth-child(9)  { width: 80px; }
-  colgroup col:nth-child(10) { width: 130px; }
-  thead tr {
-    border-bottom: 1px solid var(--border);
-  }
-  th {
-    padding: 10px 12px;
-    text-align: left;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-  }
-  th:hover { color: var(--text); }
-  th .sort-arrow { margin-left: 3px; opacity: 0.4; }
-  th.sorted .sort-arrow { opacity: 1; color: var(--ew-green); }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  tr:last-child td { border-bottom: none; }
-  tbody tr { background: #fff; }
-  tbody tr:hover { background: #FAFAFA; }
-
-  /* PRIORITY */
-  .priority-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 4px;
-    vertical-align: middle;
-  }
-  .priority-1 { background: var(--red); }
-  .priority-2 { background: var(--amber); }
-  .priority-3 { background: #94A3B8; }
-
-  /* PATIENT */
-  .patient-name { font-weight: 500; font-size: 13px; color: var(--text); }
-  .patient-id { font-size: 11px; color: var(--text-muted); }
-
-  /* TYPE TAG */
-  .type-tag {
-    display: inline-block;
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .type-async { background: var(--blue-light); color: var(--blue); }
-  .type-sync { background: #F3E8FF; color: var(--purple); }
-
-  /* URGENCY TAG */
-  .urgency-tag {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 5px;
-    font-size: 11px;
-    font-weight: 600;
-  }
-  .urgency-critical { background: var(--red-light); color: var(--red); }
-  .urgency-high { background: var(--amber-light); color: var(--amber); }
-  .urgency-normal { background: #F1F5F9; color: #64748B; }
-
-  /* CATEGORY PILL */
-  .cat-pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 500;
-    white-space: nowrap;
-  }
-  .cat-edu { background: var(--blue-light); color: #1D4ED8; }
-  .cat-rx { background: var(--amber-light); color: #92400E; }
-  .cat-ae { background: var(--red-light); color: #991B1B; }
-  .cat-intake { background: #F0FDF4; color: #166534; }
-
-  /* ASSIGNED */
-  .rn-initials {
-    display: inline-flex;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    align-items: center; justify-content: center;
-    font-size: 11px;
-    font-weight: 600;
-    background: #E2E8F0;
-    color: #475569;
-  }
-  .rn-unassigned {
-    font-size: 11px;
-    color: var(--text-light);
-    font-style: italic;
-  }
-
-  /* WAIT TIME */
-  .wait-time { font-size: 13px; }
-  .wait-urgent { color: var(--red); font-weight: 600; }
-  .wait-warn { color: var(--amber); font-weight: 500; }
-  .wait-ok { color: var(--text-muted); }
-
-  /* ACTION BUTTONS */
-  .actions { display: flex; gap: 6px; align-items: center; }
-  .btn-view {
-    border: 1px solid var(--navy);
-    background: transparent;
-    color: var(--navy);
-    border-radius: 5px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.12s;
-  }
-  .btn-view:hover { background: #F1F5F9; }
-  .btn-claim {
-    border: none;
-    background: var(--ew-green);
-    color: #fff;
-    border-radius: 5px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.12s;
-  }
-  .btn-claim:hover { background: var(--ew-green-dark); }
-  .btn-resolve {
-    border: 1px solid #CBD5E1;
-    background: transparent;
-    color: #64748B;
-    border-radius: 5px;
-    padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.12s;
-  }
-  .btn-resolve:hover { background: #F8FAFC; }
-
-  /* CONSULT ID */
-  .consult-id { font-size: 12px; color: var(--text-muted); font-family: 'SF Mono', 'Menlo', monospace; }
-
-  /* PROGRAM */
-  .program { font-size: 12px; color: var(--text); }
-
-
-  /* demo-nav-offset */
-  .sidebar { top: 60px !important; height: calc(100vh - 60px) !important; }
-  .main { margin-top: 60px !important; margin-left: 56px !important; }
-  .topbar  { top: 60px !important; }
-  .main    { margin-top: 116px !important; }
-
-
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:16px; width:540px; max-width:95vw; overflow:hidden; }
+.modal-header { padding:18px 20px; background:var(--navy); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:15px; font-weight:700; color:#fff; }
+.modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:rgba(255,255,255,0.7); }
+.modal-body { padding:20px; }
+.modal-info { background:#F0F4F8; border-radius:8px; padding:12px 14px; margin-bottom:14px; font-size:12px; color:#374151; }
+.modal-info strong { display:block; font-size:10px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px; }
+.modal-info-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.modal-field { margin-bottom:14px; }
+.modal-field label { display:block; font-size:11px; font-weight:700; color:#6B7280; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.05em; }
+.modal-field select, .modal-field input, .modal-field textarea { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 10px; font-size:13px; font-family:inherit; outline:none; color:#374151; }
+.modal-field select:focus, .modal-field input:focus, .modal-field textarea:focus { border-color:var(--navy); }
+.modal-field textarea { resize:vertical; min-height:72px; }
+.modal-warn { background:#FFF5F5; border:1px solid #FECACA; border-radius:8px; padding:10px 12px; font-size:12px; color:#991B1B; font-weight:600; margin-bottom:14px; display:none; }
+.modal-footer { display:flex; gap:10px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--border); }
+.btn-cancel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; }
+.btn-save { background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-save:hover { background:#2E4563; }
+.req-note { font-size:11px; color:var(--red); font-weight:600; display:none; margin-top:3px; }
+#erFollowUpGroup { display:none; }
 </style>
 {% endblock %}
+
 {% block content %}
-<!-- SIDEBAR -->
-
-<!-- MAIN -->
-<div class="main">
-
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div>
-      <div class="topbar-title">RN Queue</div>
-      <div class="topbar-subtitle">Registered Nurse · Shared Queue</div>
-    </div>
-    <div class="topbar-divider"></div>
-    <div class="rn-team-badge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-      RN Team
-    </div>
-    <div class="topbar-spacer"></div>
-    <div class="live-dot" title="Live queue"></div>
-    <span class="live-label">LIVE</span>
+<header class="topbar">
+  <div>
+    <div class="topbar-title">Critical Result Queue</div>
+    <div class="topbar-sub">M–F 8:00 AM – 8:00 PM ET &nbsp;·&nbsp; 3-attempt outreach protocol</div>
+  </div>
+  <div class="topbar-right">
+    <span>Jordan Patel, RN</span>
+    <div class="avatar">JP</div>
+  </div>
 </header>
 
-  <!-- CONTENT -->
-  <main class="content">
+<div class="page-wrap">
+  <div class="page-title">Critical Result Queue</div>
+  <div class="page-sub">Abnormal lab results requiring RN outreach. Each case requires up to 3 documented attempts before escalation or closure. ER referral outcomes trigger a mandatory 24-hour follow-up call.</div>
 
-    <!-- STATS ROW -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Total Queue</div>
-        <div class="stat-number green">35</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Unassigned</div>
-        <div class="stat-number amber">11</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Adverse Effects</div>
-        <div class="stat-number red">7</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Rx Failures</div>
-        <div class="stat-number amber">9</div>
-      </div>
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="strip-card">
+      <div class="strip-label">Open Cases</div>
+      <div class="strip-val" style="color:var(--navy);">14</div>
+      <div class="strip-sub">requiring outreach</div>
     </div>
-
-    <!-- TABS + TABLE CONTAINER -->
-    <div>
-      <!-- TABS -->
-      <div class="tabs-bar" role="tablist">
-        <div class="tab active" role="tab" onclick="setTab('all', this)">
-          All <span class="tab-count">35</span>
-        </div>
-        <div class="tab" role="tab" onclick="setTab('edu', this)">
-          Education Questions <span class="tab-count">8</span>
-        </div>
-        <div class="tab" role="tab" onclick="setTab('rx', this)">
-          Prescription Failure <span class="tab-count amber-count">9</span>
-        </div>
-        <div class="tab" role="tab" onclick="setTab('ae', this)">
-          Adverse Effects <span class="tab-count red-count">7</span>
-        </div>
-        <div class="tab" role="tab" onclick="setTab('intake', this)">
-          Intake Review <span class="tab-count">8</span>
-        </div>
-      </div>
-
-      <!-- FILTER BAR -->
-      <div class="filter-bar">
-        <select id="filter-category" onchange="applyFilters()">
-          <option value="">All Categories</option>
-          <option value="Education">Education Questions</option>
-          <option value="Rx Failure">Prescription Failure</option>
-          <option value="Adverse Effects">Adverse Effects</option>
-          <option value="Intake Review">Intake Review</option>
-        </select>
-        <select id="filter-type" onchange="applyFilters()">
-          <option value="">All Types</option>
-          <option value="ASYNC">Async</option>
-          <option value="SYNC VIDEO">Sync Video</option>
-        </select>
-        <select id="filter-urgency" onchange="applyFilters()">
-          <option value="">All Urgency</option>
-          <option value="CRITICAL">Critical</option>
-          <option value="HIGH">High</option>
-          <option value="NORMAL">Normal</option>
-        </select>
-        <select id="filter-assigned" onchange="applyFilters()">
-          <option value="">All RNs</option>
-          <option value="SK">SK</option>
-          <option value="LM">LM</option>
-          <option value="JT">JT</option>
-          <option value="Unassigned">Unassigned</option>
-        </select>
-        <input type="text" id="filter-search" placeholder="Search patient, ID, program…" oninput="applyFilters()">
-      </div>
-
-      <!-- TABLE -->
-      <div class="table-wrapper">
-        <table id="queue-table" aria-label="RN shared queue">
-          <colgroup>
-            <col><col><col><col><col><col><col><col><col><col>
-          </colgroup>
-          <thead>
-            <tr>
-              <th onclick="sortTable(0)">Priority <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(1)">Patient <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(2)">Consult ID <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(3)">Category <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(4)">Type <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(5)">Care Product <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(6)">Urgency <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(7)">Assigned <span class="sort-arrow">↕</span></th>
-              <th onclick="sortTable(8)">Wait Time <span class="sort-arrow">↕</span></th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="queue-tbody">
-          </tbody>
-        </table>
-      </div>
+    <div class="strip-card">
+      <div class="strip-label">ER Follow-Up Due</div>
+      <div class="strip-val" style="color:var(--red);">3</div>
+      <div class="strip-sub">within 24h window</div>
     </div>
-  </main>
+    <div class="strip-card">
+      <div class="strip-label">Overdue</div>
+      <div class="strip-val" style="color:var(--amber);">5</div>
+      <div class="strip-sub">>4h, no attempt</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Closed Today</div>
+      <div class="strip-val" style="color:var(--green);">9</div>
+      <div class="strip-sub">any outcome</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Avg Contact Time</div>
+      <div class="strip-val" style="color:var(--navy);">1.4h</div>
+      <div class="strip-sub">attempt 1 to close</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search Athena ID or result type…" oninput="filterTable()">
+    <select id="filterPri" onchange="filterTable()">
+      <option value="">All Priorities</option>
+      <option>Critical</option>
+      <option>High</option>
+      <option>Standard</option>
+    </select>
+    <select id="filterAttempt" onchange="filterTable()">
+      <option value="">All Attempts</option>
+      <option>No Attempt Yet</option>
+      <option>1st Attempt</option>
+      <option>2nd Attempt</option>
+      <option>3rd / Final</option>
+      <option>ER Follow-Up Due</option>
+    </select>
+    <select id="filterSource" onchange="filterTable()">
+      <option value="">All Sources</option>
+      <option>Labs Module</option>
+      <option>Zendesk</option>
+      <option>Care Team Escalation</option>
+      <option>Phone Verbal</option>
+    </select>
+    <span class="row-count" id="rowCount">Showing 14 cases</span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="caseTable">
+      <thead>
+        <tr>
+          <th>Athena ID</th>
+          <th>Result Type</th>
+          <th>Value / Flag</th>
+          <th>Priority</th>
+          <th>Source</th>
+          <th>Received</th>
+          <th>Attempt</th>
+          <th>Last Outcome</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="caseBody">
+        <tr class="er-row" data-pri="Critical" data-attempt="ER Follow-Up Due" data-source="Labs Module">
+          <td><span class="athena-id">64133</span></td>
+          <td><div class="result-type">HbA1c</div></td>
+          <td><div class="result-value">14.2% ↑↑</div></td>
+          <td><span class="pri pri-critical">Critical</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Today 7:12 AM</td>
+          <td><span class="att-badge att-2">2nd Attempt</span></td>
+          <td><span class="er-flag">🚨 ER Referred</span><span class="overdue-note">24h follow-up due by 9:15 AM</span></td>
+          <td><button class="btn-log" onclick="openModal('64133','HbA1c','14.2% ↑↑','Critical','2nd Attempt',true)">Log Follow-Up</button></td>
+        </tr>
+        <tr class="er-row" data-pri="Critical" data-attempt="ER Follow-Up Due" data-source="Phone Verbal">
+          <td><span class="athena-id">63292</span></td>
+          <td><div class="result-type">Potassium</div></td>
+          <td><div class="result-value">6.8 mEq/L ↑↑</div></td>
+          <td><span class="pri pri-critical">Critical</span></td>
+          <td><span class="source-text">Phone Verbal</span></td>
+          <td>Yesterday 4:44 PM</td>
+          <td><span class="att-badge att-1">1st Attempt</span></td>
+          <td><span class="er-flag">🚨 ER Referred</span><span class="overdue-note">24h follow-up overdue</span></td>
+          <td><button class="btn-log" onclick="openModal('63292','Potassium','6.8 mEq/L ↑↑','Critical','1st Attempt',true)">Log Follow-Up</button></td>
+        </tr>
+        <tr class="er-row" data-pri="Critical" data-attempt="ER Follow-Up Due" data-source="Care Team Escalation">
+          <td><span class="athena-id">65079</span></td>
+          <td><div class="result-type">Sodium</div></td>
+          <td><div class="result-value">121 mEq/L ↓↓</div></td>
+          <td><span class="pri pri-critical">Critical</span></td>
+          <td><span class="source-text">Care Team Escalation</span></td>
+          <td>Today 8:02 AM</td>
+          <td><span class="att-badge att-1">1st Attempt</span></td>
+          <td><span class="er-flag">🚨 ER Referred</span><span class="overdue-note">24h follow-up due by 10:05 AM</span></td>
+          <td><button class="btn-log" onclick="openModal('65079','Sodium','121 mEq/L ↓↓','Critical','1st Attempt',true)">Log Follow-Up</button></td>
+        </tr>
+        <tr class="overdue-row" data-pri="Critical" data-attempt="No Attempt Yet" data-source="Labs Module">
+          <td><span class="athena-id">68996</span></td>
+          <td><div class="result-type">Troponin I</div></td>
+          <td><div class="result-value">0.92 ng/mL ↑↑</div></td>
+          <td><span class="pri pri-critical">Critical</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Today 6:55 AM</td>
+          <td><span class="att-badge att-0">No Attempt</span></td>
+          <td><span class="overdue-note">⚠ Overdue — no attempt logged</span></td>
+          <td><button class="btn-log" onclick="openModal('68996','Troponin I','0.92 ng/mL ↑↑','Critical','No Attempt Yet',false)">Log Attempt</button></td>
+        </tr>
+        <tr class="overdue-row" data-pri="Critical" data-attempt="No Attempt Yet" data-source="Zendesk">
+          <td><span class="athena-id">55929</span></td>
+          <td><div class="result-type">eGFR</div></td>
+          <td><div class="result-value">12 mL/min ↓↓</div></td>
+          <td><span class="pri pri-critical">Critical</span></td>
+          <td><span class="source-text">Zendesk</span></td>
+          <td>Today 7:30 AM</td>
+          <td><span class="att-badge att-0">No Attempt</span></td>
+          <td><span class="overdue-note">⚠ Overdue — no attempt logged</span></td>
+          <td><button class="btn-log" onclick="openModal('55929','eGFR','12 mL/min ↓↓','Critical','No Attempt Yet',false)">Log Attempt</button></td>
+        </tr>
+        <tr data-pri="High" data-attempt="1st Attempt" data-source="Labs Module">
+          <td><span class="athena-id">65171</span></td>
+          <td><div class="result-type">HbA1c</div></td>
+          <td><div class="result-value">11.8% ↑</div></td>
+          <td><span class="pri pri-high">High</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Today 8:45 AM</td>
+          <td><span class="att-badge att-1">1st Attempt</span></td>
+          <td>Voicemail left — no return</td>
+          <td><button class="btn-log" onclick="openModal('65171','HbA1c','11.8% ↑','High','1st Attempt',false)">Log Attempt</button></td>
+        </tr>
+        <tr data-pri="High" data-attempt="2nd Attempt" data-source="Labs Module">
+          <td><span class="athena-id">64908</span></td>
+          <td><div class="result-type">LDL Cholesterol</div></td>
+          <td><div class="result-value">248 mg/dL ↑</div></td>
+          <td><span class="pri pri-high">High</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Jun 25</td>
+          <td><span class="att-badge att-2">2nd Attempt</span></td>
+          <td>No answer — no voicemail option</td>
+          <td><button class="btn-log" onclick="openModal('64908','LDL Cholesterol','248 mg/dL ↑','High','2nd Attempt',false)">Log Attempt</button></td>
+        </tr>
+        <tr data-pri="High" data-attempt="2nd Attempt" data-source="Care Team Escalation">
+          <td><span class="athena-id">59521</span></td>
+          <td><div class="result-type">TSH</div></td>
+          <td><div class="result-value">0.02 mIU/L ↓</div></td>
+          <td><span class="pri pri-high">High</span></td>
+          <td><span class="source-text">Care Team Escalation</span></td>
+          <td>Jun 26</td>
+          <td><span class="att-badge att-2">2nd Attempt</span></td>
+          <td>Spoke — patient aware, MD notified</td>
+          <td><button class="btn-log" onclick="openModal('59521','TSH','0.02 mIU/L ↓','High','2nd Attempt',false)">Log Attempt</button></td>
+        </tr>
+        <tr data-pri="High" data-attempt="3rd / Final" data-source="Labs Module">
+          <td><span class="athena-id">63503</span></td>
+          <td><div class="result-type">Hemoglobin</div></td>
+          <td><div class="result-value">6.8 g/dL ↓</div></td>
+          <td><span class="pri pri-high">High</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Jun 23</td>
+          <td><span class="att-badge att-3">3rd / Final</span></td>
+          <td>3 attempts — no patient contact</td>
+          <td><button class="btn-log" onclick="openModal('63503','Hemoglobin','6.8 g/dL ↓','High','3rd / Final',false)">Close Case</button></td>
+        </tr>
+        <tr data-pri="Standard" data-attempt="No Attempt Yet" data-source="Zendesk">
+          <td><span class="athena-id">59517</span></td>
+          <td><div class="result-type">Microalbumin/Cr</div></td>
+          <td><div class="result-value">310 mg/g ↑</div></td>
+          <td><span class="pri pri-standard">Standard</span></td>
+          <td><span class="source-text">Zendesk</span></td>
+          <td>Today 9:10 AM</td>
+          <td><span class="att-badge att-0">No Attempt</span></td>
+          <td>—</td>
+          <td><button class="btn-log" onclick="openModal('59517','Microalbumin/Cr','310 mg/g ↑','Standard','No Attempt Yet',false)">Log Attempt</button></td>
+        </tr>
+        <tr data-pri="Standard" data-attempt="1st Attempt" data-source="Labs Module">
+          <td><span class="athena-id">64134</span></td>
+          <td><div class="result-type">Fasting Glucose</div></td>
+          <td><div class="result-value">318 mg/dL ↑</div></td>
+          <td><span class="pri pri-standard">Standard</span></td>
+          <td><span class="source-text">Labs Module</span></td>
+          <td>Today 8:20 AM</td>
+          <td><span class="att-badge att-1">1st Attempt</span></td>
+          <td>Voicemail left</td>
+          <td><button class="btn-log" onclick="openModal('64134','Fasting Glucose','318 mg/dL ↑','Standard','1st Attempt',false)">Log Attempt</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
+
+<!-- Log Attempt Modal -->
+<div class="modal-overlay" id="attemptModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitleText">Log Outreach Attempt</div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info modal-info-grid">
+        <div><strong>Athena ID</strong><span id="mAthena">—</span></div>
+        <div><strong>Result / Flag</strong><span id="mResult">—</span></div>
+        <div><strong>Priority</strong><span id="mPriority">—</span></div>
+        <div><strong>Current Attempt</strong><span id="mAttempt">—</span></div>
+      </div>
+      <div class="modal-warn" id="thirdAttemptWarn">
+        ⚠ This is the 3rd and final attempt. After logging, this case will be closed and documented in the patient chart. The provider will be notified.
+      </div>
+      <div class="modal-field">
+        <label>Contact Method *</label>
+        <select id="methodSelect">
+          <option value="">Select method…</option>
+          <option>Phone Call — Spoke with Patient</option>
+          <option>Phone Call — No Answer</option>
+          <option>Voicemail Left</option>
+          <option>No Voicemail Option</option>
+          <option>Phone Not Accepting Calls</option>
+          <option>Mailbox Full</option>
+          <option>Portal Message Sent</option>
+        </select>
+        <div class="req-note" id="methodReq">Required</div>
+      </div>
+      <div class="modal-field">
+        <label>Outcome *</label>
+        <select id="outcomeSelect" onchange="handleOutcomeChange()">
+          <option value="">Select outcome…</option>
+          <option>Patient Notified — Acknowledged</option>
+          <option>Patient Notified — ER Referral Recommended</option>
+          <option>Patient Notified — MD Notified</option>
+          <option>Voicemail Left — No Return Call</option>
+          <option>Patient Could Not Be Reached</option>
+          <option>Patient Declined Contact</option>
+          <option>ER Follow-Up Completed — Patient OK</option>
+          <option>ER Follow-Up Completed — Still in ER</option>
+          <option>Case Closed — 3 Attempts, No Contact</option>
+        </select>
+        <div class="req-note" id="outcomeReq">Required</div>
+      </div>
+      <div class="modal-field" id="erFollowUpGroup">
+        <label>ER Visit Date / Time</label>
+        <input type="datetime-local" id="erDateTime">
+      </div>
+      <div class="modal-field">
+        <label>Notes</label>
+        <textarea id="attemptNotes" placeholder="Patient response, clinical details, provider communications…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveAttempt()">Save &amp; Update Chart</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
+
 {% block scripts %}
-{% raw %}
 <script>
-const rows = [
-  { priority: 1, patient: "Marcus T.", patientId: "#PT-00412", consultId: "CSL-20148", category: "Adverse Effects", categoryKey: "ae", type: "ASYNC", program: "GLP-1 / Weight", urgency: "CRITICAL", assigned: "Unassigned", waitMins: 87, notes: "Nausea + dizziness on semaglutide" },
-  { priority: 1, patient: "Angela R.", patientId: "#PT-00389", consultId: "CSL-20131", category: "Rx Failure", categoryKey: "rx", type: "ASYNC", program: "GLP-1 / Weight", urgency: "HIGH", assigned: "Unassigned", waitMins: 142, notes: "Semaglutide PA rejected by insurer" },
-  { priority: 1, patient: "David K.", patientId: "#PT-00501", consultId: "CSL-20162", category: "Rx Failure", categoryKey: "rx", type: "ASYNC", program: "Metabolic Health", urgency: "HIGH", assigned: "SK", waitMins: 65, notes: "Metformin 1000mg not filled at pharmacy" },
-  { priority: 2, patient: "Lisa M.", patientId: "#PT-00277", consultId: "CSL-20109", category: "Rx Failure", categoryKey: "rx", type: "SYNC VIDEO", program: "Men's Health", urgency: "HIGH", assigned: "LM", waitMins: 38, notes: "Testosterone Rx transmission error" },
-  { priority: 2, patient: "Sarah B.", patientId: "#PT-00345", consultId: "CSL-20117", category: "Adverse Effects", categoryKey: "ae", type: "ASYNC", program: "Metabolic Health", urgency: "HIGH", assigned: "JT", waitMins: 55, notes: "Persistent fatigue on metformin" },
-  { priority: 2, patient: "Kevin P.", patientId: "#PT-00466", consultId: "CSL-20155", category: "Education", categoryKey: "edu", type: "ASYNC", program: "Metabolic Health", urgency: "NORMAL", assigned: "SK", waitMins: 29, notes: "Diabetes medication dosing question" },
-  { priority: 2, patient: "Rachel O.", patientId: "#PT-00318", consultId: "CSL-20124", category: "Education", categoryKey: "edu", type: "ASYNC", program: "Thyroid", urgency: "NORMAL", assigned: "Unassigned", waitMins: 73, notes: "Questions about thyroid lab results" },
-  { priority: 2, patient: "James W.", patientId: "#PT-00530", consultId: "CSL-20171", category: "Intake Review", categoryKey: "intake", type: "ASYNC", program: "GLP-1 / Weight", urgency: "NORMAL", assigned: "LM", waitMins: 19, notes: "Incomplete intake — missing BMI entry" },
-  { priority: 3, patient: "Tina F.", patientId: "#PT-00288", consultId: "CSL-20098", category: "Intake Review", categoryKey: "intake", type: "ASYNC", program: "Women's Health", urgency: "NORMAL", assigned: "Unassigned", waitMins: 47, notes: "Missing recent labs — follow-up needed" }
-];
+var isErFollowUp = false;
 
-let currentTab = 'all';
-let sortCol = -1;
-let sortAsc = true;
-
-function priorityLabel(p) {
-  if (p === 1) return '<span class="priority-dot priority-1"></span>P1';
-  if (p === 2) return '<span class="priority-dot priority-2"></span>P2';
-  return '<span class="priority-dot priority-3"></span>P3';
+function openModal(athena, result, value, priority, attempt, erMode) {
+  isErFollowUp = erMode;
+  document.getElementById('mAthena').textContent   = athena;
+  document.getElementById('mResult').textContent   = result + ' — ' + value;
+  document.getElementById('mPriority').textContent = priority;
+  document.getElementById('mAttempt').textContent  = attempt;
+  document.getElementById('modalTitleText').textContent = erMode ? 'Log ER Follow-Up Call' : 'Log Outreach Attempt';
+  document.getElementById('thirdAttemptWarn').style.display = (attempt === '3rd / Final' && !erMode) ? 'block' : 'none';
+  document.getElementById('methodSelect').value = '';
+  document.getElementById('outcomeSelect').value = '';
+  document.getElementById('attemptNotes').value = '';
+  document.getElementById('erFollowUpGroup').style.display = 'none';
+  document.getElementById('methodReq').style.display = 'none';
+  document.getElementById('outcomeReq').style.display = 'none';
+  document.getElementById('attemptModal').classList.add('open');
 }
 
-function categoryHtml(cat) {
-  const map = {
-    'Education': ['cat-edu', 'Education'],
-    'Rx Failure': ['cat-rx', 'Rx Failure'],
-    'Adverse Effects': ['cat-ae', 'Adverse Effects'],
-    'Intake Review': ['cat-intake', 'Intake Review']
-  };
-  const [cls, label] = map[cat] || ['cat-edu', cat];
-  return `<span class="cat-pill ${cls}">${label}</span>`;
+function closeModal() {
+  document.getElementById('attemptModal').classList.remove('open');
 }
 
-function typeHtml(t) {
-  if (t === 'SYNC VIDEO') return '<span class="type-tag type-sync">SYNC VIDEO</span>';
-  return '<span class="type-tag type-async">ASYNC</span>';
+function handleOutcomeChange() {
+  var v = document.getElementById('outcomeSelect').value;
+  document.getElementById('erFollowUpGroup').style.display =
+    (v.includes('ER Referral') || v.includes('ER Follow-Up')) ? '' : 'none';
 }
 
-function urgencyHtml(u) {
-  if (u === 'CRITICAL') return '<span class="urgency-tag urgency-critical">CRITICAL</span>';
-  if (u === 'HIGH') return '<span class="urgency-tag urgency-high">HIGH</span>';
-  return '<span class="urgency-tag urgency-normal">NORMAL</span>';
+function saveAttempt() {
+  var method  = document.getElementById('methodSelect').value;
+  var outcome = document.getElementById('outcomeSelect').value;
+  var valid = true;
+  if (!method)  { document.getElementById('methodReq').style.display='block';  valid=false; }
+  else          { document.getElementById('methodReq').style.display='none'; }
+  if (!outcome) { document.getElementById('outcomeReq').style.display='block'; valid=false; }
+  else          { document.getElementById('outcomeReq').style.display='none'; }
+  if (!valid) return;
+  closeModal();
+  var isEr = outcome.includes('ER Referral');
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:360px;';
+  banner.innerHTML = isEr
+    ? '✓ Attempt logged — ER referral documented. 24-hour follow-up reminder created automatically.'
+    : '✓ Attempt logged — Athena chart note written.';
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 4000);
 }
 
-function assignedHtml(a) {
-  if (a === 'Unassigned') return '<span class="rn-unassigned">Unassigned</span>';
-  return `<span class="rn-initials">${a}</span>`;
-}
-
-function waitHtml(mins) {
-  let label = mins < 60 ? `${mins}m` : `${Math.floor(mins/60)}h ${mins%60}m`;
-  let cls = mins >= 90 ? 'wait-urgent' : mins >= 45 ? 'wait-warn' : 'wait-ok';
-  return `<span class="wait-time ${cls}">${label}</span>`;
-}
-
-function actionsHtml(row) {
-  if (row.assigned === 'Unassigned') {
-    return `<div class="actions"><button class="btn-claim" onclick="claimRow('${row.consultId}')">Take</button><button class="btn-resolve" onclick="routeRow('${row.consultId}')">Route</button><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button></div>`;
-  }
-  if (row.assigned === 'You') {
-    return `<div class="actions"><button class="btn-resolve" onclick="closeTask('${row.consultId}')">Close Task</button><button class="btn-view" onclick="viewRow('${row.consultId}')">View</button></div>`;
-  }
-  return `<div class="actions"><button class="btn-view" onclick="viewRow('${row.consultId}')">View Chart</button></div>`;
-}
-
-function renderRows(data) {
-  const tbody = document.getElementById('queue-tbody');
-  tbody.innerHTML = data.map(r => `
-    <tr data-id="${r.consultId}">
-      <td>${priorityLabel(r.priority)}</td>
-      <td><div class="patient-name">${r.patient}</div><div class="patient-id">${r.patientId}</div></td>
-      <td><span class="consult-id">${r.consultId}</span></td>
-      <td>${categoryHtml(r.category)}</td>
-      <td>${typeHtml(r.type)}</td>
-      <td><span class="program">${r.program}</span></td>
-      <td>${urgencyHtml(r.urgency)}</td>
-      <td>${assignedHtml(r.assigned)}</td>
-      <td>${waitHtml(r.waitMins)}</td>
-      <td>${actionsHtml(r)}</td>
-    </tr>
-  `).join('');
-}
-
-function getFilteredRows() {
-  const cat = document.getElementById('filter-category').value;
-  const type = document.getElementById('filter-type').value;
-  const urgency = document.getElementById('filter-urgency').value;
-  const assigned = document.getElementById('filter-assigned').value;
-  const search = document.getElementById('filter-search').value.toLowerCase();
-  return rows.filter(r => {
-    if (currentTab !== 'all' && r.categoryKey !== currentTab) return false;
-    if (cat && r.category !== cat) return false;
-    if (type && r.type !== type) return false;
-    if (urgency && r.urgency !== urgency) return false;
-    if (assigned && r.assigned !== assigned) return false;
-    if (search) {
-      if (!(r.patient + r.consultId + r.program + r.notes).toLowerCase().includes(search)) return false;
-    }
-    return true;
+function filterTable() {
+  var search  = document.getElementById('searchInput').value.toLowerCase();
+  var pri     = document.getElementById('filterPri').value.toLowerCase();
+  var attempt = document.getElementById('filterAttempt').value.toLowerCase();
+  var source  = document.getElementById('filterSource').value.toLowerCase();
+  var rows = document.querySelectorAll('#caseBody tr[data-pri]');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    var show = (!search  || text.includes(search)) &&
+               (!pri     || (row.dataset.pri||'').toLowerCase().includes(pri)) &&
+               (!attempt || (row.dataset.attempt||'').toLowerCase().includes(attempt)) &&
+               (!source  || (row.dataset.source||'').toLowerCase().includes(source));
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
   });
+  document.getElementById('rowCount').textContent = 'Showing ' + visible + ' cases';
 }
 
-function applyFilters() { renderRows(sortData(getFilteredRows())); }
-
-function sortData(data) {
-  if (sortCol < 0) return data;
-  return [...data].sort((a, b) => {
-    const vals = [[a.priority,b.priority],[a.patient,b.patient],[a.consultId,b.consultId],[a.category,b.category],[a.type,b.type],[a.program,b.program],[a.urgency,b.urgency],[a.assigned,b.assigned],[a.waitMins,b.waitMins]];
-    const [av, bv] = vals[sortCol] || [0,0];
-    let cmp = av < bv ? -1 : av > bv ? 1 : 0;
-    return sortAsc ? cmp : -cmp;
-  });
-}
-
-function sortTable(col) {
-  sortAsc = sortCol === col ? !sortAsc : true;
-  sortCol = col;
-  document.querySelectorAll('th').forEach((th, i) => {
-    th.classList.toggle('sorted', i === col);
-    const arrow = th.querySelector('.sort-arrow');
-    if (arrow) arrow.textContent = i === col ? (sortAsc ? '↑' : '↓') : '↕';
-  });
-  applyFilters();
-}
-
-function setTab(key, el) {
-  currentTab = key;
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  applyFilters();
-}
-
-function viewRow(id) { alert('Opening consult ' + id + '…\n(In production this opens the consult detail panel.)'); }
-function claimRow(id) { const r = rows.find(x => x.consultId === id); if (r) { r.assigned = 'You'; applyFilters(); } }
-function routeRow(id) { alert('Route task ' + id + '…\n(In production this opens a routing modal to reassign to another team member or escalate to provider.)'); }
-function closeTask(id) {
-  const r = rows.find(x => x.consultId === id);
-  if (r && confirm('Close task ' + id + '?\n\nNote: Close Task marks the task as closed — this is separate from the consultation being marked Complete.')) {
-    rows.splice(rows.indexOf(r), 1);
-    applyFilters();
-  }
-}
-
-renderRows(rows);
+document.getElementById('attemptModal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
 </script>
-{% endraw %}
-
 {% endblock %}
