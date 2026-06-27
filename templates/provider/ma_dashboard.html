@@ -240,7 +240,6 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
     <span>Michael Torres, MA</span>
     <div class="avatar">MT</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <main class="main">
@@ -559,12 +558,5 @@ function clockIn() {
   document.getElementById('btnClockOut').style.display = '';
   updateDuration();
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

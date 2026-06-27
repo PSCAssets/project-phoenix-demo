@@ -13,22 +13,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .back-link { color:rgba(255,255,255,0.7); font-size:12px; text-decoration:none; margin-right:12px; }
 .back-link:hover { color:#fff; }
 
-/* Help icon */
-.help-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s; }
-.help-btn:hover { background:rgba(255,255,255,0.28); }
-.help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center; }
-.help-overlay.open { display:flex; }
-.help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; overflow:hidden; }
-.help-modal-header { background:#1D4ED8; padding:18px 22px; display:flex; align-items:center; justify-content:space-between; }
-.help-modal-title { color:#fff; font-size:16px; font-weight:700; }
-.help-close { background:none; border:none; color:rgba(255,255,255,0.7); font-size:22px; cursor:pointer; }
-.help-modal-body { padding:22px; }
-.help-section { margin-bottom:18px; }
-.help-section:last-child { margin-bottom:0; }
-.help-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#9CA3AF; margin-bottom:8px; }
-.help-item { display:flex; gap:10px; margin-bottom:8px; font-size:13px; color:#374151; line-height:1.5; }
-.help-item-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
-.help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
 
 .page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
 .page-title { font-size:20px; font-weight:800; margin-bottom:4px; }
@@ -134,7 +118,6 @@ input:checked + .slider:before { transform:translateX(16px); }
   <div class="topbar-right">
     <span>Chris Navarro, Admin</span>
     <div class="avatar">CN</div>
-    <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
   </div>
 </header>
 
@@ -543,38 +526,6 @@ input:checked + .slider:before { transform:translateX(16px); }
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModals()">Cancel</button>
       <button class="btn-save" onclick="saveDest()">Save Destination</button>
-    </div>
-  </div>
-</div>
-<!-- Help Modal -->
-<div class="help-overlay" id="helpOverlay">
-  <div class="help-modal">
-    <div class="help-modal-header">
-      <div class="help-modal-title">&#8505; DOH Reporting Configuration — How This Works</div>
-      <button class="help-close" onclick="document.getElementById('helpOverlay').classList.remove('open')">&#215;</button>
-    </div>
-    <div class="help-modal-body">
-      <div class="help-section">
-        <div class="help-section-title">What this screen does</div>
-        <div class="help-item"><span class="help-item-icon">&#9881;</span><span>Configure which lab results trigger mandatory DOH reporting — no code changes needed. Define the condition, ICD-10 code, CPT lab code, and the result threshold (e.g., Positive, ≥ 5.0 μg/dL).</span></div>
-        <div class="help-item"><span class="help-item-icon">&#127759;</span><span>Set up state and county reporting destinations — the agency name, fax number or email, report form type, state-specific SLA override, and minor patient legal notes per state.</span></div>
-        <div class="help-item"><span class="help-item-icon">&#128101;</span><span>Manage DOH Coordinator role access — who can see patient demographics and submit reports, and what they cannot access (clinical charts, billing, scheduling).</span></div>
-      </div>
-      <hr class="help-divider">
-      <div class="help-section">
-        <div class="help-section-title">Workflows this solves</div>
-        <div class="help-item"><span class="help-item-icon">&#9989;</span><span><strong>Previously:</strong> Staff manually tracked which positive results required DOH reporting, looked up fax numbers, and sent reports via a physical fax machine with no confirmation log.</span></div>
-        <div class="help-item"><span class="help-item-icon">&#9989;</span><span><strong>Now:</strong> The rule engine auto-creates a report record the moment a qualifying lab result is finalized in Athena. Crystal's queue populates automatically — no manual identification needed.</span></div>
-        <div class="help-item"><span class="help-item-icon">&#9989;</span><span><strong>Previously:</strong> Adding a new reportable condition or onboarding a new state required an Engineering ticket and a deployment cycle.</span></div>
-        <div class="help-item"><span class="help-item-icon">&#9989;</span><span><strong>Now:</strong> Admin adds the condition or state here, saves, and the rule is live immediately. No ticket, no deploy.</span></div>
-      </div>
-      <hr class="help-divider">
-      <div class="help-section">
-        <div class="help-section-title">Key design decisions</div>
-        <div class="help-item"><span class="help-item-icon">&#128231;</span><span>E-fax is integrated — reports are transmitted electronically within the platform. No physical fax machine. Transmission confirmation is logged automatically.</span></div>
-        <div class="help-item"><span class="help-item-icon">&#128274;</span><span>HIPAA boundary: DOH Coordinators see demographics only (initials, DOB, sex, state, county, zip). Full clinical records remain restricted to clinical roles. All access is logged per § 164.312(b).</span></div>
-        <div class="help-item"><span class="help-item-icon">&#8987;</span><span>SLA runs on business days only — state DOH offices operate Monday–Friday. Weekend and holiday SLA pausing is configured in Admin settings.</span></div>
-      </div>
     </div>
   </div>
 </div>

@@ -116,7 +116,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
     <span>Priya Sharma, GCA</span>
     <div class="avatar">PS</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -469,12 +468,5 @@ function markPrepComplete() {
   statusEl.textContent = '✓ Prep Complete';
   alert('✓ Consult prep marked complete for PT-2026-00142.\n\nDr. Taylor Brooks has been notified and the consult brief is now available in their queue.\n\nZendesk case ZD-2026-004421 has been updated.');
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

@@ -403,12 +403,5 @@ function to12h(t) {
 document.getElementById('editModal').addEventListener('click', function(e) {
   if (e.target === this) closeEditModal();
 });
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

@@ -84,7 +84,6 @@ tbody tr:hover { background:#FAF7F2; }
     <span>Priya Sharma, GCA</span>
     <div class="avatar">PS</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <main class="main">
@@ -269,12 +268,5 @@ tbody tr:hover { background:#FAF7F2; }
 function openPortal(partner) {
   alert('Lab Portal — ' + partner + '\n\nIn the full system, this opens the ' + partner + ' results portal via SSO. Results are automatically pulled into the patient chart when received.');
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

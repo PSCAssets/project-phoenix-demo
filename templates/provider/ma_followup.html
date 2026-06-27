@@ -641,12 +641,5 @@ function closeModals() {
 document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
   overlay.addEventListener('click', function(e) { if (e.target === this) closeModals(); });
 });
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

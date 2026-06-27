@@ -92,7 +92,6 @@ tbody tr:hover { background:#F0FDFA; }
     <span>Crystal Veliz, DOH Coordinator</span>
     <div class="avatar">CV</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -427,12 +426,5 @@ function filterHistory() {
   });
   document.getElementById('histCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

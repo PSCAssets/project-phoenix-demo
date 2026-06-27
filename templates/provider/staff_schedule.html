@@ -347,12 +347,5 @@ function saveSchedule() {
 function copyLastWeek() {
   alert('In the full system, this copies your previous week\'s schedule as a starting point for the current week.');
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

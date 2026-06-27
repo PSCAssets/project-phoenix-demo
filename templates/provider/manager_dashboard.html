@@ -104,7 +104,6 @@ tbody tr:hover { background: #FAF7F2; }
     <span>Riley Perrone, Team Manager</span>
     <div class="avatar">RP</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <main class="main">
@@ -331,12 +330,5 @@ function returnTs(btn) {
   var n = parseInt(badge.textContent) - 1;
   badge.textContent = n + ' pending';
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

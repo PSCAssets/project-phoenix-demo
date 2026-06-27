@@ -94,7 +94,6 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
     <span>Crystal Veliz, DOH Coordinator</span>
     <div class="avatar">CV</div>
   </div>
-  <button class="help-btn" onclick="document.getElementById('helpOverlay').classList.add('open')" title="How this page works">?</button>
 </header>
 
 <div class="page-wrap">
@@ -425,12 +424,5 @@ function bulkSubmit() {
   updateBulk();
   alert('✓ ' + checked + ' reports submitted via fax.\n\nAll submissions logged in the audit trail. Submitted records will move to History.');
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

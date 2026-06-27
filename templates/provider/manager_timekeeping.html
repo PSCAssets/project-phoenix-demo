@@ -422,12 +422,5 @@ function setDayType(btn, type) {
 function exportAH(fmt) {
   alert('Export as .' + fmt + ' — In the full system, a formatted after-hours schedule would download, ready to send to the after-hours support vendor.');
 }
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    var o = document.getElementById('helpOverlay');
-    if (o) o.classList.remove('open');
-  }
-});
 </script>
 {% endblock %}

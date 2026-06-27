@@ -7,6 +7,36 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   {% block head %}{% endblock %}
 
+  <!-- Phoenix icon + global help system -->
+  <style>
+  .phoenix-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.13); border: 1.5px solid rgba(255,255,255,0.30);
+    color: rgba(255,255,255,0.90); border-radius: 20px;
+    padding: 4px 12px 4px 8px; cursor: pointer;
+    font-family: inherit; font-size: 12px; font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+    margin-left: 10px; flex-shrink: 0;
+  }
+  .phoenix-btn:hover { background: rgba(255,255,255,0.25); color: #fff; }
+  .phoenix-btn svg { flex-shrink: 0; }
+  .phoenix-btn-label { white-space: nowrap; }
+
+  /* Global help overlay (rendered by each page) */
+  .help-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center; }
+  .help-overlay.open { display:flex; }
+  .help-modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 24px 64px rgba(0,0,0,0.18); }
+  .help-modal-header { padding:18px 22px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; border-radius:16px 16px 0 0; }
+  .help-modal-title { color:#fff; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .help-close { background:none; border:none; color:rgba(255,255,255,0.75); font-size:22px; cursor:pointer; }
+  .help-modal-body { padding:20px 22px 24px; }
+  .help-section { margin-bottom:16px; }
+  .help-section:last-child { margin-bottom:0; }
+  .help-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#9CA3AF; margin-bottom:8px; }
+  .help-item { display:flex; gap:10px; margin-bottom:7px; font-size:13px; color:#374151; line-height:1.5; }
+  .help-icon { font-size:15px; flex-shrink:0; margin-top:1px; }
+  .help-divider { border:none; border-top:1px solid #F3F4F6; margin:14px 0; }
+  </style>
   <!-- Global sidebar CSS -->
   <style>
   .g-sidebar {
@@ -46,6 +76,21 @@
         <span class="logo-divider">|</span>
         <span class="logo-phoenix">Project Phoenix</span>
       </a>
+      {% if request.blueprint == 'provider' %}
+      <button class="phoenix-btn" onclick="openPhoenixHelp()" title="Page guide — what this screen does &amp; workflows it solves">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+          <!-- Wings -->
+          <path d="M12 21 C10 16 6 13 3 7 C6 10 9 8 10 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M12 21 C14 16 18 13 21 7 C18 10 15 8 14 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Flame body -->
+          <path d="M10 4 C11 1.5 13 1.5 14 4 C13.5 8 12.5 12 12 21 C11.5 12 10.5 8 10 4Z" fill="currentColor"/>
+          <!-- Tail feathers -->
+          <path d="M9 17 C7 18 5 17 4 15" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.7"/>
+          <path d="M15 17 C17 18 19 17 20 15" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.7"/>
+        </svg>
+        <span class="phoenix-btn-label">Page Guide</span>
+      </button>
+      {% endif %}
     </div>
     <div class="nav-links">
       <a href="{{ url_for('index') }}" class="nav-link {% if request.blueprint == 'provider' %}active{% endif %}">
@@ -61,8 +106,7 @@
     <div class="nav-user">
       {% if session.get('role') and request.blueprint != 'patient' %}{% set _r = session.get('role') %}
       <div class="nav-session-user">
-        <div class="nav-user-avatar">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% else %}??{% endif %}</div>
-        <span class="nav-user-name">{{ session.get('display_name', 'Demo User') }}</span>
+        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_doh' %}CV{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% else %}??{% endif %}</div>
       </div>
       {% endif %}
       {% if request.blueprint == 'patient' %}
@@ -174,6 +218,20 @@
   </footer>
 
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+  function openPhoenixHelp() {
+    var overlay = document.getElementById('helpOverlay');
+    if (overlay) {
+      overlay.classList.add('open');
+    }
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var o = document.getElementById('helpOverlay');
+      if (o) o.classList.remove('open');
+    }
+  });
+  </script>
   <script>
   function toggleProgSwitcher(e) {
     e.stopPropagation();
