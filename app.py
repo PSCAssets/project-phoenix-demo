@@ -144,7 +144,7 @@ def inject_sidebar_nav():
         'provider_md': [
             ('Dashboard',     '/provider/',              'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
             ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
             ('Lab Auth',      '/provider/lab-auth',       'flask',     ['/provider/lab-auth']),
@@ -155,7 +155,7 @@ def inject_sidebar_nav():
         'provider_np': [
             ('Dashboard',     '/provider/np',            'home',      ['/provider/np']),
             ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
@@ -180,7 +180,7 @@ def inject_sidebar_nav():
             ('PCP Follow-Up', '/provider/ma/followup',      'clipboard', ['/provider/ma/followup']),
             ('Referral Tracker', '/provider/ma/referrals', 'clipboard', ['/provider/ma/referrals']),
             ('Patient Queue', '/provider/queue',            'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',         'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',    'calendar',  ['/provider/schedule']),
             ('My Schedule',   '/provider/staff-schedule',   'calendar',  ['/provider/staff-schedule']),
             ('Timesheet',     '/provider/timesheet',        'clock',     ['/provider/timesheet']),
             ('Messages',      '/provider/messages',         'message',   ['/provider/messages']),
@@ -213,7 +213,7 @@ def inject_sidebar_nav():
         'provider_gc': [
             ('Dashboard',     '/provider/gc',            'home',      ['/provider/gc']),
             ('GC Queue',      '/provider/gc/queue',       'users',     ['/provider/gc/queue']),
-            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
@@ -221,7 +221,7 @@ def inject_sidebar_nav():
         'care_team': [
             ('Dashboard',     '/care-team/',             'home',      ['/care-team/']),
             ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),

@@ -361,6 +361,24 @@ tbody tr.overdue-row { background:#FFFBF0; }
         <label>Notes</label>
         <textarea id="attemptNotes" placeholder="Patient response, clinical details, provider communications…"></textarea>
       </div>
+      <!-- Set Reminder -->
+      <div class="modal-field" style="border-top:1px solid #E5E0D8;padding-top:12px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="reminderToggle" onchange="toggleReminder()" style="width:15px;height:15px;accent-color:#1B4F8A;">
+          <span>Set a follow-up reminder</span>
+        </label>
+      </div>
+      <div id="reminderSection" style="display:none;background:#F0F6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:700;color:#1B4F8A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Reminder Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Date</label>
+            <input type="date" id="reminderDate" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Time</label>
+            <input type="time" id="reminderTime" value="09:00" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+        </div>
+        <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Reminder Note (optional)</label>
+          <input type="text" id="reminderNote" placeholder="e.g. Check if patient returned from ER" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -411,15 +429,27 @@ function saveAttempt() {
   if (!outcome) { document.getElementById('outcomeReq').style.display='block'; valid=false; }
   else          { document.getElementById('outcomeReq').style.display='none'; }
   if (!valid) return;
+  var reminderOn = document.getElementById('reminderToggle').checked;
+  var reminderDate = document.getElementById('reminderDate').value;
+  var reminderTime = document.getElementById('reminderTime').value;
   closeModal();
   var isEr = outcome.includes('ER Referral');
-  var banner = document.createElement('div');
-  banner.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:360px;';
-  banner.innerHTML = isEr
+  var msg = isEr
     ? '✓ Attempt logged — ER referral documented. 24-hour follow-up reminder created automatically.'
     : '✓ Attempt logged — Athena chart note written.';
+  if (reminderOn && reminderDate) {
+    msg += ' Reminder set for ' + reminderDate + ' at ' + (reminderTime || '09:00') + '.';
+  }
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:400px;';
+  banner.innerHTML = msg;
   document.body.appendChild(banner);
-  setTimeout(function(){ banner.remove(); }, 4000);
+  setTimeout(function(){ banner.remove(); }, 4500);
+}
+
+function toggleReminder() {
+  var on = document.getElementById('reminderToggle').checked;
+  document.getElementById('reminderSection').style.display = on ? '' : 'none';
 }
 
 function filterTable() {

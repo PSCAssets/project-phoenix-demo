@@ -203,7 +203,6 @@
         <svg style="position:absolute;left:9px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <div id="patientSearchDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1.5px solid #E5E0D8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:500;overflow:hidden;"></div>
       </div>
-      <a href="/provider/new-patient?flow=new" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">+ New Patient</a>
     </div>
   </div>
   <!-- Multi-provider filter panel -->
@@ -236,10 +235,6 @@
       <div class="filter-divider"></div>
       <span class="filter-label">Providers (up to 5)</span>
       <div class="chip-list" id="providerChips"></div>
-      <div class="chip-actions" style="position:relative;">
-        <button class="chip-btn chip-btn-add" onclick="toggleAddProviderDropdown(event)">+ Add Provider</button>
-        <div id="addProviderDropdown" style="display:none;position:absolute;top:100%;left:0;background:#fff;border:1px solid #E5E0D8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:500;min-width:220px;padding:6px 0;margin-top:4px;"></div>
-      </div>
     </div>
   </div>
 
@@ -381,6 +376,7 @@
     <div class="appt-detail-ft" id="apptDetailFt">
       <a href="#" onclick="closeApptDetail();return false;" class="appt-detail-ft-close">Close</a>
       <button onclick="enterApptEditMode()" id="apptEditBtn" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">✎ Edit</button>
+      <button onclick="cancelApptAction()" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">✕ Cancel Appt</button>
       <a id="apptDetailChartLink" href="/provider/chart/1" class="btn-open-chart">Open Chart →</a>
       <button onclick="openRTQueueModal()" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">&#9889; Conduct Consult Now</button>
     </div>
@@ -664,6 +660,7 @@ function renderCalendar() {
         el.innerHTML = '<div class="appt-title" style="color:'+col.apptText+';font-size:11px;font-weight:700;">'+label+'</div>'+
           '<div class="appt-sub" style="font-size:10px;color:'+col.apptText+';opacity:0.75;">'+sublabel+'</div>'+
           '<div style="font-size:9px;font-weight:600;opacity:0.6;color:'+col.apptText+';">'+dur+' min</div>';
+        (function(l,sl,t,d,s,m,dy){ el.onclick = function(e){ e.stopPropagation(); openApptDetail(l,sl,t,d,s,m,dy); }; })(label,sublabel,type,dur,sh,sm,day);
       }
       col2.appendChild(el);
     });
@@ -956,6 +953,16 @@ function openApptDetail(label, sublabel, type, dur, sh, sm, day) {
 function closeApptDetail() {
   document.getElementById('apptDetailModal').classList.remove('open');
   cancelApptEdit(); // reset edit mode on close
+}
+function cancelApptAction() {
+  closeApptDetail();
+  showSchedToast('Cancel appointment — confirmation and reason required in full build.');
+}
+function showSchedToast(msg) {
+  var b = document.createElement('div');
+  b.style.cssText = 'position:fixed;top:80px;right:24px;background:#1F2937;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:400px;';
+  b.textContent = msg; document.body.appendChild(b);
+  setTimeout(function(){ b.remove(); }, 3500);
 }
 function enterApptEditMode() {
   var body = document.getElementById('apptDetailModal').querySelector('.appt-detail-body');

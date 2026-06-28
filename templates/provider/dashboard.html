@@ -400,6 +400,17 @@
               </tr>
             </thead>
             <tbody id="consultTbody">
+              <!-- QA Flagged consult — sorted to top -->
+              <tr data-program="Weight Management" data-type="Async" data-ct-type="async" data-wait-sec="0" data-status="QA Flag" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer;border-left:3px solid #DC2626;background:#FFF5F5;">
+                <td><div class="cr-patient">R.T.</div><div class="cr-id">CST-2026-10801</div></td>
+                <td><span class="cr-program">Weight Management</span></td>
+                <td><span style="font-size:11px;color:#6B7280;font-weight:600">TX</span></td>
+                <td><span class="cr-type">Async</span></td>
+                <td><span class="cr-wait" style="color:#DC2626;font-weight:700;">Jun 27</span></td>
+                <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:9px;background:#FEE2E2;color:#DC2626;display:inline-block;">⚑ QA Flag</span></td>
+                <td colspan="2"><span style="font-size:11px;color:#374151;">Documentation incomplete — Assessment section missing</span></td>
+                <td><button class="cr-btn" style="background:#DC2626;" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Review</button></td>
+              </tr>
               <tr data-program="Weight Management" data-type="Phone" data-ct-type="phone" data-wait-sec="11640" data-status="SLA Alert" onclick="window.location.href='/provider/chart?type=phone'" style="cursor:pointer">
                 <td><div class="cr-patient">T.W.</div><div class="cr-id">CST-2026-10849</div></td>
                 <td><span class="cr-program">Weight Management</span></td>

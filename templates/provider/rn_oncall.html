@@ -95,7 +95,7 @@ tbody tr:hover { background:#F5F7FA; }
     <div class="topbar-sub">After-hours coverage · 8 internal 1099 RN pool · $100/shift</div>
   </div>
   <div class="topbar-right" style="color:rgba(255,255,255,0.85);font-size:13px;">
-    <span>Jordan Patel, RN</span>
+    <span>Jordan Patel, Lead RN</span>
     <div class="avatar">JP</div>
   </div>
 </header>
@@ -112,6 +112,21 @@ tbody tr:hover { background:#F5F7FA; }
     <button class="export-btn" onclick="showToast('✓ Schedule exported to Notify MD — all 8 RNs notified of their shifts.')">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4"/></svg>
       Export to Notify MD
+    </button>
+  </div>
+
+  <!-- Date range filter + CSV export -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;">Custom Range</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="date" id="rangeStart" value="2026-06-23" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
+      <span style="font-size:12px;color:#9CA3AF;">to</span>
+      <input type="date" id="rangeEnd" value="2026-06-29" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
+    </div>
+    <button onclick="applyDateRange()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Apply</button>
+    <button onclick="exportCSV()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Export CSV
     </button>
   </div>
 
@@ -372,6 +387,32 @@ function openShiftDetail(name, date, shift) {
 function saveAssign() {
   document.getElementById('assignModal').classList.remove('open');
   showToast('✓ Shift assigned — RN notified. Notify MD will be updated on next export.');
+}
+
+function applyDateRange() {
+  var s = document.getElementById('rangeStart').value;
+  var e = document.getElementById('rangeEnd').value;
+  if (!s || !e) return;
+  showToast('✓ Schedule filtered: ' + s + ' to ' + e);
+}
+
+function exportCSV() {
+  var s = document.getElementById('rangeStart').value || '2026-06-23';
+  var e = document.getElementById('rangeEnd').value || '2026-06-29';
+  var rows = [
+    ['RN Name','Role','Shift Type','Date','Window','Rate'],
+    ['Desiree M.','Lead RN','Weeknight','Mon 6/23','8PM–8AM','$100'],
+    ['Desiree M.','Lead RN','Weeknight','Wed 6/25','8PM–8AM','$100'],
+    ['Marcus T.','Pool RN','Weeknight','Thu 6/26','8PM–8AM','$100'],
+    ['Sarah K.','Pool RN','Weekend Day','Sat 6/28','8AM–8PM','$100'],
+    ['James R.','Pool RN','Weekend Day','Sun 6/29','8AM–8PM','$100'],
+  ];
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'oncall_schedule_' + s + '_' + e + '.csv';
+  a.click();
 }
 
 function showToast(msg) {
