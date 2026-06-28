@@ -1,0 +1,767 @@
+{% extends "base.html" %}
+{% block title %}GC Chart — Jennifer Walsh | Project Phoenix{% endblock %}
+{% block head %}
+<style>
+/* ── Layout ── */
+.chart-shell { position: fixed; top: 60px; left: 0; right: 0; bottom: 0; display: flex; overflow: hidden; background: #F8F7F4; }
+
+/* ── Left sidebar ── */
+.gc-sidebar { width: 56px; background: #F2EDE4; border-right: 1px solid #E5E0D8; display: flex; flex-direction: column; align-items: center; padding: 10px 0; flex-shrink: 0; z-index: 10; }
+.gc-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; padding: 9px 4px; cursor: pointer; color: #9CA3AF; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; text-decoration: none; transition: background .15s, color .15s; }
+.gc-nav-item:hover { background: #E5E0D8; color: #374151; }
+.gc-nav-item.active { background: #EDE9FE; color: #6B21A8; }
+.gc-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* ── Main area ── */
+.gc-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* ── Patient header ── */
+.gc-header { background: #fff; border-bottom: 2px solid #E5E0D8; padding: 12px 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+.gc-avatar { width: 48px; height: 48px; border-radius: 50%; background: #EDE9FE; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #6B21A8; flex-shrink: 0; }
+.gc-patient-name { font-size: 17px; font-weight: 700; color: #111827; }
+.gc-patient-meta { font-size: 12px; color: #6B7280; margin-top: 2px; }
+.gc-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.gc-badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid; }
+.gc-badge-pathogenic { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
+.gc-badge-program { background: #EDE9FE; color: #6B21A8; border-color: #C4B5FD; }
+.gc-badge-status { background: #FFF8E1; color: #92400E; border-color: #FDE68A; }
+.gc-header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px; }
+.btn-primary { background: #6B21A8; color: #fff; }
+.btn-primary:hover { background: #5B1898; }
+.btn-outline { background: #fff; border: 1px solid #E5E0D8; color: #374151; }
+.btn-outline:hover { background: #F9FAFB; }
+.btn-danger { background: #DC2626; color: #fff; }
+
+/* ── Tab bar ── */
+.gc-tabs { background: #fff; border-bottom: 1px solid #E5E0D8; display: flex; padding: 0 20px; flex-shrink: 0; }
+.gc-tab { padding: 10px 16px; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .15s; }
+.gc-tab:hover { color: #374151; }
+.gc-tab.active { color: #6B21A8; border-bottom-color: #6B21A8; }
+
+/* ── Alerts banner ── */
+.gc-alert { background: #FEF2F2; border-bottom: 2px solid #FECACA; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #DC2626; font-weight: 600; flex-shrink: 0; }
+
+/* ── Body ── */
+.gc-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; gap: 18px; }
+.gc-col-main { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.gc-col-side { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+/* ── Cards ── */
+.gc-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.gc-card-header { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
+.gc-card-title { font-size: 13px; font-weight: 700; color: #111827; }
+.gc-card-badge { background: #F3F4F6; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: #6B7280; }
+.gc-card-body { padding: 14px 16px; }
+.gc-card-action { margin-left: auto; font-size: 11px; color: #6B21A8; cursor: pointer; font-weight: 600; }
+
+/* ── Field rows ── */
+.field-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #F9FAFB; font-size: 13px; }
+.field-row:last-child { border-bottom: none; }
+.field-label { color: #6B7280; font-weight: 500; }
+.field-val { color: #111827; font-weight: 600; text-align: right; max-width: 55%; }
+
+/* ── Variant block ── */
+.variant-block { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+.variant-class { font-size: 11px; font-weight: 800; color: #DC2626; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+.variant-name { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 2px; }
+.variant-hgvs { font-size: 12px; color: #6B7280; font-family: monospace; margin-bottom: 10px; }
+.variant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.variant-cell { background: #fff; border: 1px solid #FECACA; border-radius: 7px; padding: 8px 10px; }
+.variant-cell-label { font-size: 10px; color: #6B7280; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.variant-cell-val { font-size: 13px; font-weight: 700; color: #111827; margin-top: 2px; }
+
+/* ── Risk meter ── */
+.risk-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.risk-label { font-size: 12px; font-weight: 600; color: #374151; width: 140px; flex-shrink: 0; }
+.risk-bar-wrap { flex: 1; background: #F3F4F6; border-radius: 6px; height: 10px; overflow: hidden; }
+.risk-bar { height: 10px; border-radius: 6px; }
+.risk-pct { font-size: 12px; font-weight: 800; color: #111827; width: 40px; text-align: right; }
+.risk-bar.high { background: #DC2626; }
+.risk-bar.medium { background: #D97706; }
+.risk-bar.low { background: #059669; }
+
+/* ── Pedigree ── */
+.pedigree-node { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: #374151; }
+.pedigree-symbol { width: 24px; height: 24px; border: 2px solid #374151; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+.pedigree-symbol.circle { border-radius: 50%; }
+.pedigree-symbol.affected { background: #374151; color: #fff; }
+.pedigree-symbol.carrier { background: linear-gradient(135deg, #374151 50%, #fff 50%); }
+
+/* ── Note area ── */
+.note-block { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #374151; line-height: 1.6; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; }
+.note-meta { font-size: 11px; color: #9CA3AF; margin-top: 6px; }
+
+/* ── Timeline ── */
+.tl-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #F3F4F6; }
+.tl-item:last-child { border-bottom: none; }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.tl-dot.green { background: #059669; }
+.tl-dot.purple { background: #6B21A8; }
+.tl-dot.amber { background: #D97706; }
+.tl-dot.red { background: #DC2626; }
+.tl-content { flex: 1; min-width: 0; }
+.tl-label { font-size: 12px; font-weight: 700; color: #111827; }
+.tl-sub { font-size: 11px; color: #6B7280; margin-top: 1px; }
+
+/* ── Consent ── */
+.consent-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; }
+.consent-row:last-child { border-bottom: none; }
+.consent-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+.consent-icon.signed { background: #D1FAE5; }
+.consent-icon.declined { background: #FEF2F2; }
+.consent-icon.pending { background: #FFF8E1; }
+.consent-name { font-size: 13px; font-weight: 600; color: #111827; }
+.consent-date { font-size: 11px; color: #6B7280; margin-top: 1px; }
+.consent-status { margin-left: auto; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.consent-status.signed { background: #D1FAE5; color: #065F46; }
+.consent-status.declined { background: #FEF2F2; color: #DC2626; }
+.consent-status.pending { background: #FFF8E1; color: #92400E; }
+
+/* ── Tab content panels ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: flex; gap: 18px; width: 100%; }
+.tab-panel-full { display: none; flex-direction: column; gap: 14px; width: 100%; }
+.tab-panel-full.active { display: flex; }
+
+/* ── Toast ── */
+.gc-toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
+.gc-toast.show { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="chart-shell">
+
+  <!-- Left sidebar nav -->
+  <div class="gc-sidebar">
+    <a href="/provider/gc" class="gc-nav-item" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Dash
+    </a>
+    <a href="/provider/gc/queue" class="gc-nav-item" title="GC Queue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Queue
+    </a>
+    <a href="/provider/gc/chart/1" class="gc-nav-item active" title="Patient Chart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      Chart
+    </a>
+    <a href="/provider/messages" class="gc-nav-item" title="Messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Msgs
+    </a>
+    <a href="/provider/settings" class="gc-nav-item" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Settings
+    </a>
+  </div>
+
+  <!-- Main chart area -->
+  <div class="gc-main">
+
+    <!-- Critical finding alert -->
+    <div class="gc-alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      PATHOGENIC Variant Identified — BRCA1 c.5266dupC · Results disclosure required · Post-disclosure care plan pending
+    </div>
+
+    <!-- Patient header -->
+    <div class="gc-header">
+      <div class="gc-avatar">JW</div>
+      <div>
+        <div class="gc-patient-name">Jennifer Walsh</div>
+        <div class="gc-patient-meta">42F · DOB: 03/15/1982 · MRN: EW-004821 · CST-2026-10901 · TX — Licensed ✓</div>
+      </div>
+      <div class="gc-badges">
+        <span class="gc-badge gc-badge-pathogenic">⚠ BRCA1 Pathogenic</span>
+        <span class="gc-badge gc-badge-program">BRCA Counseling</span>
+        <span class="gc-badge gc-badge-status">Disclosure Pending</span>
+      </div>
+      <div class="gc-header-actions">
+        <button class="btn btn-outline" onclick="gcToast('Message sent to Jennifer Walsh')">Message Patient</button>
+        <button class="btn btn-outline" onclick="gcToast('Referral form opened')">+ Referral</button>
+        <button class="btn btn-primary" onclick="gcToast('Starting disclosure session — timer started')">Start Disclosure Session</button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="gc-tabs">
+      <div class="gc-tab active" onclick="switchTab('summary',this)">Summary</div>
+      <div class="gc-tab" onclick="switchTab('results',this)">Genetic Results</div>
+      <div class="gc-tab" onclick="switchTab('family',this)">Family History</div>
+      <div class="gc-tab" onclick="switchTab('notes',this)">GC Notes</div>
+      <div class="gc-tab" onclick="switchTab('orders',this)">Test Orders</div>
+      <div class="gc-tab" onclick="switchTab('consents',this)">Consents</div>
+      <div class="gc-tab" onclick="switchTab('referrals',this)">Referrals</div>
+    </div>
+
+    <!-- ══ SUMMARY TAB ══ -->
+    <div class="gc-body" id="tab-summary">
+      <div class="tab-panel active">
+        <!-- Main col -->
+        <div class="gc-col-main">
+
+          <!-- Variant summary -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              <div class="gc-card-title" style="color:#DC2626;">Pathogenic Variant — Action Required</div>
+            </div>
+            <div class="gc-card-body">
+              <div style="display:flex;gap:16px;align-items:flex-start;">
+                <div style="flex:1;">
+                  <div style="font-size:15px;font-weight:800;color:#111827;margin-bottom:2px;">BRCA1 — Class 5 Pathogenic</div>
+                  <div style="font-size:12px;color:#6B7280;font-family:monospace;margin-bottom:10px;">c.5266dupC · p.Gln1756fs · Chr17:43,091,434</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
+                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Classification</div>
+                      <div style="font-size:13px;font-weight:800;color:#DC2626;margin-top:2px;">Pathogenic</div>
+                    </div>
+                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
+                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Inheritance</div>
+                      <div style="font-size:13px;font-weight:700;color:#111827;margin-top:2px;">Autosomal Dominant</div>
+                    </div>
+                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
+                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Lab / Reported</div>
+                      <div style="font-size:13px;font-weight:700;color:#111827;margin-top:2px;">GeneDx · Jun 3, 2026</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lifetime risk -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              <div class="gc-card-title">Estimated Lifetime Risk — BRCA1 Carrier</div>
+              <span class="gc-card-badge">Population baseline shown for comparison</span>
+            </div>
+            <div class="gc-card-body">
+              <div class="risk-row">
+                <div class="risk-label">Breast Cancer (lifetime)</div>
+                <div class="risk-bar-wrap"><div class="risk-bar high" style="width:87%;"></div></div>
+                <div class="risk-pct" style="color:#DC2626;">87%</div>
+              </div>
+              <div class="risk-row">
+                <div class="risk-label">Ovarian Cancer (lifetime)</div>
+                <div class="risk-bar-wrap"><div class="risk-bar high" style="width:44%;"></div></div>
+                <div class="risk-pct" style="color:#DC2626;">44%</div>
+              </div>
+              <div class="risk-row">
+                <div class="risk-label">Breast Cancer — General Pop.</div>
+                <div class="risk-bar-wrap"><div class="risk-bar low" style="width:13%;"></div></div>
+                <div class="risk-pct" style="color:#059669;">13%</div>
+              </div>
+              <div class="risk-row">
+                <div class="risk-label">Ovarian Cancer — General Pop.</div>
+                <div class="risk-bar-wrap"><div class="risk-bar low" style="width:2%;"></div></div>
+                <div class="risk-pct" style="color:#059669;">2%</div>
+              </div>
+              <div style="margin-top:10px;font-size:11px;color:#9CA3AF;">Risk estimates per NCCN Guidelines v3.2026 — Hereditary Breast and Ovarian Cancer. Individual risk may vary based on additional factors.</div>
+            </div>
+          </div>
+
+          <!-- Care plan checklist -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              <div class="gc-card-title">Post-Disclosure Care Plan</div>
+              <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;">3 of 5 complete</span>
+            </div>
+            <div class="gc-card-body" style="padding:0;">
+              <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <tbody>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 16px;width:28px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                    <td style="padding:10px 16px;color:#111827;font-weight:500;">Results disclosure counseling completed</td>
+                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 16px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                    <td style="padding:10px 16px;color:#111827;font-weight:500;">NCCN risk management guidelines reviewed with patient</td>
+                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 16px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                    <td style="padding:10px 16px;color:#111827;font-weight:500;">Psychosocial support resources provided</td>
+                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 16px;"><input type="checkbox" onclick="gcToast('Care plan updated')" style="accent-color:#6B21A8;"></td>
+                    <td style="padding:10px 16px;color:#374151;">High-risk breast/gynecologic oncology referral placed</td>
+                    <td style="padding:10px 16px;"><span style="font-size:11px;color:#D97706;font-weight:600;">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 16px;"><input type="checkbox" onclick="gcToast('Care plan updated')" style="accent-color:#6B21A8;"></td>
+                    <td style="padding:10px 16px;color:#374151;">Cascade testing letter sent to first-degree relatives</td>
+                    <td style="padding:10px 16px;"><span style="font-size:11px;color:#D97706;font-weight:600;">Pending</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Side col -->
+        <div class="gc-col-side">
+
+          <!-- Patient demographics -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <div class="gc-card-title">Patient Information</div>
+            </div>
+            <div class="gc-card-body">
+              <div class="field-row"><span class="field-label">Full Name</span><span class="field-val">Jennifer Walsh</span></div>
+              <div class="field-row"><span class="field-label">Date of Birth</span><span class="field-val">03/15/1982 (42F)</span></div>
+              <div class="field-row"><span class="field-label">State</span><span class="field-val">Texas (TX)</span></div>
+              <div class="field-row"><span class="field-label">Partner / Client</span><span class="field-val">Invitae / Eli Lilly</span></div>
+              <div class="field-row"><span class="field-label">Care Product</span><span class="field-val">BRCA Counseling</span></div>
+              <div class="field-row"><span class="field-label">Consult ID</span><span class="field-val">CST-2026-10901</span></div>
+              <div class="field-row"><span class="field-label">Assigned GC</span><span class="field-val">Taylor Brooks, MS CGC</span></div>
+              <div class="field-row"><span class="field-label">GCA Coordinator</span><span class="field-val">Priya Sharma, GCA</span></div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <div class="gc-card-title">Consult Timeline</div>
+            </div>
+            <div class="gc-card-body" style="padding:10px 16px;">
+              <div class="tl-item">
+                <div class="tl-dot green"></div>
+                <div class="tl-content"><div class="tl-label">Pre-Test Counseling</div><div class="tl-sub">May 28, 2026 · Taylor Brooks, MS CGC</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot green"></div>
+                <div class="tl-content"><div class="tl-label">Pre-Test Consent Signed</div><div class="tl-sub">May 28, 2026 · Patient portal</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot green"></div>
+                <div class="tl-content"><div class="tl-label">GeneDx Order Placed</div><div class="tl-sub">May 28, 2026 · BRCA1/2 Full Sequencing</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot green"></div>
+                <div class="tl-content"><div class="tl-label">Results Received — PATHOGENIC</div><div class="tl-sub">Jun 3, 2026 · GeneDx Lab</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot purple"></div>
+                <div class="tl-content"><div class="tl-label">Results Disclosure Session</div><div class="tl-sub">Jun 18, 2026 · In progress</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot amber"></div>
+                <div class="tl-content"><div class="tl-label">Post-Disclosure Referral</div><div class="tl-sub">Pending — Breast/Gyn Oncology</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Messages snapshot -->
+          <div class="gc-card">
+            <div class="gc-card-header">
+              <div class="gc-card-title">Recent Messages</div>
+              <span class="gc-card-action" onclick="gcToast('Opening messages')">View all →</span>
+            </div>
+            <div class="gc-card-body" style="padding:10px 16px;">
+              <div class="tl-item">
+                <div class="tl-dot purple"></div>
+                <div class="tl-content"><div class="tl-label">Patient: "Will I need surgery?"</div><div class="tl-sub">Jun 10, 2026 · Unread</div></div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot green"></div>
+                <div class="tl-content"><div class="tl-label">GC: Pre-session prep materials sent</div><div class="tl-sub">Jun 15, 2026 · Delivered</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- end tab-panel -->
+    </div><!-- end gc-body -->
+
+    <!-- ══ GENETIC RESULTS TAB ══ -->
+    <div class="gc-body" id="tab-results" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="display:flex;gap:18px;">
+          <div style="flex:1;">
+            <div class="gc-card" style="margin-bottom:14px;">
+              <div class="gc-card-header" style="background:#FEF2F2;">
+                <div class="gc-card-title" style="color:#DC2626;">Primary Finding — Pathogenic</div>
+              </div>
+              <div class="gc-card-body">
+                <div class="variant-block">
+                  <div class="variant-class">Class 5 — Pathogenic</div>
+                  <div class="variant-name">BRCA1 — Frameshift Variant</div>
+                  <div class="variant-hgvs">NM_007294.4:c.5266dupC · NP_009225.1:p.Gln1756fs</div>
+                  <div class="variant-grid">
+                    <div class="variant-cell"><div class="variant-cell-label">Gene</div><div class="variant-cell-val">BRCA1</div></div>
+                    <div class="variant-cell"><div class="variant-cell-label">Chromosome</div><div class="variant-cell-val">17q21.31</div></div>
+                    <div class="variant-cell"><div class="variant-cell-label">Variant Type</div><div class="variant-cell-val">Frameshift (duplication)</div></div>
+                    <div class="variant-cell"><div class="variant-cell-label">Zygosity</div><div class="variant-cell-val">Heterozygous</div></div>
+                    <div class="variant-cell"><div class="variant-cell-label">ClinVar</div><div class="variant-cell-val" style="color:#DC2626;">Pathogenic (★★★★)</div></div>
+                    <div class="variant-cell"><div class="variant-cell-label">gnomAD AF</div><div class="variant-cell-val">&lt; 0.001%</div></div>
+                  </div>
+                </div>
+                <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6;">
+                  <strong>Clinical Interpretation:</strong> This frameshift variant (c.5266dupC) in BRCA1 creates a premature stop codon at position p.Gln1756fs, resulting in a truncated, non-functional protein. This is one of the most common Ashkenazi Jewish founder mutations. The variant has been classified as Pathogenic by multiple independent labs and is associated with a substantially elevated lifetime risk of breast and ovarian cancer (HBOC syndrome). Per NCCN guidelines, enhanced surveillance and risk-reduction discussions are indicated.
+                </div>
+              </div>
+            </div>
+
+            <div class="gc-card">
+              <div class="gc-card-header">
+                <div class="gc-card-title">Secondary / Incidental Findings</div>
+                <span class="gc-card-badge" style="background:#D1FAE5;color:#065F46;">None reportable</span>
+              </div>
+              <div class="gc-card-body">
+                <div style="text-align:center;padding:16px;color:#9CA3AF;font-size:13px;">
+                  No secondary or incidental findings to report at this time. Panel includes 47 additional genes — all variants of uncertain significance (VUS) or benign.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+            <div class="gc-card">
+              <div class="gc-card-header"><div class="gc-card-title">Lab Report Details</div></div>
+              <div class="gc-card-body">
+                <div class="field-row"><span class="field-label">Laboratory</span><span class="field-val">GeneDx (Stamford, CT)</span></div>
+                <div class="field-row"><span class="field-label">Order Date</span><span class="field-val">May 28, 2026</span></div>
+                <div class="field-row"><span class="field-label">Report Date</span><span class="field-val">Jun 3, 2026</span></div>
+                <div class="field-row"><span class="field-label">Panel</span><span class="field-val">BRCA1/2 Full Seq + Del/Dup</span></div>
+                <div class="field-row"><span class="field-label">Report ID</span><span class="field-val">GDX-2026-4721</span></div>
+                <div class="field-row"><span class="field-label">Ordering GC</span><span class="field-val">Taylor Brooks, MS CGC</span></div>
+                <div style="margin-top:10px;">
+                  <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="gcToast('Opening lab report PDF')">View Full Lab Report PDF</button>
+                </div>
+              </div>
+            </div>
+            <div class="gc-card">
+              <div class="gc-card-header"><div class="gc-card-title">Population Context</div></div>
+              <div class="gc-card-body">
+                <div style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:8px;">c.5266dupC is one of three Ashkenazi Jewish BRCA1/2 founder mutations. Prevalence ~1:40 in AJ population vs ~1:400 in general population.</div>
+                <div class="field-row"><span class="field-label">AJ Population Freq.</span><span class="field-val" style="color:#DC2626;">~2.5%</span></div>
+                <div class="field-row"><span class="field-label">General Population</span><span class="field-val">~0.1%</span></div>
+                <div class="field-row"><span class="field-label">Reported in ClinVar</span><span class="field-val">2,847 times</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FAMILY HISTORY TAB ══ -->
+    <div class="gc-body" id="tab-family" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="display:flex;gap:18px;">
+          <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div class="gc-card">
+              <div class="gc-card-header">
+                <div class="gc-card-title">3-Generation Pedigree Summary</div>
+                <span class="gc-card-badge">Maternal line predominant</span>
+              </div>
+              <div class="gc-card-body">
+                <!-- Visual pedigree approximation -->
+                <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:16px;margin-bottom:14px;overflow-x:auto;">
+                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation III — Grandparents (maternal)</div>
+                  <div style="display:flex;align-items:flex-end;gap:24px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px dashed #E5E0D8;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
+                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;background:#374151;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♂</div>
+                      Grandfather
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
+                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
+                      Grandmother
+                      <div style="font-size:9px;color:#DC2626;">Breast Ca · 52</div>
+                    </div>
+                  </div>
+                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation II — Mother's siblings</div>
+                  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px dashed #E5E0D8;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
+                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
+                      Mother
+                      <div style="font-size:9px;color:#DC2626;">Breast Ca · 46</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
+                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
+                      Aunt
+                      <div style="font-size:9px;color:#DC2626;">Ovarian Ca · 51</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
+                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;">♂</div>
+                      Uncle
+                      <div style="font-size:9px;color:#6B7280;">Unaffected</div>
+                    </div>
+                  </div>
+                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation I — Proband & siblings</div>
+                  <div style="display:flex;align-items:flex-end;gap:16px;">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#6B21A8;">
+                      <div style="width:28px;height:28px;border:2.5px solid #6B21A8;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:10px;">♀</div>
+                      <strong>Proband</strong>
+                      <div style="font-size:9px;color:#6B21A8;">Jennifer W. · BRCA1+</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
+                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;">♂</div>
+                      Brother
+                      <div style="font-size:9px;color:#D97706;">Testing pending</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
+                      <div style="width:24px;height:24px;border:2px solid #374151;display:flex;align-items:center;justify-content:center;font-size:9px;">♀</div>
+                      Sister
+                      <div style="font-size:9px;color:#D97706;">Testing pending</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="font-size:11px;color:#9CA3AF;">Legend: Filled = affected · ⬧ = proband · Dashed border = cascade testing recommended</div>
+              </div>
+            </div>
+
+            <div class="gc-card">
+              <div class="gc-card-header"><div class="gc-card-title">Cancer History — First Degree Relatives</div></div>
+              <div class="gc-card-body" style="padding:0;">
+                <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                  <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Relative</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Cancer Type</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Age at Dx</th>
+                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
+                  </tr></thead>
+                  <tbody>
+                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Mother (maternal)</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Breast Cancer</td><td style="padding:10px 16px;">46</td><td style="padding:10px 16px;"><span style="background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Survivor</span></td></tr>
+                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Maternal Aunt</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Ovarian Cancer</td><td style="padding:10px 16px;">51</td><td style="padding:10px 16px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Deceased</span></td></tr>
+                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Maternal Grandmother</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Breast Cancer</td><td style="padding:10px 16px;">52</td><td style="padding:10px 16px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Deceased</span></td></tr>
+                    <tr><td style="padding:10px 16px;">Paternal side</td><td style="padding:10px 16px;color:#6B7280;">No significant history</td><td style="padding:10px 16px;">—</td><td style="padding:10px 16px;"><span style="background:#F3F4F6;color:#6B7280;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Unaffected</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div style="width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+            <div class="gc-card">
+              <div class="gc-card-header"><div class="gc-card-title">Cascade Testing</div></div>
+              <div class="gc-card-body">
+                <div style="font-size:12px;color:#374151;margin-bottom:10px;line-height:1.5;">First-degree relatives recommended for targeted BRCA1 c.5266dupC testing.</div>
+                <div class="tl-item"><div class="tl-dot amber"></div><div class="tl-content"><div class="tl-label">Brother (39M)</div><div class="tl-sub">Letter sent Jun 18 · Testing pending</div></div></div>
+                <div class="tl-item"><div class="tl-dot amber"></div><div class="tl-content"><div class="tl-label">Sister (37F)</div><div class="tl-sub">Letter sent Jun 18 · Testing pending</div></div></div>
+                <div class="tl-item"><div class="tl-dot green"></div><div class="tl-content"><div class="tl-label">Mother (64F)</div><div class="tl-sub">BRCA1+ confirmed · Under surveillance</div></div></div>
+                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:10px;" onclick="gcToast('Cascade testing letters ready for download')">Generate Cascade Letter</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GC NOTES TAB ══ -->
+    <div class="gc-body" id="tab-notes" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+          <button class="btn btn-primary" onclick="gcToast('New GC note opened for editing')">+ Add Note</button>
+        </div>
+
+        <!-- Pre-test note -->
+        <div class="gc-card">
+          <div class="gc-card-header">
+            <div class="gc-card-title">Pre-Test Counseling Note</div>
+            <span class="gc-card-badge" style="background:#D1FAE5;color:#065F46;">Signed &amp; Finalized</span>
+            <span class="gc-card-action">Edit</span>
+          </div>
+          <div class="gc-card-body">
+            <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Taylor Brooks, MS CGC · May 28, 2026 · Video · 45 min</div>
+            <div class="note-block">Patient is a 42-year-old female referred for BRCA1/2 genetic counseling due to significant personal and family history of HBOC-associated cancers (see family history tab).
+
+DISCUSSION POINTS:
+• Reviewed purpose and scope of BRCA1/2 comprehensive panel testing
+• Discussed autosomal dominant inheritance pattern and 50% transmission risk to first-degree relatives
+• Addressed potential results: positive (pathogenic), VUS, negative, and their respective implications
+• Reviewed insurance and employment discrimination protections under GINA
+• Patient expressed understanding and signed consent for testing
+
+CLINICAL IMPRESSION: High pre-test probability given strong 3-generation maternal history. Patient emotionally prepared for positive result; has support system in place (partner present, mother already confirmed positive).
+
+PLAN: GeneDx BRCA1/2 full sequencing + large rearrangement analysis ordered. Results expected in 5–7 business days. Follow-up results disclosure scheduled upon return.</div>
+            <div class="note-meta">Authored: Taylor Brooks, MS CGC · May 28, 2026, 2:45 PM · Signed: May 28, 2026, 3:02 PM</div>
+          </div>
+        </div>
+
+        <!-- Results disclosure note (in progress) -->
+        <div class="gc-card">
+          <div class="gc-card-header">
+            <div class="gc-card-title">Results Disclosure Note</div>
+            <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;">In Progress — Not Signed</span>
+            <span class="gc-card-action" onclick="gcToast('Opening note for editing')">Edit &amp; Sign</span>
+          </div>
+          <div class="gc-card-body">
+            <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Taylor Brooks, MS CGC · Jun 18, 2026 · Async · In progress</div>
+            <div class="note-block" style="border:1.5px dashed #C4B5FD;background:#FDFCFF;">Patient contacted via secure async message to discuss results. PATHOGENIC variant BRCA1 c.5266dupC (p.Gln1756fs) identified.
+
+DISCUSSION:
+• Result communicated clearly with plain-language explanation
+• Patient asked about surgical prevention options — reviewed prophylactic mastectomy and salpingo-oophorectomy as options per NCCN
+• Discussed enhanced surveillance (annual MRI + mammogram starting at age 25)
+• Chemoprevention options reviewed (tamoxifen, raloxifene)
+• Patient expressed significant distress — referred to psychosocial support resources
+
+NEXT STEPS:
+[ ] Referral to high-risk breast/gyn oncology — MD Anderson Cancer Center (preferred by patient)
+[ ] Cascade testing letters to brother and sister
+[ ] Follow-up call scheduled in 2 weeks to answer additional questions
+
+— NOTE IN PROGRESS — sign before closing chart</div>
+            <div class="note-meta" style="color:#D97706;">⚠ Unsigned · Last autosaved: Jun 18, 2026, 10:41 AM</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="btn btn-outline" onclick="gcToast('Note saved as draft')">Save Draft</button>
+              <button class="btn btn-primary" onclick="gcToast('Note signed and finalized — GCA notified')">Sign &amp; Finalize Note</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TEST ORDERS TAB ══ -->
+    <div class="gc-body" id="tab-orders" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+          <button class="btn btn-primary" onclick="gcToast('GeneDx order panel opened')">+ New Order</button>
+        </div>
+        <div class="gc-card">
+          <div class="gc-card-header"><div class="gc-card-title">Genetic Test Orders</div></div>
+          <div class="gc-card-body" style="padding:0;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Order ID</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Panel</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Lab</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ordered</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Resulted</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
+                <th style="padding:10px 16px;"></th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #F3F4F6;">
+                  <td style="padding:10px 16px;font-family:monospace;font-size:12px;">GDX-2026-4721</td>
+                  <td style="padding:10px 16px;font-weight:600;">BRCA1/2 Full Seq + Del/Dup</td>
+                  <td style="padding:10px 16px;">GeneDx</td>
+                  <td style="padding:10px 16px;">May 28, 2026</td>
+                  <td style="padding:10px 16px;">Jun 3, 2026</td>
+                  <td style="padding:10px 16px;"><span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">PATHOGENIC</span></td>
+                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Opening lab report PDF')">View Report</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONSENTS TAB ══ -->
+    <div class="gc-body" id="tab-consents" style="display:none;">
+      <div class="tab-panel-full active">
+        <div class="gc-card">
+          <div class="gc-card-header"><div class="gc-card-title">Consent Forms</div></div>
+          <div class="gc-card-body">
+            <div class="consent-row">
+              <div class="consent-icon signed">✅</div>
+              <div><div class="consent-name">Pre-Test Genetic Counseling Consent</div><div class="consent-date">Signed May 28, 2026 · Patient portal e-signature</div></div>
+              <span class="consent-status signed">Signed</span>
+              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Opening consent PDF')">View</button>
+            </div>
+            <div class="consent-row">
+              <div class="consent-icon signed">✅</div>
+              <div><div class="consent-name">Genetic Testing Authorization (GeneDx)</div><div class="consent-date">Signed May 28, 2026 · Patient portal e-signature</div></div>
+              <span class="consent-status signed">Signed</span>
+              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Opening consent PDF')">View</button>
+            </div>
+            <div class="consent-row">
+              <div class="consent-icon declined">❌</div>
+              <div><div class="consent-name">Research Biobank Consent (optional)</div><div class="consent-date">Declined May 28, 2026</div></div>
+              <span class="consent-status declined">Declined</span>
+            </div>
+            <div class="consent-row">
+              <div class="consent-icon pending">⏳</div>
+              <div><div class="consent-name">Results Disclosure Acknowledgment</div><div class="consent-date">Sent Jun 3, 2026 · Patient has not yet signed</div></div>
+              <span class="consent-status pending">Pending</span>
+              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Reminder sent to patient')">Send Reminder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REFERRALS TAB ══ -->
+    <div class="gc-body" id="tab-referrals" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
+          <button class="btn btn-primary" onclick="gcToast('Referral form opened')">+ New Referral</button>
+        </div>
+        <div class="gc-card">
+          <div class="gc-card-header"><div class="gc-card-title">Post-Disclosure Referrals</div></div>
+          <div class="gc-card-body" style="padding:0;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Referral Type</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Specialist / Center</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Initiated</th>
+                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
+                <th style="padding:10px 16px;"></th>
+              </tr></thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #F3F4F6;">
+                  <td style="padding:10px 16px;font-weight:600;">High-Risk Breast Oncology</td>
+                  <td style="padding:10px 16px;">MD Anderson Cancer Center (Houston, TX)</td>
+                  <td style="padding:10px 16px;">Jun 18, 2026</td>
+                  <td style="padding:10px 16px;"><span style="background:#FFF8E1;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Pending</span></td>
+                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Referral status updated')">Update</button></td>
+                </tr>
+                <tr style="border-bottom:1px solid #F3F4F6;">
+                  <td style="padding:10px 16px;font-weight:600;">Gynecologic Oncology</td>
+                  <td style="padding:10px 16px;">MD Anderson Cancer Center (Houston, TX)</td>
+                  <td style="padding:10px 16px;">Jun 18, 2026</td>
+                  <td style="padding:10px 16px;"><span style="background:#FFF8E1;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Pending</span></td>
+                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Referral status updated')">Update</button></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 16px;font-weight:600;">Psychosocial / Social Work</td>
+                  <td style="padding:10px 16px;">Everlywell Behavioral Health Partner</td>
+                  <td style="padding:10px 16px;">Jun 18, 2026</td>
+                  <td style="padding:10px 16px;"><span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Accepted</span></td>
+                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Opening referral details')">View</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end gc-main -->
+</div><!-- end chart-shell -->
+
+<div class="gc-toast" id="gcToast"></div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function switchTab(name, el) {
+  // Hide all tab bodies
+  document.querySelectorAll('.gc-body').forEach(function(b){ b.style.display = 'none'; });
+  // Deactivate all tabs
+  document.querySelectorAll('.gc-tab').forEach(function(t){ t.classList.remove('active'); });
+  // Show selected
+  var panel = document.getElementById('tab-' + name);
+  if (panel) panel.style.display = 'flex';
+  el.classList.add('active');
+}
+
+function gcToast(msg) {
+  var t = document.getElementById('gcToast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+}
+</script>
+{% endblock %}

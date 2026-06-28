@@ -65,6 +65,14 @@ def queue():
     }.get(role, '')
     return render_template("provider/queue.html", show_own_only=show_own_only, provider_name=provider_name)
 
+@bp.route("/gc/chart/<int:patient_id>")
+def gc_chart(patient_id):
+    return render_template("provider/gc_chart.html", patient_id=patient_id)
+
+@bp.route("/gc/chart")
+def gc_chart_default():
+    return render_template("provider/gc_chart.html", patient_id=1)
+
 @bp.route("/chart/<int:patient_id>")
 def chart(patient_id):
     type_param = request.args.get('type', 'async')

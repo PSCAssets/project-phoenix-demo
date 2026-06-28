@@ -501,7 +501,7 @@ function openConsultDetail(patient, svc, partner, state) {
 function openChart() {
   closeModal('consultModal');
   showToast('Opening patient chart…');
-  setTimeout(function(){ window.location.href = '/provider/chart/1?type=async'; }, 800);
+  setTimeout(function(){ window.location.href = '/provider/gc/chart/1'; }, 800);
 }
 
 function setStateFilter(state, btn) {
