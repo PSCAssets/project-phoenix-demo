@@ -367,7 +367,7 @@ def gate_access_log():
 ROLE_NAMES = {
     'provider_md':      'Dr. Sarah Lee, MD',
     'provider_np':      'Maria Rodriguez, NP',
-    'provider_rn':      'Jennifer Martinez, RN',
+    'provider_rn':      'Jennifer Martinez, Lead RN',
     'provider_ma':      'Michael Torres, MA',
     'provider_gc':      'Lisa Park, MS CGC',
     'provider_gca':     'Priya Sharma, GCA',
