@@ -60,7 +60,7 @@ tbody tr:last-child td { border-bottom: none; }
 <div class="ga-shell">
   <div class="ga-topbar">
     <div class="ga-title">GC Administrator — Dana Cooper</div>
-    <div class="ga-topbar-sub">Supervisory · QA Resolution · Blurb Queue · Content Library</div>
+    <div class="ga-topbar-sub">Supervisory · QA Resolution · Blurb Queue · Queue Health · Content Library</div>
   </div>
 
   <div class="ga-body">
@@ -74,11 +74,14 @@ tbody tr:last-child td { border-bottom: none; }
       <div class="stat-card"><div class="stat-label">Overdue Blurbs (>24h)</div><div class="stat-value red">1</div></div>
       <div class="stat-card"><div class="stat-label">Articles Pending Publish</div><div class="stat-value teal">3</div></div>
       <div class="stat-card"><div class="stat-label">Published Articles</div><div class="stat-value green">47</div></div>
+      <div class="stat-card"><div class="stat-label">GC Providers Active</div><div class="stat-value teal">3 / 3</div></div>
+      <div class="stat-card"><div class="stat-label">Queue Depth — Unassigned</div><div class="stat-value amber">8</div></div>
     </div>
 
     <div class="tab-bar">
       <div class="ga-tab active" onclick="switchTab('qa')">🔴 QA Failure Queue (2)</div>
       <div class="ga-tab" onclick="switchTab('blurb')">📋 Blurb Requests (5)</div>
+      <div class="ga-tab" onclick="switchTab('health')">📊 Queue Health</div>
       <div class="ga-tab" onclick="switchTab('library')">📚 Content Library</div>
     </div>
 
@@ -107,7 +110,7 @@ tbody tr:last-child td { border-bottom: none; }
               <td><div class="p-name">Sarah T. (minor)</div><div class="p-id">PT-2026-00619</div></td>
               <td>CST-2026-11188</td>
               <td><span class="cp-tag">BRCA Hereditary</span></td>
-              <td>Jordan Patel, RN</td>
+              <td>Rachel Kim, MS CGC</td>
               <td><div class="reject-note">Parent/guardian consent form unsigned — patient is 16 years old, guardian signature required on all documentation.</div></td>
               <td>Yesterday 4:17 PM<br><span style="font-size:11px;color:#DC2626;font-weight:600;">18h 6m blocked</span></td>
               <td>
@@ -141,7 +144,7 @@ tbody tr:last-child td { border-bottom: none; }
             </tr>
             <tr>
               <td><strong>BLB-2026-044</strong></td>
-              <td>Alex Kim, MA</td>
+              <td>Lisa Park, MS CGC</td>
               <td>CST-2026-11187<br><span class="p-id">Lynch syndrome — MMR variant</span></td>
               <td><span class="sla-pill sla-warn">⏱ 18h 32m remaining</span></td>
               <td>Patient asking about surveillance recommendations for MLH1 variant.</td>
@@ -161,7 +164,7 @@ tbody tr:last-child td { border-bottom: none; }
             </tr>
             <tr>
               <td><strong>BLB-2026-047</strong></td>
-              <td>Jordan Patel, RN</td>
+              <td>Rachel Kim, MS CGC</td>
               <td>CST-2026-11218<br><span class="p-id">VUS in ATM gene</span></td>
               <td><span class="sla-pill sla-ok">✓ 22h 41m remaining</span></td>
               <td>ATM variant of uncertain significance — patient requesting clarification on cancer risk.</td>
@@ -181,6 +184,73 @@ tbody tr:last-child td { border-bottom: none; }
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Queue Health Panel -->
+    <div class="panel" id="panelHealth">
+      <div class="queue-card">
+        <div class="queue-header">
+          <div class="queue-title">GC Capacity &amp; Queue Health</div>
+          <span class="badge badge-teal">3 active GCs · 13 consults in queue</span>
+        </div>
+        <table>
+          <thead><tr><th>GC Provider</th><th>States Licensed</th><th>Assigned Today</th><th>Queue Depth</th><th>ASAP Pending</th><th>Avg Turnaround</th><th>Availability</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="p-name">Lisa Park, MS CGC</div><div class="p-id">Genetics · TX · NY · NJ · FL</div></td>
+              <td><span style="font-size:11px;">TX · NY · NJ · FL · CT · PA · CA</span></td>
+              <td style="font-weight:600;">5</td>
+              <td><span class="badge badge-amber">3 unassigned</span></td>
+              <td style="font-weight:600;color:#DC2626;">2</td>
+              <td>31 min</td>
+              <td><span class="badge badge-green">Available</span></td>
+            </tr>
+            <tr>
+              <td><div class="p-name">Taylor Brooks, MS CGC</div><div class="p-id">Genetics · NY · NJ · CT</div></td>
+              <td><span style="font-size:11px;">NY · NJ · CT · PA</span></td>
+              <td style="font-weight:600;">4</td>
+              <td><span class="badge badge-amber">2 unassigned</span></td>
+              <td style="font-weight:600;color:#DC2626;">1</td>
+              <td>28 min</td>
+              <td><span class="badge badge-green">Available</span></td>
+            </tr>
+            <tr>
+              <td><div class="p-name">Rachel Kim, MS CGC</div><div class="p-id">Genetics · CA · TX · FL</div></td>
+              <td><span style="font-size:11px;">CA · TX · FL · NY</span></td>
+              <td style="font-weight:600;">4</td>
+              <td><span class="badge badge-red">3 unassigned</span></td>
+              <td style="font-weight:600;color:#DC2626;">1</td>
+              <td>35 min</td>
+              <td><span class="badge badge-amber">In Consult</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="queue-card" style="margin-top:16px;">
+        <div class="queue-header">
+          <div class="queue-title">Reassignment — Unavailable GC Coverage</div>
+          <span class="badge badge-teal">Bulk reassign open consults when a GC is out</span>
+        </div>
+        <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:#374151;">Reassign open consults from:</span>
+          <select style="font-size:12px;padding:5px 10px;border:1px solid #E5E0D8;border-radius:6px;color:#374151;">
+            <option>Select GC...</option>
+            <option>Lisa Park, MS CGC</option>
+            <option>Taylor Brooks, MS CGC</option>
+            <option>Rachel Kim, MS CGC</option>
+          </select>
+          <span style="font-size:13px;color:#374151;">to:</span>
+          <select style="font-size:12px;padding:5px 10px;border:1px solid #E5E0D8;border-radius:6px;color:#374151;">
+            <option>Select receiving GC...</option>
+            <option>Lisa Park, MS CGC</option>
+            <option>Taylor Brooks, MS CGC</option>
+            <option>Rachel Kim, MS CGC</option>
+            <option>Provider Pool (auto-assign)</option>
+          </select>
+          <button onclick="alert('Reassignment preview: 4 open consults will be moved. Both GCs will be notified. Confirm to proceed.')" style="background:#0E7490;color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;">Preview &amp; Reassign</button>
+        </div>
       </div>
     </div>
 
@@ -221,7 +291,7 @@ tbody tr:last-child td { border-bottom: none; }
               <td>PALB2</td>
               <td>Autosomal dominant</td>
               <td>—</td>
-              <td>Alex Kim, MA</td>
+              <td>Lisa Park, MS CGC</td>
               <td><span class="cl-status cl-pending">Pending Publish</span></td>
               <td>
                 <button class="action-btn btn-approve-cl" onclick="publishArticle('PALB2')">Publish ✓</button>
@@ -241,7 +311,7 @@ tbody tr:last-child td { border-bottom: none; }
               <td>APOE</td>
               <td>Complex / Multi-factorial</td>
               <td>—</td>
-              <td>Jordan Patel, RN</td>
+              <td>Rachel Kim, MS CGC</td>
               <td><span class="cl-status cl-published">Published</span></td>
               <td><button class="action-btn" style="border-color:#E5E0D8;color:#6B7280;" onclick="alert('View article')">View</button></td>
             </tr>
@@ -267,7 +337,7 @@ tbody tr:last-child td { border-bottom: none; }
 function switchTab(tab) {
   document.querySelectorAll('.ga-tab').forEach((t, i) => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  const tabs = ['qa','blurb','library'];
+  const tabs = ['qa','blurb','health','library'];
   const idx = tabs.indexOf(tab);
   document.querySelectorAll('.ga-tab')[idx].classList.add('active');
   document.getElementById('panel' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
