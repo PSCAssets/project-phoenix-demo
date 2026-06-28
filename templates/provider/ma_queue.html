@@ -198,6 +198,7 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
 
 <main class="main">
 
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
   <div class="stat-grid">
     <div class="stat-card">
       <div class="label">Total Queue</div>
@@ -383,10 +384,122 @@ function renderRows() {
   }
 }
 
-function takeTask(btn) { var row = btn.closest('tr'); row.querySelector('.ma-chip').textContent = 'You'; row.querySelector('.ma-chip').className = 'ma-chip ma-assigned'; btn.parentElement.innerHTML = '<button class="action-btn btn-amber" onclick="closeTask(this)">Close Task</button><button class="action-btn btn-gray" onclick="viewTask()">View</button>'; }
-function routeTask() { alert('Route task…\n\n(In production this opens a routing modal to reassign to another team member or escalate to provider.)'); }
-function closeTask(btn) { if (confirm('Close this task?\n\nNote: Close Task marks the task closed — separate from the consultation being marked Complete.')) { btn.closest('tr').remove(); } }
-function viewTask() { alert('Opening chart…\n\n(In production this navigates to the patient chart.)'); }
+/* ── MA Queue: toast notification ── */
+function showMAToast(msg, color) {
+  color = color || '#059669';
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:'+color+';color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:340px;line-height:1.4;';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){ t.remove(); }, 400); }, 3000);
+}
+
+/* ── Take ownership ── */
+function takeTask(btn) {
+  var row = btn.closest('tr');
+  row.querySelector('.ma-chip').textContent = 'You (MT)';
+  row.querySelector('.ma-chip').className = 'ma-chip ma-assigned';
+  btn.parentElement.innerHTML = '<button class="action-btn btn-amber" onclick="workTask(this)">Work Task</button><button class="action-btn btn-gray" onclick="viewChart()">View Chart</button>';
+  showMAToast('✓ Task assigned to you. Start working it from the queue.');
+}
+
+/* ── Work task (after taking) ── */
+function workTask(btn) {
+  var row = btn.closest('tr');
+  var cat = row.cells[3] ? row.cells[3].textContent.trim() : '';
+  var patient = row.cells[1] ? row.cells[1].textContent.trim().split('
+')[0] : 'Patient';
+  showMAWorkModal(btn, patient, cat);
+}
+
+/* ── Work modal ── */
+function showMAWorkModal(btn, patient, cat) {
+  var overlay = document.createElement('div');
+  overlay.id = 'maWorkOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5000;display:flex;align-items:center;justify-content:center;';
+  var outcomes = {
+    'Intake Review':     ['Intake complete — route to provider', 'Missing documents — request from patient', 'On hold — awaiting lab results'],
+    'Prior Auth':        ['PA submitted to insurance', 'Additional clinical info needed', 'PA denied — escalate to provider'],
+    'Patient Reminders': ['Patient reached — confirmed appointment', 'Left voicemail — attempt 2 pending', 'Unable to reach — close and re-queue'],
+    'Doc Collection':    ['Documents received — intake complete', 'Partial docs received — follow up needed', 'Patient declined — close task'],
+  };
+  var opts = outcomes[cat] || ['Task completed', 'Follow-up needed', 'Escalate to provider'];
+  var optHtml = opts.map(function(o){ return '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;margin-bottom:6px;"><input type="radio" name="outcome" value="'+o+'"> '+o+'</label>'; }).join('');
+  overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:400px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;">'
+    + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
+    + '<span style="font-size:14px;font-weight:700;color:#111827;">Close Task — '+patient+'</span>'
+    + '<button onclick="document.getElementById('maWorkOverlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
+    + '<div style="padding:16px 20px;">'
+    + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:8px;">Outcome</div>'
+    + optHtml
+    + '<div style="margin-top:12px;"><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:4px;">Notes (optional)</label>'
+    + '<textarea rows="2" placeholder="Add any notes..." style="width:100%;padding:7px 10px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:12px;resize:none;box-sizing:border-box;"></textarea></div></div>'
+    + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
+    + '<button onclick="document.getElementById('maWorkOverlay').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="submitMAClose(this)" data-row="'+Date.now()+'" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">✓ Close Task</button>'
+    + '</div></div>';
+  overlay.querySelector('[data-row]')._btn = btn;
+  document.body.appendChild(overlay);
+}
+
+function submitMAClose(closeBtn) {
+  var overlay = document.getElementById('maWorkOverlay');
+  var sel = overlay.querySelector('input[name="outcome"]:checked');
+  if (!sel) { showMAToast('Select an outcome before closing.', '#D97706'); return; }
+  var outcome = sel.value;
+  var origBtn = closeBtn._btn || document.querySelector('.action-btn.btn-amber');
+  if (origBtn) {
+    var row = origBtn.closest('tr');
+    if (row) {
+      row.style.opacity = '0.4';
+      row.style.textDecoration = 'line-through';
+      setTimeout(function(){ row.remove(); }, 800);
+    }
+  }
+  overlay.remove();
+  showMAToast('✓ Task closed: ' + outcome);
+}
+
+/* ── Route task ── */
+function routeTask() {
+  var overlay = document.createElement('div');
+  overlay.id = 'maRouteOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:5000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:360px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;">'
+    + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
+    + '<span style="font-size:14px;font-weight:700;color:#111827;">Route Task</span>'
+    + '<button onclick="document.getElementById('maRouteOverlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
+    + '<div style="padding:16px 20px;">'
+    + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:8px;">Route To</div>'
+    + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;margin-bottom:6px;"><input type="radio" name="route" value="AM"> AM — Medical Assistant (2 open tasks)</label>'
+    + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;margin-bottom:6px;"><input type="radio" name="route" value="JD"> JD — Medical Assistant (4 open tasks)</label>'
+    + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;margin-bottom:6px;"><input type="radio" name="route" value="PR"> PR — Medical Assistant (1 open task)</label>'
+    + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #FEF3C7;background:#FFFBEB;border-radius:7px;cursor:pointer;font-size:13px;"><input type="radio" name="route" value="Provider"> ⚑ Escalate to Provider Queue</label>'
+    + '</div>'
+    + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
+    + '<button onclick="document.getElementById('maRouteOverlay').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="submitRoute()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Route Task</button>'
+    + '</div></div>';
+  document.body.appendChild(overlay);
+}
+
+function submitRoute() {
+  var overlay = document.getElementById('maRouteOverlay');
+  var sel = overlay.querySelector('input[name="route"]:checked');
+  if (!sel) { showMAToast('Select a destination before routing.', '#D97706'); return; }
+  var dest = sel.value;
+  overlay.remove();
+  if (dest === 'Provider') {
+    showMAToast('⚑ Task escalated to Provider Queue. The provider will see it in their active consults.', '#D97706');
+  } else {
+    showMAToast('✓ Task routed to ' + dest + '. They have been notified.');
+  }
+}
+
+/* ── View chart ── */
+function viewChart() { window.location.href = '/provider/chart/1'; }
+function viewTask()  { window.location.href = '/provider/chart/1'; }
+function closeTask(btn) { workTask(btn); }
 renderRows();
 </script>
 {% endraw %}
