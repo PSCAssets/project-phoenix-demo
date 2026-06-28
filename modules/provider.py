@@ -269,3 +269,7 @@ def doh_report(record_id):
 @bp.route("/doh/history")
 def doh_history():
     return render_template("provider/doh_history.html")
+
+@bp.route("/patient-management")
+def patient_management():
+    return render_template("scheduler/search_patient.html")
