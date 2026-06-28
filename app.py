@@ -236,7 +236,6 @@ def inject_sidebar_nav():
             ('Dashboard',     '/care-team/psr',          'home',      ['/care-team/psr']),
             ('Call Queue',    '/care-team/psr/queue',    'phone',     ['/care-team/psr/queue']),
             ('Link Generator','/care-team/psr/link-generator','link', ['/care-team/psr/link-generator']),
-            ('Team Dashboard','/provider/manager',       'users',     ['/provider/manager']),
             ('Messages',      '/provider/messages',      'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',      'settings',  ['/provider/settings']),
         ],
@@ -432,12 +431,12 @@ def login_post():
 def switch_user():
     role = request.form.get("role", "")
     if role in ROLE_DESTINATIONS:
+        session.clear()
         session.permanent = True
         session['role'] = role
         session['display_name'] = ROLE_NAMES.get(role, role)
-        next_url = request.form.get('next') or request.referrer or url_for(ROLE_DESTINATIONS[role])
-        return redirect(next_url)
-    return redirect(request.referrer or url_for('index'))
+        return redirect(url_for(ROLE_DESTINATIONS[role]))
+    return redirect(url_for('index'))
 
 @app.route("/logout")
 def logout():
