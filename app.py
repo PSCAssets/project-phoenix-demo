@@ -121,8 +121,8 @@ def inject_sidebar_nav():
     role  = session.get('role', '')
     _path = _req.path
 
-    # Admin and patient portals have their own sidebars — never show the global g-sidebar
-    if _req.blueprint in ('admin', 'patient'):
+    # Admin, patient, and care_team portals have their own sidebars — never show the global g-sidebar
+    if _req.blueprint in ('admin', 'patient', 'care_team'):
         return dict(sidebar_nav=[], user_role=role)
 
     # Index page (login screen) — no sidebar
