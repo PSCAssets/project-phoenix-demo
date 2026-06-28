@@ -17,3 +17,7 @@ def psr_queue():
 @bp.route("/psr/link-generator")
 def psr_link_generator():
     return render_template("care_team/psr_dashboard.html")
+
+@bp.route("/gaps")
+def gaps_dashboard():
+    return render_template("care_team/gaps_under_construction.html")

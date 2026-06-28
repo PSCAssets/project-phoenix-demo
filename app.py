@@ -240,6 +240,9 @@ def inject_sidebar_nav():
             ('Messages',      '/provider/messages',      'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',      'settings',  ['/provider/settings']),
         ],
+        'care_team_gaps': [
+            ('Dashboard',     '/care-team/gaps',         'home',      ['/care-team/gaps']),
+        ],
         'scheduler': [
             ('Dashboard',     '/scheduler/',             'home',      ['/scheduler/']),
             ('Schedule',      '/scheduler/schedule',      'calendar',  ['/scheduler/schedule', '/provider/schedule']),
@@ -379,7 +382,8 @@ ROLE_NAMES = {
     'qa_reviewer':      'Rachel Chen, QA Reviewer',
     'gc_admin':         'Dana Cooper, GC Admin',
     'provider_manager': 'Riley Perrone, Team Manager',
-    'provider_psr':     'Melanie Marmo, PSR Manager',
+    'provider_psr':     'Melanie Marmo, PSS Manager',
+    'care_team_gaps':   'Missy',
 }
 
 ROLE_DESTINATIONS = {
@@ -398,6 +402,7 @@ ROLE_DESTINATIONS = {
     'patient':          'patient.dashboard',
     'provider_manager': 'provider.manager_dashboard',
     'provider_psr':     'care_team.psr_dashboard',
+    'care_team_gaps':   'care_team.gaps_dashboard',
 }
 
 @app.route("/")
