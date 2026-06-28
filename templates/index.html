@@ -3,6 +3,12 @@
 
 {% block head %}
 <style>
+  /* Hide global nav and sidebar on login screen */
+  .nav { display: none !important; }
+  .g-sidebar { display: none !important; }
+  body { padding-top: 0 !important; }
+  .g-shell { display: block !important; }
+
   .nav-badge { background: #dc2626 !important; }
 
   .login-wrap {
@@ -396,7 +402,7 @@ function swRow(u) {
       <div class="sw-user-name">${u.name}</div>
       <div class="sw-user-meta">${u.role}<span class="sw-portal-badge">${u.portal}</span></div>
     </div>
-    <a href="${href}" class="sw-login-btn">${u.btnLabel}</a>
+    <a href="${href}" class="sw-login-btn">Log in →</a>
   </div>`;
 }
 
