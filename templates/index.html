@@ -389,7 +389,7 @@ function swFilter(dept) {
 }
 
 function swRow(u) {
-  const href = u.loginUrl || ('/login?role=' + u.loginRole);
+  const href = u.loginUrl || ('/login/' + u.loginRole);
   return `<div class="sw-user-row">
     <div class="sw-avatar" style="background:${u.color}">${u.initials}</div>
     <div class="sw-user-info">
