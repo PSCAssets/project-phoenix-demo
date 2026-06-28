@@ -587,18 +587,20 @@
             <button onclick="openPreConsult('Alex Rivera','CST-2026-10905','Pre-Test Consult','BRCA Counseling','Video','2:30 PM',45)" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Pre-Test Checklist →</button>
             <button onclick="sendPrepMaterials('Alex Rivera','BRCA Counseling')" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;">Send Prep Materials</button>
           </div>
-          <div class="sched-row">
+          <div class="sched-row" onclick="openPreConsult('J.W.','CST-2026-10904','Pre-Test Counseling','BRCA Counseling','Video','11:30 AM',45)" style="cursor:pointer;" title="Click to start pre-consult workflow">
             <div class="sched-time"><div class="sched-hour">11:30</div><div class="sched-ampm">AM</div></div>
             <div class="sched-divider video"></div>
             <div class="sched-info"><div class="sched-patient">J.W. · CST-2026-10904</div><div class="sched-detail">BRCA Counseling — Video Pre-test Counseling</div></div>
             <span class="sched-badge video">Video</span>
+            <span style="font-size:11px;background:#6B21A8;color:#fff;padding:2px 8px;border-radius:10px;font-weight:600;">Pre-Test Checklist →</span>
             <div class="sched-countdown soon">1h 04m away</div>
           </div>
-          <div class="sched-row">
+          <div class="sched-row" onclick="openResultsDisclosure('R.T.','CST-2026-10902','Hereditary Cancer Panel','MLH1/MSH2 Panel — PATHOGENIC','Phone','2:00 PM',30)" style="cursor:pointer;" title="Click to review results disclosure">
             <div class="sched-time"><div class="sched-hour">2:00</div><div class="sched-ampm">PM</div></div>
             <div class="sched-divider phone"></div>
             <div class="sched-info"><div class="sched-patient">R.T. · CST-2026-10902</div><div class="sched-detail">Hereditary Cancer — Phone Results Disclosure</div></div>
             <span class="sched-badge phone">Phone</span>
+            <span style="font-size:11px;background:#DC2626;color:#fff;padding:2px 8px;border-radius:10px;font-weight:600;">⚠ PATHOGENIC</span>
             <div class="sched-countdown">3h 34m</div>
           </div>
         </div>
@@ -698,7 +700,7 @@
         <option>Preconception Genetic Screen</option>
         <option>Single-Gene BRCA1/2</option>
       </select>
-      <button onclick="alert('GeneDx order submitted. Order ID: GDX-2026-4821\nStatus: Pending provider signature.')" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;">Submit Order →</button>
+      <button onclick="submitGeneDxOrder(this)" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;">Submit Order →</button>
     </div>
     <div style="margin-top:10px;font-size:11px;color:#9CA3AF;">Last order: Apr 12, 2026 — Comprehensive Carrier Screen — Resulted</div>
   </div>
@@ -951,6 +953,87 @@ function confirmSendPrep(btn, patient) {
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);';
   t.textContent = 'Prep materials sent to '+patient+'. Patient notified via email and portal.';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){ t.remove(); },400); }, 4000);
+}
+
+/* ══════════════════════════════
+   RESULTS DISCLOSURE WORKFLOW
+══════════════════════════════ */
+function openResultsDisclosure(patient, cstId, product, finding, mode, time, dur) {
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:500px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.22);overflow:hidden;">'
+    + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
+    + '<div><div style="font-size:14px;font-weight:700;color:#111827;">Results Disclosure Session</div>'
+    + '<div style="font-size:12px;color:#6B7280;margin-top:2px;">'+cstId+' · '+mode+' · '+time+' · '+dur+' min</div></div>'
+    + '<button onclick="this.closest('div[style]').remove()" style="background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;line-height:1;">×</button></div>'
+    + '<div style="padding:16px 20px;">'
+    + '<div style="padding:12px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;margin-bottom:14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;">'
+    + '<span style="font-size:16px;flex-shrink:0;">⚠</span>'
+    + '<div><strong style="color:#DC2626;">Pathogenic Variant Identified</strong><br>'
+    + '<span style="color:#374151;font-size:12px;">'+finding+' — Requires results counseling and post-disclosure care plan. Review variant interpretation before session.</span></div></div>'
+    + [['Patient',patient],['Care Product',product],['Session Mode',mode+' · '+time],['Duration',dur+' min'],['Disclosure Type','Positive Results — PATHOGENIC'],['Post-Disclosure','Referral + care plan required']].map(function(r){
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F3F4F6;font-size:13px;">'
+          +'<span style="color:#6B7280;">'+r[0]+'</span><span style="font-weight:600;color:#111827;">'+r[1]+'</span></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:space-between;gap:8px;">'
+    + '<button onclick="this.closest('div[style]').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<div style="display:flex;gap:8px;">'
+    + '<button onclick="window.location.href='/provider/chart/1'" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;">Open Chart →</button>'
+    + '<button onclick="startDisclosureSession(this)" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Start Disclosure Session</button>'
+    + '</div></div></div>';
+  document.body.appendChild(overlay);
+}
+
+function startDisclosureSession(btn) {
+  btn.closest('div[style]').remove();
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:360px;';
+  t.textContent = 'Results disclosure session started — Timer running. Chart note will be auto-created on close.';
+  document.body.appendChild(t);
+  setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){ t.remove(); },400); }, 5000);
+}
+
+/* ══════════════════════════════
+   GENEDX ORDER SUBMISSION
+══════════════════════════════ */
+function submitGeneDxOrder(btn) {
+  var select = btn.previousElementSibling;
+  var panel = select ? select.value : '';
+  if (!panel || panel.startsWith('Select')) {
+    select.style.border = '1.5px solid #DC2626';
+    setTimeout(function(){ select.style.border = ''; }, 2000);
+    return;
+  }
+  var orderId = 'GDX-2026-' + (4800 + Math.floor(Math.random()*200));
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:420px;max-width:95vw;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden;">'
+    + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;font-size:14px;font-weight:700;color:#111827;">GeneDx Order Submitted</div>'
+    + '<div style="padding:16px 20px;">'
+    + '<div style="text-align:center;padding:8px 0 16px;">'
+    + '<div style="width:48px;height:48px;border-radius:50%;background:#EDE9FE;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:22px;">&#129516;</div>'
+    + '<div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:4px;">Order Created</div>'
+    + '<div style="font-size:12px;color:#6B7280;">Pending your electronic signature</div></div>'
+    + [['Order ID',orderId],['Test Panel',panel],['Lab','GeneDx (Stamford, CT)'],['Est. Turnaround','10–14 business days'],['Status','Pending Provider Signature'],['Patient Notification','Sent on signature']].map(function(r){
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #F3F4F6;font-size:13px;">'
+          +'<span style="color:#6B7280;">'+r[0]+'</span><span style="font-weight:600;color:#111827;">'+r[1]+'</span></div>';
+      }).join('')
+    + '</div>'
+    + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
+    + '<button onclick="this.closest('div[style]').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>'
+    + '<button onclick="signOrder(this,''+orderId+'')" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Submit →</button>'
+    + '</div></div>';
+  document.body.appendChild(overlay);
+}
+
+function signOrder(btn, orderId) {
+  btn.closest('div[style]').remove();
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);';
+  t.textContent = 'Order '+orderId+' signed and submitted to GeneDx. Patient notified.';
   document.body.appendChild(t);
   setTimeout(function(){ t.style.opacity='0'; t.style.transition='opacity .4s'; setTimeout(function(){ t.remove(); },400); }, 4000);
 }
