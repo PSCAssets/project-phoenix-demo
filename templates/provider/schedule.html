@@ -418,7 +418,13 @@ var PROVIDERS = [
   { id:5, name:'Dr. Kevin Martinez, MD', state:'CA', role:'MD', slots:0, products:['A1C Management','Testosterone','Thyroid'] },
   { id:6, name:'Dr. Amanda Foster, NP',  state:'FL', role:'NP', slots:5, products:["Women's Health",'A1C Management','STI Treatment'] },
   { id:7, name:'Dr. Chris Rogers, MD',   state:'NY', role:'MD', slots:2, products:['ED Treatment','Testosterone','Thyroid'] },
+  // GC Providers
+  { id:8, name:'Lisa Park, MS CGC',    state:'TX', role:'GC', slots:3, products:['BRCA Counseling','Hereditary Cancer','Carrier Screening'] },
+  { id:9, name:'Taylor Brooks, MS CGC',state:'NY', role:'GC', slots:2, products:['BRCA Counseling','Pharmacogenomics','Carrier Screening'] },
+  { id:10,name:'Rachel Kim, MS CGC',   state:'CA', role:'GC', slots:4, products:['Carrier Screening','Hereditary Cancer','Pharmacogenomics'] },
 ];
+
+var USER_ROLE = '{{ user_role }}';
 
 var PROV_COLORS = [
   { bg:'#EDE9FE', border:'#7C3AED', text:'#5B21B6', dot:'#6B21A8', apptBg:'rgba(107,33,168,0.12)', apptBorder:'#6B21A8', apptText:'#3B0764' },
@@ -446,9 +452,15 @@ var APPTS_BY_PROV = [
   [[0,8,0,30,'a1c','A1C Consult','Xena T.'],[1,9,30,30,'followup','Follow-up','Yara U.'],[2,11,0,45,'annual','Annual Visit','Zane V.'],[3,10,30,30,'phone','Phone Consult','Abe W.'],[4,9,0,30,'telehealth','Telehealth','Bea X.']],
   // Provider 7: Dr. Chris Rogers, MD
   [[0,10,30,30,'followup','Follow-up','Cal Y.'],[1,13,0,30,'phone','Phone Consult','Deb Z.'],[2,10,0,45,'annual','Annual Visit','Ed A.'],[3,13,30,30,'telehealth','Telehealth','Faye B.'],[4,14,0,30,'a1c','A1C Consult','Gil C.']],
+  // Provider 8: Lisa Park, MS CGC
+  [[0,9,0,45,'annual','Pre-Test Consult','Alex R. · BRCA Counseling'],[0,10,0,45,'annual','Results Disclosure','Jordan M. · Hereditary Cancer'],[1,9,30,45,'phone','Phone Consult','Maria S. · Carrier Screening'],[2,9,0,45,'annual','Pre-Test Consult','Chris W. · BRCA Counseling'],[2,14,0,30,'followup','Follow-up','Dana P.'],[3,10,0,45,'annual','Results Disclosure','Lee T. · Hereditary Cancer'],[4,9,0,45,'annual','Pre-Test Consult','Sam K. · Carrier Screening']],
+  // Provider 9: Taylor Brooks, MS CGC
+  [[0,11,0,45,'annual','Pre-Test Consult','Robin A. · BRCA Counseling'],[1,10,0,45,'annual','Results Disclosure','Casey B. · Pharmacogenomics'],[2,10,30,45,'phone','Phone Consult','Drew C. · Carrier Screening'],[3,9,0,45,'annual','Pre-Test Consult','Quinn D. · BRCA Counseling'],[4,11,0,45,'annual','Results Disclosure','Avery E. · Hereditary Cancer']],
+  // Provider 10: Rachel Kim, MS CGC
+  [[0,8,30,45,'annual','Pre-Test Consult','Blake F. · Carrier Screening'],[1,8,0,45,'annual','Results Disclosure','Devon G. · Hereditary Cancer'],[2,9,0,45,'annual','Pre-Test Consult','Emery H. · Carrier Screening'],[3,10,0,45,'phone','Phone Consult','Finley I. · Pharmacogenomics'],[3,14,0,45,'annual','Results Disclosure','Haven J. · Hereditary Cancer'],[4,9,30,45,'annual','Pre-Test Consult','Indigo K. · Carrier Screening']],
 ];
 
-var selectedProviders = [0]; // Start with provider 0 selected
+var selectedProviders = (USER_ROLE === 'provider_gc') ? [8] : [0]; // Role-based default
 var colorAssignments  = {};  // providerId -> colorIndex
 var filteredState = '';
 var filteredProduct = '';

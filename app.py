@@ -123,7 +123,7 @@ def inject_sidebar_nav():
 
     # Admin and patient portals have their own sidebars — never show the global g-sidebar
     if _req.blueprint in ('admin', 'patient'):
-        return dict(sidebar_nav=[])
+        return dict(sidebar_nav=[], user_role=role)
 
     ICONS = {
         'home':      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>',
@@ -253,7 +253,7 @@ def inject_sidebar_nav():
             is_active = False
         nav_items.append({'label': label, 'href': href, 'icon': ICONS[icon_key], 'active': is_active})
 
-    return dict(sidebar_nav=nav_items)
+    return dict(sidebar_nav=nav_items, user_role=role)
 
 @app.before_request
 def enforce_demo_gate():

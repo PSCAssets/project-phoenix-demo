@@ -112,6 +112,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
 /* Toast */
 .toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
 .toast.show { opacity: 1; transform: translateY(0); }
+  /* ── base.html offset overrides ── */
+  .sidebar { position: fixed; top: 60px !important; left: 0; height: calc(100vh - 60px) !important; z-index: 200; }
+  .main    { position: fixed !important; top: 60px !important; left: 64px !important; right: 0 !important; bottom: 0 !important; margin: 0 !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
 </style>
 {% endblock %}
 {% block content %}
