@@ -291,15 +291,38 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
 {% raw %}
 <script>
 const DATA = [
-  { pri: 1, priLabel: "P1", name: "Marcus T.",  id: "#PT-00412", catLabel: "Prior Auth",       cat: "pa",      type: "PA",       program: "GLP-1/Weight",    urgency: "CRITICAL", ma: "Unassigned", wait: 92,  tc: "fail" },
-  { pri: 1, priLabel: "P1", name: "Angela R.",  id: "#PT-00389", catLabel: "Prior Auth",       cat: "pa",      type: "PA",       program: "Men's Health",    urgency: "HIGH",     ma: "Unassigned", wait: 118, tc: "pass" },
-  { pri: 1, priLabel: "P1", name: "David K.",   id: "#PT-00501", catLabel: "Intake Review",    cat: "intake",  type: "Review",   program: "Metabolic Health",urgency: "HIGH",     ma: "AM",         wait: 71,  tc: "pending" },
-  { pri: 2, priLabel: "P2", name: "Lisa M.",    id: "#PT-00277", catLabel: "Patient Reminders",cat: "reminder",type: "Outreach", program: "Thyroid",         urgency: "NORMAL",   ma: "JD",         wait: 34,  tc: "pass" },
-  { pri: 2, priLabel: "P2", name: "Sarah B.",   id: "#PT-00345", catLabel: "Intake Review",    cat: "intake",  type: "Review",   program: "Women's Health",  urgency: "NORMAL",   ma: "PR",         wait: 52,  tc: "pass" },
-  { pri: 2, priLabel: "P2", name: "Kevin P.",   id: "#PT-00466", catLabel: "Patient Reminders",cat: "reminder",type: "Outreach", program: "GLP-1/Weight",    urgency: "NORMAL",   ma: "AM",         wait: 27,  tc: "pass" },
-  { pri: 2, priLabel: "P2", name: "Rachel O.",  id: "#PT-00318", catLabel: "Patient Reminders",cat: "reminder",type: "Outreach", program: "Metabolic Health",urgency: "NORMAL",   ma: "Unassigned", wait: 68,  tc: "pass" },
-  { pri: 3, priLabel: "P3", name: "James W.",   id: "#PT-00530", catLabel: "Doc Collection",   cat: "doc",     type: "Document", program: "Men's Health",    urgency: "NORMAL",   ma: "JD",         wait: 19,  tc: "pass" },
-  { pri: 3, priLabel: "P3", name: "Tina F.",    id: "#PT-00288", catLabel: "Intake Review",    cat: "intake",  type: "Review",   program: "Women's Health",  urgency: "NORMAL",   ma: "Unassigned", wait: 43,  tc: "pass" },
+  // ── Prior Auth (6) ─────────────────────────────────────────────────────────
+  { pri: 1, priLabel: "P1", name: "Marcus T.",  id: "#PT-00412", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "GLP-1/Weight",     urgency: "CRITICAL", ma: "Unassigned", wait: 92,  tc: "fail" },
+  { pri: 1, priLabel: "P1", name: "Angela R.",  id: "#PT-00389", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "Men's Health",     urgency: "HIGH",     ma: "Unassigned", wait: 118, tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Omar H.",    id: "#PT-00517", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "GLP-1/Weight",     urgency: "HIGH",     ma: "MT",         wait: 55,  tc: "pending" },
+  { pri: 2, priLabel: "P2", name: "Sandra K.",  id: "#PT-00498", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "Women's Health",   urgency: "NORMAL",   ma: "AM",         wait: 33,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Louis V.",   id: "#PT-00441", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "Metabolic Health", urgency: "NORMAL",   ma: "JD",         wait: 22,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Yvonne B.",  id: "#PT-00376", catLabel: "Prior Auth",        cat: "pa",      type: "PA",       program: "Thyroid",          urgency: "NORMAL",   ma: "PR",         wait: 14,  tc: "pass" },
+  // ── Intake Review (9) ──────────────────────────────────────────────────────
+  { pri: 1, priLabel: "P1", name: "David K.",   id: "#PT-00501", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Metabolic Health", urgency: "HIGH",     ma: "AM",         wait: 71,  tc: "pending" },
+  { pri: 1, priLabel: "P1", name: "Carla D.",   id: "#PT-00463", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "GLP-1/Weight",     urgency: "HIGH",     ma: "Unassigned", wait: 87,  tc: "fail" },
+  { pri: 2, priLabel: "P2", name: "Sarah B.",   id: "#PT-00345", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Women's Health",   urgency: "NORMAL",   ma: "PR",         wait: 52,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Tina F.",    id: "#PT-00288", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Women's Health",   urgency: "NORMAL",   ma: "Unassigned", wait: 43,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Greg N.",    id: "#PT-00522", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Men's Health",     urgency: "NORMAL",   ma: "JD",         wait: 38,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Priya S.",   id: "#PT-00537", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Thyroid",          urgency: "NORMAL",   ma: "MT",         wait: 29,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Ellen M.",   id: "#PT-00491", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Metabolic Health", urgency: "NORMAL",   ma: "AM",         wait: 18,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Felix T.",   id: "#PT-00449", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "GLP-1/Weight",     urgency: "NORMAL",   ma: "Unassigned", wait: 12,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Naomi R.",   id: "#PT-00333", catLabel: "Intake Review",     cat: "intake",  type: "Review",   program: "Women's Health",   urgency: "NORMAL",   ma: "PR",         wait: 9,   tc: "pass" },
+  // ── Patient Reminders (9) ──────────────────────────────────────────────────
+  { pri: 2, priLabel: "P2", name: "Lisa M.",    id: "#PT-00277", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Thyroid",          urgency: "NORMAL",   ma: "JD",         wait: 34,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Kevin P.",   id: "#PT-00466", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "GLP-1/Weight",     urgency: "NORMAL",   ma: "AM",         wait: 27,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Rachel O.",  id: "#PT-00318", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Metabolic Health", urgency: "NORMAL",   ma: "Unassigned", wait: 68,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Brenda L.",  id: "#PT-00405", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Women's Health",   urgency: "NORMAL",   ma: "MT",         wait: 45,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Carlos M.",  id: "#PT-00358", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Men's Health",     urgency: "NORMAL",   ma: "Unassigned", wait: 51,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Joan T.",    id: "#PT-00420", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Thyroid",          urgency: "NORMAL",   ma: "PR",         wait: 16,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Derek W.",   id: "#PT-00477", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "GLP-1/Weight",     urgency: "NORMAL",   ma: "JD",         wait: 11,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Alicia F.",  id: "#PT-00392", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Metabolic Health", urgency: "NORMAL",   ma: "AM",         wait: 8,   tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Paul C.",    id: "#PT-00311", catLabel: "Patient Reminders", cat: "reminder",type: "Outreach", program: "Women's Health",   urgency: "NORMAL",   ma: "Unassigned", wait: 6,   tc: "pass" },
+  // ── Doc Collection (4) ─────────────────────────────────────────────────────
+  { pri: 2, priLabel: "P2", name: "James W.",   id: "#PT-00530", catLabel: "Doc Collection",    cat: "doc",     type: "Document", program: "Men's Health",     urgency: "NORMAL",   ma: "JD",         wait: 19,  tc: "pass" },
+  { pri: 2, priLabel: "P2", name: "Hana K.",    id: "#PT-00484", catLabel: "Doc Collection",    cat: "doc",     type: "Document", program: "GLP-1/Weight",     urgency: "NORMAL",   ma: "Unassigned", wait: 37,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Victor G.",  id: "#PT-00426", catLabel: "Doc Collection",    cat: "doc",     type: "Document", program: "Metabolic Health", urgency: "NORMAL",   ma: "AM",         wait: 24,  tc: "pass" },
+  { pri: 3, priLabel: "P3", name: "Mia S.",     id: "#PT-00369", catLabel: "Doc Collection",    cat: "doc",     type: "Document", program: "Women's Health",   urgency: "NORMAL",   ma: "MT",         wait: 13,  tc: "pass" },
 ];
 
 let sortKey = 'pri';

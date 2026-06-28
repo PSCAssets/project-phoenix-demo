@@ -382,7 +382,7 @@ ROLE_NAMES = {
     'gc_admin':         'Dana Cooper, GC Admin',
     'provider_manager': 'Riley Perrone, Team Manager',
     'provider_psr':     'Melanie Marmo, PSS Manager',
-    'care_team_gaps':   'Missy',
+    'care_team_gaps':   'Missy Lemieux',
 }
 
 ROLE_DESTINATIONS = {
