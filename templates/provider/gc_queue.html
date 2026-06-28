@@ -194,59 +194,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
       </div>
     </div>
 
-    <!-- ASAP Queue -->
+    <!-- Unified GC Consult Queue -->
     <div class="section">
       <div class="section-header">
-        <div class="asap-indicator"></div>
-        <span class="section-title" style="color:var(--asap);">ASAP Consult Queue</span>
-        <span class="section-count" style="background:#FEE2E2;color:var(--asap);" id="asapCount">2</span>
-        <span style="font-size:11px;color:#6B7280;margin-left:4px;">— Urgent. Self-assign now or GCA will assign.</span>
-      </div>
-      <table class="q-table">
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>Care Product</th>
-            <th>Service Type</th>
-            <th>State</th>
-            <th>Partner / Client</th>
-            <th>Waiting</th>
-            <th>Ordered</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="asapTbody">
-          <tr class="asap-row">
-            <td><span class="badge badge-asap">🚨 ASAP</span><br><span style="font-size:12px;color:#374151;margin-top:4px;display:block;">M.R. · 52F</span></td>
-            <td>Galleri Multi-Cancer</td>
-            <td><span class="badge badge-new">Results Delivery 45</span></td>
-            <td><span class="badge-state">NY</span></td>
-            <td>Grail / Elevance</td>
-            <td><span class="wait-warn">47 min</span></td>
-            <td>Results Delivery</td>
-            <td><button class="btn-asap" onclick="selfAssign(this,'M.R., 52F','Galleri Multi-Cancer','Results Delivery 45','NY')">Self-Assign</button></td>
-          </tr>
-          <tr class="asap-row">
-            <td><span class="badge badge-asap">🚨 ASAP</span><br><span style="font-size:12px;color:#374151;margin-top:4px;display:block;">K.O. · 38F</span></td>
-            <td>Hereditary Cancer Panel</td>
-            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
-            <td><span class="badge-state">NJ</span></td>
-            <td>Quest Diagnostics</td>
-            <td><span class="wait-warn">22 min</span></td>
-            <td>Pre-Test Genetic Counseling</td>
-            <td><button class="btn-asap" onclick="selfAssign(this,'K.O., 38F','Hereditary Cancer Panel','Pre-Test Consult 45','NJ')">Self-Assign</button></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Regular Queue -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">My Assigned Consults</span>
-        <span class="section-count" id="mineCount">3</span>
+        <span class="section-title">GC Consult Queue</span>
+        <span class="section-count" id="totalCount">13</span>
+        <span style="font-size:11px;color:#6B7280;margin-left:4px;">— Showing states you are licensed in</span>
         <div class="filter-row">
-          <select class="form-select" style="font-size:11px;padding:4px 8px;" onchange="filterQueue(this.value)">
+          <button class="filter-btn active" onclick="setStateFilter('all',this)">All States</button>
+          <button class="filter-btn" onclick="setStateFilter('NY',this)">NY</button>
+          <button class="filter-btn" onclick="setStateFilter('NJ',this)">NJ</button>
+          <button class="filter-btn" onclick="setStateFilter('FL',this)">FL</button>
+          <button class="filter-btn" onclick="setStateFilter('CT',this)">CT</button>
+          <select class="form-select" style="font-size:11px;padding:4px 8px;margin-left:4px;" onchange="filterByType(this.value)">
             <option value="all">All service types</option>
             <option>Results Delivery 30</option>
             <option>Results Delivery 45</option>
@@ -256,92 +216,113 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
           </select>
         </div>
       </div>
-      <table class="q-table" id="assignedTable">
+      <table class="q-table" id="gcQueue">
         <thead>
           <tr>
             <th>Patient</th>
             <th>Care Product</th>
             <th>Service Type</th>
             <th>State</th>
-            <th>Partner</th>
-            <th>Consult Time</th>
+            <th>Partner / Client</th>
+            <th>Waiting</th>
+            <th>Preferred Time</th>
             <th>Status</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <!-- ASAP rows first -->
+          <tr class="asap-row" data-state="NY" data-stype="Results Delivery 45">
+            <td>M.R. · 52F</td>
+            <td>Galleri Multi-Cancer</td>
+            <td><span class="badge badge-new">Results Delivery 45</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Grail / Elevance</td>
+            <td><span class="wait-warn">47 min</span></td>
+            <td>ASAP</td>
+            <td><span class="badge badge-asap">ASAP</span></td>
+            <td><button class="btn-asap" onclick="doAssign(this,'M.R., 52F','Results Delivery 45')">Self-Assign</button></td>
+          </tr>
+          <tr class="asap-row" data-state="NJ" data-stype="Pre-Test Consult 45">
+            <td>K.O. · 38F</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
+            <td><span class="badge-state">NJ</span></td>
+            <td>Quest Diagnostics</td>
+            <td><span class="wait-warn">22 min</span></td>
+            <td>ASAP</td>
+            <td><span class="badge badge-asap">ASAP</span></td>
+            <td><button class="btn-asap" onclick="doAssign(this,'K.O., 38F','Pre-Test Consult 45')">Self-Assign</button></td>
+          </tr>
+          <tr class="asap-row" data-state="NJ" data-stype="Pre-Test Consult 45">
+            <td>C.H. · 41F</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
+            <td><span class="badge-state">NJ</span></td>
+            <td>Invitae / Eli Lilly</td>
+            <td><span class="wait-warn">1h 30m</span></td>
+            <td>ASAP</td>
+            <td><span class="badge badge-asap">ASAP</span></td>
+            <td><button class="btn-asap" onclick="doAssign(this,'C.H., 41F','Pre-Test Consult 45')">Self-Assign</button></td>
+          </tr>
+          <tr class="asap-row" data-state="NY" data-stype="Results Delivery 30">
+            <td>J.R. · 45M</td>
+            <td>Hereditary Cancer Panel</td>
+            <td><span class="badge badge-new">Results Delivery 30</span></td>
+            <td><span class="badge-state">NY</span></td>
+            <td>Color Genomics</td>
+            <td><span class="wait-warn">15m</span></td>
+            <td>ASAP</td>
+            <td><span class="badge badge-asap">ASAP</span></td>
+            <td><button class="btn-asap" onclick="doAssign(this,'J.R., 45M','Results Delivery 30')">Self-Assign</button></td>
+          </tr>
+          <!-- Assigned rows -->
+          <tr data-state="NY" data-stype="Results Delivery 45">
             <td>D.W. · 61M</td>
             <td>Hereditary Cancer Panel</td>
             <td><span class="badge badge-inprog">Results Delivery 45</span></td>
             <td><span class="badge-state">NY</span></td>
             <td>Quest Diagnostics</td>
+            <td>—</td>
             <td>Today 10:30 AM</td>
             <td><span class="badge badge-inprog">In Progress</span></td>
             <td><button class="btn-primary" onclick="openConsultDetail('D.W., 61M','Results Delivery 45','Quest Diagnostics','NY')">Open Chart</button></td>
           </tr>
-          <tr>
+          <tr data-state="FL" data-stype="Results Delivery PGx">
             <td>A.M. · 44F</td>
             <td>Pharmacogenomics Panel</td>
             <td><span class="badge" style="background:#F0FDF4;color:#15803D;border:1px solid #86EFAC;">Results Delivery PGx</span></td>
             <td><span class="badge-state">FL</span></td>
             <td>Fulgent Genetics</td>
+            <td>—</td>
             <td>Today 1:00 PM</td>
             <td><span class="badge badge-assigned">Scheduled</span></td>
             <td><button class="btn-primary" onclick="openConsultDetail('A.M., 44F','Results Delivery PGx','Fulgent Genetics','FL')">Open Chart</button></td>
           </tr>
-          <tr>
+          <tr data-state="CT" data-stype="Pre-Test Consult 45">
             <td>L.C. · 29F</td>
             <td>Hereditary Cancer Panel</td>
             <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
             <td><span class="badge-state">CT</span></td>
             <td>MyHeritage Health</td>
+            <td>—</td>
             <td>Today 3:15 PM</td>
             <td><span class="badge badge-assigned">Scheduled</span></td>
             <td><button class="btn-primary" onclick="openConsultDetail('L.C., 29F','Pre-Test Consult 45','MyHeritage Health','CT')">Open Chart</button></td>
           </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Open Queue (Unassigned) -->
-    <div class="section">
-      <div class="section-header">
-        <span class="section-title">Open Queue — Unassigned</span>
-        <span class="section-count">8</span>
-        <span style="font-size:11px;color:#6B7280;margin-left:4px;">— Only showing states you are licensed in</span>
-        <div class="filter-row">
-          <button class="filter-btn active" onclick="setStateFilter('all',this)">All States</button>
-          <button class="filter-btn" onclick="setStateFilter('NY',this)">NY</button>
-          <button class="filter-btn" onclick="setStateFilter('NJ',this)">NJ</button>
-          <button class="filter-btn" onclick="setStateFilter('FL',this)">FL</button>
-        </div>
-      </div>
-      <table class="q-table" id="openQueue">
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>Care Product</th>
-            <th>Service Type</th>
-            <th>State</th>
-            <th>Partner</th>
-            <th>Waiting</th>
-            <th>Preferred Time</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-state="NY">
+          <!-- Unassigned rows -->
+          <tr data-state="NY" data-stype="Results Delivery 45">
             <td>S.P. · 47F</td>
             <td>Galleri Multi-Cancer</td>
             <td><span class="badge badge-new">Results Delivery 45</span></td>
             <td><span class="badge-state">NY</span></td>
             <td>Grail / Elevance</td>
             <td>1h 12m</td>
-            <td>ASAP</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'S.P., 47F','Galleri Multi-Cancer','Results Delivery 45')">Self-Assign</button></td>
+            <td>Flexible</td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'S.P., 47F','Results Delivery 45')">Self-Assign</button></td>
           </tr>
-          <tr data-state="NJ">
+          <tr data-state="NJ" data-stype="Results Delivery 30">
             <td>R.T. · 55M</td>
             <td>Hereditary Cancer Panel</td>
             <td><span class="badge badge-new">Results Delivery 30</span></td>
@@ -349,9 +330,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td>Quest Diagnostics</td>
             <td>38m</td>
             <td>Flexible</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'R.T., 55M','Hereditary Cancer Panel','Results Delivery 30')">Self-Assign</button></td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'R.T., 55M','Results Delivery 30')">Self-Assign</button></td>
           </tr>
-          <tr data-state="FL">
+          <tr data-state="FL" data-stype="Pre-Test Consult 60 (ExomeDx)">
             <td>B.K. · 33F</td>
             <td>Hereditary Cancer Panel</td>
             <td><span class="badge" style="background:#EDE9FE;color:#5B21B6;border:1px solid #C4B5FD;">Pre-Test Consult 60 (ExomeDx)</span></td>
@@ -359,9 +341,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td>Probably Genetic</td>
             <td>2h 5m</td>
             <td>Afternoon</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'B.K., 33F','Hereditary Cancer Panel','Pre-Test Consult 60')">Self-Assign</button></td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'B.K., 33F','Pre-Test Consult 60')">Self-Assign</button></td>
           </tr>
-          <tr data-state="NY">
+          <tr data-state="NY" data-stype="Results Delivery PGx">
             <td>T.O. · 68M</td>
             <td>Pharmacogenomics Panel</td>
             <td><span class="badge" style="background:#F0FDF4;color:#15803D;border:1px solid #86EFAC;">Results Delivery PGx</span></td>
@@ -369,19 +352,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td>Fulgent Genetics</td>
             <td>54m</td>
             <td>Morning</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'T.O., 68M','Pharmacogenomics Panel','Results Delivery PGx')">Self-Assign</button></td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'T.O., 68M','Results Delivery PGx')">Self-Assign</button></td>
           </tr>
-          <tr data-state="NJ">
-            <td>C.H. · 41F</td>
-            <td>Hereditary Cancer Panel</td>
-            <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
-            <td><span class="badge-state">NJ</span></td>
-            <td>Invitae / Eli Lilly</td>
-            <td>1h 30m</td>
-            <td>ASAP</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'C.H., 41F','Hereditary Cancer Panel','Pre-Test Consult 45')">Self-Assign</button></td>
-          </tr>
-          <tr data-state="FL">
+          <tr data-state="FL" data-stype="Results Delivery 45">
             <td>M.G. · 58F</td>
             <td>Galleri Multi-Cancer</td>
             <td><span class="badge badge-new">Results Delivery 45</span></td>
@@ -389,19 +363,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td>Grail / Humana</td>
             <td>28m</td>
             <td>Flexible</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'M.G., 58F','Galleri Multi-Cancer','Results Delivery 45')">Self-Assign</button></td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'M.G., 58F','Results Delivery 45')">Self-Assign</button></td>
           </tr>
-          <tr data-state="NY">
-            <td>J.R. · 45M</td>
-            <td>Hereditary Cancer Panel</td>
-            <td><span class="badge badge-new">Results Delivery 30</span></td>
-            <td><span class="badge-state">NY</span></td>
-            <td>Color Genomics</td>
-            <td>15m</td>
-            <td>ASAP</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'J.R., 45M','Hereditary Cancer Panel','Results Delivery 30')">Self-Assign</button></td>
-          </tr>
-          <tr data-state="FL">
+          <tr data-state="FL" data-stype="Results Delivery 30">
             <td>P.N. · 52F</td>
             <td>Viome Full Body Intelligence</td>
             <td><span class="badge badge-new">Results Delivery 30</span></td>
@@ -409,7 +374,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td>Viome Life Sciences</td>
             <td>3h 10m</td>
             <td>Afternoon</td>
-            <td><button class="btn-primary" onclick="selfAssignOpen(this,'P.N., 52F','Viome Full Body Intelligence','Results Delivery 30')">Self-Assign</button></td>
+            <td><span class="badge" style="background:#F3F4F6;color:#6B7280;border:1px solid #E5E0D8;">Unassigned</span></td>
+            <td><button class="btn-primary" onclick="doAssign(this,'P.N., 52F','Results Delivery 30')">Self-Assign</button></td>
           </tr>
         </tbody>
       </table>
@@ -496,28 +462,28 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function openAvailModal() { document.getElementById('availModal').classList.add('open'); }
 function saveAvail() { closeModal('availModal'); showToast('Availability updated — GCA notified'); }
 
-function selfAssign(btn, patient, product, svc, state) {
-  btn.disabled = true;
-  btn.textContent = '✓ Assigned';
-  btn.style.background = '#15803D';
-  var count = parseInt(document.getElementById('asapCount').textContent) - 1;
-  document.getElementById('asapCount').textContent = count;
-  document.getElementById('statAsap').textContent = count;
-  var mine = parseInt(document.getElementById('statMine').textContent) + 1;
-  document.getElementById('statMine').textContent = mine;
-  document.getElementById('mineCount').textContent = mine;
-  showToast('ASAP consult assigned — ' + patient + ' · ' + svc);
-}
-
-function selfAssignOpen(btn, patient, product, svc) {
+function doAssign(btn, patient, svc) {
   btn.disabled = true;
   btn.textContent = '✓ Assigned';
   btn.style.background = '#059669';
+  btn.style.border = 'none';
+  // Update status badge in same row
+  var row = btn.closest('tr');
+  var statusCell = row.cells[7];
+  statusCell.innerHTML = '<span class="badge badge-assigned">Assigned</span>';
+  row.classList.remove('asap-row');
+  // Update stats
+  var asapEl = document.getElementById('statAsap');
+  if (asapEl && row.dataset.priority === 'asap') {
+    asapEl.textContent = Math.max(0, parseInt(asapEl.textContent) - 1);
+  }
   var mine = parseInt(document.getElementById('statMine').textContent) + 1;
   document.getElementById('statMine').textContent = mine;
-  document.getElementById('mineCount').textContent = mine;
   showToast('Consult assigned — ' + patient + ' · ' + svc);
 }
+
+function selfAssign(btn, patient, product, svc, state) { doAssign(btn, patient, svc); }
+function selfAssignOpen(btn, patient, product, svc) { doAssign(btn, patient, svc); }
 
 function openConsultDetail(patient, svc, partner, state) {
   document.getElementById('consultModalTitle').textContent = 'Consult — ' + patient;
@@ -541,13 +507,20 @@ function openChart() {
 function setStateFilter(state, btn) {
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  document.querySelectorAll('#openQueue tbody tr').forEach(function(row){
+  document.querySelectorAll('#gcQueue tbody tr').forEach(function(row){
     if (state === 'all' || row.dataset.state === state) row.style.display = '';
     else row.style.display = 'none';
   });
 }
 
-function filterQueue(val) { /* service type filter placeholder */ }
+function filterByType(val) {
+  document.querySelectorAll('#gcQueue tbody tr').forEach(function(row){
+    if (val === 'all' || row.dataset.stype === val) row.style.display = '';
+    else row.style.display = 'none';
+  });
+}
+
+function filterQueue(val) { filterByType(val); }
 
 function showToast(msg) {
   var t = document.getElementById('toast');

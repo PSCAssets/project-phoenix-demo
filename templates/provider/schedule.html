@@ -406,6 +406,7 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script>var USER_ROLE = '{{ user_role }}';</script>
 {% raw %}
 <script>
 // ── Provider data ──────────────────────────────────────────────
@@ -423,8 +424,6 @@ var PROVIDERS = [
   { id:9, name:'Taylor Brooks, MS CGC',state:'NY', role:'GC', slots:2, products:['BRCA Counseling','Pharmacogenomics','Carrier Screening'] },
   { id:10,name:'Rachel Kim, MS CGC',   state:'CA', role:'GC', slots:4, products:['Carrier Screening','Hereditary Cancer','Pharmacogenomics'] },
 ];
-
-var USER_ROLE = '{{ user_role }}';
 
 var PROV_COLORS = [
   { bg:'#EDE9FE', border:'#7C3AED', text:'#5B21B6', dot:'#6B21A8', apptBg:'rgba(107,33,168,0.12)', apptBorder:'#6B21A8', apptText:'#3B0764' },
