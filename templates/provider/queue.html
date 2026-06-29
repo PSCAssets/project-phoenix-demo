@@ -262,16 +262,7 @@
 
   .actions-cell {
     display: flex; gap: 6px; align-items: center;
-    position: sticky; right: 0;
-    background: inherit;
-    z-index: 5;
-    min-width: 120px;
-    padding-right: 12px;
-  }
-  thead th:last-child {
-    position: sticky; right: 0;
-    background: var(--bg-secondary);
-    z-index: 11;
+    white-space: nowrap;
   }
   .take-btn {
     font-size: 12px; font-weight: 600;
@@ -476,7 +467,7 @@
           <th>State</th>
           <th class="sorted">Wait time <i class="ti ti-chevron-down sort-icon"></i></th>
           <th>SLA status</th>
-          <th>Program</th>
+          <th></th>
           <th></th>
         </tr>
       </thead>
@@ -1278,78 +1269,6 @@ document.querySelectorAll('.take-btn').forEach(function(btn) {
   });
 });
 
-(function() {
-  // Program names for MD/NP/RN/MA queue rows (in order)
-  var programs = [
-    'Everlywell360','Everlywell360','Humana - A1C','Elevance - AV',
-    'Humana - A1C','Everlywell360','Elevance - AV','Everlywell360',
-    'Humana - A1C','Elevance - AV','Everlywell360','Humana - A1C',
-    'Elevance - AV','Everlywell360'
-  ];
-  var pStyles = {
-    'Everlywell360': 'background:#D1FAE5;color:#065F46',
-    'Humana - A1C':  'background:#DBEAFE;color:#1D4ED8',
-    'Elevance - AV': 'background:#EDE9FE;color:#6B21A8',
-    // GC-specific lab/plan labels
-    'Blueprint Genetics': 'background:#EEF2FF;color:#3730A3',
-    'GeneDx Referral':    'background:#EEF2FF;color:#3730A3',
-    'CareFirst Insurance':'background:#FEF3C7;color:#92400E',
-  };
-
-  var rows = Array.from(document.querySelectorAll('#queueTableBody tr'));
-  var mdIdx = 0;  // counter for MD/NP rows (GC rows use their own badge)
-
-  rows.forEach(function(row) {
-    // Hide patient-dob div (data moves to dedicated column)
-    var dobDiv = row.querySelector('.patient-dob');
-    var dob = '', gender = '';
-    if (dobDiv) {
-      var m = dobDiv.textContent.match(/DOB:\s*(\d{2}\/\d{2}\/\d{4})/);
-      if (m) dob = m[1];
-      var gEl = dobDiv.querySelector('.patient-gender');
-      if (gEl) gender = gEl.textContent.trim();
-      dobDiv.style.display = 'none';
-    }
-
-    // Determine program label
-    var existingBadge = row.querySelector('.client-badge');
-    var label = '';
-    if (existingBadge) {
-      label = existingBadge.textContent.trim();
-      existingBadge.style.display = 'none';  // hide from patient cell
-    } else {
-      label = programs[mdIdx] || 'Everlywell360';
-      mdIdx++;
-    }
-
-    // Build the 3 new cells
-    var style = pStyles[label] || pStyles['Everlywell360'];
-    var progTd = document.createElement('td');
-    var badge = document.createElement('span');
-    badge.style.cssText = style + ';font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;white-space:nowrap;';
-    badge.textContent = label;
-    progTd.appendChild(badge);
-
-    var dobTd = document.createElement('td');
-    dobTd.style.cssText = 'font-size:12px;color:#6B7280;white-space:nowrap;';
-    dobTd.textContent = dob;
-
-    var genTd = document.createElement('td');
-    genTd.style.cssText = 'font-size:12px;font-weight:600;color:#6B7280;text-align:center;';
-    genTd.textContent = gender;
-
-    // Find readiness TD (10th TD, index 9) and replace it
-    var tds = row.querySelectorAll('td');
-    var readinessTd = tds[9];  // 0-indexed: icon(0) patient(1) age(2) id(3) type(4) product(5) state(6) wait(7) sla(8) readiness(9) actions(10)
-    if (readinessTd) {
-      var parent = readinessTd.parentNode;
-      parent.insertBefore(progTd, readinessTd);
-      parent.insertBefore(dobTd, readinessTd);
-      parent.insertBefore(genTd, readinessTd);
-      parent.removeChild(readinessTd);
-    }
-  });
-})();
 </script>
 {% endraw %}
 
