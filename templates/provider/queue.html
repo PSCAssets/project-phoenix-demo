@@ -140,7 +140,7 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 960px;
+    min-width: 1300px;
   }
 
   thead {
@@ -260,7 +260,19 @@
   .s-pending   { background: #FEF3C7; color: #92400E; }
   .s-escalated { background: #FCE7F3; color: #9D174D; }
 
-  .actions-cell { display: flex; gap: 6px; align-items: center; }
+  .actions-cell {
+    display: flex; gap: 6px; align-items: center;
+    position: sticky; right: 0;
+    background: inherit;
+    z-index: 5;
+    min-width: 120px;
+    padding-right: 12px;
+  }
+  thead th:last-child {
+    position: sticky; right: 0;
+    background: var(--bg-secondary);
+    z-index: 11;
+  }
   .take-btn {
     font-size: 12px; font-weight: 600;
     padding: 5px 14px; border-radius: 6px;
