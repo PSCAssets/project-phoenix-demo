@@ -468,7 +468,6 @@
           <th class="sorted">Wait time <i class="ti ti-chevron-down sort-icon"></i></th>
           <th>SLA status</th>
           <th></th>
-          <th></th>
         </tr>
       </thead>
       <tbody id="queueTableBody">
@@ -489,7 +488,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
           <td class="wait-time red">4h 22m</td>
           <td><span class="sla-badge sb-red" title="SLA Overdue — 22 min past limit">⚠ 22 min ago</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),1)">Route</button>
@@ -509,7 +507,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">CA</td>
           <td class="wait-time orange">2h 15m</td>
           <td><span class="sla-badge sb-orange">⚠ 45 min</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),2)">Route</button>
@@ -529,7 +526,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
           <td class="wait-time yellow">1h 41m</td>
           <td><span class="sla-badge sb-yellow">2h remaining</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),3)">Route</button>
@@ -549,7 +545,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">IL</td>
           <td class="wait-time">52m</td>
           <td><span class="sla-badge sb-green">Within SLA</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),4)">Route</button>
@@ -569,7 +564,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
           <td class="wait-time">28m</td>
           <td><span class="sla-badge sb-green">Within SLA</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),5)">Route</button>
@@ -589,7 +583,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
           <td class="wait-time">12m</td>
           <td><span class="sla-badge sb-green">Within SLA</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),6)">Route</button>
@@ -611,7 +604,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
           <td class="wait-time red">4h 22m</td>
           <td><span class="sla-badge sb-red" title="SLA Overdue — 22 min past limit">⚠ 22 min ago</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),1)">Route</button>
@@ -630,7 +622,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">FL</td>
           <td class="wait-time red">3h 08m</td>
           <td><span class="sla-badge sb-red" title="SLA Overdue — 8 min past limit">⚠ 8 min ago</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),2)">Route</button>
@@ -649,7 +640,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">CA</td>
           <td class="wait-time red">2h 42m</td>
           <td><span class="sla-badge sb-red" title="SLA Overdue — 2 min past limit">⚠ 2 min ago</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="view-btn">View</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),3)">Route</button>
@@ -668,7 +658,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
           <td class="wait-time orange">2h 12m</td>
           <td><span class="sla-badge sb-orange" title="SLA approaching — 18 min to breach">⚠ 18 min</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),4)">Route</button>
@@ -687,7 +676,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NY</td>
           <td class="wait-time orange">1h 59m</td>
           <td><span class="sla-badge sb-orange" title="SLA approaching — 31 min to breach">⚠ 31 min</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="view-btn">View</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),5)">Route</button>
@@ -706,15 +694,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">GA</td>
           <td class="wait-time orange">1h 45m</td>
           <td><span class="sla-badge sb-orange" title="SLA approaching — 45 min to breach">⚠ 45 min</span></td>
-          <td>
-            <div style="display:flex;gap:3px;flex-wrap:wrap;">
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Reg</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Intake</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Tech</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Joined</span>
-            </div>
-            <button onclick="alert('SMS visit link re-sent to patient.\nLink expires in 60 minutes.')" style="background:none;border:1px solid #6B21A8;color:#6B21A8;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;margin-top:4px;display:block;">📱 Re-send Link</button>
-          </td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),6)">Route</button>
@@ -733,7 +712,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">IL</td>
           <td class="wait-time yellow">58m</td>
           <td><span class="sla-badge sb-yellow" title="SLA Warning">⚠</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),7)">Route</button>
@@ -752,7 +730,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">AZ</td>
           <td class="wait-time yellow">47m</td>
           <td><span class="sla-badge sb-yellow" title="SLA Warning">⚠</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="view-btn">View</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),8)">Route</button>
@@ -771,7 +748,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">CO</td>
           <td class="wait-time yellow">41m</td>
           <td><span class="sla-badge sb-yellow" title="SLA Warning">⚠</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),9)">Route</button>
@@ -790,7 +766,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
           <td class="wait-time yellow">33m</td>
           <td><span class="sla-badge sb-yellow" title="SLA Warning">⚠</span></td>
-          <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),10)">Route</button>
@@ -809,15 +784,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NV</td>
           <td class="wait-time ok">12m</td>
           <td></td>
-          <td>
-            <div style="display:flex;gap:3px;flex-wrap:wrap;">
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Reg</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Intake</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Tech</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Joined</span>
-            </div>
-            <button onclick="alert('SMS visit link re-sent to patient.\nLink expires in 60 minutes.')" style="background:none;border:1px solid #6B21A8;color:#6B21A8;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;margin-top:4px;display:block;">📱 Re-send Link</button>
-          </td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),14)">Route</button>
@@ -835,7 +801,6 @@
           <td class="program-cell">Weight Management</td>
           <td style="font-size:12px;font-weight:600;color:#6B7280;">TX</td>
           <td class="wait-time ok">12m</td>
-          <td></td>
           <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
@@ -855,7 +820,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">OH</td>
           <td class="wait-time ok">8m</td>
           <td></td>
-          <td></td>
           <td class="actions-cell">
             <button class="view-btn">View</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),12)">Route</button>
@@ -873,7 +837,6 @@
           <td class="program-cell">STI Treatment</td>
           <td style="font-size:12px;font-weight:600;color:#6B7280;">WA</td>
           <td class="wait-time ok">5m</td>
-          <td></td>
           <td></td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
@@ -893,14 +856,6 @@
           <td style="font-size:12px;font-weight:600;color:#6B7280;">NY</td>
           <td class="wait-time ok">2m</td>
           <td></td>
-          <td>
-            <div style="display:flex;gap:3px;flex-wrap:wrap;">
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Reg</span>
-              <span style="font-size:10px;background:#DCFCE7;color:#166534;padding:2px 7px;border-radius:10px;font-weight:600;">✅ Intake</span>
-              <span style="font-size:10px;background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;padding:2px 7px;border-radius:10px;font-weight:600;">❌ Tech Failed</span>
-            </div>
-            <button onclick="alert('Tech check link re-sent to patient.')" style="background:none;border:1px solid #DC2626;color:#DC2626;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:600;cursor:pointer;display:block;margin-top:3px;">Re-send Tech Link</button>
-          </td>
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),14)">Route</button>
@@ -1154,7 +1109,7 @@ function toggleRoute(rowEl, n) {
   var formRow = document.createElement('tr');
   formRow.id = 'rf-' + n;
   formRow.className = 'route-form-row';
-  formRow.innerHTML = '<td colspan="13" style="padding:0;background:#F8FAFF;border-bottom:2px solid #BFDBFE;">' +
+  formRow.innerHTML = '<td colspan="12" style="padding:0;background:#F8FAFF;border-bottom:2px solid #BFDBFE;">' +
     '<div style="padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
     '<span style="font-size:12px;font-weight:600;color:#6B21A8;">Route to dept:</span>' +
     '<select id="rf-sel-' + n + '" style="font-size:12px;padding:4px 8px;border:1px solid #D1D5DB;border-radius:6px;color:#374151;">' +
@@ -1191,7 +1146,7 @@ function toggleAssign(rowEl, n) {
   var formRow = document.createElement('tr');
   formRow.id = 'af-' + n;
   formRow.className = 'route-form-row';
-  formRow.innerHTML = '<td colspan="13" style="padding:0;background:#F0F6FF;border-bottom:2px solid #93C5FD;">' +
+  formRow.innerHTML = '<td colspan="12" style="padding:0;background:#F0F6FF;border-bottom:2px solid #93C5FD;">' +
     '<div style="padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
     '<span style="font-size:12px;font-weight:600;color:#1B4F8A;">Assign to:</span>' +
     '<select id="af-sel-' + n + '" style="font-size:12px;padding:4px 8px;border:1px solid #93C5FD;border-radius:6px;color:#374151;">' +
