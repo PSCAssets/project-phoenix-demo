@@ -222,21 +222,254 @@ tbody tr:last-child td { border-bottom: none; }
 .btn-primary { padding: 9px 26px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
 .btn-primary:hover { background: #047857; }
 .btn-primary:disabled { background: #9CA3AF; cursor: not-allowed; }
+
+/* ── New Patient Wizard ── */
+.wiz-step { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.wiz-num { width:28px; height:28px; border-radius:50%; border:2px solid #D1D5DB; background:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#9CA3AF; }
+.wiz-step.active .wiz-num { border-color:#059669; background:#059669; color:#fff; }
+.wiz-step.done .wiz-num { border-color:#059669; background:#D1FAE5; color:#059669; }
+.wiz-label { font-size:10px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:.05em; white-space:nowrap; }
+.wiz-step.active .wiz-label, .wiz-step.done .wiz-label { color:#059669; }
+.wiz-connector { flex:1; height:2px; background:#E5E0D8; margin-top:14px; min-width:40px; }
+.wiz-panel { display:none; }
+.wiz-panel.active { display:block; }
+.wiz-card { background:#fff; border:1px solid #E5E0D8; border-radius:12px; padding:28px 32px; max-width:680px; }
+.wiz-card-title { font-size:15px; font-weight:700; color:#111827; margin-bottom:20px; padding-bottom:12px; border-bottom:1px solid #F3F4F6; }
+.wiz-row { display:flex; gap:16px; margin-bottom:16px; }
+.wiz-field { flex:1; display:flex; flex-direction:column; gap:5px; }
+.wiz-label-txt { font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:.05em; }
+.wiz-input { padding:9px 12px; border:1.5px solid #D1D5DB; border-radius:7px; font-size:13px; outline:none; font-family:inherit; }
+.wiz-input:focus { border-color:#059669; box-shadow:0 0 0 3px rgba(5,150,105,.1); }
+.wiz-actions { display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:16px; border-top:1px solid #F3F4F6; }
+.wiz-btn-primary { padding:10px 22px; background:#059669; color:#fff; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.wiz-btn-primary:hover { background:#047857; }
+.wiz-btn-secondary { padding:10px 18px; background:#F3F4F6; color:#374151; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.wiz-btn-secondary:hover { background:#E5E7EB; }
+.review-section { margin-bottom:16px; }
+.review-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#9CA3AF; margin-bottom:8px; }
+.review-row { display:flex; gap:8px; margin-bottom:6px; font-size:13px; }
+.review-key { color:#6B7280; min-width:130px; }
+.review-val { color:#111827; font-weight:500; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="sch-shell">
-  <div class="page-title">Patient &amp; Member Search</div>
-  <div class="page-sub">Search for existing patients or look up health plan members to schedule a new consult.</div>
+  <div class="page-title">Patient Management</div>
+  <div class="page-sub">Register a new patient, search existing records, or look up health plan members.</div>
 
   <div class="tab-bar">
-    <div class="sch-tab active" onclick="switchTab('patient')">Patient Search</div>
-    <div class="sch-tab" onclick="switchTab('member')">Member Lookup</div>
+    <div class="sch-tab active" data-tab="new" onclick="switchTab('new')">+ New Patient</div>
+    <div class="sch-tab" data-tab="patient" onclick="switchTab('patient')">Patient Search</div>
+    <div class="sch-tab" data-tab="member" onclick="switchTab('member')">Member Lookup</div>
+  </div>
+
+  <!-- ── New Patient Registration Panel ── -->
+  <div class="panel active" id="panelNew">
+    <div id="wizardContainer">
+
+      <!-- Step indicator -->
+      <div id="wizSteps" style="display:flex;gap:0;margin-bottom:28px;">
+        <div class="wiz-step active" id="ws1">
+          <div class="wiz-num">1</div><div class="wiz-label">Demographics</div>
+        </div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" id="ws2">
+          <div class="wiz-num">2</div><div class="wiz-label">Contact</div>
+        </div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" id="ws3">
+          <div class="wiz-num">3</div><div class="wiz-label">Insurance</div>
+        </div>
+        <div class="wiz-connector"></div>
+        <div class="wiz-step" id="ws4">
+          <div class="wiz-num">4</div><div class="wiz-label">Review</div>
+        </div>
+      </div>
+
+      <!-- Step 1: Demographics -->
+      <div class="wiz-panel active" id="wizStep1">
+        <div class="wiz-card">
+          <div class="wiz-card-title">Patient Demographics</div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">First Name *</label>
+              <input class="wiz-input" type="text" id="nw_first" placeholder="First name">
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Last Name *</label>
+              <input class="wiz-input" type="text" id="nw_last" placeholder="Last name">
+            </div>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Date of Birth *</label>
+              <input class="wiz-input" type="date" id="nw_dob">
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Sex at Birth</label>
+              <select class="wiz-input" id="nw_sex">
+                <option value="">— Select —</option>
+                <option>Female</option>
+                <option>Male</option>
+                <option>Intersex</option>
+                <option>Unknown</option>
+              </select>
+            </div>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Preferred Language</label>
+              <select class="wiz-input" id="nw_lang">
+                <option value="">— Select —</option>
+                <option>English</option>
+                <option>Spanish</option>
+                <option>French</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Patient ID (auto-assigned)</label>
+              <input class="wiz-input" type="text" value="PT-2026-XXXXX" disabled style="background:#F9F5EE;color:#9CA3AF;">
+            </div>
+          </div>
+          <div class="wiz-actions">
+            <div></div>
+            <button class="wiz-btn-primary" onclick="wizNext(1)">Next: Contact Info →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Contact -->
+      <div class="wiz-panel" id="wizStep2">
+        <div class="wiz-card">
+          <div class="wiz-card-title">Contact Information</div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Phone (Mobile) *</label>
+              <input class="wiz-input" type="tel" id="nw_phone" placeholder="(555) 000-0000">
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Email Address</label>
+              <input class="wiz-input" type="email" id="nw_email" placeholder="patient@email.com">
+            </div>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field" style="flex:2;">
+              <label class="wiz-label-txt">Street Address</label>
+              <input class="wiz-input" type="text" id="nw_addr" placeholder="123 Main St">
+            </div>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">City</label>
+              <input class="wiz-input" type="text" id="nw_city" placeholder="City">
+            </div>
+            <div class="wiz-field" style="flex:0.5;">
+              <label class="wiz-label-txt">State</label>
+              <select class="wiz-input" id="nw_state">
+                <option value="">—</option>
+                <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+                <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+                <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+                <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+                <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+                <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+                <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+                <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+                <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+                <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+                <option>WI</option><option>WY</option>
+              </select>
+            </div>
+            <div class="wiz-field" style="flex:0.7;">
+              <label class="wiz-label-txt">ZIP</label>
+              <input class="wiz-input" type="text" id="nw_zip" placeholder="00000">
+            </div>
+          </div>
+          <div class="wiz-actions">
+            <button class="wiz-btn-secondary" onclick="wizBack(2)">← Back</button>
+            <button class="wiz-btn-primary" onclick="wizNext(2)">Next: Insurance →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Insurance -->
+      <div class="wiz-panel" id="wizStep3">
+        <div class="wiz-card">
+          <div class="wiz-card-title">Insurance / Health Plan</div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Payer / Plan *</label>
+              <select class="wiz-input" id="nw_plan">
+                <option value="">— Select plan —</option>
+                <option>Humana — MA</option>
+                <option>Elevance / Anthem — MA</option>
+                <option>UnitedHealth — MA</option>
+                <option>Quest / Everlywell — Employer</option>
+                <option>Aetna — Commercial</option>
+                <option>BCBS — Commercial</option>
+                <option>Cigna — Commercial</option>
+                <option>Self-Pay</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Member ID</label>
+              <input class="wiz-input" type="text" id="nw_memberid" placeholder="Member ID">
+            </div>
+          </div>
+          <div class="wiz-row">
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Group Number</label>
+              <input class="wiz-input" type="text" id="nw_group" placeholder="Group #">
+            </div>
+            <div class="wiz-field">
+              <label class="wiz-label-txt">Effective Date</label>
+              <input class="wiz-input" type="date" id="nw_effdate">
+            </div>
+          </div>
+          <div class="wiz-actions">
+            <button class="wiz-btn-secondary" onclick="wizBack(3)">← Back</button>
+            <button class="wiz-btn-primary" onclick="wizNext(3)">Review &amp; Submit →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Review -->
+      <div class="wiz-panel" id="wizStep4">
+        <div class="wiz-card">
+          <div class="wiz-card-title">Review &amp; Confirm</div>
+          <div id="wizReviewBody" style="margin-bottom:20px;"></div>
+          <div style="background:#FEF3C7;border:1px solid #FCD34D;border-radius:8px;padding:12px 16px;font-size:12px;color:#92400E;margin-bottom:20px;">
+            <strong>Before registering:</strong> Confirm patient identity and insurance eligibility. A unique Patient ID will be generated and the patient record will be created in the system.
+          </div>
+          <div class="wiz-actions">
+            <button class="wiz-btn-secondary" onclick="wizBack(4)">← Edit</button>
+            <button class="wiz-btn-primary" style="background:#059669;" onclick="wizSubmit()">✓ Register Patient</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Success state -->
+      <div class="wiz-panel" id="wizSuccess" style="text-align:center;padding:48px 24px;">
+        <div style="font-size:52px;margin-bottom:16px;">✅</div>
+        <div style="font-size:20px;font-weight:700;color:#065F46;margin-bottom:8px;">Patient Registered</div>
+        <div id="wizSuccessName" style="font-size:14px;color:#374151;margin-bottom:6px;"></div>
+        <div id="wizSuccessId" style="font-size:13px;font-weight:700;color:#059669;background:#D1FAE5;display:inline-block;padding:4px 14px;border-radius:20px;margin-bottom:24px;"></div>
+        <div style="display:flex;gap:12px;justify-content:center;">
+          <button class="wiz-btn-primary" onclick="switchTab('patient')">Search Patient Records</button>
+          <button class="wiz-btn-secondary" onclick="wizReset()">Register Another</button>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- ── Patient Search Panel ── -->
-  <div class="panel active" id="panelPatient">
+  <div class="panel" id="panelPatient">
     <div class="search-row">
       <input class="search-input" type="text" id="patientSearchInput" placeholder="Search by name, patient ID, or date of birth…" oninput="filterPatients(this.value)">
       <button class="search-btn" onclick="filterPatients(document.getElementById('patientSearchInput').value)">Search</button>
@@ -686,12 +919,108 @@ function filterMembers(q) {
 function switchTab(tab) {
   document.querySelectorAll('.sch-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  if (tab === 'patient') {
-    document.querySelectorAll('.sch-tab')[0].classList.add('active');
-    document.getElementById('panelPatient').classList.add('active');
-  } else {
-    document.querySelectorAll('.sch-tab')[1].classList.add('active');
-    document.getElementById('panelMember').classList.add('active');
+  var tabEl = document.querySelector('[data-tab="'+tab+'"]');
+  if (tabEl) tabEl.classList.add('active');
+  var panelMap = { new:'panelNew', patient:'panelPatient', member:'panelMember' };
+  var panelId = panelMap[tab] || 'panelNew';
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ─── WIZARD ───
+var wizData = {};
+var wizCurrentStep = 1;
+var WIZ_TOTAL = 4;
+
+function wizNext(step) {
+  // Collect current step data
+  if (step === 1) {
+    wizData.first = document.getElementById('nw_first').value.trim();
+    wizData.last  = document.getElementById('nw_last').value.trim();
+    wizData.dob   = document.getElementById('nw_dob').value;
+    wizData.sex   = document.getElementById('nw_sex').value;
+    wizData.lang  = document.getElementById('nw_lang').value;
+    if (!wizData.first || !wizData.last || !wizData.dob) {
+      alert('Please fill in First Name, Last Name, and Date of Birth.');
+      return;
+    }
+  } else if (step === 2) {
+    wizData.phone = document.getElementById('nw_phone').value.trim();
+    wizData.email = document.getElementById('nw_email').value.trim();
+    wizData.addr  = document.getElementById('nw_addr').value.trim();
+    wizData.city  = document.getElementById('nw_city').value.trim();
+    wizData.state = document.getElementById('nw_state').value;
+    wizData.zip   = document.getElementById('nw_zip').value.trim();
+    if (!wizData.phone) { alert('Please enter a phone number.'); return; }
+  } else if (step === 3) {
+    wizData.plan     = document.getElementById('nw_plan').value;
+    wizData.memberid = document.getElementById('nw_memberid').value.trim();
+    wizData.group    = document.getElementById('nw_group').value.trim();
+    wizData.effdate  = document.getElementById('nw_effdate').value;
+  } else if (step === 4) {
+    wizSubmit(); return;
+  }
+  wizGo(step + 1);
+}
+
+function wizBack(step) { wizGo(step - 1); }
+
+function wizGo(step) {
+  document.querySelectorAll('.wiz-panel').forEach(function(p){ p.classList.remove('active'); });
+  var el = document.getElementById('wizStep' + step);
+  if (el) el.classList.add('active');
+  // Update step indicators
+  for (var i = 1; i <= WIZ_TOTAL; i++) {
+    var ws = document.getElementById('ws' + i);
+    if (!ws) continue;
+    ws.classList.remove('active','done');
+    if (i < step) ws.classList.add('done');
+    else if (i === step) ws.classList.add('active');
+  }
+  if (step === 4) buildReview();
+  wizCurrentStep = step;
+}
+
+function buildReview() {
+  var html = '';
+  html += '<div class="review-section"><div class="review-section-title">Demographics</div>';
+  html += '<div class="review-row"><span class="review-key">Name</span><span class="review-val">' + (wizData.first||'—') + ' ' + (wizData.last||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Date of Birth</span><span class="review-val">' + (wizData.dob||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Sex at Birth</span><span class="review-val">' + (wizData.sex||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Language</span><span class="review-val">' + (wizData.lang||'English') + '</span></div></div>';
+  html += '<div class="review-section"><div class="review-section-title">Contact</div>';
+  html += '<div class="review-row"><span class="review-key">Phone</span><span class="review-val">' + (wizData.phone||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Email</span><span class="review-val">' + (wizData.email||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Address</span><span class="review-val">' + [wizData.addr, wizData.city, wizData.state, wizData.zip].filter(Boolean).join(', ') + '</span></div></div>';
+  html += '<div class="review-section"><div class="review-section-title">Insurance</div>';
+  html += '<div class="review-row"><span class="review-key">Plan</span><span class="review-val">' + (wizData.plan||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Member ID</span><span class="review-val">' + (wizData.memberid||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Group #</span><span class="review-val">' + (wizData.group||'—') + '</span></div>';
+  html += '<div class="review-row"><span class="review-key">Effective Date</span><span class="review-val">' + (wizData.effdate||'—') + '</span></div></div>';
+  document.getElementById('wizReviewBody').innerHTML = html;
+}
+
+function wizSubmit() {
+  var ptId = 'PT-2026-' + Math.floor(10000 + Math.random()*89999);
+  document.querySelectorAll('.wiz-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('wizSuccess').classList.add('active');
+  document.getElementById('wizSteps').style.display = 'none';
+  document.getElementById('wizSuccessName').textContent = (wizData.first||'') + ' ' + (wizData.last||'');
+  document.getElementById('wizSuccessId').textContent = ptId;
+}
+
+function wizReset() {
+  wizData = {}; wizCurrentStep = 1;
+  document.querySelectorAll('.wiz-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('wizStep1').classList.add('active');
+  document.getElementById('wizSteps').style.display = 'flex';
+  document.getElementById('wizSuccessId').textContent = '';
+  // Clear inputs
+  ['nw_first','nw_last','nw_dob','nw_sex','nw_lang','nw_phone','nw_email','nw_addr','nw_city','nw_state','nw_zip','nw_plan','nw_memberid','nw_group','nw_effdate'].forEach(function(id){
+    var el = document.getElementById(id); if(el && !el.disabled) el.value = '';
+  });
+  for (var i = 1; i <= WIZ_TOTAL; i++) {
+    var ws = document.getElementById('ws'+i);
+    if (ws) { ws.classList.remove('active','done'); if(i===1) ws.classList.add('active'); }
   }
 }
 
