@@ -214,6 +214,7 @@ def inject_sidebar_nav():
             ('Dashboard',     '/provider/manager',              'home',        ['/provider/manager']),
             ('MA Queue',      '/provider/ma/queue',             'users',       ['/provider/ma/queue']),
             ('RN Queue',      '/provider/rn/queue',             'users',       ['/provider/rn/queue']),
+            ('Titer Queue',   '/provider/rn/titers',            'clipboard',   ['/provider/rn/titers']),
             ('Master Queue',  '/provider/queue',                'clipboard',   ['/provider/queue']),
             ('Patient Mgmt',  '/provider/patient-management',  'person-search',['/provider/patient-management', '/scheduler/search-patient']),
             ('Timekeeping',   '/provider/manager/timekeeping',  'clock',       ['/provider/manager/timekeeping']),
