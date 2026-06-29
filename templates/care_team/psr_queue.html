@@ -112,10 +112,15 @@ main.main-content{flex:1;display:flex;flex-direction:row;overflow:hidden;min-hei
     </div>
   </div>
   <div class="sidebar-user">
-    <div class="user-avatar">MM</div>
+    {% set _dn = session.get('display_name', 'Melanie Marmo, PSS Manager') %}
+    {% set _parts = _dn.split(', ', 1) %}
+    {% set _uname = _parts[0] %}
+    {% set _utitle = _parts[1] if _parts|length > 1 else 'PSS Team' %}
+    {% set _initials = (_uname.split()[0][0] + _uname.split()[-1][0]) if _uname.split()|length > 1 else _uname[:2] %}
+    <div class="user-avatar">{{ _initials|upper }}</div>
     <div>
-      <div class="user-name">Melanie Marmo</div>
-      <div class="user-role-label">Patient Care Manager · PSS Team</div>
+      <div class="user-name">{{ _uname }}</div>
+      <div class="user-role-label">{{ _utitle }} · PSS Team</div>
     </div>
   </div>
   <div class="team-toggle">

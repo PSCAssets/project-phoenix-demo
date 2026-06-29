@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Everlywell — Patient Portal</title>
+<title>Patient Portal</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F9FAFB; min-height: 100vh; display: flex; flex-direction: column; }
@@ -201,22 +201,11 @@
 <body>
 
   <header class="portal-header">
-    <a class="header-logo" href="/">everlywell</a>
-
-    <div class="switcher-wrap">
-      <button class="switcher-btn" id="switcherBtn" onclick="toggleDropdown()">
-        <span id="switcherLabel">Everlywell Direct &mdash; Annual Wellness Visit</span>
-        <span class="arrow">&#9660;</span>
-      </button>
-      <div class="switcher-dropdown" id="switcherDropdown">
-        <div class="dropdown-section-label">Everlywell Direct</div>
-        <div class="dropdown-option active" data-program="wellness" onclick="switchProgram('wellness', this)">Annual Wellness Visit</div>
-        <div class="dropdown-option" data-program="weight" onclick="switchProgram('weight', this)">Weight Loss Program</div>
-        <div class="dropdown-section-label">Health Plan</div>
-        <div class="dropdown-option" data-program="humana" onclick="switchProgram('humana', this)">Humana A1C Program</div>
-      </div>
-    </div>
-
+    <a class="header-logo" href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <span style="color:#6B21A8;font-size:20px;">&#9672;</span>
+      <span style="font-size:17px;font-weight:700;color:#1F2937;">Patient Portal</span>
+    </a>
+    <div style="flex:1;"></div>
     <div class="header-user">
       <span class="name">Marcus Johnson</span>
       <a href="/patient/login">Logout</a>
@@ -230,6 +219,19 @@
   <div class="portal-body">
 
     <nav class="sidebar">
+      <!-- Program selector -->
+      <div style="padding:12px 14px 8px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;margin-bottom:6px;">Program</div>
+        <div style="position:relative;">
+          <select id="programSelect" onchange="switchProgramSelect(this.value)" style="width:100%;border:1.5px solid #E5E7EB;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;color:#6B21A8;background:#F5F3FF;cursor:pointer;appearance:none;outline:none;">
+            <option value="wellness">Annual Wellness Visit</option>
+            <option value="weight">Weight Loss Program</option>
+            <option value="humana">Humana A1C Program</option>
+          </select>
+          <span style="position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:9px;color:#6B21A8;pointer-events:none;">&#9660;</span>
+        </div>
+      </div>
+      <div style="height:1px;background:#F3F4F6;margin:6px 0 8px;"></div>
       <a class="nav-item active" onclick="showSection('dashboard', this)">Dashboard</a>
       <a class="nav-item" onclick="showSection('consultations', this)">My Consultations</a>
       <a class="nav-item" onclick="showSection('labs', this)">Lab Results</a>
@@ -538,24 +540,13 @@ const programs = {
 
 let currentProgram = 'wellness';
 
-function toggleDropdown() {
-  var btn = document.getElementById('switcherBtn');
-  var dd = document.getElementById('switcherDropdown');
-  btn.classList.toggle('open');
-  dd.classList.toggle('open');
+function switchProgramSelect(key) {
+  switchProgram(key);
 }
 
-function switchProgram(key, el) {
+function switchProgram(key) {
   currentProgram = key;
   var p = programs[key];
-
-  document.getElementById('switcherLabel').textContent = p.label;
-  document.getElementById('switcherBtn').classList.remove('open');
-  document.getElementById('switcherDropdown').classList.remove('open');
-
-  document.querySelectorAll('.dropdown-option').forEach(function(opt) {
-    opt.classList.toggle('active', opt.dataset.program === key);
-  });
 
   var banner = document.getElementById('subBanner');
   banner.style.background = p.subheaderBg;
@@ -624,13 +615,11 @@ function renderCard(p) {
 // Init
 renderCard(programs['wellness']);
 
-// Close dropdown on outside click
-document.addEventListener('click', function(e) {
-  if (!e.target.closest('.switcher-wrap')) {
-    document.getElementById('switcherBtn').classList.remove('open');
-    document.getElementById('switcherDropdown').classList.remove('open');
-  }
-});
+// Sync select on program change
+function syncProgramSelect(key) {
+  var sel = document.getElementById('programSelect');
+  if (sel) sel.value = key;
+}
 </script>
 </body>
 </html>

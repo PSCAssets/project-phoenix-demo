@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Provider Queue{% endblock %}
+{% block title %}Patient Queue{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
@@ -361,7 +361,7 @@
   <!-- Topbar -->
   <div class="topbar">
     <a href="/provider/" style="font-size:12px;color:#6B7280;text-decoration:none;font-weight:600;white-space:nowrap;padding:4px 8px;border-radius:5px;transition:background 0.15s;" onmouseover="this.style.background='rgba(107,33,168,0.06)'" onmouseout="this.style.background='transparent'">← Dashboard</a>
-    <span class="page-title">Queue</span>
+    <span class="page-title">Patient Queue</span>
     <div class="queue-toggle">
       <button class="tog" id="togMyQueue" onclick="switchTab('my')">My queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">5</span></button>
       <button class="tog active" id="togMasterQueue" onclick="switchTab('master')">Master queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">14</span></button>

@@ -151,8 +151,7 @@ def inject_sidebar_nav():
     RAW = {
         'provider_md': [
             ('Dashboard',     '/provider/',              'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
-            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
+            ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
             ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
@@ -163,8 +162,7 @@ def inject_sidebar_nav():
         ],
         'provider_np': [
             ('Dashboard',     '/provider/np',            'home',      ['/provider/np']),
-            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
+            ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
             ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
@@ -235,8 +233,7 @@ def inject_sidebar_nav():
         ],
         'care_team': [
             ('Dashboard',     '/care-team/',             'home',      ['/care-team/']),
-            ('Queue',         '/provider/queue',          'users',     ['/provider/queue']),
-            ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
+            ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
             ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),

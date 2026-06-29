@@ -162,8 +162,12 @@
   <span class="topbar-sub">Care Team · Clinical Operations</span>
   <div class="topbar-right">
     <a href="/provider/new-patient?flow=new" style="background:#fff;color:#6B21A8;border:1.5px solid rgba(255,255,255,0.5);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">+ New Patient</a>
-    <span class="topbar-user">Alex Kim</span>
-    <div class="avatar">AK</div>
+    {% set _dn = session.get('display_name', 'Alex Kim, Care Team Manager') %}
+    {% set _parts = _dn.split(', ', 1) %}
+    {% set _uname = _parts[0] %}
+    {% set _initials = (_uname.split()[0][0] + _uname.split()[-1][0])|upper if _uname.split()|length > 1 else _uname[:2]|upper %}
+    <span class="topbar-user">{{ _uname }}</span>
+    <div class="avatar">{{ _initials }}</div>
   </div>
 </header>
 
