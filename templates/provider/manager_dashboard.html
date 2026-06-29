@@ -121,12 +121,32 @@ tbody tr:hover { background: #FAF7F2; }
     </div>
   </div>
 
+  <!-- Critical Alert Stats -->
+  <div class="queue-section-label" style="color:#DC2626;">⚠ Critical Alerts — Requires Attention</div>
+  <div class="queue-grid" style="margin-bottom:12px;">
+    <a class="queue-card" href="/provider/rn/queue" style="border-color:#FCA5A5;">
+      <div class="q-label" style="color:#DC2626;">RN — Critical Results</div>
+      <div class="q-count" style="color:#DC2626;">2</div>
+      <div class="q-sub">abnormal results · uncontacted · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/ma/queue" style="border-color:#FCD34D;">
+      <div class="q-label" style="color:#D97706;">MA — Unassigned P1</div>
+      <div class="q-count" style="color:#D97706;">8</div>
+      <div class="q-sub">unassigned high-priority tasks · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/ma/queue" style="border-color:#FCA5A5;">
+      <div class="q-label" style="color:#DC2626;">MA — Prior Auth Critical</div>
+      <div class="q-count" style="color:#DC2626;">1</div>
+      <div class="q-sub">CRITICAL urgency · 92m wait · view →</div>
+    </a>
+  </div>
+
   <!-- Queue Stats -->
   <div class="queue-section-label">Live Queue Status — Read Access</div>
   <div class="queue-grid">
     <a class="queue-card" href="/provider/ma/queue">
       <div class="q-label">MA Queue</div>
-      <div class="q-count" style="color:#6B21A8;">7</div>
+      <div class="q-count" style="color:#6B21A8;">28</div>
       <div class="q-sub">open tasks · view →</div>
     </a>
     <a class="queue-card" href="/provider/rn/queue">
@@ -134,11 +154,11 @@ tbody tr:hover { background: #FAF7F2; }
       <div class="q-count" style="color:#1D4ED8;">3</div>
       <div class="q-sub">open tasks · view →</div>
     </a>
-    <div class="queue-card" style="cursor:default;opacity:0.5;" title="CT queue not in your access rights">
-      <div class="q-label">CT Queue</div>
-      <div class="q-count" style="color:#9CA3AF;">—</div>
-      <div class="q-sub">no access configured</div>
-    </div>
+    <a class="queue-card" href="/provider/queue">
+      <div class="q-label">Master Patient Queue</div>
+      <div class="q-count" style="color:#059669;">14</div>
+      <div class="q-sub">active consults · view →</div>
+    </a>
   </div>
 
   <!-- Timesheet Approval Queue -->
