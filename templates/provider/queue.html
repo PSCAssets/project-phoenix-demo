@@ -1074,7 +1074,7 @@ function toggleInProgress(btn) {
 switchTab('master');
 
 // Role-based assign right — set server-side
-var canAssign = {{ 'true' if session.get('role') in ['care_team', 'provider_manager'] else 'false' }};
+var canAssign = {% endraw %}{{ (session.get('role') in ['care_team', 'provider_manager']) | tojson }}{% raw %};
 
 // Inject Assign buttons into action cells for roles with the right
 window.addEventListener('load', function() {
