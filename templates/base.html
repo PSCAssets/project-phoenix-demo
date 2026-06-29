@@ -76,7 +76,7 @@
         <span class="logo-divider">|</span>
         <span class="logo-phoenix">Project Phoenix</span>
       </a>
-      {% if request.blueprint == 'provider' %}
+      {% if request.blueprint in ('provider', 'care_team', 'scheduler') %}
       <button class="phoenix-btn" onclick="openPhoenixHelp()" title="Page guide — what this screen does &amp; workflows it solves">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
           <!-- Wings -->
@@ -106,7 +106,7 @@
     <div class="nav-user">
       {% if session.get('role') and request.blueprint != 'patient' %}{% set _r = session.get('role') %}
       <div class="nav-session-user">
-        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_doh' %}CV{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% else %}??{% endif %}</div>
+        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% else %}??{% endif %}</div>
       </div>
       {% endif %}
       {% if request.blueprint == 'patient' %}
