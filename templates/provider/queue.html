@@ -463,8 +463,6 @@
           <th class="sorted">Wait time <i class="ti ti-chevron-down sort-icon"></i></th>
           <th>SLA status</th>
           <th>Program</th>
-          <th>DOB</th>
-          <th>Gender</th>
           <th></th>
         </tr>
       </thead>
@@ -487,7 +485,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),1)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -505,7 +502,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),2)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -523,7 +519,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),3)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -541,7 +536,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),4)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -559,7 +553,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),5)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -577,7 +570,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),6)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -598,7 +590,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),1)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -616,7 +607,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),2)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -634,7 +624,6 @@
           <td class="actions-cell">
             <button class="view-btn">View</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),3)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -652,7 +641,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),4)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -695,7 +683,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),6)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -713,7 +700,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),7)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -748,7 +734,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),9)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -766,7 +751,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),10)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -792,7 +776,6 @@
           <td class="actions-cell">
             <button class="take-btn">Take</button>
             <button class="route-btn" onclick="toggleRoute(this.closest('tr'),14)">Route</button>
-            <button class="escalate-btn" title="Escalate"><i class="ti ti-arrow-up"></i></button>
           </td>
         </tr>
 
@@ -1094,16 +1077,18 @@ switchTab('master');
 var canAssign = {{ 'true' if session.get('role') in ['care_team', 'provider_manager'] else 'false' }};
 
 // Inject Assign buttons into action cells for roles with the right
-document.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('load', function() {
   if (!canAssign) return;
   document.querySelectorAll('.actions-cell').forEach(function(cell, i) {
     var routeBtn = cell.querySelector('.route-btn');
     if (!routeBtn) return;
-    var n = parseInt((routeBtn.getAttribute('onclick') || '').match(/\d+/)?.[0] || (i+1));
+    var oc = routeBtn.getAttribute('onclick') || '';
+    var m = oc.match(/\d+/);
+    var n = m ? parseInt(m[0]) : (i + 1);
     var assignBtn = document.createElement('button');
     assignBtn.className = 'assign-btn';
     assignBtn.textContent = 'Assign';
-    assignBtn.onclick = function(e) { e.stopPropagation(); toggleAssign(routeBtn.closest('tr'), n); };
+    assignBtn.setAttribute('onclick', 'event.stopPropagation();toggleAssign(this.closest("tr"),' + n + ')');
     routeBtn.parentNode.insertBefore(assignBtn, routeBtn.nextSibling);
   });
 });
@@ -1116,7 +1101,7 @@ function toggleRoute(rowEl, n) {
   var formRow = document.createElement('tr');
   formRow.id = 'rf-' + n;
   formRow.className = 'route-form-row';
-  formRow.innerHTML = '<td colspan="10" style="padding:0;background:#F8FAFF;border-bottom:2px solid #BFDBFE;">' +
+  formRow.innerHTML = '<td colspan="11" style="padding:0;background:#F8FAFF;border-bottom:2px solid #BFDBFE;">' +
     '<div style="padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
     '<span style="font-size:12px;font-weight:600;color:#6B21A8;">Route to dept:</span>' +
     '<select id="rf-sel-' + n + '" style="font-size:12px;padding:4px 8px;border:1px solid #D1D5DB;border-radius:6px;color:#374151;">' +
@@ -1153,7 +1138,7 @@ function toggleAssign(rowEl, n) {
   var formRow = document.createElement('tr');
   formRow.id = 'af-' + n;
   formRow.className = 'route-form-row';
-  formRow.innerHTML = '<td colspan="10" style="padding:0;background:#F0F6FF;border-bottom:2px solid #93C5FD;">' +
+  formRow.innerHTML = '<td colspan="11" style="padding:0;background:#F0F6FF;border-bottom:2px solid #93C5FD;">' +
     '<div style="padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">' +
     '<span style="font-size:12px;font-weight:600;color:#1B4F8A;">Assign to:</span>' +
     '<select id="af-sel-' + n + '" style="font-size:12px;padding:4px 8px;border:1px solid #93C5FD;border-radius:6px;color:#374151;">' +
