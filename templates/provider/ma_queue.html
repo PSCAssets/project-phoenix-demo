@@ -430,8 +430,7 @@ function takeTask(btn) {
 function workTask(btn) {
   var row = btn.closest('tr');
   var cat = row.cells[3] ? row.cells[3].textContent.trim() : '';
-  var patient = row.cells[1] ? row.cells[1].textContent.trim().split('
-')[0] : 'Patient';
+  var patient = row.cells[1] ? row.cells[1].textContent.trim().split('\n')[0] : 'Patient';
   showMAWorkModal(btn, patient, cat);
 }
 
@@ -451,14 +450,14 @@ function showMAWorkModal(btn, patient, cat) {
   overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:400px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;">'
     + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
     + '<span style="font-size:14px;font-weight:700;color:#111827;">Close Task — '+patient+'</span>'
-    + '<button onclick="document.getElementById('maWorkOverlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
+    + '<button onclick="document.getElementById(&quot;maWorkOverlay&quot;).remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
     + '<div style="padding:16px 20px;">'
     + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:8px;">Outcome</div>'
     + optHtml
     + '<div style="margin-top:12px;"><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:4px;">Notes (optional)</label>'
     + '<textarea rows="2" placeholder="Add any notes..." style="width:100%;padding:7px 10px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:12px;resize:none;box-sizing:border-box;"></textarea></div></div>'
     + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
-    + '<button onclick="document.getElementById('maWorkOverlay').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="document.getElementById(&quot;maWorkOverlay&quot;).remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
     + '<button onclick="submitMAClose(this)" data-row="'+Date.now()+'" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">✓ Close Task</button>'
     + '</div></div>';
   overlay.querySelector('[data-row]')._btn = btn;
@@ -491,7 +490,7 @@ function routeTask() {
   overlay.innerHTML = '<div style="background:#fff;border-radius:14px;width:360px;max-width:94vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;">'
     + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
     + '<span style="font-size:14px;font-weight:700;color:#111827;">Route Task</span>'
-    + '<button onclick="document.getElementById('maRouteOverlay').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
+    + '<button onclick="document.getElementById(&quot;maRouteOverlay&quot;).remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button></div>'
     + '<div style="padding:16px 20px;">'
     + '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;margin-bottom:8px;">Route To</div>'
     + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #E5E0D8;border-radius:7px;cursor:pointer;font-size:13px;margin-bottom:6px;"><input type="radio" name="route" value="AM"> AM — Medical Assistant (2 open tasks)</label>'
@@ -500,7 +499,7 @@ function routeTask() {
     + '<label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #FEF3C7;background:#FFFBEB;border-radius:7px;cursor:pointer;font-size:13px;"><input type="radio" name="route" value="Provider"> ⚑ Escalate to Provider Queue</label>'
     + '</div>'
     + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
-    + '<button onclick="document.getElementById('maRouteOverlay').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="document.getElementById(&quot;maRouteOverlay&quot;).remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
     + '<button onclick="submitRoute()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Route Task</button>'
     + '</div></div>';
   document.body.appendChild(overlay);
