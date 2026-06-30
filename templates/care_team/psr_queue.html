@@ -92,8 +92,10 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
   </div>
 
   <div class="body">
-    <!-- Filter bar -->
-    <div class="filter-bar">
+    <!-- Search + Filter bar -->
+    <div class="filter-bar" style="flex-wrap:wrap;gap:10px;">
+      <input class="form-input" id="queueSearch" placeholder="🔍  Search patient, client, or ID…" style="width:220px;padding:6px 10px;font-size:12px;" oninput="applyAllFilters()">
+      <div style="width:1px;background:#E5E0D8;height:24px;flex-shrink:0;"></div>
       <span class="filter-label">Status:</span>
       <button class="filter-btn active" onclick="applyFilter('all',this)">All</button>
       <button class="filter-btn" onclick="applyFilter('pending',this)">Pending</button>
@@ -101,16 +103,28 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
       <button class="filter-btn" onclick="applyFilter('attempt3',this)">3rd Attempt</button>
       <button class="filter-btn" onclick="applyFilter('exhausted',this)" style="color:var(--red);border-color:#FCA5A5;">Exhausted</button>
       <button class="filter-btn" onclick="applyFilter('closed',this)">Closed Today</button>
-      <select class="filter-select" onchange="applyProductFilter(this.value)">
-        <option value="">All products</option>
-        <option>Hereditary Cancer Panel</option>
-        <option>Galleri Multi-Cancer</option>
-        <option>STI Panel</option>
-        <option>Thyroid Panel</option>
-        <option>A1C Management</option>
-        <option>Annual Wellness Visit</option>
+      <div style="width:1px;background:#E5E0D8;height:24px;flex-shrink:0;"></div>
+      <select class="filter-select" id="filterClient" onchange="applyAllFilters()">
+        <option value="">All clients</option>
+        <option>Humana / EverlyCare</option>
+        <option>Quest / EW</option>
+        <option>Grail / Elevance</option>
+        <option>Everlywell Direct</option>
+        <option>Fulgent Genetics</option>
       </select>
-      <span class="filter-count" id="filterCount">Showing 14 records</span>
+      <select class="filter-select" id="filterState" onchange="applyAllFilters()">
+        <option value="">All states</option>
+        <option>CA</option><option>FL</option><option>GA</option><option>IL</option>
+        <option>MA</option><option>NY</option><option>NJ</option><option>PA</option>
+        <option>TX</option><option>VA</option><option>WA</option>
+      </select>
+      <select class="filter-select" id="filterResult" onchange="applyAllFilters()">
+        <option value="">All result types</option>
+        <option>Abnormal</option>
+        <option>Borderline</option>
+        <option>Normal</option>
+      </select>
+      <span class="filter-count" id="filterCount" style="margin-left:auto;">Showing 14 records</span>
     </div>
 
     <!-- Queue Table -->
@@ -299,25 +313,34 @@ function logCall() {
   showToast('Call logged successfully');
 }
 
+var _activeStatus = 'all';
+
 function applyFilter(status, btn) {
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  var rows = document.querySelectorAll('#queueTbody tr');
-  var count = 0;
-  rows.forEach(function(r){
-    var match = status === 'all' || r.dataset.status === status;
-    r.style.display = match ? '' : 'none';
-    if (match) count++;
-  });
-  document.getElementById('filterCount').textContent = 'Showing ' + count + ' records';
+  _activeStatus = status;
+  applyAllFilters();
 }
 
-function applyProductFilter(val) {
-  document.querySelectorAll('#queueTbody tr').forEach(function(r){
-    if (!val) { r.style.display = ''; return; }
-    var cell = r.cells[1] ? r.cells[1].textContent : '';
-    r.style.display = cell.includes(val) ? '' : 'none';
+function applyAllFilters() {
+  var search  = (document.getElementById('queueSearch').value || '').toLowerCase();
+  var client  = document.getElementById('filterClient').value;
+  var state   = document.getElementById('filterState').value;
+  var result  = document.getElementById('filterResult').value;
+  var rows    = document.querySelectorAll('#queueTbody tr');
+  var count   = 0;
+  rows.forEach(function(r){
+    var statusMatch = _activeStatus === 'all' || r.dataset.status === _activeStatus;
+    var text = r.textContent.toLowerCase();
+    var searchMatch = !search || text.includes(search);
+    var clientMatch = !client || (r.cells[3] && r.cells[3].textContent.includes(client));
+    var stateMatch  = !state  || (r.cells[4] && r.cells[4].textContent.trim() === state);
+    var resultMatch = !result || (r.cells[2] && r.cells[2].textContent.includes(result));
+    var show = statusMatch && searchMatch && clientMatch && stateMatch && resultMatch;
+    r.style.display = show ? '' : 'none';
+    if (show) count++;
   });
+  document.getElementById('filterCount').textContent = 'Showing ' + count + ' records';
 }
 
 function showToast(msg) {

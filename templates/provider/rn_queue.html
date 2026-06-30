@@ -19,10 +19,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .sum-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px 18px; cursor:pointer; transition:box-shadow .15s, border-color .15s; display:flex; gap:14px; align-items:center; }
 .sum-card:hover { border-color:var(--navy); box-shadow:0 2px 8px rgba(68,93,122,.12); }
 .sum-card.active-tab-card { border-color:var(--navy); box-shadow:0 2px 12px rgba(68,93,122,.18); }
-.sum-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:20px; }
-.icon-crit { background:#FEE2E2; }
-.icon-titer { background:#EDE9FE; }
-.icon-dxs { background:#FEF3C7; }
 .sum-info { flex:1; min-width:0; }
 .sum-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#9CA3AF; margin-bottom:4px; }
 .sum-count { font-size:24px; font-weight:800; line-height:1; }
@@ -144,7 +140,6 @@ tbody tr.flagged-row { background:#FFF5F5; border-left:3px solid var(--amber); }
   <!-- Summary cards / tab triggers -->
   <div class="summary-strip">
     <div class="sum-card active-tab-card" id="card-crit" onclick="switchTab('crit')">
-      <div class="sum-icon icon-crit">🚨</div>
       <div class="sum-info">
         <div class="sum-label">Critical Results</div>
         <div class="sum-count" style="color:var(--red);">14</div>
@@ -152,7 +147,6 @@ tbody tr.flagged-row { background:#FFF5F5; border-left:3px solid var(--amber); }
       </div>
     </div>
     <div class="sum-card" id="card-titer" onclick="switchTab('titer')">
-      <div class="sum-icon icon-titer">🔬</div>
       <div class="sum-info">
         <div class="sum-label">Titer Interpretations</div>
         <div class="sum-count" style="color:var(--purple);">8</div>
@@ -160,7 +154,6 @@ tbody tr.flagged-row { background:#FFF5F5; border-left:3px solid var(--amber); }
       </div>
     </div>
     <div class="sum-card" id="card-dxs" onclick="switchTab('dxs')">
-      <div class="sum-icon icon-dxs">📋</div>
       <div class="sum-info">
         <div class="sum-label">DXS Audit</div>
         <div class="sum-count" style="color:var(--amber);">11</div>
