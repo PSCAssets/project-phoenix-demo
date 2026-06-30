@@ -199,6 +199,7 @@ def inject_sidebar_nav():
             ('Patient Queue', '/provider/queue',            'users',     ['/provider/queue']),
             ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
             ('Network Schedule', '/provider/schedule',    'calendar',  ['/provider/schedule']),
+            ('My Schedule',   '/provider/staff-schedule',  'calendar',  ['/provider/staff-schedule']),
             ('Timesheet',     '/provider/timesheet',        'clock',     ['/provider/timesheet']),
             ('Messages',      '/provider/messages',         'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',    'bell',      ['/provider/notifications', '/provider/alerts']),

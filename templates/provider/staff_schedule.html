@@ -2,334 +2,440 @@
 {% block title %}My Schedule{% endblock %}
 {% block head %}
 <style>
-.page-wrap { padding: 32px 28px; margin-left: 56px; }
+.page-wrap { padding: 28px 28px; margin-left: 56px; }
+.page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 12px; }
 .page-title { font-size: 22px; font-weight: 800; color: #111827; }
-.page-sub { font-size: 13px; color: #6B7280; margin-top: 3px; margin-bottom: 28px; }
+.page-sub { font-size: 13px; color: #6B7280; margin-bottom: 20px; }
 
-.week-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-.week-label { font-size: 15px; font-weight: 700; color: #111827; min-width: 200px; text-align: center; }
-.week-btn { background: #fff; border: 1px solid #E5E0D8; border-radius: 7px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; font-family: inherit; }
-.week-btn:hover { border-color: #6B21A8; color: #6B21A8; }
+/* Month nav */
+.month-nav { display: flex; align-items: center; gap: 10px; }
+.month-label { font-size: 16px; font-weight: 700; color: #111827; min-width: 180px; text-align: center; }
+.nav-btn { background: #fff; border: 1px solid #E5E0D8; border-radius: 7px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; color: #374151; font-family: inherit; transition: border-color .15s; }
+.nav-btn:hover { border-color: #6B21A8; color: #6B21A8; }
+.today-btn { background: #6B21A8; color: #fff; border: none; border-radius: 7px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
 
-.info-banner { background: #EDE9FE; border: 1px solid #DDD6FE; border-radius: 10px; padding: 12px 18px; margin-bottom: 22px; font-size: 13px; color: #5B21B6; }
-.info-banner strong { color: #4C1D95; }
+/* Legend */
+.legend { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; color: #374151; }
+.leg-dot { width: 12px; height: 12px; border-radius: 3px; }
 
-/* Schedule grid */
-.sched-grid { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
-.sched-grid table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.sched-grid thead th { background: #FAF7F2; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid #E5E0D8; }
-.sched-grid tbody td { padding: 14px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
-.sched-grid tbody tr:last-child td { border-bottom: none; }
-.sched-grid tbody tr:hover { background: #FAF7F2; }
-
-.day-name { font-weight: 700; color: #111827; }
-.day-date { font-size: 11px; color: #9CA3AF; }
-
-/* Shift type chips */
-.shift-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; }
-.shift-regular { background: #D1FAE5; color: #065F46; }
-.shift-oncall  { background: #DBEAFE; color: #1E40AF; }
+/* Calendar grid */
+.cal-grid { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+.cal-header { display: grid; grid-template-columns: repeat(7, 1fr); background: #FAF7F2; border-bottom: 1px solid #E5E0D8; }
+.cal-header-day { padding: 10px 0; text-align: center; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: .05em; }
+.cal-body { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal-cell {
+  min-height: 90px; border-right: 1px solid #F3F4F6; border-bottom: 1px solid #F3F4F6;
+  padding: 8px; cursor: pointer; position: relative; transition: background .1s;
+}
+.cal-cell:nth-child(7n) { border-right: none; }
+.cal-cell:hover { background: #FAF7F2; }
+.cal-cell.other-month { background: #FAFAFA; }
+.cal-cell.other-month .cell-date { color: #D1D5DB; }
+.cal-cell.today { background: #F5F3FF; }
+.cal-cell.today .cell-date { background: #6B21A8; color: #fff; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
+.cell-date { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 5px; }
+.cell-shift {
+  font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 6px;
+  display: inline-block; width: 100%; text-align: center; margin-top: 2px;
+}
+.shift-regular    { background: #D1FAE5; color: #065F46; }
+.shift-oncall     { background: #DBEAFE; color: #1E40AF; }
 .shift-afterhours { background: #FEF3C7; color: #92400E; }
-.shift-off     { background: #F3F4F6; color: #9CA3AF; }
+.shift-off        { background: #F3F4F6; color: #9CA3AF; }
+.shift-submitted  { background: #EDE9FE; color: #5B21B6; }
+.cell-time { font-size: 9px; color: #6B7280; margin-top: 2px; text-align: center; }
+.cell-status { position: absolute; top: 6px; right: 6px; width: 7px; height: 7px; border-radius: 50%; }
+.status-approved { background: #10B981; }
+.status-pending  { background: #F59E0B; }
+.status-unsaved  { background: #E5E0D8; }
 
-/* Shift type selector */
-select.shift-select { border: 1px solid #E5E0D8; border-radius: 7px; padding: 5px 10px; font-size: 12px; font-family: inherit; outline: none; background: #fff; color: #374151; cursor: pointer; }
-select.shift-select:focus { border-color: #6B21A8; }
-input.time-input { border: 1px solid #E5E0D8; border-radius: 7px; padding: 5px 10px; font-size: 12px; font-family: inherit; outline: none; background: #fff; color: #374151; width: 100px; }
-input.time-input:focus { border-color: #6B21A8; }
-input.time-input:disabled { background: #F9FAFB; color: #9CA3AF; cursor: not-allowed; }
+/* Summary strip */
+.summary-strip { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+.sum-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 12px 18px; flex: 1; min-width: 120px; }
+.sum-num { font-size: 22px; font-weight: 800; color: #111827; }
+.sum-label { font-size: 11px; color: #6B7280; margin-top: 2px; }
+.sum-card.purple .sum-num { color: #6B21A8; }
+.sum-card.green  .sum-num { color: #059669; }
+.sum-card.amber  .sum-num { color: #D97706; }
 
-/* Availability notes */
-.notes-input { border: 1px solid #E5E0D8; border-radius: 7px; padding: 5px 10px; font-size: 12px; font-family: inherit; outline: none; background: #fff; color: #374151; width: 100%; }
-.notes-input:focus { border-color: #6B21A8; }
-
-/* Status indicator */
-.row-status { font-size: 11px; font-weight: 600; }
-.status-saved   { color: #059669; }
-.status-pending { color: #D97706; }
-.status-unsaved { color: #9CA3AF; }
-
-/* Footer buttons */
-.page-footer { display: flex; align-items: center; gap: 12px; }
+/* Footer */
+.page-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .btn-save { background: #6B21A8; color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .btn-save:hover { background: #5B1898; }
 .btn-outline { background: #fff; color: #6B21A8; border: 1.5px solid #6B21A8; border-radius: 8px; padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
 .btn-outline:hover { background: #F5F3FF; }
+.info-banner { background: #EDE9FE; border: 1px solid #DDD6FE; border-radius: 10px; padding: 11px 16px; margin-bottom: 18px; font-size: 12px; color: #5B21B6; }
 
-/* Availability summary cards */
-.avail-row { display: flex; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
-.avail-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 18px; min-width: 120px; }
-.avail-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-.avail-val { font-size: 22px; font-weight: 800; color: #111827; }
-.avail-val.green { color: #059669; }
-.avail-val.blue  { color: #1D4ED8; }
-.avail-val.amber { color: #D97706; }
-
-.section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9CA3AF; margin-bottom: 10px; }
-
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 14px; padding: 28px; width: 360px; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
+.modal-title { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 4px; }
+.modal-date  { font-size: 12px; color: #6B7280; margin-bottom: 20px; }
+.form-row { margin-bottom: 14px; }
+.form-label { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; display: block; }
+select.form-select, input.form-input {
+  width: 100%; border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 12px;
+  font-size: 13px; font-family: inherit; outline: none; background: #fff; color: #374151;
+}
+select.form-select:focus, input.form-input:focus { border-color: #6B21A8; }
+.time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+.btn-modal-save { flex: 1; background: #6B21A8; color: #fff; border: none; border-radius: 8px; padding: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; }
+.btn-modal-cancel { background: #fff; color: #374151; border: 1px solid #E5E0D8; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.btn-modal-off { background: #F3F4F6; color: #6B7280; border: none; border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="page-wrap">
 
-  {% set is_manager = session.get('role') == 'provider_manager' %}
-  <div class="page-title">{% if is_manager %}Team Schedule{% else %}My Schedule{% endif %}</div>
-  <div class="page-sub">{{ session.get('display_name', 'Jennifer Martinez, Lead RN') }} &mdash; {% if is_manager %}Staff weekly availability and shift preferences{% else %}Weekly availability and shift preferences{% endif %}</div>
+  <div class="page-header">
+    <div>
+      <div class="page-title">My Schedule</div>
+      <div class="page-sub">Click any day to set your availability. Submitted weeks appear to your manager for approval.</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div class="legend">
+        <div class="leg-item"><div class="leg-dot shift-regular"></div>Regular</div>
+        <div class="leg-item"><div class="leg-dot shift-oncall"></div>On-Call</div>
+        <div class="leg-item"><div class="leg-dot shift-afterhours"></div>After-Hours</div>
+        <div class="leg-item"><div class="leg-dot shift-off"></div>Day Off</div>
+        <div class="leg-item"><div class="leg-dot shift-submitted"></div>Submitted</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+    <div class="month-nav">
+      <button class="nav-btn" onclick="changeMonth(-1)">&#8592; Prev</button>
+      <div class="month-label" id="monthLabel"></div>
+      <button class="nav-btn" onclick="changeMonth(1)">Next &#8594;</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="nav-btn today-btn" onclick="goToday()">Today</button>
+      <button class="btn-outline" onclick="submitWeek()">Submit for Approval</button>
+    </div>
+  </div>
 
   <div class="info-banner">
-    {% if is_manager %}
-    <strong>Manager view:</strong> Review and approve your team's submitted availability. Changes to approved entries will generate a notification to the staff member.
-    {% else %}
-    <strong>How this works:</strong> Enter your availability for each day. Your manager can view and approve your schedule from the Team Schedule view. Changes to manager-approved entries will generate a notification.
-    {% endif %}
+    <strong>June 2026:</strong> 14 days entered &nbsp;·&nbsp; 8 Approved &nbsp;·&nbsp; 4 Pending &nbsp;·&nbsp; 2 Unsaved &nbsp;·&nbsp;
+    <strong style="color:#059669;">On track for 40h this week</strong>
   </div>
 
-  <!-- Week navigation -->
-  <div class="week-nav">
-    <button class="week-btn" onclick="changeWeek(-1)">&#8592; Prev</button>
-    <div class="week-label" id="weekLabel">Jun 23 &ndash; Jun 29, 2026</div>
-    <button class="week-btn" onclick="changeWeek(1)">Next &#8594;</button>
-    <span style="font-size:12px;color:#9CA3AF;margin-left:8px;">Submit your availability for upcoming weeks in advance.</span>
+  <!-- Summary strip -->
+  <div class="summary-strip">
+    <div class="sum-card purple"><div class="sum-num" id="sumRegular">0</div><div class="sum-label">Regular Shifts</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumOncall">0</div><div class="sum-label">On-Call Days</div></div>
+    <div class="sum-card amber"><div class="sum-num" id="sumAH">0</div><div class="sum-label">After-Hours</div></div>
+    <div class="sum-card green"><div class="sum-num" id="sumHours">0h</div><div class="sum-label">Est. Hours This Month</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumOff">0</div><div class="sum-label">Days Off</div></div>
   </div>
 
-  <!-- Custom date range filter -->
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-    <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;">Custom Range</span>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <input type="date" id="schedStart" value="2026-06-23" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
-      <span style="font-size:12px;color:#9CA3AF;">to</span>
-      <input type="date" id="schedEnd" value="2026-06-29" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
+  <!-- Calendar -->
+  <div class="cal-grid">
+    <div class="cal-header">
+      <div class="cal-header-day">Sun</div>
+      <div class="cal-header-day">Mon</div>
+      <div class="cal-header-day">Tue</div>
+      <div class="cal-header-day">Wed</div>
+      <div class="cal-header-day">Thu</div>
+      <div class="cal-header-day">Fri</div>
+      <div class="cal-header-day">Sat</div>
     </div>
-    <button onclick="applySchedRange()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Apply</button>
-  </div>
-
-  <!-- Summary cards -->
-  <div class="section-label">This Week at a Glance</div>
-  <div class="avail-row">
-    <div class="avail-card">
-      <div class="avail-label">Regular Shifts</div>
-      <div class="avail-val green">4</div>
-    </div>
-    <div class="avail-card">
-      <div class="avail-label">On-Call Days</div>
-      <div class="avail-val blue">1</div>
-    </div>
-    <div class="avail-card">
-      <div class="avail-label">Days Off</div>
-      <div class="avail-val">2</div>
-    </div>
-    <div class="avail-card">
-      <div class="avail-label">Total Hours</div>
-      <div class="avail-val amber">40h</div>
-    </div>
-  </div>
-
-  <!-- Schedule grid -->
-  <div class="section-label">Daily Availability</div>
-  <div class="sched-grid">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:130px;">Day</th>
-          <th>Shift Type</th>
-          <th>Start Time</th>
-          <th>End Time</th>
-          <th>Notes / Restrictions</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr id="row-mon">
-          <td><div class="day-name">Monday</div><div class="day-date">Jun 23, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-mon" onchange="onShiftChange('mon')">
-              <option value="regular" selected>Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-              <option value="off">Day Off</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-mon" value="07:00"></td>
-          <td><input class="time-input" type="time" id="end-mon" value="15:30"></td>
-          <td><input class="notes-input" type="text" id="notes-mon" placeholder="Optional notes…" value=""></td>
-          <td><span class="row-status status-saved" id="status-mon">&#10003; Approved</span></td>
-        </tr>
-        <tr id="row-tue">
-          <td><div class="day-name">Tuesday</div><div class="day-date">Jun 24, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-tue" onchange="onShiftChange('tue')">
-              <option value="regular" selected>Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-              <option value="off">Day Off</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-tue" value="07:00"></td>
-          <td><input class="time-input" type="time" id="end-tue" value="15:30"></td>
-          <td><input class="notes-input" type="text" id="notes-tue" placeholder="Optional notes…" value=""></td>
-          <td><span class="row-status status-saved" id="status-tue">&#10003; Approved</span></td>
-        </tr>
-        <tr id="row-wed">
-          <td><div class="day-name">Wednesday</div><div class="day-date">Jun 25, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-wed" onchange="onShiftChange('wed')">
-              <option value="regular" selected>Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-              <option value="off">Day Off</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-wed" value="07:00"></td>
-          <td><input class="time-input" type="time" id="end-wed" value="15:30"></td>
-          <td><input class="notes-input" type="text" id="notes-wed" placeholder="Optional notes…" value=""></td>
-          <td><span class="row-status status-saved" id="status-wed">&#10003; Approved</span></td>
-        </tr>
-        <tr id="row-thu">
-          <td><div class="day-name">Thursday</div><div class="day-date">Jun 26, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-thu" onchange="onShiftChange('thu')">
-              <option value="regular" selected>Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-              <option value="off">Day Off</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-thu" value="07:00"></td>
-          <td><input class="time-input" type="time" id="end-thu" value="15:30"></td>
-          <td><input class="notes-input" type="text" id="notes-thu" placeholder="Optional notes…" value=""></td>
-          <td><span class="row-status status-saved" id="status-thu">&#10003; Approved</span></td>
-        </tr>
-        <tr id="row-fri">
-          <td><div class="day-name">Friday</div><div class="day-date">Jun 27, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-fri" onchange="onShiftChange('fri')">
-              <option value="oncall" selected>On-Call</option>
-              <option value="regular">Regular</option>
-              <option value="afterhours">After-Hours</option>
-              <option value="off">Day Off</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-fri" value="08:00"></td>
-          <td><input class="time-input" type="time" id="end-fri" value="16:30"></td>
-          <td><input class="notes-input" type="text" id="notes-fri" placeholder="Optional notes…" value="Available for urgent calls"></td>
-          <td><span class="row-status status-pending" id="status-fri">&#9679; Pending</span></td>
-        </tr>
-        <tr id="row-sat">
-          <td><div class="day-name">Saturday</div><div class="day-date">Jun 28, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-sat" onchange="onShiftChange('sat')">
-              <option value="off" selected>Day Off</option>
-              <option value="regular">Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-sat" disabled></td>
-          <td><input class="time-input" type="time" id="end-sat" disabled></td>
-          <td><input class="notes-input" type="text" id="notes-sat" placeholder="Optional notes…" value="Not available"></td>
-          <td><span class="row-status status-saved" id="status-sat">&#10003; Approved</span></td>
-        </tr>
-        <tr id="row-sun">
-          <td><div class="day-name">Sunday</div><div class="day-date">Jun 29, 2026</div></td>
-          <td>
-            <select class="shift-select" id="type-sun" onchange="onShiftChange('sun')">
-              <option value="off" selected>Day Off</option>
-              <option value="regular">Regular</option>
-              <option value="oncall">On-Call</option>
-              <option value="afterhours">After-Hours</option>
-            </select>
-          </td>
-          <td><input class="time-input" type="time" id="start-sun" disabled></td>
-          <td><input class="time-input" type="time" id="end-sun" disabled></td>
-          <td><input class="notes-input" type="text" id="notes-sun" placeholder="Optional notes…" value="Not available"></td>
-          <td><span class="row-status status-saved" id="status-sun">&#10003; Approved</span></td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="cal-body" id="calBody"></div>
   </div>
 
   <div class="page-footer">
-    <button class="btn-save" onclick="saveSchedule()">Submit for Approval</button>
-    <button class="btn-outline" onclick="copyLastWeek()">Copy Last Week</button>
-    <span style="font-size:12px;color:#9CA3AF;">Changes marked Pending will notify your manager for approval.</span>
+    <button class="btn-save" onclick="saveAll()">Save Changes</button>
+    <button class="btn-outline" onclick="copyLastMonth()">Copy Last Month</button>
+    <span id="saveMsg" style="font-size:12px;color:#059669;font-weight:600;display:none;">✓ Changes saved</span>
   </div>
-
 </div>
 
+<!-- Day edit modal -->
+<div class="modal-overlay" id="dayModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Set Availability</div>
+    <div class="modal-date" id="modalDate"></div>
+    <div class="form-row">
+      <label class="form-label">Shift Type</label>
+      <select class="form-select" id="modalShift" onchange="toggleTimes()">
+        <option value="regular">Regular</option>
+        <option value="oncall">On-Call</option>
+        <option value="afterhours">After-Hours</option>
+        <option value="off">Day Off</option>
+      </select>
+    </div>
+    <div class="form-row" id="timeRow">
+      <label class="form-label">Hours</label>
+      <div class="time-row">
+        <div>
+          <label class="form-label" style="font-size:10px;margin-bottom:3px;">Start</label>
+          <input class="form-input" type="time" id="modalStart" value="08:00">
+        </div>
+        <div>
+          <label class="form-label" style="font-size:10px;margin-bottom:3px;">End</label>
+          <input class="form-input" type="time" id="modalEnd" value="16:30">
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" type="text" id="modalNotes" placeholder="e.g. covering for Sara">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-modal-off" onclick="markOff()">Mark as Day Off</button>
+      <button class="btn-modal-save" onclick="saveDay()">Save Day</button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-var weekOffset = 0;
-var weeks = [
-  'Jun 23 – Jun 29, 2026',
-  'Jun 16 – Jun 22, 2026',
-  'Jun 30 – Jul 6, 2026',
-];
+// ── State ─────────────────────────────────────────────────────────────────
+const today = new Date();
+let viewYear  = today.getFullYear();
+let viewMonth = today.getMonth(); // 0-indexed
+let editKey   = null;
 
-function changeWeek(dir) {
-  weekOffset = Math.max(0, Math.min(2, weekOffset - dir));
-  document.getElementById('weekLabel').textContent = weeks[weekOffset];
-}
+// Pre-seeded demo data for June 2026
+const schedData = {
+  '2026-06-02': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-03': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-04': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-05': { shift:'oncall',     start:'17:00', end:'23:00', status:'approved' },
+  '2026-06-06': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-09': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-10': { shift:'off',        start:'',      end:'',      status:'approved' },
+  '2026-06-11': { shift:'regular',    start:'08:00', end:'16:30', status:'approved' },
+  '2026-06-12': { shift:'afterhours', start:'16:00', end:'22:00', status:'approved' },
+  '2026-06-13': { shift:'regular',    start:'08:00', end:'16:30', status:'pending' },
+  '2026-06-16': { shift:'regular',    start:'08:00', end:'16:30', status:'pending' },
+  '2026-06-17': { shift:'oncall',     start:'17:00', end:'23:00', status:'pending' },
+  '2026-06-18': { shift:'regular',    start:'08:00', end:'16:30', status:'pending' },
+  '2026-06-23': { shift:'regular',    start:'08:00', end:'16:30', status:'unsaved' },
+  '2026-06-24': { shift:'regular',    start:'08:00', end:'16:30', status:'unsaved' },
+};
 
-var DAYS = ['mon','tue','wed','thu','fri','sat','sun'];
+const SHIFT_LABELS = {
+  regular: 'Regular', oncall: 'On-Call',
+  afterhours: 'After-Hours', off: 'Day Off', submitted: 'Submitted'
+};
 
-function onShiftChange(day) {
-  var type = document.getElementById('type-' + day).value;
-  var startEl = document.getElementById('start-' + day);
-  var endEl   = document.getElementById('end-' + day);
-  var statusEl = document.getElementById('status-' + day);
+// ── Render calendar ────────────────────────────────────────────────────────
+function renderCalendar() {
+  const months = ['January','February','March','April','May','June',
+                  'July','August','September','October','November','December'];
+  document.getElementById('monthLabel').textContent = `${months[viewMonth]} ${viewYear}`;
 
-  if (type === 'off') {
-    startEl.disabled = true; startEl.value = '';
-    endEl.disabled   = true; endEl.value   = '';
-  } else {
-    startEl.disabled = false;
-    endEl.disabled   = false;
-    if (!startEl.value) {
-      startEl.value = type === 'afterhours' ? '17:00' : '07:00';
-      endEl.value   = type === 'afterhours' ? '21:00' : '15:30';
-    }
+  const body = document.getElementById('calBody');
+  body.innerHTML = '';
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(viewYear, viewMonth, 0).getDate();
+
+  // Previous month padding
+  for (let i = firstDay - 1; i >= 0; i--) {
+    body.appendChild(makeCell(daysInPrev - i, viewYear, viewMonth - 1, true));
+  }
+  // Current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    body.appendChild(makeCell(d, viewYear, viewMonth, false));
+  }
+  // Next month padding
+  const total = firstDay + daysInMonth;
+  const remainder = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= remainder; d++) {
+    body.appendChild(makeCell(d, viewYear, viewMonth + 1, true));
   }
 
-  statusEl.className = 'row-status status-unsaved';
-  statusEl.textContent = '○ Unsaved';
+  updateSummary();
 }
 
-function saveSchedule() {
-  var anyChange = false;
-  DAYS.forEach(function(day) {
-    var statusEl = document.getElementById('status-' + day);
-    if (statusEl.textContent.includes('Unsaved')) {
-      statusEl.className = 'row-status status-pending';
-      statusEl.textContent = '● Pending';
-      anyChange = true;
-    }
-  });
+function dateKey(y, m, d) {
+  const mm = String(m + 1).padStart(2,'0');
+  const dd = String(d).padStart(2,'0');
+  return `${y}-${mm}-${dd}`;
+}
 
-  if (anyChange) {
-    alert('✓ Schedule submitted for manager approval.\n\nYour manager will be notified. Once approved, your schedule will be visible to the team.');
+function makeCell(day, year, month, otherMonth) {
+  const cell = document.createElement('div');
+  cell.className = 'cal-cell' + (otherMonth ? ' other-month' : '');
+
+  const key = dateKey(year, month, day);
+  const isToday = (year === today.getFullYear() && month === today.getMonth() && day === today.getDate());
+  if (isToday) cell.classList.add('today');
+
+  // Date number
+  const dateDiv = document.createElement('div');
+  dateDiv.className = 'cell-date';
+  if (isToday) {
+    const span = document.createElement('div');
+    span.textContent = day;
+    span.style.cssText = 'background:#6B21A8;color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;';
+    dateDiv.appendChild(span);
   } else {
-    alert('No changes to submit — your schedule is up to date.');
+    dateDiv.textContent = day;
   }
+  cell.appendChild(dateDiv);
+
+  const entry = schedData[key];
+  if (entry) {
+    const badge = document.createElement('div');
+    badge.className = `cell-shift shift-${entry.shift}`;
+    badge.textContent = SHIFT_LABELS[entry.shift] || entry.shift;
+    cell.appendChild(badge);
+
+    if (entry.start && entry.end) {
+      const time = document.createElement('div');
+      time.className = 'cell-time';
+      time.textContent = `${fmtTime(entry.start)} – ${fmtTime(entry.end)}`;
+      cell.appendChild(time);
+    }
+
+    // Status dot
+    const dot = document.createElement('div');
+    dot.className = `cell-status status-${entry.status}`;
+    cell.appendChild(dot);
+  }
+
+  if (!otherMonth) {
+    cell.onclick = () => openModal(key, day, year, month);
+  }
+  return cell;
 }
 
-function copyLastWeek() {
-  alert('In the full system, this copies your previous week\'s schedule as a starting point for the current week.');
+function fmtTime(t) {
+  if (!t) return '';
+  const [h, m] = t.split(':').map(Number);
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-function applySchedRange() {
-  var s = document.getElementById('schedStart').value;
-  var e = document.getElementById('schedEnd').value;
-  if (!s || !e) return;
-  var label = document.getElementById('weekLabel');
-  if (label) label.textContent = s + ' – ' + e;
-  var b = document.createElement('div');
-  b.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
-  b.textContent = '✓ Schedule filtered: ' + s + ' to ' + e;
-  document.body.appendChild(b);
-  setTimeout(function(){ b.remove(); }, 3000);
+function updateSummary() {
+  let reg = 0, oc = 0, ah = 0, off = 0, hrs = 0;
+  for (const [key, v] of Object.entries(schedData)) {
+    if (!key.startsWith(`${viewYear}-${String(viewMonth+1).padStart(2,'0')}`)) continue;
+    if (v.shift === 'regular') reg++;
+    else if (v.shift === 'oncall') oc++;
+    else if (v.shift === 'afterhours') ah++;
+    else if (v.shift === 'off') off++;
+    if (v.start && v.end) {
+      const [sh, sm] = v.start.split(':').map(Number);
+      const [eh, em] = v.end.split(':').map(Number);
+      hrs += (eh * 60 + em - sh * 60 - sm) / 60;
+    }
+  }
+  document.getElementById('sumRegular').textContent = reg;
+  document.getElementById('sumOncall').textContent  = oc;
+  document.getElementById('sumAH').textContent      = ah;
+  document.getElementById('sumOff').textContent     = off;
+  document.getElementById('sumHours').textContent   = Math.round(hrs) + 'h';
 }
+
+// ── Modal ──────────────────────────────────────────────────────────────────
+const MONTH_NAMES = ['January','February','March','April','May','June',
+                     'July','August','September','October','November','December'];
+
+function openModal(key, day, year, month) {
+  editKey = key;
+  document.getElementById('modalTitle').textContent = 'Set Availability';
+  document.getElementById('modalDate').textContent  = `${MONTH_NAMES[month]} ${day}, ${year}`;
+  const entry = schedData[key] || {};
+  document.getElementById('modalShift').value = entry.shift || 'regular';
+  document.getElementById('modalStart').value = entry.start || '08:00';
+  document.getElementById('modalEnd').value   = entry.end   || '16:30';
+  document.getElementById('modalNotes').value = entry.notes || '';
+  toggleTimes();
+  document.getElementById('dayModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('dayModal').classList.remove('open');
+  editKey = null;
+}
+
+function toggleTimes() {
+  const shift = document.getElementById('modalShift').value;
+  document.getElementById('timeRow').style.display = shift === 'off' ? 'none' : '';
+}
+
+function saveDay() {
+  if (!editKey) return;
+  const shift = document.getElementById('modalShift').value;
+  const start = shift === 'off' ? '' : document.getElementById('modalStart').value;
+  const end   = shift === 'off' ? '' : document.getElementById('modalEnd').value;
+  schedData[editKey] = { shift, start, end, notes: document.getElementById('modalNotes').value, status: 'unsaved' };
+  closeModal();
+  renderCalendar();
+}
+
+function markOff() {
+  if (!editKey) return;
+  schedData[editKey] = { shift: 'off', start: '', end: '', status: 'unsaved' };
+  closeModal();
+  renderCalendar();
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────
+function changeMonth(dir) {
+  viewMonth += dir;
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  if (viewMonth < 0)  { viewMonth = 11; viewYear--; }
+  renderCalendar();
+}
+
+function goToday() {
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+  renderCalendar();
+}
+
+function saveAll() {
+  for (const key of Object.keys(schedData)) {
+    if (schedData[key].status === 'unsaved') schedData[key].status = 'pending';
+  }
+  renderCalendar();
+  const msg = document.getElementById('saveMsg');
+  msg.style.display = 'inline';
+  setTimeout(() => { msg.style.display = 'none'; }, 3000);
+}
+
+function submitWeek() {
+  for (const key of Object.keys(schedData)) {
+    if (schedData[key].status !== 'approved') schedData[key].status = 'submitted';
+  }
+  renderCalendar();
+  alert('Week submitted for manager approval.');
+}
+
+function copyLastMonth() {
+  const prevMonth = viewMonth === 0 ? 11 : viewMonth - 1;
+  const prevYear  = viewMonth === 0 ? viewYear - 1 : viewYear;
+  const prefix    = `${prevYear}-${String(prevMonth+1).padStart(2,'0')}`;
+  for (const [key, val] of Object.entries(schedData)) {
+    if (key.startsWith(prefix)) {
+      const day     = key.slice(8);
+      const newKey  = `${viewYear}-${String(viewMonth+1).padStart(2,'0')}-${day}`;
+      if (!schedData[newKey]) {
+        schedData[newKey] = { ...val, status: 'unsaved' };
+      }
+    }
+  }
+  renderCalendar();
+}
+
+// Close modal on overlay click
+document.getElementById('dayModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Init
+renderCalendar();
 </script>
 {% endblock %}
