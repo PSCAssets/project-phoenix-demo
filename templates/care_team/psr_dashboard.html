@@ -124,59 +124,6 @@ main.main-content { flex: 1; display: flex; flex-direction: row; overflow: hidde
 {% endblock %}
 {% block content %}
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    </div>
-    <div>
-      <div class="logo-text">Project Phoenix</div>
-      <div class="logo-sub">Care Team — PSS</div>
-    </div>
-  </div>
-  <div class="sidebar-user">
-    {% set _dn = session.get('display_name', 'Melanie Marmo, PSS Manager') %}
-    {% set _parts = _dn.split(', ', 1) %}
-    {% set _uname = _parts[0] %}
-    {% set _utitle = _parts[1] if _parts|length > 1 else 'PSS Team' %}
-    {% set _initials = (_uname.split()[0][0] + _uname.split()[-1][0]) if _uname.split()|length > 1 else _uname[:2] %}
-    <div class="user-avatar">{{ _initials|upper }}</div>
-    <div>
-      <div class="user-name">{{ _uname }}</div>
-      <div class="user-role-label">{{ _utitle }} · PSS Team</div>
-    </div>
-  </div>
-  <div class="team-toggle">
-    <button class="team-toggle-btn active">PSS Team</button>
-    <button class="team-toggle-btn" onclick="showToast('PCC portal coming soon — Missy Lemieux\'s Gaps in Care team')">PCC Team</button>
-  </div>
-  <div class="nav-section">Outreach</div>
-  <a href="/care-team/psr" class="nav-item active">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-    Dashboard
-  </a>
-  <a href="/care-team/psr/queue" class="nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.41 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l1.42-1.42a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-    Call Queue
-    <span class="nav-badge">14</span>
-  </a>
-  <a href="/care-team/psr/link-generator" class="nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-    Link Generator
-  </a>
-  <div class="nav-section">Account</div>
-  <a href="/provider/messages" class="nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-    Messages
-  </a>
-  <a href="/provider/settings" class="nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    Settings
-  </a>
-  <div class="sidebar-bottom">PSS Team · EverlyCare &amp; DXS</div>
-</div>
-
 <!-- Main -->
 <div class="main">
   <div class="topbar">

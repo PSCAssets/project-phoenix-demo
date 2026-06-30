@@ -122,7 +122,8 @@ def inject_sidebar_nav():
     _path = _req.path
 
     # Admin, patient, and care_team portals have their own sidebars — never show the global g-sidebar
-    if _req.blueprint in ('admin', 'patient', 'care_team'):
+    # Exception: provider_psr uses the global sidebar across all pages for consistency
+    if _req.blueprint in ('admin', 'patient', 'care_team') and role != 'provider_psr':
         return dict(sidebar_nav=[], user_role=role)
 
     # Index page (login screen) — no sidebar
@@ -241,11 +242,14 @@ def inject_sidebar_nav():
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_psr': [
-            ('Dashboard',     '/care-team/psr',          'home',      ['/care-team/psr']),
-            ('Call Queue',    '/care-team/psr/queue',    'phone',     ['/care-team/psr/queue']),
-            ('Link Generator','/care-team/psr/link-generator','link', ['/care-team/psr/link-generator']),
-            ('Messages',      '/provider/messages',      'message',   ['/provider/messages']),
-            ('Settings',      '/provider/settings',      'settings',  ['/provider/settings']),
+            ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
+            ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
+            ('Sched. Link',    '/care-team/psr/link-generator',   'link',      ['/care-team/psr/link-generator']),
+            ('Patient Queue',  '/provider/queue',                 'users',     ['/provider/queue']),
+            ('Patient Mgmt',   '/provider/patient-management',    'clipboard', ['/provider/patient-management']),
+            ('Schedule',       '/provider/schedule',              'calendar',  ['/provider/schedule']),
+            ('Messages',       '/provider/messages',              'message',   ['/provider/messages']),
+            ('Settings',       '/provider/settings',              'settings',  ['/provider/settings']),
         ],
         'care_team_gaps': [
             ('Dashboard',     '/care-team/gaps',         'home',      ['/care-team/gaps']),
