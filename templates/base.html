@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Everlywell Telehealth{% endblock %} — Everlywell Telehealth</title>
+  <title>{% block title %}Telehealth{% endblock %} — Telehealth</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   {% block head %}{% endblock %}
 
@@ -74,7 +74,7 @@
       <a href="{{ url_for('index') }}" class="nav-logo">
         <span class="logo-ew">everlywell</span>
         <span class="logo-divider">|</span>
-        <span class="logo-phoenix">Everlywell Telehealth</span>
+        <span class="logo-phoenix">Telehealth</span>
       </a>
       {% if request.blueprint in ('provider', 'care_team', 'scheduler') %}
       <button class="phoenix-btn" onclick="openPhoenixHelp()" title="Page guide — what this screen does &amp; workflows it solves">
@@ -212,7 +212,7 @@
 
   <footer class="footer">
     <div class="container">
-      <span>&copy; 2026 Everlywell — Everlywell Telehealth Demo</span>
+      <span>&copy; 2026 Everlywell — Telehealth Demo</span>
       <span class="footer-build">Build: v0.1-demo</span>
     </div>
   </footer>
