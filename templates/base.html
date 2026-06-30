@@ -106,7 +106,7 @@
     <div class="nav-user">
       {% if session.get('role') and request.blueprint != 'patient' %}{% set _r = session.get('role') %}
       <div class="nav-session-user">
-        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% else %}??{% endif %}</div>
+        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% elif _r == 'gc_admin' %}DC{% elif _r == 'qa_reviewer' %}RC{% else %}??{% endif %}</div>
       </div>
       {% endif %}
       {% if request.blueprint == 'patient' %}
