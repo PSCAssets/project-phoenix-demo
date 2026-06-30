@@ -1,0 +1,581 @@
+{% extends "base.html" %}
+{% block title %}Thyroid Program Queue — Telehealth{% endblock %}
+{% block head %}
+<style>
+:root { --psr:#059669;--psr-dark:#047857;--psr-light:#ECFDF5;--psr-border:#6EE7B7;--amber:#D97706;--amber-bg:#FFFBEB;--red:#DC2626;--red-bg:#FEF2F2;--blue:#2563EB;--blue-bg:#EFF6FF;--purple:#7C3AED;--purple-bg:#F5F3FF; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;background:#FAF7F2;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{height:56px;background:#fff;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;}
+.topbar-title{font-size:16px;font-weight:800;color:#111827;}
+.topbar-badge{background:var(--psr-light);color:var(--psr);font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid var(--psr-border);}
+.topbar-right{margin-left:auto;display:flex;gap:10px;align-items:center;}
+.body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+
+/* Stats strip */
+.stats-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.stat-card{background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:14px 16px;}
+.stat-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:4px;}
+.stat-val{font-size:22px;font-weight:800;line-height:1;}
+.stat-sub{font-size:11px;color:#9CA3AF;margin-top:2px;}
+
+/* Filter bar */
+.filter-bar{background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.filter-label{font-size:11px;font-weight:700;color:#6B7280;}
+.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;transition:all .15s;}
+.filter-btn.active{border-color:var(--psr);background:var(--psr-light);color:var(--psr);}
+.filter-select{border:1px solid #E5E0D8;border-radius:8px;padding:5px 10px;font-size:12px;color:#374151;font-family:inherit;}
+.filter-count{margin-left:auto;font-size:12px;color:#6B7280;font-weight:600;}
+.search-input{border:1px solid #E5E0D8;border-radius:8px;padding:5px 10px;font-size:12px;color:#374151;font-family:inherit;min-width:160px;}
+
+/* Table */
+.section{background:#fff;border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;}
+.q-table{width:100%;border-collapse:collapse;}
+.q-table th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;background:#F9FAFB;border-bottom:1px solid #E5E0D8;white-space:nowrap;}
+.q-table td{padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E0D8;vertical-align:middle;}
+.q-table tr:last-child td{border-bottom:none;}
+.q-table tr.row-b{background:#FFFBEB;}
+.q-table tr.row-c{background:#EFF6FF;}
+.q-table tr.row-optout{opacity:.55;background:#F9FAFB;}
+.q-table tr:hover{background:#F5F7FA;}
+.q-table tr.row-optout:hover{background:#F9FAFB;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;}
+.badge-ok{background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;}
+.badge-warn{background:var(--amber-bg);color:var(--amber);border:1px solid #FCD34D;}
+.badge-err{background:var(--red-bg);color:var(--red);border:1px solid #FCA5A5;}
+.badge-gray{background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid #BFDBFE;}
+.badge-purple{background:var(--purple-bg);color:var(--purple);border:1px solid #DDD6FE;}
+.badge-psr{background:var(--psr-light);color:var(--psr);border:1px solid var(--psr-border);}
+
+/* Buttons */
+.btn-primary{background:var(--psr);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-primary:hover{background:var(--psr-dark);}
+.btn-secondary{background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-secondary:hover{background:#F9FAFB;}
+.btn-optout{background:var(--red-bg);color:var(--red);border:1px solid #FCA5A5;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:12px;width:560px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18);}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid #E5E0D8;display:flex;align-items:flex-start;gap:12px;}
+.modal-title{font-size:15px;font-weight:700;color:#111827;}
+.modal-sub{font-size:12px;color:#6B7280;margin-top:2px;}
+.modal-close{margin-left:auto;background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;line-height:1;}
+.modal-body{padding:18px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.modal-footer{padding:14px 22px;border-top:1px solid #E5E0D8;display:flex;gap:10px;justify-content:flex-end;flex-shrink:0;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-label{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.04em;}
+.form-select,.form-input{border:1px solid #E5E0D8;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:#111827;background:#fff;}
+.form-select:focus,.form-input:focus{outline:none;border-color:var(--psr);box-shadow:0 0 0 2px rgba(5,150,105,.1);}
+
+/* Info / scenario boxes */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;}
+.info-cell strong{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;}
+.info-cell span{font-size:13px;color:#111827;font-weight:600;}
+
+.scenario-box{border-radius:8px;padding:12px 14px;font-size:12px;font-weight:600;line-height:1.5;}
+.scenario-a{background:#DCFCE7;border:1px solid #86EFAC;color:#14532D;}
+.scenario-b{background:var(--amber-bg);border:1px solid #FCD34D;color:#78350F;}
+.scenario-c{background:var(--blue-bg);border:1px solid #BFDBFE;color:#1E3A5F;}
+
+.steps-list{display:flex;flex-direction:column;gap:8px;}
+.step-row{display:flex;gap:10px;align-items:flex-start;}
+.step-num{width:22px;height:22px;border-radius:50%;background:#F3F4F6;border:1px solid #E5E0D8;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6B7280;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:12px;color:#374151;line-height:1.5;}
+
+.warn-box{background:var(--red-bg);border:1px solid #FCA5A5;border-radius:8px;padding:11px 14px;font-size:12px;color:#7F1D1D;line-height:1.6;}
+.optout-confirm{display:none;}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;z-index:2000;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Thyroid Program Queue</div>
+    <span class="topbar-badge">Care Management — Daily Review</span>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:#6B7280;" id="topbarSub">18 due today &nbsp;·&nbsp; 8 need action</span>
+      <button class="btn-secondary" onclick="window.location.href='/care-team/psr'">&#8592; Dashboard</button>
+    </div>
+  </div>
+
+  <div class="body">
+
+    <!-- Stats -->
+    <div class="stats-strip">
+      <div class="stat-card">
+        <div class="stat-label">Due today</div>
+        <div class="stat-val" style="color:#059669;">18</div>
+        <div class="stat-sub">patients to review</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Scenario A</div>
+        <div class="stat-val" style="color:#15803D;">7</div>
+        <div class="stat-sub">purchased — no action</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Scenario B</div>
+        <div class="stat-val" style="color:var(--amber);">5</div>
+        <div class="stat-sub">no purchase — ticket needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Scenario C</div>
+        <div class="stat-val" style="color:var(--blue);">3</div>
+        <div class="stat-sub">results ready — link needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Opted out</div>
+        <div class="stat-val" style="color:#6B7280;">3</div>
+        <div class="stat-sub">no Rx — removed</div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <span class="filter-label">Session date:</span>
+      <select class="filter-select" id="dateFilter" onchange="applyFilter()">
+        <option value="today">Today — Jun 30, 2026</option>
+        <option value="tomorrow">Tomorrow</option>
+        <option value="week">This week</option>
+      </select>
+      <span class="filter-label" style="margin-left:4px;">Scenario:</span>
+      <button class="filter-btn active" data-scenario="all" onclick="setScenario('all',this)">All</button>
+      <button class="filter-btn" data-scenario="a" onclick="setScenario('a',this)">A — no action</button>
+      <button class="filter-btn" data-scenario="b" onclick="setScenario('b',this)" style="color:var(--amber);border-color:#FCD34D;">B — follow-up</button>
+      <button class="filter-btn" data-scenario="c" onclick="setScenario('c',this)" style="color:var(--blue);border-color:#BFDBFE;">C — results ready</button>
+      <input class="search-input" type="text" placeholder="Search patient…" oninput="applyFilter()">
+      <span class="filter-count" id="filterCount">Showing 18 patients</span>
+    </div>
+
+    <!-- Queue table -->
+    <div class="section">
+      <table class="q-table" id="thyroidTable">
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>Program status</th>
+            <th>Medication Rx'd</th>
+            <th>Email consent</th>
+            <th>Last session</th>
+            <th>Next session</th>
+            <th>Check type</th>
+            <th>Scenario</th>
+            <th>Reviewed</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="thyroidBody">
+
+          <tr class="row-b" data-scenario="b" data-name="P.A.">
+            <td><strong>P.A.</strong> · 44F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 16</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-warn">Same-day</span></td>
+            <td><span class="badge badge-warn">B — follow-up</span></td>
+            <td><span class="badge badge-gray" id="reviewed-0">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('PA44F','b',0)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="D.L.">
+            <td><strong>D.L.</strong> · 58M</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 14</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">1-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-1">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('DL58M','a',1)">Review</button></td>
+          </tr>
+
+          <tr class="row-c" data-scenario="c" data-name="T.R.">
+            <td><strong>T.R.</strong> · 61F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 13</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-warn">Same-day</span></td>
+            <td><span class="badge badge-blue">C — results ready</span></td>
+            <td><span class="badge badge-gray" id="reviewed-2">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('TR61F','c',2)">Review</button></td>
+          </tr>
+
+          <tr class="row-b" data-scenario="b" data-name="M.K.">
+            <td><strong>M.K.</strong> · 52F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 10</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">2-week</span></td>
+            <td><span class="badge badge-warn">B — follow-up</span></td>
+            <td><span class="badge badge-gray" id="reviewed-3">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('MK52F','b',3)">Review</button></td>
+          </tr>
+
+          <tr class="row-optout" data-scenario="optout" data-name="J.V.">
+            <td><strong>J.V.</strong> · 48M</td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td>Jun 9</td>
+            <td style="color:#9CA3AF;">—</td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-gray">Complete</span></td>
+            <td style="color:#9CA3AF;font-size:12px;">No action</td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="C.H.">
+            <td><strong>C.H.</strong> · 39F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 18</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">1-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-5">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('CH39F','a',5)">Review</button></td>
+          </tr>
+
+          <tr class="row-b" data-scenario="b" data-name="R.S.">
+            <td><strong>R.S.</strong> · 55F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 5</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-warn">Same-day</span></td>
+            <td><span class="badge badge-warn">B — follow-up</span></td>
+            <td><span class="badge badge-gray" id="reviewed-6">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('RS55F','b',6)">Review</button></td>
+          </tr>
+
+          <tr class="row-c" data-scenario="c" data-name="E.M.">
+            <td><strong>E.M.</strong> · 47F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 12</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">2-week</span></td>
+            <td><span class="badge badge-blue">C — results ready</span></td>
+            <td><span class="badge badge-gray" id="reviewed-7">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('EM47F','c',7)">Review</button></td>
+          </tr>
+
+          <tr class="row-optout" data-scenario="optout" data-name="B.W.">
+            <td><strong>B.W.</strong> · 63M</td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td>Jun 7</td>
+            <td style="color:#9CA3AF;">—</td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-gray">Complete</span></td>
+            <td style="color:#9CA3AF;font-size:12px;">No action</td>
+          </tr>
+
+          <tr class="row-b" data-scenario="b" data-name="L.T.">
+            <td><strong>L.T.</strong> · 42F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 15</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-warn">Same-day</span></td>
+            <td><span class="badge badge-warn">B — follow-up</span></td>
+            <td><span class="badge badge-gray" id="reviewed-9">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('LT42F','b',9)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="F.O.">
+            <td><strong>F.O.</strong> · 71F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 20</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">1-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-10">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('FO71F','a',10)">Review</button></td>
+          </tr>
+
+          <tr class="row-c" data-scenario="c" data-name="N.A.">
+            <td><strong>N.A.</strong> · 38F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 11</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-warn">Same-day</span></td>
+            <td><span class="badge badge-blue">C — results ready</span></td>
+            <td><span class="badge badge-gray" id="reviewed-11">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('NA38F','c',11)">Review</button></td>
+          </tr>
+
+          <tr class="row-optout" data-scenario="optout" data-name="G.P.">
+            <td><strong>G.P.</strong> · 56M</td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-err">No</span></td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td>Jun 6</td>
+            <td style="color:#9CA3AF;">—</td>
+            <td><span class="badge badge-gray">—</span></td>
+            <td><span class="badge badge-gray">Opted out</span></td>
+            <td><span class="badge badge-gray">Complete</span></td>
+            <td style="color:#9CA3AF;font-size:12px;">No action</td>
+          </tr>
+
+          <tr class="row-b" data-scenario="b" data-name="H.B.">
+            <td><strong>H.B.</strong> · 49F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 8</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">2-week</span></td>
+            <td><span class="badge badge-warn">B — follow-up</span></td>
+            <td><span class="badge badge-gray" id="reviewed-13">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('HB49F','b',13)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="S.N.">
+            <td><strong>S.N.</strong> · 34F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 22</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">1-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-14">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('SN34F','a',14)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="W.C.">
+            <td><strong>W.C.</strong> · 67M</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 19</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">2-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-15">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('WC67M','a',15)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="I.F.">
+            <td><strong>I.F.</strong> · 53F</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 17</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">1-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-16">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('IF53F','a',16)">Review</button></td>
+          </tr>
+
+          <tr class="row-a" data-scenario="a" data-name="Q.D.">
+            <td><strong>Q.D.</strong> · 45M</td>
+            <td><span class="badge badge-psr">Active</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td><span class="badge badge-ok">Yes</span></td>
+            <td>Jun 21</td>
+            <td><strong style="color:var(--amber);">Today</strong></td>
+            <td><span class="badge badge-gray">2-week</span></td>
+            <td><span class="badge badge-ok">A — no action</span></td>
+            <td><span class="badge badge-gray" id="reviewed-17">Pending</span></td>
+            <td><button class="btn-primary" onclick="openModal('QD45M','a',17)">Review</button></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /main -->
+
+<!-- Review Modal -->
+<div class="overlay" id="reviewOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle">Thyroid History</div>
+        <div class="modal-sub" id="modalSub">Review patient and determine action</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div class="modal-body" id="modalBody">
+    </div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" id="completeBtn" onclick="markComplete()">Mark complete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var currentRowIdx = null;
+
+var SCENARIOS = {
+  a: {
+    label: 'Scenario A — no action needed',
+    cls: 'scenario-box scenario-a',
+    desc: 'Patient purchased a thyroid test within the last 6 weeks. No Zendesk ticket required. Move to the next patient.',
+    steps: null
+  },
+  b: {
+    label: 'Scenario B — follow-up ticket required',
+    cls: 'scenario-box scenario-b',
+    desc: 'Patient has NOT purchased a thyroid test within the last 6 weeks. Create a Zendesk ticket so PCC can make an outbound call.',
+    steps: [
+      'Copy the patient\'s email address from their session page in Telehealth.',
+      'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field so their profile auto-populates.',
+      'Set Ticket Type to <strong>Problem</strong> (same-day check) or <strong>Incident</strong> (1-week / 2-week check).',
+      'Apply the <strong>Pending Next Order Thyroid Follow-Up</strong> macro.',
+      'Paste the participant link from the consult report into the ticket body. Set From to <strong>alert@everlyhealth.com</strong>.',
+      'Click <strong>Submit as Solved</strong>. PCC will see this in the Thyroid Zendesk view.'
+    ]
+  },
+  c: {
+    label: 'Scenario C — test results finalized, no active consult',
+    cls: 'scenario-box scenario-c',
+    desc: 'Test results have finalized but there is no active consult linked. Generate a Thyroid Initial Link and create a Zendesk ticket.',
+    steps: [
+      'In Telehealth, generate a <strong>Thyroid Initial Link</strong> for this patient.',
+      'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field.',
+      'Set Ticket Type to <strong>Incident</strong> (applies to same-day, 1-week, and 2-week checks).',
+      'Apply the <strong>Resulted Thyroid</strong> macro.',
+      'Paste the generated Thyroid Initial Link into the ticket body. Set From to <strong>alert@everlyhealth.com</strong>.',
+      'Click <strong>Submit as Solved</strong>.'
+    ]
+  }
+};
+
+var PATIENTS = {
+  'PA44F': { name:'P.A. · 44F', lastSession:'Jun 16', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706' },
+  'DL58M': { name:'D.L. · 58M', lastSession:'Jun 14', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D' },
+  'TR61F': { name:'T.R. · 61F', lastSession:'Jun 13', nextSession:'Today', check:'Same-day', rxd:'Yes — Methimazole 10mg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB' },
+  'MK52F': { name:'M.K. · 52F', lastSession:'Jun 10', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706' },
+  'CH39F': { name:'C.H. · 39F', lastSession:'Jun 18', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D' },
+  'RS55F': { name:'R.S. · 55F', lastSession:'Jun 5',  nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706' },
+  'EM47F': { name:'E.M. · 47F', lastSession:'Jun 12', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 125mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB' },
+  'LT42F': { name:'L.T. · 42F', lastSession:'Jun 15', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706' },
+  'FO71F': { name:'F.O. · 71F', lastSession:'Jun 20', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 4 weeks ago', labsColor:'#15803D' },
+  'NA38F': { name:'N.A. · 38F', lastSession:'Jun 11', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB' },
+  'HB49F': { name:'H.B. · 49F', lastSession:'Jun 8',  nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706' },
+  'SN34F': { name:'S.N. · 34F', lastSession:'Jun 22', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 25mcg', consent:'Yes', labs:'Thyroid test purchased 1 week ago', labsColor:'#15803D' },
+  'WC67M': { name:'W.C. · 67M', lastSession:'Jun 19', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D' },
+  'IF53F': { name:'I.F. · 53F', lastSession:'Jun 17', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D' },
+  'QD45M': { name:'Q.D. · 45M', lastSession:'Jun 21', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 5 weeks ago', labsColor:'#15803D' }
+};
+
+function openModal(patientKey, scenario, rowIdx) {
+  currentRowIdx = rowIdx;
+  var p = PATIENTS[patientKey];
+  var s = SCENARIOS[scenario];
+  document.getElementById('modalTitle').textContent = 'Thyroid history — ' + p.name;
+  document.getElementById('modalSub').textContent = p.check + ' check · Last session ' + p.lastSession;
+
+  var stepsHtml = '';
+  if (s.steps) {
+    stepsHtml = '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#6B7280;margin-bottom:8px;">Steps to complete</div><div class="steps-list">';
+    s.steps.forEach(function(st, i) {
+      stepsHtml += '<div class="step-row"><div class="step-num">' + (i+1) + '</div><div class="step-text">' + st + '</div></div>';
+    });
+    stepsHtml += '</div>';
+  } else {
+    stepsHtml = '<div style="font-size:13px;color:#374151;">No action required. Mark this patient complete and move to the next one.</div>';
+  }
+
+  document.getElementById('modalBody').innerHTML =
+    '<div class="info-grid">' +
+      '<div class="info-cell"><strong>Medication prescribed</strong><span style="color:#15803D;">' + p.rxd + '</span></div>' +
+      '<div class="info-cell"><strong>Email consent</strong><span style="color:#15803D;">' + p.consent + '</span></div>' +
+      '<div class="info-cell"><strong>Labs module check</strong><span style="color:' + p.labsColor + ';">' + p.labs + '</span></div>' +
+      '<div class="info-cell"><strong>Next session date</strong><span>' + p.nextSession + ' (' + p.check + ')</span></div>' +
+    '</div>' +
+    '<div class="' + s.cls + '"><strong>' + s.label + '</strong><br>' + s.desc + '</div>' +
+    stepsHtml;
+
+  document.getElementById('reviewOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('reviewOverlay').classList.remove('open');
+  currentRowIdx = null;
+}
+
+function markComplete() {
+  if (currentRowIdx !== null) {
+    var badge = document.getElementById('reviewed-' + currentRowIdx);
+    if (badge) {
+      badge.className = 'badge badge-psr';
+      badge.textContent = 'Done';
+    }
+    showToast('Patient marked complete');
+  }
+  closeModal();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+var currentScenario = 'all';
+function setScenario(s, btn) {
+  currentScenario = s;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  var search = document.querySelector('.search-input').value.toLowerCase();
+  var rows = document.querySelectorAll('#thyroidBody tr');
+  var count = 0;
+  rows.forEach(function(r) {
+    var sc = r.dataset.scenario;
+    var nm = (r.dataset.name || '').toLowerCase();
+    var scenarioMatch = currentScenario === 'all' || sc === currentScenario;
+    var searchMatch = !search || nm.includes(search);
+    var show = scenarioMatch && searchMatch;
+    r.style.display = show ? '' : 'none';
+    if (show) count++;
+  });
+  document.getElementById('filterCount').textContent = 'Showing ' + count + ' patients';
+}
+
+document.getElementById('reviewOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}

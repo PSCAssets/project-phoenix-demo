@@ -18,6 +18,10 @@ def psr_queue():
 def psr_link_generator():
     return render_template("care_team/psr_dashboard.html")
 
+@bp.route("/psr/thyroid-queue")
+def psr_thyroid_queue():
+    return render_template("care_team/thyroid_queue.html")
+
 @bp.route("/gaps")
 def gaps_dashboard():
     return render_template("care_team/gaps_under_construction.html")
