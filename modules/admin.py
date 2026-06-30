@@ -113,6 +113,10 @@ def settings():
 def users():
     return render_template("admin/users.html")
 
+@bp.route("/role-config")
+def role_config():
+    return render_template("admin/role_config.html")
+
 @bp.route("/integrations")
 def integrations():
     return render_template("admin/integrations.html")

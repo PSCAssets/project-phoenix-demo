@@ -1,0 +1,594 @@
+{% extends "base.html" %}
+{% block title %}Role Configuration — Admin{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+.sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+.nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+.nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+.nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+.main { margin-left: 240px; flex: 1; min-height: 100vh; }
+.topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+.topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+.content { padding: 24px 28px; display: flex; gap: 20px; align-items: flex-start; }
+
+/* Left: role list */
+.role-list-panel { width: 280px; flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.panel-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9CA3AF; }
+.btn-new-role { background: #7C3AED; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.btn-new-role:hover { background: #6D28D9; }
+.role-card { background: #fff; border: 1.5px solid #E5E0D8; border-radius: 10px; padding: 14px 16px; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.role-card:hover { border-color: #7C3AED; box-shadow: 0 0 0 2px rgba(124,58,237,.08); }
+.role-card.selected { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124,58,237,.12); }
+.role-card-name { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 3px; }
+.role-card-meta { font-size: 12px; color: #6B7280; margin-bottom: 8px; }
+.module-pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.pill { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+.pill-on { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+.pill-off { background: #F3F4F6; color: #9CA3AF; border: 1px solid #E5E0D8; text-decoration: line-through; }
+.pill-more { background: #EDE9FE; color: #5B21B6; border: 1px solid #DDD6FE; }
+.custom-badge { font-size: 10px; font-weight: 700; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 8px; padding: 1px 7px; margin-left: 6px; }
+
+/* Right: edit panel */
+.edit-panel { flex: 1; background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+.edit-header { padding: 18px 22px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 12px; }
+.edit-title { font-size: 16px; font-weight: 700; color: #111827; flex: 1; }
+.edit-meta { font-size: 12px; color: #6B7280; }
+.btn-save { background: #7C3AED; color: #fff; border: none; border-radius: 8px; padding: 8px 20px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #6D28D9; }
+.btn-secondary { background: #fff; color: #374151; border: 1px solid #E5E0D8; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-secondary:hover { background: #F9FAFB; }
+
+/* Module sections */
+.edit-body { padding: 20px 22px; display: flex; flex-direction: column; gap: 20px; }
+.module-section { display: flex; flex-direction: column; gap: 2px; }
+.section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9CA3AF; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid #F3F4F6; }
+.module-row { display: flex; align-items: center; padding: 10px 14px; border-radius: 8px; transition: background .1s; }
+.module-row:hover { background: #F9FAFB; }
+.module-row-locked { opacity: .55; }
+.module-icon { width: 32px; height: 32px; border-radius: 8px; background: #F3F4F6; display: flex; align-items: center; justify-content: center; font-size: 15px; margin-right: 12px; flex-shrink: 0; }
+.module-info { flex: 1; }
+.module-name { font-size: 13px; font-weight: 600; color: #111827; }
+.module-desc { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+.module-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; margin-left: 8px; }
+.badge-locked { background: #F3F4F6; color: #9CA3AF; border: 1px solid #E5E0D8; }
+.badge-override { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; }
+
+/* Toggle switch */
+.toggle-wrap { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle-wrap input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-slider { position: absolute; inset: 0; background: #D1D5DB; border-radius: 11px; cursor: pointer; transition: background .2s; }
+.toggle-slider::before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+.toggle-wrap input:checked + .toggle-slider { background: #7C3AED; }
+.toggle-wrap input:checked + .toggle-slider::before { transform: translateX(18px); }
+.toggle-wrap input:disabled + .toggle-slider { background: #6366F1; cursor: default; }
+
+/* Users count strip */
+.users-strip { background: #F5F3FF; border: 1px solid #DDD6FE; border-radius: 8px; padding: 10px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #374151; }
+.users-strip strong { color: #5B21B6; }
+
+/* Confirm modal */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 1000; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 12px; width: 460px; box-shadow: 0 8px 40px rgba(0,0,0,.18); overflow: hidden; }
+.modal-header { padding: 18px 22px 14px; border-bottom: 1px solid #E5E0D8; }
+.modal-title { font-size: 15px; font-weight: 700; color: #111827; }
+.modal-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 12px; font-size: 13px; color: #374151; line-height: 1.6; }
+.modal-footer { padding: 14px 22px; border-top: 1px solid #E5E0D8; display: flex; gap: 10px; justify-content: flex-end; }
+.diff-box { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 12px 14px; font-size: 12px; }
+.diff-add { color: #065F46; font-weight: 600; }
+.diff-remove { color: #991B1B; font-weight: 600; }
+
+/* New role modal */
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #374151; }
+.form-input, .form-select { border: 1px solid #E5E0D8; border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: inherit; color: #111827; }
+.form-input:focus, .form-select:focus { outline: none; border-color: #7C3AED; box-shadow: 0 0 0 2px rgba(124,58,237,.1); }
+
+.toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+</style>
+{% endblock %}
+
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding:8px 0;flex:1;">
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/users" class="nav-item"><span class="nav-icon">👥</span> User Management</a>
+    <a href="/admin/role-config" class="nav-item active"><span class="nav-icon">🔐</span> Role Configuration</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
+    <a href="/admin/integrations" class="nav-item"><span class="nav-icon">🔌</span> Integrations</a>
+    <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Config</a>
+    <a href="/admin/doh-config" class="nav-item"><span class="nav-icon">🏥</span> DOH Configuration</a>
+    <a href="/admin/notifications" class="nav-item"><span class="nav-icon">🔔</span> Notification Templates</a>
+    <a href="/admin/audit-log" class="nav-item"><span class="nav-icon">📋</span> Audit Log</a>
+    <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Role Configuration</div>
+    <span style="font-size:13px;color:#6B7280;">Chris Navarro · Platform Admin</span>
+  </div>
+
+  <div class="content">
+
+    <!-- Left: role list -->
+    <div class="role-list-panel">
+      <div class="panel-header">
+        <span class="panel-label">Roles (8)</span>
+        <button class="btn-new-role" onclick="openNewRoleModal()">+ New Role</button>
+      </div>
+
+      <div class="role-card selected" onclick="selectRole('rn_standard')" id="card-rn_standard">
+        <div class="role-card-name">RN Standard</div>
+        <div class="role-card-meta">7 users · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">RN Queue</span>
+          <span class="pill pill-on">Titer Queue</span>
+          <span class="pill pill-on">DXS Audit</span>
+          <span class="pill pill-off">Network Sched.</span>
+          <span class="pill pill-more">+4 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('rn_lead')" id="card-rn_lead">
+        <div class="role-card-name">RN Lead</div>
+        <div class="role-card-meta">1 user · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">RN Queue</span>
+          <span class="pill pill-on">On-Call Sched.</span>
+          <span class="pill pill-on">Network Sched.</span>
+          <span class="pill pill-more">+5 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('ma_standard')" id="card-ma_standard">
+        <div class="role-card-name">MA Standard</div>
+        <div class="role-card-meta">4 users · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">MA Queue</span>
+          <span class="pill pill-on">PCP Follow-Up</span>
+          <span class="pill pill-on">My Schedule</span>
+          <span class="pill pill-more">+4 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('psr_manager')" id="card-psr_manager">
+        <div class="role-card-name">PSR Manager</div>
+        <div class="role-card-meta">1 user · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">Call Queue</span>
+          <span class="pill pill-on">Thyroid Program</span>
+          <span class="pill pill-on">Patient Queue</span>
+          <span class="pill pill-more">+4 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('team_manager')" id="card-team_manager">
+        <div class="role-card-name">Team Manager</div>
+        <div class="role-card-meta">1 user · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">MA Queue</span>
+          <span class="pill pill-on">RN Queue</span>
+          <span class="pill pill-on">Network Sched.</span>
+          <span class="pill pill-more">+6 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('provider_md')" id="card-provider_md">
+        <div class="role-card-name">Provider (MD/NP)</div>
+        <div class="role-card-meta">12 users · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">Patient Queue</span>
+          <span class="pill pill-on">Lab Auth</span>
+          <span class="pill pill-on">Schedule</span>
+          <span class="pill pill-more">+3 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('gc_standard')" id="card-gc_standard">
+        <div class="role-card-name">Genetic Counselor</div>
+        <div class="role-card-meta">3 users · System default</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">GC Queue</span>
+          <span class="pill pill-on">Network Sched.</span>
+          <span class="pill pill-on">Messages</span>
+          <span class="pill pill-more">+2 more</span>
+        </div>
+      </div>
+
+      <div class="role-card" onclick="selectRole('rn_dxs_only')" id="card-rn_dxs_only">
+        <div class="role-card-name">RN — DXS Focus <span class="custom-badge">Custom</span></div>
+        <div class="role-card-meta">2 users · Custom role</div>
+        <div class="module-pills">
+          <span class="pill pill-on">Dashboard</span>
+          <span class="pill pill-on">DXS Audit</span>
+          <span class="pill pill-on">Patient Queue</span>
+          <span class="pill pill-off">Titer Queue</span>
+          <span class="pill pill-more">+2 more</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: edit panel -->
+    <div class="edit-panel" id="editPanel">
+      <div class="edit-header">
+        <div>
+          <div class="edit-title" id="editTitle">RN Standard</div>
+          <div class="edit-meta" id="editMeta">System default · 7 users assigned</div>
+        </div>
+        <button class="btn-secondary" style="margin-right:8px;" onclick="showCloneModal()">Clone Role</button>
+        <button class="btn-save" onclick="openConfirmModal()">Save Changes</button>
+      </div>
+
+      <div class="edit-body">
+
+        <div class="users-strip" id="usersStrip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" width="16" height="16"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          <span><strong>7 users</strong> are assigned to this role. Saving changes will update their access on next login.</span>
+        </div>
+
+        <!-- Clinical Queues -->
+        <div class="module-section">
+          <div class="section-label">Clinical Queues</div>
+
+          <div class="module-row">
+            <div class="module-icon">🏠</div>
+            <div class="module-info">
+              <div class="module-name">Dashboard <span class="module-badge badge-locked">Always on</span></div>
+              <div class="module-desc">Role home page — cannot be disabled</div>
+            </div>
+            <label class="toggle-wrap module-row-locked"><input type="checkbox" checked disabled><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">🚨</div>
+            <div class="module-info">
+              <div class="module-name">RN Queue</div>
+              <div class="module-desc">Consolidated critical results, titers, and DXS items</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'RN Queue')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">🧪</div>
+            <div class="module-info">
+              <div class="module-name">Titer Queue</div>
+              <div class="module-desc">Shared titer interpretation queue — centralized, no individual assignment</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Titer Queue')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">📋</div>
+            <div class="module-info">
+              <div class="module-name">DXS Audit</div>
+              <div class="module-desc">Consultation audit queue for diagnosis and coding review</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'DXS Audit')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">📞</div>
+            <div class="module-info">
+              <div class="module-name">On-Call Schedule</div>
+              <div class="module-desc">RN on-call rotation with Notify MD export</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" onchange="trackChange(this,'On-Call Schedule')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">👥</div>
+            <div class="module-info">
+              <div class="module-name">Patient Queue</div>
+              <div class="module-desc">General on-demand consultation queue</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Patient Queue')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">🔍</div>
+            <div class="module-info">
+              <div class="module-name">Patient Management</div>
+              <div class="module-desc">Member lookup via Athena — replaces Retool</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" onchange="trackChange(this,'Patient Management')"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Scheduling & Ops -->
+        <div class="module-section">
+          <div class="section-label">Scheduling &amp; Operations</div>
+
+          <div class="module-row">
+            <div class="module-icon">📅</div>
+            <div class="module-info">
+              <div class="module-name">Network Schedule</div>
+              <div class="module-desc">Provider availability across the network — defaults to hidden for RN roles</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" id="toggle-network-sched" onchange="trackChange(this,'Network Schedule')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">🗓</div>
+            <div class="module-info">
+              <div class="module-name">My Schedule</div>
+              <div class="module-desc">Personal availability / shift calendar</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'My Schedule')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">⏱</div>
+            <div class="module-info">
+              <div class="module-name">Timekeeping</div>
+              <div class="module-desc">Time entry and monthly approval tracking</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Timekeeping')"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Communication -->
+        <div class="module-section">
+          <div class="section-label">Communication</div>
+
+          <div class="module-row">
+            <div class="module-icon">💬</div>
+            <div class="module-info">
+              <div class="module-name">Messages</div>
+              <div class="module-desc">Secure internal and patient messaging</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Messages')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">🔔</div>
+            <div class="module-info">
+              <div class="module-name">Alerts &amp; Notifications</div>
+              <div class="module-desc">System alerts, task reminders, and escalation notices</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Alerts')"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Admin & Reporting -->
+        <div class="module-section">
+          <div class="section-label">Reporting &amp; Admin</div>
+
+          <div class="module-row">
+            <div class="module-icon">📈</div>
+            <div class="module-info">
+              <div class="module-name">Reports &amp; Dashboards</div>
+              <div class="module-desc">Operational reports and performance metrics</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" onchange="trackChange(this,'Reports')"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="module-row">
+            <div class="module-icon">⚙️</div>
+            <div class="module-info">
+              <div class="module-name">Settings</div>
+              <div class="module-desc">Personal account and notification preferences</div>
+            </div>
+            <label class="toggle-wrap"><input type="checkbox" checked onchange="trackChange(this,'Settings')"><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+      </div><!-- /edit-body -->
+    </div><!-- /edit-panel -->
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- Confirm Save Modal -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Confirm Role Changes</div>
+    </div>
+    <div class="modal-body">
+      <p>You are updating <strong id="confirmRoleName">RN Standard</strong>. The following changes will take effect for all assigned users on their next login:</p>
+      <div class="diff-box" id="diffBox">No changes detected.</div>
+      <p>This will affect <strong id="confirmUserCount">7 users</strong>.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn-save" onclick="saveChanges()">Confirm &amp; Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Role Modal -->
+<div class="overlay" id="newRoleOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Create New Role</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Role Name</label>
+        <input class="form-input" type="text" id="newRoleName" placeholder="e.g., RN Telehealth Only">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Clone from Base Role</label>
+        <select class="form-select" id="newRoleBase">
+          <option value="rn_standard">RN Standard</option>
+          <option value="rn_lead">RN Lead</option>
+          <option value="ma_standard">MA Standard</option>
+          <option value="psr_manager">PSR Manager</option>
+          <option value="team_manager">Team Manager</option>
+          <option value="provider_md">Provider (MD/NP)</option>
+          <option value="gc_standard">Genetic Counselor</option>
+        </select>
+      </div>
+      <p style="font-size:12px;color:#6B7280;">The new role will inherit all modules from the base role. You can then toggle modules on or off in the editor.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeNewRole()">Cancel</button>
+      <button class="btn-save" onclick="createRole()">Create Role</button>
+    </div>
+  </div>
+</div>
+
+<!-- Clone Modal -->
+<div class="overlay" id="cloneOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Clone Role</div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">New Role Name</label>
+        <input class="form-input" type="text" id="cloneName" placeholder="e.g., RN — Float Pool">
+      </div>
+      <p style="font-size:12px;color:#6B7280;">A copy of <strong id="cloneSourceName">RN Standard</strong> will be created with the same module configuration. No users will be moved automatically.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="document.getElementById('cloneOverlay').classList.remove('open')">Cancel</button>
+      <button class="btn-save" onclick="confirmClone()">Clone &amp; Edit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var currentRole = 'rn_standard';
+var pendingChanges = { added: [], removed: [] };
+
+var ROLE_META = {
+  rn_standard:  { name: 'RN Standard',          users: 7,  isCustom: false },
+  rn_lead:      { name: 'RN Lead',               users: 1,  isCustom: false },
+  ma_standard:  { name: 'MA Standard',           users: 4,  isCustom: false },
+  psr_manager:  { name: 'PSR Manager',           users: 1,  isCustom: false },
+  team_manager: { name: 'Team Manager',          users: 1,  isCustom: false },
+  provider_md:  { name: 'Provider (MD/NP)',       users: 12, isCustom: false },
+  gc_standard:  { name: 'Genetic Counselor',     users: 3,  isCustom: false },
+  rn_dxs_only:  { name: 'RN — DXS Focus',        users: 2,  isCustom: true  },
+};
+
+function selectRole(roleKey) {
+  // Deselect all cards
+  document.querySelectorAll('.role-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('card-' + roleKey).classList.add('selected');
+  currentRole = roleKey;
+  pendingChanges = { added: [], removed: [] };
+
+  var meta = ROLE_META[roleKey];
+  document.getElementById('editTitle').textContent = meta.name;
+  document.getElementById('editMeta').textContent = (meta.isCustom ? 'Custom role' : 'System default') + ' · ' + meta.users + ' users assigned';
+  document.getElementById('usersStrip').querySelector('strong').textContent = meta.users + ' users';
+  document.getElementById('usersStrip').querySelector('span').innerHTML = '<strong>' + meta.users + ' users</strong> are assigned to this role. Saving changes will update their access on next login.';
+}
+
+function trackChange(checkbox, moduleName) {
+  if (checkbox.checked) {
+    pendingChanges.removed = pendingChanges.removed.filter(function(m){ return m !== moduleName; });
+    if (!pendingChanges.added.includes(moduleName)) pendingChanges.added.push(moduleName);
+  } else {
+    pendingChanges.added = pendingChanges.added.filter(function(m){ return m !== moduleName; });
+    if (!pendingChanges.removed.includes(moduleName)) pendingChanges.removed.push(moduleName);
+  }
+}
+
+function openConfirmModal() {
+  var meta = ROLE_META[currentRole];
+  document.getElementById('confirmRoleName').textContent = meta.name;
+  document.getElementById('confirmUserCount').textContent = meta.users + ' user' + (meta.users !== 1 ? 's' : '');
+
+  var html = '';
+  if (pendingChanges.added.length === 0 && pendingChanges.removed.length === 0) {
+    html = 'No changes detected.';
+  } else {
+    if (pendingChanges.added.length) {
+      html += '<div class="diff-add">+ Enabling: ' + pendingChanges.added.join(', ') + '</div>';
+    }
+    if (pendingChanges.removed.length) {
+      html += '<div class="diff-remove" style="margin-top:4px;">− Disabling: ' + pendingChanges.removed.join(', ') + '</div>';
+    }
+  }
+  document.getElementById('diffBox').innerHTML = html;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+
+function saveChanges() {
+  closeConfirm();
+  pendingChanges = { added: [], removed: [] };
+  showToast('Role configuration saved — takes effect on next login');
+}
+
+function openNewRoleModal() {
+  document.getElementById('newRoleName').value = '';
+  document.getElementById('newRoleOverlay').classList.add('open');
+}
+function closeNewRole() { document.getElementById('newRoleOverlay').classList.remove('open'); }
+
+function createRole() {
+  var name = document.getElementById('newRoleName').value.trim();
+  if (!name) { document.getElementById('newRoleName').focus(); return; }
+  closeNewRole();
+  showToast('Role "' + name + '" created — select it from the list to configure modules');
+}
+
+function showCloneModal() {
+  document.getElementById('cloneName').value = '';
+  document.getElementById('cloneSourceName').textContent = ROLE_META[currentRole].name;
+  document.getElementById('cloneOverlay').classList.add('open');
+}
+
+function confirmClone() {
+  var name = document.getElementById('cloneName').value.trim();
+  if (!name) { document.getElementById('cloneName').focus(); return; }
+  document.getElementById('cloneOverlay').classList.remove('open');
+  showToast('Role "' + name + '" cloned from ' + ROLE_META[currentRole].name);
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// Close overlays on background click
+['confirmOverlay','newRoleOverlay','cloneOverlay'].forEach(function(id) {
+  document.getElementById(id).addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+</script>
+{% endblock %}

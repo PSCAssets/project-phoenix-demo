@@ -45,6 +45,45 @@
   .role-admin { background: #EDE9FE; color: #5B21B6; }
   .role-staff { background: #D1FAE5; color: #065F46; }
   .role-patient { background: #F3F4F6; color: #374151; }
+  .role-template-link { font-size: 11px; color: #7C3AED; font-weight: 600; text-decoration: none; display: block; margin-top: 3px; }
+  .role-template-link:hover { text-decoration: underline; }
+  .override-badge { font-size: 10px; font-weight: 700; background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; border-radius: 8px; padding: 1px 6px; margin-left: 4px; }
+  /* Edit user modal */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:400; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:#fff; border-radius:14px; width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+  .modal-head { padding:18px 24px 14px; border-bottom:1px solid #E5E0D8; display:flex; align-items:center; }
+  .modal-head-title { font-size:16px; font-weight:700; color:#111827; flex:1; }
+  .modal-head-sub { font-size:12px; color:#6B7280; margin-top:2px; }
+  .modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:#9CA3AF; }
+  .modal-section { padding:16px 24px; border-bottom:1px solid #F3F4F6; }
+  .modal-section-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#9CA3AF; margin-bottom:10px; }
+  .form-row { display:flex; flex-direction:column; gap:4px; margin-bottom:14px; }
+  .form-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#374151; }
+  .form-ctrl { border:1px solid #E5E0D8; border-radius:8px; padding:8px 12px; font-size:13px; font-family:inherit; color:#111827; }
+  .form-ctrl:focus { outline:none; border-color:#7C3AED; box-shadow:0 0 0 2px rgba(124,58,237,.1); }
+  .override-row { display:flex; align-items:center; padding:8px 0; border-bottom:1px solid #F9FAFB; gap:10px; }
+  .override-row:last-child { border-bottom:none; }
+  .override-icon { width:28px; height:28px; border-radius:7px; background:#F3F4F6; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+  .override-info { flex:1; }
+  .override-name { font-size:13px; font-weight:600; color:#111827; }
+  .override-source { font-size:11px; color:#9CA3AF; }
+  .override-source.from-role { color:#059669; }
+  .override-source.override-on { color:#7C3AED; }
+  .override-source.override-off { color:#EF4444; }
+  .toggle-sm { position:relative; width:34px; height:18px; flex-shrink:0; }
+  .toggle-sm input { opacity:0; width:0; height:0; position:absolute; }
+  .toggle-sm-slider { position:absolute; inset:0; background:#D1D5DB; border-radius:9px; cursor:pointer; transition:background .2s; }
+  .toggle-sm-slider::before { content:''; position:absolute; width:12px; height:12px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform .2s; }
+  .toggle-sm input:checked + .toggle-sm-slider { background:#7C3AED; }
+  .toggle-sm input:checked + .toggle-sm-slider::before { transform:translateX(16px); }
+  .modal-footer { padding:14px 24px; display:flex; gap:10px; justify-content:flex-end; }
+  .btn-save-sm { background:#7C3AED; color:#fff; border:none; border-radius:8px; padding:8px 20px; font-size:13px; font-weight:700; cursor:pointer; }
+  .btn-save-sm:hover { background:#6D28D9; }
+  .btn-cancel-sm { background:#fff; border:1px solid #E5E0D8; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer; color:#374151; }
+  .info-strip { background:#F5F3FF; border:1px solid #DDD6FE; border-radius:8px; padding:9px 14px; font-size:12px; color:#374151; line-height:1.5; margin-bottom:12px; }
+  .toast { position:fixed; bottom:24px; right:24px; background:#111827; color:#fff; border-radius:10px; padding:12px 18px; font-size:13px; font-weight:600; opacity:0; transform:translateY(10px); transition:all .3s; z-index:2000; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateY(0); }
 </style>
 {% endblock %}
 {% block content %}
@@ -58,6 +97,7 @@
     <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
     <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
     <a href="/admin/users" class="nav-item active"><span class="nav-icon">👥</span> User Management</a>
+    <a href="/admin/role-config" class="nav-item"><span class="nav-icon">🔐</span> Role Configuration</a>
     <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
     <a href="/admin/integrations" class="nav-item"><span class="nav-icon">🔌</span> Integrations</a>
     <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Config</a>
@@ -85,7 +125,8 @@
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Role</th>
+            <th>Role Template</th>
+            <th>Module Overrides</th>
             <th>Status</th>
             <th>Last Login</th>
             <th>Actions</th>
@@ -93,69 +134,137 @@
         </thead>
         <tbody>
           <tr>
-  <td style="font-weight:600">Sarah Lee, MD</td>
-  <td style="color:#6B7280;font-size:12px;">sarah.lee@everlywell.com</td>
-  <td><span class="role-tag role-provider">Provider (MD)</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 13, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">Maria Rodriguez, NP</td>
-  <td style="color:#6B7280;font-size:12px;">maria.r@everlywell.com</td>
-  <td><span class="role-tag role-provider">Provider (NP)</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 13, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">James Thompson, RN</td>
-  <td style="color:#6B7280;font-size:12px;">j.thompson@everlywell.com</td>
-  <td><span class="role-tag role-staff">Care Team (RN)</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 12, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">Carlos Rivera, MA</td>
-  <td style="color:#6B7280;font-size:12px;">c.rivera@everlywell.com</td>
-  <td><span class="role-tag role-staff">Care Team (MA)</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 13, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">Lisa Park, GC</td>
-  <td style="color:#6B7280;font-size:12px;">l.park@everlywell.com</td>
-  <td><span class="role-tag role-provider">Provider (GC)</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 11, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">David Nguyen</td>
-  <td style="color:#6B7280;font-size:12px;">d.nguyen@everlywell.com</td>
-  <td><span class="role-tag role-staff">Scheduler</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 13, 2026</td>
-  <td><a href="#" class="action-link">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
-</tr>
-<tr>
-  <td style="font-weight:600">Admin User</td>
-  <td style="color:#6B7280;font-size:12px;">admin@everlywell.com</td>
-  <td><span class="role-tag role-admin">Admin</span></td>
-  <td><span class="status-pill s-active">Active</span></td>
-  <td>Jun 13, 2026</td>
-  <td><a href="#" class="action-link">Edit</a></td>
-</tr>
+            <td style="font-weight:600">Sarah Lee, MD</td>
+            <td style="color:#6B7280;font-size:12px;">sarah.lee@everlywell.com</td>
+            <td><span class="role-tag role-provider">Provider (MD/NP)</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('sarah','Sarah Lee, MD','Provider (MD/NP)','role-provider',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Maria Rodriguez, NP</td>
+            <td style="color:#6B7280;font-size:12px;">maria.r@everlywell.com</td>
+            <td><span class="role-tag role-provider">Provider (MD/NP)</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('maria','Maria Rodriguez, NP','Provider (MD/NP)','role-provider',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Jennifer Martinez, RN</td>
+            <td style="color:#6B7280;font-size:12px;">j.martinez@everlywell.com</td>
+            <td><span class="role-tag role-staff">RN Standard</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td><span class="override-badge">1 override</span></td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 12, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('jennifer','Jennifer Martinez, RN','RN Standard','role-staff',true);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Michael Torres, MA</td>
+            <td style="color:#6B7280;font-size:12px;">m.torres@everlywell.com</td>
+            <td><span class="role-tag role-staff">MA Standard</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('michael','Michael Torres, MA','MA Standard','role-staff',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Lisa Park, GC</td>
+            <td style="color:#6B7280;font-size:12px;">l.park@everlywell.com</td>
+            <td><span class="role-tag role-provider">Genetic Counselor</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 11, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('lisa','Lisa Park, GC','Genetic Counselor','role-provider',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Melanie Marmo</td>
+            <td style="color:#6B7280;font-size:12px;">m.marmo@everlywell.com</td>
+            <td><span class="role-tag role-staff">PSR Manager</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('melanie','Melanie Marmo','PSR Manager','role-staff',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Riley Perrone</td>
+            <td style="color:#6B7280;font-size:12px;">r.perrone@everlywell.com</td>
+            <td><span class="role-tag role-staff">Team Manager</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('riley','Riley Perrone','Team Manager','role-staff',false);return false;">Edit</a><a href="#" class="action-link danger">Deactivate</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Chris Navarro</td>
+            <td style="color:#6B7280;font-size:12px;">admin@everlywell.com</td>
+            <td><span class="role-tag role-admin">Platform Admin</span><a href="/admin/role-config" class="role-template-link">View role config →</a></td>
+            <td style="color:#9CA3AF;font-size:12px;">None</td>
+            <td><span class="status-pill s-active">Active</span></td>
+            <td>Jun 13, 2026</td>
+            <td><a href="#" class="action-link" onclick="openEditUser('chris','Chris Navarro','Platform Admin','role-admin',false);return false;">Edit</a></td>
+          </tr>
         </tbody>
       </table>
+      <div class="table-note">Showing 8 of 29 platform users · <a href="#" style="color:#7C3AED;font-weight:600;">View all</a> &nbsp;·&nbsp; <a href="/admin/role-config" style="color:#7C3AED;font-weight:600;">Manage role templates →</a></div>
     </div>
   </div>
 
+<!-- Edit User Modal -->
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-head-title" id="editUserTitle">Edit User</div>
+        <div class="modal-head-sub" id="editUserSub">Role template · Module overrides</div>
+      </div>
+      <button class="modal-close" onclick="closeEditUser()">&#215;</button>
+    </div>
+
+    <!-- Basic info -->
+    <div class="modal-section">
+      <div class="modal-section-label">User Details</div>
+      <div class="form-row"><label class="form-lbl">Full Name</label><input class="form-ctrl" type="text" id="editName" /></div>
+      <div class="form-row"><label class="form-lbl">Email</label><input class="form-ctrl" type="email" id="editEmail" /></div>
+      <div class="form-row" style="margin-bottom:0;">
+        <label class="form-lbl">Role Template</label>
+        <select class="form-ctrl" id="editRoleTemplate">
+          <option value="provider_md">Provider (MD/NP)</option>
+          <option value="rn_standard">RN Standard</option>
+          <option value="rn_lead">RN Lead</option>
+          <option value="rn_dxs_only">RN — DXS Focus (Custom)</option>
+          <option value="ma_standard">MA Standard</option>
+          <option value="psr_manager">PSR Manager</option>
+          <option value="team_manager">Team Manager</option>
+          <option value="gc_standard">Genetic Counselor</option>
+          <option value="admin">Platform Admin</option>
+        </select>
+        <div style="font-size:11px;color:#6B7280;margin-top:5px;">Changing role takes effect on next login. <a href="/admin/role-config" style="color:#7C3AED;">Edit role templates →</a></div>
+      </div>
+    </div>
+
+    <!-- Module overrides -->
+    <div class="modal-section">
+      <div class="modal-section-label">Module Overrides <span style="font-weight:400;text-transform:none;font-size:11px;color:#6B7280;">— individual settings on top of the role template</span></div>
+      <div class="info-strip" id="editOverrideInfo">Overrides let you grant or restrict specific modules for this user without changing their role template for everyone.</div>
+
+      <div id="overrideList">
+        <!-- Populated by JS based on selected user -->
+      </div>
+      <div style="margin-top:10px;"><a href="#" style="font-size:12px;color:#7C3AED;font-weight:600;" onclick="clearOverrides();return false;">Clear all overrides — revert to role defaults</a></div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel-sm" onclick="closeEditUser()">Cancel</button>
+      <button class="btn-save-sm" onclick="saveUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- Invite User Modal -->
 <div id="inviteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:14px;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+  <div style="background:#fff;border-radius:14px;width:500px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
     <div style="padding:20px 24px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;">
       <div style="flex:1;font-size:17px;font-weight:700;color:#111827;">Invite New User</div>
       <button onclick="document.getElementById('inviteModal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6B7280;">✕</button>
@@ -163,14 +272,139 @@
     <div style="padding:24px;">
       <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;margin-bottom:5px;">Full Name</label><input type="text" placeholder="e.g. Jane Smith, NP" style="width:100%;padding:9px 12px;border:1px solid #E5E0D8;border-radius:8px;font-size:13px;outline:none;" /></div>
       <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;margin-bottom:5px;">Email Address</label><input type="email" placeholder="name@everlywell.com" style="width:100%;padding:9px 12px;border:1px solid #E5E0D8;border-radius:8px;font-size:13px;outline:none;" /></div>
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;margin-bottom:5px;">Role</label><select style="width:100%;padding:9px 12px;border:1px solid #E5E0D8;border-radius:8px;font-size:13px;"><option>Provider (MD)</option><option>Provider (NP)</option><option>Provider (GC)</option><option>Care Team (RN)</option><option>Care Team (MA)</option><option>Scheduler</option><option>Admin</option></select></div>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;margin-bottom:5px;">Role Template</label>
+        <select style="width:100%;padding:9px 12px;border:1px solid #E5E0D8;border-radius:8px;font-size:13px;">
+          <option>Provider (MD/NP)</option><option>RN Standard</option><option>RN Lead</option><option>MA Standard</option><option>PSR Manager</option><option>Team Manager</option><option>Genetic Counselor</option><option>Platform Admin</option>
+        </select>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">User inherits all modules from the selected role template. <a href="/admin/role-config" style="color:#7C3AED;">Manage templates →</a></div>
+      </div>
       <div style="margin-bottom:24px;"><label style="display:block;font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;margin-bottom:5px;">Care Products</label><select multiple style="width:100%;padding:9px 12px;border:1px solid #E5E0D8;border-radius:8px;font-size:13px;height:90px;"><option>Weight Management</option><option>Testosterone Therapy</option><option>BRCA Counseling</option><option>Hereditary Cancer Panel</option><option>Carrier Screening</option><option>GLP-1 Program</option><option>Skincare</option></select><div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Hold Cmd/Ctrl to select multiple</div></div>
       <div style="display:flex;gap:10px;justify-content:flex-end;">
         <button onclick="document.getElementById('inviteModal').style.display='none'" style="background:#fff;border:1.5px solid #E5E0D8;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Cancel</button>
-        <button onclick="alert('Invitation sent!');document.getElementById('inviteModal').style.display='none'" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;">Send Invite</button>
+        <button onclick="showToast('Invitation sent to new user');document.getElementById('inviteModal').style.display='none'" style="background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;">Send Invite</button>
       </div>
     </div>
   </div>
 </div>
+
+<div class="toast" id="toast"></div>
 </div>
+
+{% block scripts %}
+<script>
+var MODULES = [
+  { icon:'🏠', name:'Dashboard', desc:'Role home page', key:'dashboard', locked:true },
+  { icon:'🚨', name:'RN Queue', desc:'Critical results, titers, DXS', key:'rn_queue' },
+  { icon:'🧪', name:'Titer Queue', desc:'Shared titer interpretation', key:'titer_queue' },
+  { icon:'📋', name:'DXS Audit', desc:'Diagnosis & coding review', key:'dxs_audit' },
+  { icon:'📞', name:'On-Call Schedule', desc:'RN on-call rotation', key:'oncall' },
+  { icon:'📅', name:'Network Schedule', desc:'Provider availability', key:'net_sched' },
+  { icon:'🗓', name:'My Schedule', desc:'Personal shift calendar', key:'my_sched' },
+  { icon:'⏱', name:'Timekeeping', desc:'Time entry & monthly approval', key:'time' },
+  { icon:'👥', name:'Patient Queue', desc:'On-demand consultation queue', key:'pat_queue' },
+  { icon:'🔍', name:'Patient Management', desc:'Member lookup via Athena', key:'pat_mgmt' },
+  { icon:'💬', name:'Messages', desc:'Secure messaging', key:'messages' },
+  { icon:'🔔', name:'Alerts & Notifications', desc:'System alerts & reminders', key:'alerts' },
+  { icon:'📈', name:'Reports', desc:'Operational reports & metrics', key:'reports' },
+  { icon:'⚙️', name:'Settings', desc:'Account preferences', key:'settings' },
+];
+
+// Per-user module state: true=on(from role), false=off(from role), 'override-on', 'override-off'
+var USER_MODULES = {
+  jennifer: { rn_queue:'on', titer_queue:'on', dxs_audit:'on', oncall:'off', net_sched:'override-on', my_sched:'on', time:'on', pat_queue:'on', pat_mgmt:'off', messages:'on', alerts:'on', reports:'off', settings:'on' },
+  sarah:    { pat_queue:'on', pat_mgmt:'on', net_sched:'on', my_sched:'off', time:'on', messages:'on', alerts:'on', reports:'on', settings:'on' },
+  maria:    { pat_queue:'on', pat_mgmt:'on', net_sched:'on', my_sched:'off', time:'on', messages:'on', alerts:'on', reports:'on', settings:'on' },
+  michael:  { rn_queue:'off', titer_queue:'off', dxs_audit:'off', oncall:'off', net_sched:'on', my_sched:'on', time:'on', pat_queue:'on', pat_mgmt:'on', messages:'on', alerts:'on', reports:'off', settings:'on' },
+  lisa:     { pat_queue:'on', net_sched:'on', my_sched:'off', time:'on', messages:'on', alerts:'on', reports:'on', settings:'on' },
+  melanie:  { pat_queue:'on', pat_mgmt:'on', net_sched:'off', my_sched:'off', time:'on', messages:'on', alerts:'on', reports:'off', settings:'on' },
+  riley:    { rn_queue:'on', titer_queue:'on', dxs_audit:'on', oncall:'on', net_sched:'on', my_sched:'on', time:'on', pat_queue:'on', pat_mgmt:'on', messages:'on', alerts:'on', reports:'on', settings:'on' },
+  chris:    {},
+};
+
+var currentUser = null;
+
+function openEditUser(userKey, name, roleTemplate, roleClass, hasOverride) {
+  currentUser = userKey;
+  document.getElementById('editUserTitle').textContent = name;
+  document.getElementById('editUserSub').textContent = roleTemplate + (hasOverride ? ' · 1 individual override' : ' · No overrides');
+  document.getElementById('editName').value = name;
+  document.getElementById('editEmail').value = userKey + '@everlywell.com';
+
+  // Build override list
+  var mods = USER_MODULES[userKey] || {};
+  var html = '';
+  MODULES.forEach(function(m) {
+    var state = mods[m.key];
+    var checked = (state === 'on' || state === 'override-on') ? 'checked' : '';
+    var sourceLabel = '', sourceCls = '';
+    if (m.locked) {
+      sourceLabel = 'Always on'; sourceCls = 'from-role';
+    } else if (state === 'override-on') {
+      sourceLabel = 'Override: enabled for this user'; sourceCls = 'override-on';
+    } else if (state === 'override-off') {
+      sourceLabel = 'Override: disabled for this user'; sourceCls = 'override-off';
+    } else if (state === 'on') {
+      sourceLabel = 'Inherited from role template'; sourceCls = 'from-role';
+    } else {
+      sourceLabel = 'Disabled by role template'; sourceCls = '';
+    }
+    html += '<div class="override-row">' +
+      '<div class="override-icon">' + m.icon + '</div>' +
+      '<div class="override-info"><div class="override-name">' + m.name + '</div>' +
+      '<div class="override-source ' + sourceCls + '">' + sourceLabel + '</div></div>' +
+      (m.locked
+        ? '<label class="toggle-sm"><input type="checkbox" checked disabled><span class="toggle-sm-slider"></span></label>'
+        : '<label class="toggle-sm"><input type="checkbox" ' + checked + ' onchange="markOverride(this,\'' + m.key + '\',\'' + (state||'off') + '\')"><span class="toggle-sm-slider"></span></label>'
+      ) +
+      '</div>';
+  });
+  document.getElementById('overrideList').innerHTML = html;
+  document.getElementById('editUserModal').classList.add('open');
+}
+
+function markOverride(cb, key, originalState) {
+  var row = cb.closest('.override-row');
+  var sourceEl = row.querySelector('.override-source');
+  var isOn = cb.checked;
+  var roleDefault = (originalState === 'on' || originalState === 'override-on');
+  if (isOn === roleDefault) {
+    sourceEl.className = 'override-source from-role';
+    sourceEl.textContent = isOn ? 'Inherited from role template' : 'Disabled by role template';
+  } else if (isOn) {
+    sourceEl.className = 'override-source override-on';
+    sourceEl.textContent = 'Override: enabled for this user';
+  } else {
+    sourceEl.className = 'override-source override-off';
+    sourceEl.textContent = 'Override: disabled for this user';
+  }
+}
+
+function clearOverrides() {
+  if (!currentUser) return;
+  showToast('All overrides cleared — user reverted to role defaults');
+  closeEditUser();
+}
+
+function closeEditUser() {
+  document.getElementById('editUserModal').classList.remove('open');
+  currentUser = null;
+}
+
+function saveUser() {
+  closeEditUser();
+  showToast('User settings saved — takes effect on next login');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+document.getElementById('editUserModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEditUser();
+});
+</script>
+{% endblock %}
 {% endblock %}
