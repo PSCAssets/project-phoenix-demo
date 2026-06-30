@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Alerts — Lisa Park | Telehealth{% endblock %}
+{% block head %}
+<style>
+  :root { --gc: #6D28D9; --sidebar-w: 56px; }
+  .sidebar {
+    position: fixed; top: 60px; left: 0; width: 56px; height: calc(100vh - 60px);
+    background: #F2EDE4; display: flex; flex-direction: column;
+    align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
+    transition: width 0.22s ease; overflow: hidden;
+  }
+  .sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+    color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+    transition: background .15s, color .15s; position: relative; white-space: nowrap;
+  }
+  .nav-item:hover { background: rgba(109,40,217,0.08); }
+  .nav-item.active { background: rgba(109,40,217,0.12); color: var(--gc); }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-badge {
+    position: absolute; top: 6px; right: 8px; background: #EF4444;
+    color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px;
+    padding: 1px 5px; min-width: 16px; text-align: center;
+  }
+  .nav-label { font-size: 9px; font-weight: 500; text-align: center; line-height: 1; color: inherit; }
+  .sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .provider-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gc); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+
+  .notif-page { margin-left: 56px; padding: 28px 32px; max-width: 860px; }
+  .notif-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .notif-header h1 { font-size: 22px; font-weight: 700; color: #111827; }
+  .notif-count-badge { background: #EF4444; color: #fff; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .mark-all { font-size: 13px; font-weight: 600; color: var(--gc); background: none; border: none; cursor: pointer; margin-left: auto; }
+
+  .filter-tabs { display: flex; gap: 0; border-bottom: 2px solid #E5E0D8; margin-bottom: 20px; overflow-x: auto; }
+  .ftab { padding: 9px 16px; background: none; border: none; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .ftab:hover { color: #111827; }
+  .ftab.active { color: var(--gc); border-bottom-color: var(--gc); font-weight: 700; }
+  .ftab-badge { font-size: 11px; font-weight: 700; background: #F3F4F6; color: #374151; padding: 1px 6px; border-radius: 10px; }
+  .ftab.active .ftab-badge { background: #EDE9FE; color: var(--gc); }
+
+  .notif-row { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .notif-row.unread { background: #F9F7FF; }
+  .notif-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-unread { background: #EF4444; }
+  .dot-read { background: #D1D5DB; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 14px; color: #111827; margin-bottom: 3px; }
+  .notif-row.unread .notif-title { font-weight: 700; }
+  .notif-msg { font-size: 13px; color: #374151; line-height: 1.5; margin-bottom: 6px; }
+  .notif-footer { display: flex; align-items: center; gap: 14px; }
+  .notif-time { font-size: 11px; color: #9CA3AF; }
+  .notif-action { font-size: 12px; font-weight: 600; color: var(--gc); background: none; border: none; cursor: pointer; padding: 0; text-decoration: none; }
+  .notif-action:hover { text-decoration: underline; }
+  .notif-type-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: inline-block; }
+  .nt-sla    { background: #FEE2E2; color: #DC2626; }
+  .nt-report { background: #EDE9FE; color: #5B21B6; }
+  .nt-consult{ background: #DBEAFE; color: #1D4ED8; }
+  .nt-msg    { background: #D1FAE5; color: #065F46; }
+  .nt-system { background: #F3F4F6; color: #374151; }
+  .nt-order  { background: #FEF3C7; color: #92400E; }
+
+  .empty-state { text-align: center; padding: 48px 0; color: #9CA3AF; font-size: 14px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="notif-page">
+  <div class="notif-header">
+    <h1>Alerts</h1>
+    <span class="notif-count-badge">3 unread</span>
+    <button class="mark-all" onclick="markAllRead()">Mark all read</button>
+  </div>
+
+  <!-- GC-specific filter tabs -->
+  <div class="filter-tabs" id="filterTabs">
+    <button class="ftab active" onclick="filterTab(this,'all')">All <span class="ftab-badge">10</span></button>
+    <button class="ftab" onclick="filterTab(this,'unread')">Unread <span class="ftab-badge">3</span></button>
+    <button class="ftab" onclick="filterTab(this,'sla')">SLA Alerts <span class="ftab-badge">2</span></button>
+    <button class="ftab" onclick="filterTab(this,'consult')">Consult Updates <span class="ftab-badge">3</span></button>
+    <button class="ftab" onclick="filterTab(this,'report')">Reports Ready <span class="ftab-badge">2</span></button>
+    <button class="ftab" onclick="filterTab(this,'order')">Lab Orders <span class="ftab-badge">2</span></button>
+    <button class="ftab" onclick="filterTab(this,'msg')">Messages <span class="ftab-badge">1</span></button>
+  </div>
+
+  <div id="notifList">
+
+    <!-- Unread: SLA breach -->
+    <div class="notif-row unread" data-type="sla">
+      <div class="notif-dot dot-unread"></div>
+      <div class="notif-body">
+        <div class="notif-title">SLA Breach — K.O. · 38F (Hereditary Cancer Panel) <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+        <div class="notif-msg">Pre-Test Consult 45 has exceeded the 45-minute SLA threshold. Consult C-20260630-014 requires immediate attention to avoid further escalation.</div>
+        <div class="notif-footer">
+          <span class="notif-time">8 min ago</span>
+          <a class="notif-action" href="/provider/gc/queue">View Consult &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unread: Report ready -->
+    <div class="notif-row unread" data-type="report">
+      <div class="notif-dot dot-unread"></div>
+      <div class="notif-body">
+        <div class="notif-title">Genetic Report Ready — M.R. · 52F <span class="notif-type-tag nt-report">Report Ready</span></div>
+        <div class="notif-msg">Galleri Multi-Cancer results report has been finalized by the lab and is ready for your review and delivery to the patient. Results delivery consult is scheduled for today at 10:30 AM.</div>
+        <div class="notif-footer">
+          <span class="notif-time">22 min ago</span>
+          <a class="notif-action" href="/provider/gc/chart">Open Chart &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Unread: Consult assigned -->
+    <div class="notif-row unread" data-type="consult">
+      <div class="notif-dot dot-unread"></div>
+      <div class="notif-body">
+        <div class="notif-title">New Consult Assigned — J.R. · 45M <span class="notif-type-tag nt-consult">Consult Update</span></div>
+        <div class="notif-msg">A Results Delivery 30 consult for Hereditary Cancer Panel has been routed to your queue from Color Genomics. Patient is located in NY. Preferred time: ASAP.</div>
+        <div class="notif-footer">
+          <span class="notif-time">34 min ago</span>
+          <a class="notif-action" href="/provider/gc/queue">View Queue &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: SLA warning -->
+    <div class="notif-row" data-type="sla">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">SLA Warning — C.H. · 41F (Hereditary Cancer Panel) <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+        <div class="notif-msg">Pre-Test Consult 45 is approaching the SLA limit. 1h 30m elapsed — review recommended within the next 15 minutes to avoid a breach.</div>
+        <div class="notif-footer">
+          <span class="notif-time">1h ago</span>
+          <a class="notif-action" href="/provider/gc/queue">View Consult &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Consult completed -->
+    <div class="notif-row" data-type="consult">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Consult Closed — A.M. · 44F (PGx) <span class="notif-type-tag nt-consult">Consult Update</span></div>
+        <div class="notif-msg">Pharmacogenomics Results Delivery consult with Fulgent Genetics has been completed and closed. Audit log finalized. Billing triggered.</div>
+        <div class="notif-footer">
+          <span class="notif-time">2h ago</span>
+          <a class="notif-action" href="/provider/gc/chart">View Chart &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Lab order fulfilled -->
+    <div class="notif-row" data-type="order">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Lab Order Received — L.C. · 29F <span class="notif-type-tag nt-order">Lab Order</span></div>
+        <div class="notif-msg">Hereditary Cancer Panel sample has been received and is being processed by MyHeritage Health. Estimated turnaround: 7–10 business days. Pre-test consult scheduled for Today 3:15 PM.</div>
+        <div class="notif-footer">
+          <span class="notif-time">3h ago</span>
+          <a class="notif-action" href="/provider/gc/chart">View Chart &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Report ready -->
+    <div class="notif-row" data-type="report">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Genetic Report Ready — D.W. · 61M <span class="notif-type-tag nt-report">Report Ready</span></div>
+        <div class="notif-msg">Hereditary Cancer Panel results from Quest Diagnostics are finalized. Consult is in progress — results delivery scheduled for Today 10:30 AM.</div>
+        <div class="notif-footer">
+          <span class="notif-time">4h ago</span>
+          <a class="notif-action" href="/provider/gc/chart">Open Chart &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Consult routed away -->
+    <div class="notif-row" data-type="consult">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Consult Re-Routed — B.T. · 47F <span class="notif-type-tag nt-consult">Consult Update</span></div>
+        <div class="notif-msg">A Hereditary Cancer Panel consult assigned to you was re-routed to Sarah Kim, MS CGC due to state licensure coverage. No action required.</div>
+        <div class="notif-footer">
+          <span class="notif-time">5h ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Lab order pending -->
+    <div class="notif-row" data-type="order">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Lab Order Pending Approval — P.R. · 33F <span class="notif-type-tag nt-order">Lab Order</span></div>
+        <div class="notif-msg">A Hereditary Cancer Panel order submitted by GCA Priya Sharma is awaiting your sign-off before it is sent to the lab. Review required.</div>
+        <div class="notif-footer">
+          <span class="notif-time">Yesterday</span>
+          <a class="notif-action" href="/provider/gc/chart">Review Order &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Read: Message from GCA -->
+    <div class="notif-row" data-type="msg">
+      <div class="notif-dot dot-read"></div>
+      <div class="notif-body">
+        <div class="notif-title">Message from Priya Sharma, GCA <span class="notif-type-tag nt-msg">Message</span></div>
+        <div class="notif-msg">Pre-consult prep is complete for your 2:00 PM appointment with K.O. Family history summary and pedigree are attached in the chart. One question flagged for you regarding paternal lineage — see notes.</div>
+        <div class="notif-footer">
+          <span class="notif-time">Yesterday</span>
+          <a class="notif-action" href="/provider/messages">Reply &#8594;</a>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /notifList -->
+</div><!-- /notif-page -->
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterTab(el, type) {
+  document.querySelectorAll('.ftab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  document.querySelectorAll('#notifList .notif-row').forEach(function(row) {
+    if (type === 'all') {
+      row.style.display = '';
+    } else if (type === 'unread') {
+      row.style.display = row.classList.contains('unread') ? '' : 'none';
+    } else {
+      row.style.display = (row.dataset.type === type) ? '' : 'none';
+    }
+  });
+}
+function markAllRead() {
+  document.querySelectorAll('.notif-row.unread').forEach(function(r) {
+    r.classList.remove('unread');
+    var dot = r.querySelector('.notif-dot');
+    if (dot) { dot.classList.remove('dot-unread'); dot.classList.add('dot-read'); }
+    var title = r.querySelector('.notif-title');
+    if (title) { title.style.fontWeight = ''; }
+  });
+  var badge = document.querySelector('.notif-count-badge');
+  if (badge) badge.style.display = 'none';
+  var unreadTab = document.querySelector('[onclick*="unread"] .ftab-badge');
+  if (unreadTab) unreadTab.textContent = '0';
+}
+</script>
+{% endblock %}

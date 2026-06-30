@@ -205,6 +205,10 @@ def new_patient():
 def notifications():
     return render_template("provider/notifications.html")
 
+@bp.route("/gc/notifications")
+def gc_notifications():
+    return render_template("provider/gc_notifications.html")
+
 @bp.route("/pharmacy")
 def pharmacy():
     return render_template("provider/pharmacy.html")

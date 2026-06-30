@@ -230,7 +230,7 @@ def inject_sidebar_nav():
             ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
             ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
+            ('Alerts',        '/provider/gc/notifications',  'bell',      ['/provider/gc/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'care_team': [
