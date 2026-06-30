@@ -31,6 +31,13 @@ GATE_BYPASS_ROUTES   = {'gate_login', 'gate_login_post', 'static'}
 
 _DB_PATH = os.path.join(os.path.dirname(__file__), 'project_phoenix.db')
 
+# ── Seed page guides on startup (ensures Render has all content) ──────────────
+try:
+    from seed_page_guides import seed as _seed_page_guides
+    _seed_page_guides(_DB_PATH)
+except Exception as _e:
+    print(f"[startup] page guide seed skipped: {_e}")
+
 # ── Supabase access log (persists across Render restarts) ─────────────────────
 _SUPABASE_URL = os.environ.get('SUPABASE_URL', '').rstrip('/')
 _SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
