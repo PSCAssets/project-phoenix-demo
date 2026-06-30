@@ -15,8 +15,8 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; background: #FAF7F2; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-/* Make main-content the flex-row container for PSS sidebar + content */
-main.main-content { flex: 1; display: flex; flex-direction: row; overflow: hidden; min-height: 0; }
+/* Offset for fixed g-sidebar (56px) */
+main.main-content { margin-left: 56px; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
 
 /* Sidebar */
 .sidebar { width: var(--sidebar-w); min-width: var(--sidebar-w); background: #fff; border-right: 1px solid #E5E0D8; display: flex; flex-direction: column; height: 100%; overflow-y: auto; flex-shrink: 0; }
