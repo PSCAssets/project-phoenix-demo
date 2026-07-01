@@ -376,7 +376,7 @@
     <span class="page-title">Patient Queue</span>
     <div class="queue-toggle">
       <button class="tog" id="togMyQueue" onclick="switchTab('my')">My queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">5</span></button>
-      <button class="tog active" id="togMasterQueue" onclick="switchTab('master')">Master queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">14</span></button>
+      <button class="tog active" id="togMasterQueue" onclick="switchTab('master')">Patient Queue <span style="font-weight:400;color:var(--text-tertiary);margin-left:4px;">14</span></button>
     </div>
     <div class="topbar-stats">
       <div class="stat-chip red" id="chip-overdue" onclick="toggleChip('chip-overdue','overdue');toggleStatusFilter('overdue',this)" title="Filter: Overdue only" style="cursor:pointer;transition:opacity 0.15s,transform 0.15s;"><i class="ti ti-alert-triangle" style="font-size:13px;color:var(--red);"></i> <span class="num">3</span> overdue</div>
@@ -393,7 +393,7 @@
   <div id="ownOnlyBanner" style="display:none;background:#EFF6FF;border-bottom:1px solid #BFDBFE;padding:7px 24px;font-size:12px;color:#1D4ED8;flex-shrink:0;">
     Showing your assigned patients only —
     <a id="switchToMasterBtn" href="#" onclick="switchTab('master');return false;"
-       style="color:#1D4ED8;font-weight:600;text-decoration:underline;margin-left:4px;">Switch to Master Queue</a>
+       style="color:#1D4ED8;font-weight:600;text-decoration:underline;margin-left:4px;">Switch to Patient Queue</a>
   </div>
   {% if show_own_only %}<script>document.getElementById('ownOnlyBanner').setAttribute('data-show-own','1');</script>{% endif %}
 
@@ -924,7 +924,7 @@ function switchTab(tab) {
   const showOwn = tab === 'my' && (SHOW_OWN_ONLY || banner.getAttribute('data-show-own') === '1');
   banner.style.display = showOwn ? 'block' : 'none';
 
-  // C4: Show "Switch to Master Queue" link only on My Queue tab
+  // C4: Show "Switch to Patient Queue" link only on My Queue tab
   const switchBtn = document.getElementById('switchToMasterBtn');
   if (switchBtn) switchBtn.style.display = tab === 'my' ? '' : 'none';
 
