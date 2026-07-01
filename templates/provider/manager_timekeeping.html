@@ -65,62 +65,124 @@ tbody tr:hover { background: #FAF7F2; }
     <button class="tab-btn" onclick="switchTab('afterhours', this)">After-Hours Export</button>
   </div>
 
-  <!-- TAB 1: Approval Queue -->
+  <!-- TAB 1: Approval Queue — Monthly View -->
   <div class="tab-content active" id="tab-approvals">
+    <div style="font-size:13px;color:#6B7280;margin-bottom:12px;">Showing <strong>June 2026</strong> — click a row to expand weekly breakdown. Approve the full month per person.</div>
     <div class="table-wrap">
-      <table>
+      <table id="approvalTable">
         <thead>
           <tr>
+            <th style="width:32px;"></th>
             <th>Team Member</th>
             <th>Role</th>
-            <th>Week</th>
-            <th>Total Hours</th>
-            <th>Submitted</th>
+            <th>Month Total</th>
+            <th>Weeks Submitted</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
-        <tbody id="approvalTable">
-          <tr>
+        <tbody>
+
+          <!-- Michael Torres — summary row -->
+          <tr class="month-summary" onclick="toggleWeeks('mt')" style="cursor:pointer;background:#F9FAFB;">
+            <td style="text-align:center;color:#6B7280;font-size:11px;" id="mt-arrow">▶</td>
             <td style="font-weight:600;">Michael Torres</td>
             <td><span class="chip chip-ma">MA</span></td>
-            <td>Jun 16 – Jun 22</td>
-            <td>40.5h</td>
-            <td>Jun 22</td>
+            <td>159.5h</td>
+            <td>4 of 4</td>
             <td><span class="chip chip-pending">Pending</span></td>
-            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Michael Torres')">Approve</button>
-                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="event.stopPropagation();approveMonth(this,'Michael Torres')">Approve Month</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="event.stopPropagation();returnRow(this)">Return</button></td>
           </tr>
-          <tr>
+          <tr class="week-detail" id="mt-weeks" style="display:none;">
+            <td colspan="7" style="padding:0;background:#F0FFF4;">
+              <table style="width:100%;font-size:12px;border:none;">
+                <tr style="background:#DCFCE7;">
+                  <td style="width:32px;"></td><td style="color:#6B7280;padding:6px 16px;">Week</td><td style="color:#6B7280;">Hours</td><td style="color:#6B7280;">Submitted</td><td style="color:#6B7280;">Status</td>
+                </tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 2 – Jun 8</td><td>39.5h</td><td>Jun 8</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 9 – Jun 15</td><td>40.0h</td><td>Jun 15</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 16 – Jun 22</td><td>40.5h</td><td>Jun 22</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 23 – Jun 29</td><td>39.5h</td><td>Jun 29</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Jennifer Martinez — summary row -->
+          <tr class="month-summary" onclick="toggleWeeks('jm')" style="cursor:pointer;background:#F9FAFB;">
+            <td style="text-align:center;color:#6B7280;font-size:11px;" id="jm-arrow">▶</td>
             <td style="font-weight:600;">Jennifer Martinez</td>
             <td><span class="chip chip-rn">RN</span></td>
-            <td>Jun 16 – Jun 22</td>
-            <td>38.0h</td>
-            <td>Jun 22</td>
+            <td>152.0h</td>
+            <td>4 of 4</td>
             <td><span class="chip chip-pending">Pending</span></td>
-            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Jennifer Martinez')">Approve</button>
-                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="event.stopPropagation();approveMonth(this,'Jennifer Martinez')">Approve Month</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="event.stopPropagation();returnRow(this)">Return</button></td>
           </tr>
-          <tr>
+          <tr class="week-detail" id="jm-weeks" style="display:none;">
+            <td colspan="7" style="padding:0;background:#EFF6FF;">
+              <table style="width:100%;font-size:12px;border:none;">
+                <tr style="background:#DBEAFE;">
+                  <td style="width:32px;"></td><td style="color:#6B7280;padding:6px 16px;">Week</td><td style="color:#6B7280;">Hours</td><td style="color:#6B7280;">Submitted</td><td style="color:#6B7280;">Status</td>
+                </tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 2 – Jun 8</td><td>38.0h</td><td>Jun 8</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 9 – Jun 15</td><td>38.0h</td><td>Jun 15</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 16 – Jun 22</td><td>38.0h</td><td>Jun 22</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 23 – Jun 29</td><td>38.0h</td><td>Jun 29</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Carla Ruiz — summary row -->
+          <tr class="month-summary" onclick="toggleWeeks('cr')" style="cursor:pointer;background:#F9FAFB;">
+            <td style="text-align:center;color:#6B7280;font-size:11px;" id="cr-arrow">▶</td>
             <td style="font-weight:600;">Carla Ruiz</td>
             <td><span class="chip chip-ma">MA</span></td>
-            <td>Jun 16 – Jun 22</td>
-            <td>37.5h</td>
-            <td>Jun 23</td>
+            <td>150.5h</td>
+            <td>4 of 4</td>
             <td><span class="chip chip-pending">Pending</span></td>
-            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'Carla Ruiz')">Approve</button>
-                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="event.stopPropagation();approveMonth(this,'Carla Ruiz')">Approve Month</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="event.stopPropagation();returnRow(this)">Return</button></td>
           </tr>
-          <tr>
+          <tr class="week-detail" id="cr-weeks" style="display:none;">
+            <td colspan="7" style="padding:0;background:#F0FFF4;">
+              <table style="width:100%;font-size:12px;border:none;">
+                <tr style="background:#DCFCE7;">
+                  <td style="width:32px;"></td><td style="color:#6B7280;padding:6px 16px;">Week</td><td style="color:#6B7280;">Hours</td><td style="color:#6B7280;">Submitted</td><td style="color:#6B7280;">Status</td>
+                </tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 2 – Jun 8</td><td>37.5h</td><td>Jun 8</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 9 – Jun 15</td><td>38.0h</td><td>Jun 15</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 16 – Jun 22</td><td>37.5h</td><td>Jun 23</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 23 – Jun 29</td><td>37.5h</td><td>Jun 29</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- David Park — summary row -->
+          <tr class="month-summary" onclick="toggleWeeks('dp')" style="cursor:pointer;background:#F9FAFB;">
+            <td style="text-align:center;color:#6B7280;font-size:11px;" id="dp-arrow">▶</td>
             <td style="font-weight:600;">David Park</td>
             <td><span class="chip chip-rn">RN</span></td>
-            <td>Jun 16 – Jun 22</td>
-            <td>42.0h <span class="ot-flag">+2h OT</span></td>
-            <td>Jun 23</td>
+            <td>166.0h <span class="ot-flag">+6h OT</span></td>
+            <td>4 of 4</td>
             <td><span class="chip chip-pending">Pending</span></td>
-            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="approveRow(this,'David Park')">Approve</button>
-                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="returnRow(this)">Return</button></td>
+            <td><button class="btn-primary" style="padding:5px 14px;font-size:12px;" onclick="event.stopPropagation();approveMonth(this,'David Park')">Approve Month</button>
+                <button class="btn-export" style="padding:5px 12px;font-size:12px;margin-left:4px;" onclick="event.stopPropagation();returnRow(this)">Return</button></td>
           </tr>
+          <tr class="week-detail" id="dp-weeks" style="display:none;">
+            <td colspan="7" style="padding:0;background:#EFF6FF;">
+              <table style="width:100%;font-size:12px;border:none;">
+                <tr style="background:#DBEAFE;">
+                  <td style="width:32px;"></td><td style="color:#6B7280;padding:6px 16px;">Week</td><td style="color:#6B7280;">Hours</td><td style="color:#6B7280;">Submitted</td><td style="color:#6B7280;">Status</td>
+                </tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 2 – Jun 8</td><td>40.0h</td><td>Jun 8</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 9 – Jun 15</td><td>42.0h <span class="ot-flag">+2h</span></td><td>Jun 15</td><td><span class="chip chip-approved" style="font-size:11px;">Approved</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 16 – Jun 22</td><td>42.0h <span class="ot-flag">+2h</span></td><td>Jun 23</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+                <tr><td></td><td style="padding:5px 16px;">Jun 23 – Jun 29</td><td>42.0h <span class="ot-flag">+2h</span></td><td>Jun 29</td><td><span class="chip chip-pending" style="font-size:11px;">Pending</span></td></tr>
+              </table>
+            </td>
+          </tr>
+
         </tbody>
       </table>
     </div>
@@ -321,6 +383,24 @@ function switchTab(name, btn) {
   document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
+}
+
+function toggleWeeks(id) {
+  var detail = document.getElementById(id + '-weeks');
+  var arrow  = document.getElementById(id + '-arrow');
+  if (!detail) return;
+  var open = detail.style.display !== 'none';
+  detail.style.display = open ? 'none' : 'table-row';
+  if (arrow) arrow.textContent = open ? '▶' : '▼';
+}
+
+function approveMonth(btn, name) {
+  if (!confirm('Approve all June 2026 timesheets for ' + name + '?')) return;
+  var row = btn.closest('tr');
+  var chip = row.querySelector('.chip-pending');
+  if (chip) { chip.className = 'chip chip-approved'; chip.textContent = 'Approved'; }
+  row.querySelector('td:last-child').innerHTML = '<span style="font-size:12px;font-weight:600;color:#059669;">&#10003; Approved</span>';
+  checkEmpty();
 }
 
 function approveRow(btn, name) {

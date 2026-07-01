@@ -193,7 +193,7 @@ def inject_sidebar_nav():
         ],
         'provider_ma': [
             ('My Dashboard',  '/provider/ma',              'home',      ['/provider/ma']),
-            ('Task Queue',    '/provider/ma/queue',         'clipboard', ['/provider/ma/queue']),
+            ('MA Queue',      '/provider/ma/queue',         'clipboard', ['/provider/ma/queue']),
             ('PCP Follow-Up', '/provider/ma/followup',      'clipboard', ['/provider/ma/followup']),
             ('Referral Tracker', '/provider/ma/referrals', 'clipboard', ['/provider/ma/referrals']),
             ('Patient Queue', '/provider/queue',            'users',     ['/provider/queue']),
