@@ -258,7 +258,6 @@ def inject_sidebar_nav():
             ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
             ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
             ('Thyroid Program','/care-team/psr/thyroid-queue',    'clipboard', ['/care-team/psr/thyroid-queue']),
-            ('Sched. Link',    '/care-team/psr/link-generator',   'link',      ['/care-team/psr/link-generator']),
             ('Patient Queue',  '/provider/queue',                 'users',     ['/provider/queue']),
             ('Patient Mgmt',   '/provider/patient-management',    'clipboard', ['/provider/patient-management']),
             ('Network Schedule','/provider/schedule',             'calendar',  ['/provider/schedule']),

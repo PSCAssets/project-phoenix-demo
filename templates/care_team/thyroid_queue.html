@@ -454,7 +454,7 @@ var SCENARIOS = {
     cls: 'scenario-box scenario-b',
     desc: 'Patient has NOT purchased a thyroid test within the last 6 weeks. Create a Zendesk ticket so PCC can make an outbound call.',
     steps: [
-      'Copy the patient\'s email address from their session page in Telehealth.',
+      'Open the patient\'s record in this platform and copy their email address from the contact info panel.',
       'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field so their profile auto-populates.',
       'Set Ticket Type to <strong>Problem</strong> (same-day check) or <strong>Incident</strong> (1-week / 2-week check).',
       'Apply the <strong>Pending Next Order Thyroid Follow-Up</strong> macro.',
@@ -467,7 +467,7 @@ var SCENARIOS = {
     cls: 'scenario-box scenario-c',
     desc: 'Test results have finalized but there is no active consult linked. Generate a Thyroid Initial Link and create a Zendesk ticket.',
     steps: [
-      'In Telehealth, generate a <strong>Thyroid Initial Link</strong> for this patient.',
+      'Use the platform\'s Scheduling Link tool to generate a <strong>Thyroid Initial Link</strong> for this patient.',
       'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field.',
       'Set Ticket Type to <strong>Incident</strong> (applies to same-day, 1-week, and 2-week checks).',
       'Apply the <strong>Resulted Thyroid</strong> macro.',
