@@ -228,7 +228,7 @@ def inject_sidebar_nav():
             ('Titer Queue',    '/provider/rn/titers',            'clipboard',   ['/provider/rn/titers']),
             ('On-Call Sched.', '/provider/rn/oncall',            'calendar',    ['/provider/rn/oncall']),
             ('DXS Audit',      '/provider/rn/audit',             'clipboard',   ['/provider/rn/audit']),
-            ('Master Queue',   '/provider/queue',                'clipboard',   ['/provider/queue']),
+            ('Patient Queue',   '/provider/queue',                'clipboard',   ['/provider/queue']),
             ('Patient Mgmt',   '/provider/patient-management',  'person-search',['/provider/patient-management', '/scheduler/search-patient']),
             ('Network Schedule','/provider/schedule',            'calendar',    ['/provider/schedule']),
             ('Timekeeping',    '/provider/manager/timekeeping',  'clock',       ['/provider/manager/timekeeping']),
