@@ -127,6 +127,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .modal-btn.cancel:hover { background: #E5E7EB; }
 .success-banner { display: none; padding: 12px 16px; background: #D1FAE5; border: 1px solid #A7F3D0; border-radius: 8px; color: #065F46; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
 .success-banner.show { display: block; }
+
+/* On Demand row button */
+.od-btn { background: #059669; color: #fff; border: none; border-radius: 16px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.12s; }
+.od-btn:hover { background: #047857; }
 </style>
 {% endblock %}
 {% block content %}
@@ -157,7 +161,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <option>Illinois</option><option>Pennsylvania</option><option>Ohio</option><option>Georgia</option>
     </select>
     <label>Care Product</label>
-    <select class="filter-select" id="filterProduct">
+    <select class="filter-select" id="filterProduct" onchange="productChanged()">
       <option value="">— Any care product —</option>
       <option>Testosterone</option><option>Weight Management</option><option>Skincare</option>
       <option>ED Treatment</option><option>Women's Health</option><option>Hair Loss</option>
@@ -166,11 +170,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <label>Consult Type</label>
     <select class="filter-select" id="filterType">
       <option value="">— Any type —</option>
-      <option>Video</option><option>Telephonic</option>
+      <option>Video</option><option>Telephonic</option><option>On Demand</option>
     </select>
     <label>Date</label>
     <input type="date" class="filter-input" id="filterDate">
     <span class="filter-clear" onclick="clearFilters()">Clear filters</span>
+    <!-- On Demand badge — shown when selected care product supports it -->
+    <span id="onDemandBadge" style="display:none;margin-left:8px;background:#059669;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;" onclick="openOnDemandModal()">
+      ⚡ On Demand Available — Connect Now
+    </span>
   </div>
 
   <div class="tool-body">
@@ -226,14 +234,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
               <td>TX, CA, FL, NY</td>
               <td><span class="cp-tag">Testosterone</span><span class="cp-tag">Weight Mgmt</span></td>
               <td><span class="avail-pill">Today 2:30 PM</span></td>
-              <td><span class="action-link">View schedule →</span></td>
+              <td style="display:flex;gap:8px;align-items:center;">
+                <span class="action-link">View schedule →</span>
+                <button id="odBtnA1" class="od-btn" onclick="event.stopPropagation();openOnDemandModal('Dr. Sarah Lee, MD')" style="display:none;">⚡ On Demand</button>
+              </td>
             </tr>
             <tr onclick="showProviderCal('A','Maria Rodriguez, NP')">
               <td><div class="patient-name">Maria Rodriguez, NP</div><div class="sub-text">Nurse Practitioner</div></td>
               <td>TX, CA, FL, IL, PA</td>
               <td><span class="cp-tag">Testosterone</span><span class="cp-tag">A1C Mgmt</span></td>
               <td><span class="avail-pill">Today 3:00 PM</span></td>
-              <td><span class="action-link">View schedule →</span></td>
+              <td style="display:flex;gap:8px;align-items:center;">
+                <span class="action-link">View schedule →</span>
+                <button id="odBtnA2" class="od-btn" onclick="event.stopPropagation();openOnDemandModal('Maria Rodriguez, NP')" style="display:none;">⚡ On Demand</button>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -425,6 +439,29 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 </div><!-- /tool-shell -->
 
+<!-- On Demand Modal -->
+<div class="modal-overlay" id="odModal">
+  <div class="modal">
+    <div style="font-size:28px;margin-bottom:8px;">⚡</div>
+    <div class="modal-title">Start On Demand Consult</div>
+    <div class="modal-sub">Connect the patient immediately with an available provider — no scheduled slot needed.</div>
+    <div class="modal-field"><label>Care Product</label><div class="val" id="odModalProduct">—</div></div>
+    <div class="modal-field"><label>Provider</label><div class="val" id="odModalProvider">—</div></div>
+    <div class="modal-field">
+      <label>Consult Type</label>
+      <select id="odConsultType"><option>Video</option><option>Telephonic</option></select>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optional)</label>
+      <textarea id="odNotes" rows="2" placeholder="Any context for the provider…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeOnDemandModal()">Cancel</button>
+      <button class="modal-btn confirm" style="background:#059669;" onclick="confirmOnDemand()">⚡ Connect Now</button>
+    </div>
+  </div>
+</div>
+
 <!-- Booking Confirmation Modal -->
 <div class="modal-overlay" id="bookingModal">
   <div class="modal">
@@ -583,6 +620,46 @@ function saveAvailability() {
 // Close modal on overlay click
 document.getElementById('bookingModal').addEventListener('click', function(e) {
   if (e.target === this) closeModal();
+});
+
+// ─── On Demand Logic ───────────────────────────────────────────────────────
+const ON_DEMAND_PRODUCTS = ['Testosterone', 'ED Treatment', 'Weight Management', "Women's Health", 'Hair Loss', 'Skincare'];
+
+function productChanged() {
+  const val = document.getElementById('filterProduct').value;
+  const isOnDemand = ON_DEMAND_PRODUCTS.includes(val);
+  document.getElementById('onDemandBadge').style.display = isOnDemand ? '' : 'none';
+  // Show/hide per-row On Demand buttons
+  document.querySelectorAll('.od-btn').forEach(btn => {
+    btn.style.display = isOnDemand ? '' : 'none';
+  });
+}
+
+function openOnDemandModal(providerName) {
+  const cp = document.getElementById('filterProduct').value || 'Selected Care Product';
+  document.getElementById('odModalProduct').textContent = cp;
+  document.getElementById('odModalProvider').textContent = providerName || 'Next Available Provider';
+  document.getElementById('odModal').classList.add('show');
+}
+
+function closeOnDemandModal() {
+  document.getElementById('odModal').classList.remove('show');
+}
+
+function confirmOnDemand() {
+  closeOnDemandModal();
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = '<div style="font-size:56px;">⚡</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#111827;">On Demand Consult Started</div>' +
+    '<div style="font-size:14px;color:#6B7280;">Patient and provider have been notified. Connecting now.</div>' +
+    '<div style="font-size:13px;color:#9CA3AF;margin-top:8px;">Returning to dashboard…</div>';
+  document.body.appendChild(overlay);
+  setTimeout(() => { window.location.href = '/scheduler/dashboard'; }, 2400);
+}
+
+document.getElementById('odModal').addEventListener('click', function(e) {
+  if (e.target === this) closeOnDemandModal();
 });
 </script>
 {% endraw %}
