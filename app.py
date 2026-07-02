@@ -128,9 +128,11 @@ def inject_sidebar_nav():
     role  = session.get('role', '')
     _path = _req.path
 
-    # Admin and patient portals have their own sidebars — never show the global g-sidebar
-    # care_team and provider_psr both use the global g-sidebar for consistency across all pages
-    if _req.blueprint in ('admin', 'patient') and role not in ('provider_psr', 'care_team', 'care_team_gaps'):
+    # Admin and patient blueprints always suppress the global g-sidebar (they have their own)
+    if _req.blueprint in ('admin', 'patient'):
+        return dict(sidebar_nav=[], user_role=role)
+    # care_team blueprint: suppress g-sidebar for any role that shouldn't see it there
+    if _req.blueprint == 'care_team' and role not in ('care_team', 'care_team_gaps', 'provider_psr'):
         return dict(sidebar_nav=[], user_role=role)
 
     # Index page (login screen) — no sidebar

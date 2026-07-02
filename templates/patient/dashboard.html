@@ -3,20 +3,30 @@
 {% block head %}
 <style>
   :root {
-    --navy: #2D5C2E; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4;
-    --white: #FFFFFF; --bg: #FAF7F2; --border: #D4E4DC;
+    --navy: #1A3D2B; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4;
+    --white: #FFFFFF; --bg: #F7F9F7; --border: #D4E4DC;
     --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
-    --amber: #D97706; --amber-bg: #FFFBEB; --blue: #2D5C2E; --blue-bg: #F2EDE4;
+    --amber: #D97706; --amber-bg: #FFFBEB; --blue: #1A3D2B; --blue-bg: #EFF7F2;
+    --sidebar-bg: #FFFFFF; --sidebar-border: #E2EBE6;
+    --nav-text: #374151; --nav-active-bg: #E8F5EE; --nav-active-text: #1A3D2B;
+    --nav-hover-bg: #F4FAF6;
   }
   /* ── Humana theme overrides (applied via .theme-humana on body) ── */
-  .theme-humana { --navy: #1A4F16; --green: #43863D; --green-dark: #2E6B2B; --green-light: #EAF4E8; --border: #C3DFC0; --bg: #F3FAF2; --blue: #1A4F16; --blue-bg: #EAF4E8; }
-  .theme-humana .sidenav { background: #1A4F16; }
-  .theme-humana .nav-item.active { background: rgba(67,134,61,0.30); }
-  .theme-humana .nav-item.active::before { background: #43863D; }
-  .theme-humana .nav-logo-text { color: #fff; }
-  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C3DFC0; }
-  .theme-humana .topbar-title { color: #1A4F16; }
-  .theme-humana .nav-logo { border-bottom-color: rgba(255,255,255,0.15); }
+  .theme-humana { --navy: #2C6B30; --green: #4CAF50; --green-dark: #388E3C; --green-light: #E8F5E9; --border: #C8E6C9; --bg: #F9FBF9; --blue: #2C6B30; --blue-bg: #E8F5E9; --sidebar-bg: #FFFFFF; --sidebar-border: #C8E6C9; --nav-text: #1B5E20; --nav-active-bg: #E8F5E9; --nav-active-text: #1B5E20; --nav-hover-bg: #F1F8E9; }
+  .theme-humana .sidenav { background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); }
+  .theme-humana .nav-item { color: var(--nav-text); }
+  .theme-humana .nav-item:hover { background: var(--nav-hover-bg); color: var(--nav-active-text); }
+  .theme-humana .nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-text); }
+  .theme-humana .nav-item.active::before { background: #4CAF50; }
+  .theme-humana .nav-logo-text { color: #2C6B30; }
+  .theme-humana .nav-logo-sub { color: #6B9E6E; }
+  .theme-humana .nav-user-name { color: #1B5E20; }
+  .theme-humana .nav-user-prog { color: #6B9E6E; }
+  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C8E6C9; }
+  .theme-humana .topbar-title { color: #2C6B30; }
+  .theme-humana .nav-logo { border-bottom-color: #C8E6C9; }
+  .theme-humana .nav-user { border-bottom-color: #C8E6C9; }
+  .theme-humana .nav-bottom { border-top-color: #C8E6C9; }
 
   /* Care product selector chip */
   .cp-selector-wrap { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 20px; background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--navy); white-space: nowrap; position: relative; }
@@ -27,27 +37,27 @@
   .cp-option { display: flex; align-items: center; gap: 10px; padding: 11px 14px; font-size: 13px; color: #374151; cursor: pointer; border-bottom: 1px solid #F3F4F6; }
   .cp-option:last-child { border-bottom: none; }
   .cp-option:hover { background: #F9FAFB; }
-  .cp-option.active { background: #EBF4FF; color: #003087; font-weight: 700; }
+  .cp-option.active { background: var(--nav-active-bg); color: var(--nav-active-text); font-weight: 700; }
   .cp-option-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .cp-option-label { flex: 1; }
   .cp-option-sub { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
-  .sidenav { width: 240px; background: var(--navy); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
-  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
-  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .sidenav { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--sidebar-border); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .nav-logo-sub { font-size: 11px; color: #6B8E7A; margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
   .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
-  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
-  .nav-user-prog { font-size: 11px; color: rgba(255,255,255,0.5); }
-  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
-  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-  .nav-item.active { background: rgba(62,129,104,0.25); color: #fff; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .nav-user-prog { font-size: 11px; color: #6B8E7A; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: var(--nav-text); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: var(--nav-hover-bg); color: var(--nav-active-text); }
+  .nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-text); font-weight: 600; }
   .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--green); border-radius: 0 2px 2px 0; margin-left: 8px; }
   .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
   .nav-badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
-  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid var(--sidebar-border); }
   .main { margin-left: 240px; flex: 1; min-height: 100vh; }
   .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
   .topbar-title { font-size: 18px; font-weight: 700; color: var(--navy); flex: 1; }
