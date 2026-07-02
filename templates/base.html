@@ -258,7 +258,11 @@
         <div class="help-section">
           <div class="help-label">What this screen does</div>
           {% for item in page_guide.section_what %}
+          {% if item is mapping %}
           <div class="help-item"><span class="help-icon">{{ item.icon }}</span><span>{{ item.text }}</span></div>
+          {% else %}
+          <div class="help-item"><span class="help-icon">🔹</span><span>{{ item }}</span></div>
+          {% endif %}
           {% endfor %}
         </div>
         {% endif %}
@@ -267,8 +271,12 @@
         <div class="help-section">
           <div class="help-label">Workflows this solves</div>
           {% for item in page_guide.section_solves %}
+          {% if item is mapping %}
           <div class="help-item"><span class="help-icon">🔴</span><span><strong>Previously:</strong> {{ item.prev }}</span></div>
           <div class="help-item"><span class="help-icon">🟢</span><span><strong>Now:</strong> {{ item.now }}</span></div>
+          {% else %}
+          <div class="help-item"><span class="help-icon">✅</span><span>{{ item }}</span></div>
+          {% endif %}
           {% endfor %}
         </div>
         {% endif %}
@@ -277,7 +285,11 @@
         <div class="help-section">
           <div class="help-label">Key design decisions</div>
           {% for item in page_guide.section_key %}
+          {% if item is mapping %}
           <div class="help-item"><span class="help-icon">{{ item.icon }}</span><span>{{ item.text }}</span></div>
+          {% else %}
+          <div class="help-item"><span class="help-icon">💡</span><span>{{ item }}</span></div>
+          {% endif %}
           {% endfor %}
         </div>
         {% endif %}
