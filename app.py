@@ -250,11 +250,11 @@ def inject_sidebar_nav():
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'care_team': [
-            ('Dashboard',     '/care-team/',             'home',      ['/care-team/']),
+            ('My Dashboard',  '/care-team/',             'home',      ['/care-team/']),
+            ('CT Queue',      '/care-team/queue',        'clipboard', ['/care-team/queue']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
-            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
+            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_psr': [

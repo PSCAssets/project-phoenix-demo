@@ -459,8 +459,9 @@ tbody tr:last-child td { border-bottom: none; }
         <div style="font-size:20px;font-weight:700;color:#065F46;margin-bottom:8px;">Patient Registered</div>
         <div id="wizSuccessName" style="font-size:14px;color:#374151;margin-bottom:6px;"></div>
         <div id="wizSuccessId" style="font-size:13px;font-weight:700;color:#059669;background:#D1FAE5;display:inline-block;padding:4px 14px;border-radius:20px;margin-bottom:24px;"></div>
-        <div style="display:flex;gap:12px;justify-content:center;">
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
           <button class="wiz-btn-primary" onclick="switchTab('patient')">Search Patient Records</button>
+          <button class="wiz-btn-primary" style="background:#059669;" onclick="scheduleConsult()">Schedule Consult</button>
           <button class="wiz-btn-secondary" onclick="wizReset()">Register Another</button>
         </div>
       </div>
@@ -1008,6 +1009,11 @@ function wizSubmit() {
   document.getElementById('wizSuccessId').textContent = ptId;
 }
 
+function scheduleConsult() {
+  // Navigate to scheduler with the registered patient pre-selected
+  window.location.href = '/scheduler/schedule';
+}
+
 function wizReset() {
   wizData = {}; wizCurrentStep = 1;
   document.querySelectorAll('.wiz-panel').forEach(function(p){ p.classList.remove('active'); });
@@ -1194,6 +1200,15 @@ document.getElementById('book-appt-modal').addEventListener('click', function(e)
 // ─── INIT ───
 renderPatients(PATIENTS);
 renderMembers(MEMBERS);
+
+// ─── URL TAB PARAM ───
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  var tab = params.get('tab');
+  if (tab && ['patient','member'].includes(tab)) {
+    switchTab(tab);
+  }
+});
 </script>
 {% endraw %}
 {% endblock %}
