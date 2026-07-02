@@ -9,13 +9,13 @@
     --amber: #D97706; --amber-bg: #FFFBEB; --blue: #2D5C2E; --blue-bg: #F2EDE4;
   }
   /* ── Humana theme overrides (applied via .theme-humana on body) ── */
-  .theme-humana { --navy: #003087; --green: #0070CE; --green-dark: #005BAA; --green-light: #EBF4FF; --border: #C5D8F0; --bg: #F5F9FF; --blue: #003087; --blue-bg: #EBF4FF; }
-  .theme-humana .sidenav { background: #003087; }
-  .theme-humana .nav-item.active { background: rgba(0,112,206,0.25); }
-  .theme-humana .nav-item.active::before { background: #0070CE; }
+  .theme-humana { --navy: #1A4F16; --green: #43863D; --green-dark: #2E6B2B; --green-light: #EAF4E8; --border: #C3DFC0; --bg: #F3FAF2; --blue: #1A4F16; --blue-bg: #EAF4E8; }
+  .theme-humana .sidenav { background: #1A4F16; }
+  .theme-humana .nav-item.active { background: rgba(67,134,61,0.30); }
+  .theme-humana .nav-item.active::before { background: #43863D; }
   .theme-humana .nav-logo-text { color: #fff; }
-  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C5D8F0; }
-  .theme-humana .topbar-title { color: #003087; }
+  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C3DFC0; }
+  .theme-humana .topbar-title { color: #1A4F16; }
   .theme-humana .nav-logo { border-bottom-color: rgba(255,255,255,0.15); }
 
   /* Care product selector chip */
@@ -137,31 +137,24 @@
       <div style="position:relative;margin-left:auto;" id="cpSelectorWrap">
         <div class="cp-selector-wrap" onclick="toggleCpDropdown(event)" id="cpSelectorChip">
           <span class="cp-selector-dot" id="cpSelectorDot"></span>
-          <span id="cpSelectorLabel">A1C Management</span>
+          <span id="cpSelectorLabel">Everlywell 360</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
         </div>
         <div class="cp-dropdown" id="cpDropdown">
           <div style="padding:8px 14px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;">Switch Care Product</div>
-          <div class="cp-option active" onclick="selectCareProduct('a1c')" id="cpOpt-a1c">
-            <span class="cp-option-dot" style="background:#3E8168;"></span>
-            <div class="cp-option-label">
-              <div>A1C Management</div>
-              <div class="cp-option-sub">Everlywell · Active</div>
-            </div>
-            <span style="font-size:11px;color:#3E8168;">✓</span>
-          </div>
-          <div class="cp-option" onclick="selectCareProduct('humana')" id="cpOpt-humana">
-            <span class="cp-option-dot" style="background:#0070CE;"></span>
-            <div class="cp-option-label">
-              <div>Humana A1C</div>
-              <div class="cp-option-sub">Humana · Active</div>
-            </div>
-          </div>
-          <div class="cp-option" onclick="selectCareProduct('awv')" id="cpOpt-awv">
+          <div class="cp-option active" onclick="selectCareProduct('awv')" id="cpOpt-awv">
             <span class="cp-option-dot" style="background:#D97706;"></span>
             <div class="cp-option-label">
               <div>Everlywell 360</div>
               <div class="cp-option-sub">Everlywell · Pending</div>
+            </div>
+            <span style="font-size:11px;color:#D97706;">✓</span>
+          </div>
+          <div class="cp-option" onclick="selectCareProduct('humana')" id="cpOpt-humana">
+            <span class="cp-option-dot" style="background:#43863D;"></span>
+            <div class="cp-option-label">
+              <div>Humana A1C</div>
+              <div class="cp-option-sub">Humana · Active</div>
             </div>
           </div>
         </div>
@@ -296,22 +289,6 @@
 {% block scripts %}
 <script>
 var CARE_PRODUCTS = {
-  a1c: {
-    label: 'A1C Management',
-    dotColor: '#3E8168',
-    theme: null,         // default Everlywell theme
-    logoMain: 'Everlywell',
-    logoSub: 'Patient Portal',
-    greeting: 'Good morning, Jamie 👋',
-  },
-  humana: {
-    label: 'Humana A1C',
-    dotColor: '#0070CE',
-    theme: 'humana',
-    logoMain: 'Humana',
-    logoSub: 'Powered by Everlywell',
-    greeting: 'Good morning, Jamie 👋',
-  },
   awv: {
     label: 'Everlywell 360',
     dotColor: '#D97706',
@@ -320,9 +297,17 @@ var CARE_PRODUCTS = {
     logoSub: 'Patient Portal',
     greeting: 'Good morning, Jamie 👋',
   },
+  humana: {
+    label: 'Humana A1C',
+    dotColor: '#43863D',
+    theme: 'humana',
+    logoMain: 'Humana',
+    logoSub: 'Powered by Everlywell',
+    greeting: 'Good morning, Jamie 👋',
+  },
 };
 
-var _activeCp = 'a1c';
+var _activeCp = 'awv';
 
 function selectCareProduct(key) {
   _activeCp = key;
@@ -334,7 +319,7 @@ function selectCareProduct(key) {
   document.getElementById('cpSelectorDot').style.background = cp.dotColor;
 
   // Update active state in dropdown
-  ['a1c','humana','awv'].forEach(function(k) {
+  ['awv','humana'].forEach(function(k) {
     var opt = document.getElementById('cpOpt-' + k);
     if (!opt) return;
     opt.classList.toggle('active', k === key);
@@ -364,14 +349,13 @@ function closeCpDropdown() {
 }
 document.addEventListener('click', closeCpDropdown);
 
-// Init — ensure tick marks are correct on load
+// Init — hide tick on non-active option
 document.addEventListener('DOMContentLoaded', function() {
-  ['humana','awv'].forEach(function(k) {
-    var opt = document.getElementById('cpOpt-' + k);
-    if (!opt) return;
-    var tick = opt.querySelector('span:last-child');
+  var humOpt = document.getElementById('cpOpt-humana');
+  if (humOpt) {
+    var tick = humOpt.querySelector('span:last-child');
     if (tick) tick.style.display = 'none';
-  });
+  }
 });
 </script>
 {% endblock %}
