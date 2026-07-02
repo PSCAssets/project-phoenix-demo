@@ -539,6 +539,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
         </div>
         <div class="form-group">
+          <label class="form-label">Account-Level Consult Blocking</label>
+          <div style="display:flex;align-items:flex-start;gap:14px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:14px 16px;">
+            <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:1px;">
+              <input type="checkbox" id="ct_block" style="opacity:0;width:0;height:0;" onchange="document.getElementById('ct_block_track').style.background=this.checked?'#D97706':'#D1D5DB'">
+              <span id="ct_block_track" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#D1D5DB;border-radius:24px;transition:.2s;"></span>
+              <span style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;" id="ct_block_knob"></span>
+            </label>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:3px;">Block consults for specific account numbers</div>
+              <div style="font-size:12px;color:#B45309;">When enabled, certain client account numbers under this care product will be restricted from creating new consults. Account-level block list is configured in the Client Account settings after this wizard is saved.</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
           <label class="form-label">Short Description <span style="font-weight:400;color:#9CA3AF">(160 char max)</span></label>
           <textarea class="form-textarea" id="s1_desc" maxlength="160" oninput="document.getElementById('s1_desc_count').textContent=this.value.length+'/160'" placeholder="Patient-facing summary of this care product"></textarea>
           <div class="char-count" id="s1_desc_count">0/160</div>
