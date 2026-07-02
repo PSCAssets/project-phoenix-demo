@@ -335,14 +335,14 @@
 const SW_USERS = [
   {initials:'SL', color:'#1B4F8A', name:'Dr. Sarah Lee, MD',     role:'Physician (Internal Medicine)',      dept:'physician',    portal:'Provider Portal — MD',   loginRole:'provider_md',  btnLabel:'Log in as Sarah — Physician (MD)'},
   {initials:'MR', color:'#0D9488', name:'Maria Rodriguez, NP',   role:'Nurse Practitioner',                 dept:'physician',    portal:'Provider Portal — NP',   loginRole:'provider_np',  btnLabel:'Log in as Maria — Nurse Practitioner'},
-  {initials:'JM', color:'#00A99D', name:'Jennifer Martinez, Lead RN', role:'Lead RN',                   dept:'nursing',      portal:'Provider Portal — RN',   loginRole:'provider_rn',  btnLabel:'Log in as Jennifer — RN'},
-  {initials:'MT', color:'#445D7A', name:'Michael Torres, MA',    role:'Medical Assistant',                  dept:'ma',           portal:'Provider Portal — MA',   loginRole:'provider_ma',  btnLabel:'Log in as Michael — Medical Assistant'},
+  {initials:'JM', color:'#00A99D', verified:true, name:'Jennifer Martinez, Lead RN', role:'Lead RN',                   dept:'nursing',      portal:'Provider Portal — RN',   loginRole:'provider_rn',  btnLabel:'Log in as Jennifer — RN'},
+  {initials:'MT', color:'#445D7A', verified:true, name:'Michael Torres, MA',    role:'Medical Assistant',                  dept:'ma',           portal:'Provider Portal — MA',   loginRole:'provider_ma',  btnLabel:'Log in as Michael — Medical Assistant'},
   {initials:'LP', color:'#6B5EA8', name:'Lisa Park, MS CGC',     role:'Genetic Counselor',                  dept:'genetics',     portal:'Provider Portal — GC',   loginRole:'provider_gc',  btnLabel:'Log in as Lisa — Genetic Counselor'},
   {initials:'PS', color:'#BE185D', name:'Priya Sharma',          role:'GC Assistant',                       dept:'genetics',     portal:'GCA Portal',             loginRole:'provider_gca', btnLabel:'Log in as Priya — GC Assistant'},
   {initials:'DC', color:'#0E7490', name:'Dana Cooper',           role:'GC Administrator',                   dept:'genetics',     portal:'Provider Portal',        loginRole:'gc_admin',     btnLabel:'Log in as Dana — GC Administrator'},
   {initials:'RC', color:'#B45309', name:'Rachel Chen',           role:'QA Reviewer',                        dept:'clinical-ops', portal:'Provider Portal',        loginRole:'qa_reviewer',  btnLabel:'Log in as Rachel — QA Reviewer'},
   {initials:'CV', color:'#0F766E', name:'Crystal Veliz',         role:'DOH Coordinator',                    dept:'clinical-ops', portal:'DOH Reporting Portal',   loginRole:'provider_doh', btnLabel:'Log in as Crystal — DOH Coordinator'},
-  {initials:'RP', color:'#7C3AED', name:'Riley Perrone',         role:'MA / RN Team Manager',               dept:'management',   portal:'Manager Portal',         loginRole:'provider_manager', btnLabel:'Log in as Riley — Team Manager'},
+  {initials:'RP', color:'#7C3AED', verified:true, name:'Riley Perrone',         role:'MA / RN Team Manager',               dept:'management',   portal:'Manager Portal',         loginRole:'provider_manager', btnLabel:'Log in as Riley — Team Manager'},
   {initials:'MM', color:'#059669', name:'Melanie Marmo',         role:'PSS Team Manager',                   dept:'management',   portal:'Care Team Portal — PSS', loginRole:'provider_psr', btnLabel:'Log in as Melanie — PSS Manager'},
   {initials:'DN', color:'#D97706', name:'David Nguyen',          role:'Scheduling Coordinator',             dept:'scheduling',   portal:'Scheduling',             loginRole:'scheduler',    btnLabel:'Log in as David — Scheduling Coordinator'},
   {initials:'AK', color:'#059669', name:'Alex Kim',              role:'Care Team',                          dept:'care-team',    portal:'Care Team Portal',       loginRole:'care_team',    btnLabel:'Log in as Alex — Care Team'},
@@ -381,7 +381,7 @@ function swFilter(dept) {
 function swRow(u) {
   const href = u.loginUrl || ('/login/' + u.loginRole);
   return `<div class="sw-user-row">
-    <div class="sw-avatar" style="background:#FFFFFF;border:2px solid #D1D5DB;color:#374151;">${u.initials}</div>
+    <div class="sw-avatar" style="background:${u.verified ? '#F59E0B' : '#FFFFFF'};border:2px solid ${u.verified ? '#F59E0B' : '#D1D5DB'};color:${u.verified ? '#FFFFFF' : '#374151'};">${u.initials}</div>
     <div class="sw-user-info">
       <div class="sw-user-name">${u.name}</div>
       <div class="sw-user-meta">${u.role}<span class="sw-portal-badge">${u.portal}</span></div>

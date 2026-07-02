@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}Blurb Library{% endblock %}
+{% block head %}
+<style>
+.page-wrap { padding: 32px 28px; margin-left: 56px; }
+.page-title { font-size: 22px; font-weight: 800; color: #111827; }
+.page-sub { font-size: 13px; color: #6B7280; margin-top: 3px; margin-bottom: 24px; }
+
+.blurb-controls {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  background: #FFFFFF; border: 1px solid #E5E0D8; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 20px;
+}
+.blurb-search {
+  flex: 1; min-width: 220px; padding: 7px 12px; border: 1px solid #E5E0D8;
+  border-radius: 7px; font-size: 13px; font-family: inherit; outline: none;
+  color: #111827;
+}
+.blurb-search:focus { border-color: #6B5EA8; box-shadow: 0 0 0 3px rgba(107,94,168,.1); }
+.filter-chip {
+  padding: 5px 14px; font-size: 12px; font-weight: 600; border-radius: 20px;
+  border: 1px solid #E5E0D8; background: #F9F8F6; color: #374151; cursor: pointer;
+  transition: all .15s;
+}
+.filter-chip.active { background: #6B5EA8; border-color: #6B5EA8; color: #fff; }
+.filter-chip:hover:not(.active) { border-color: #6B5EA8; color: #6B5EA8; }
+
+.blurb-count { margin-left:auto; font-size:12px; color:#9CA3AF; font-weight:600; }
+
+.btn-new-blurb {
+  padding: 7px 16px; background: #6B5EA8; color: #fff; border: none; border-radius: 7px;
+  font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; white-space:nowrap;
+}
+.btn-new-blurb:hover { background: #5a4d97; }
+
+.blurb-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px;
+}
+
+.blurb-card {
+  background: #fff; border: 1px solid #E5E0D8; border-radius: 10px;
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+  transition: box-shadow .15s;
+}
+.blurb-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,.08); border-color: #C4BAF0; }
+
+.blurb-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.blurb-title { font-size: 14px; font-weight: 700; color: #111827; }
+.blurb-tag {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.tag-hereditary { background: #EDE9FE; color: #5B21B6; }
+.tag-cardiac { background: #DBEAFE; color: #1D4ED8; }
+.tag-cancer { background: #FEE2E2; color: #991B1B; }
+.tag-prenatal { background: #D1FAE5; color: #065F46; }
+.tag-general { background: #F3F4F6; color: #374151; }
+.tag-pediatric { background: #FEF3C7; color: #92400E; }
+
+.blurb-body {
+  font-size: 12px; line-height: 1.6; color: #374151;
+  background: #F9F8F6; border-radius: 6px; padding: 10px 12px;
+  border-left: 3px solid #C4BAF0; font-style: italic;
+  max-height: 80px; overflow: hidden; position: relative;
+}
+.blurb-body.expanded { max-height: none; }
+.blurb-meta { display: flex; gap: 12px; font-size: 11px; color: #9CA3AF; }
+.blurb-actions { display: flex; gap: 8px; margin-top: 2px; }
+.btn-blurb {
+  padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 6px;
+  cursor: pointer; font-family: inherit; border: none; transition: .15s;
+}
+.btn-copy { background: #EDE9FE; color: #5B21B6; }
+.btn-copy:hover { background: #DDD6FE; }
+.btn-edit { background: #F3F4F6; color: #374151; }
+.btn-edit:hover { background: #E5E7EB; }
+.btn-expand { background: none; border: none; color: #6B5EA8; font-size:11px; font-weight:600; cursor:pointer; padding:0; }
+
+.empty-state { text-align:center; padding:60px 20px; color:#9CA3AF; font-size:14px; }
+
+/* New/Edit modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:#fff; border-radius:14px; padding:28px 28px 24px; width:560px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2); }
+.modal-title { font-size:17px; font-weight:800; color:#111827; margin-bottom:20px; }
+.modal-field { margin-bottom:16px; }
+.modal-label { font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; margin-bottom:5px; }
+.modal-input, .modal-select, .modal-textarea { width:100%; padding:9px 12px; border:1px solid #E5E0D8; border-radius:8px; font-size:13px; font-family:inherit; color:#111827; outline:none; box-sizing:border-box; }
+.modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color:#6B5EA8; box-shadow:0 0 0 3px rgba(107,94,168,.1); }
+.modal-textarea { min-height:120px; resize:vertical; }
+.modal-footer { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+.btn-save-modal { background:#6B5EA8; color:#fff; border:none; border-radius:8px; padding:9px 22px; font-size:13px; font-weight:700; cursor:pointer; }
+.btn-cancel-modal { background:#F3F4F6; color:#374151; border:none; border-radius:8px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer; }
+
+.toast { position:fixed; bottom:24px; right:24px; background:#111827; color:#fff; padding:12px 20px; border-radius:8px; font-size:13px; font-weight:600; z-index:9999; display:none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-title">Blurb Library</div>
+  <div class="page-sub">Pre-approved communication templates for GC consultations — select and copy into patient correspondence.</div>
+
+  <!-- Controls -->
+  <div class="blurb-controls">
+    <input class="blurb-search" id="blurbSearch" placeholder="🔍  Search blurbs…" oninput="filterBlurbs()">
+    <button class="filter-chip active" onclick="setFilter('all',this)">All</button>
+    <button class="filter-chip" onclick="setFilter('hereditary',this)">Hereditary Risk</button>
+    <button class="filter-chip" onclick="setFilter('cancer',this)">Cancer</button>
+    <button class="filter-chip" onclick="setFilter('cardiac',this)">Cardiac</button>
+    <button class="filter-chip" onclick="setFilter('prenatal',this)">Prenatal</button>
+    <button class="filter-chip" onclick="setFilter('pediatric',this)">Pediatric</button>
+    <button class="filter-chip" onclick="setFilter('general',this)">General</button>
+    <span class="blurb-count" id="blurbCount">18 blurbs</span>
+    <button class="btn-new-blurb" onclick="openModal()">+ New Blurb</button>
+  </div>
+
+  <!-- Grid -->
+  <div class="blurb-grid" id="blurbGrid"></div>
+  <div class="empty-state" id="blurbEmpty" style="display:none;">No blurbs match your search.</div>
+
+</div>
+
+<!-- New/Edit Modal -->
+<div class="modal-overlay" id="blurbModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">New Blurb</div>
+    <div class="modal-field">
+      <div class="modal-label">Blurb Title *</div>
+      <input class="modal-input" id="mTitle" placeholder="e.g. BRCA Positive Result — Patient Intro">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Category *</div>
+      <select class="modal-select" id="mCategory">
+        <option value="hereditary">Hereditary Risk</option>
+        <option value="cancer">Cancer</option>
+        <option value="cardiac">Cardiac</option>
+        <option value="prenatal">Prenatal</option>
+        <option value="pediatric">Pediatric</option>
+        <option value="general">General</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Care Product (optional)</div>
+      <input class="modal-input" id="mProduct" placeholder="e.g. BRCA Hereditary Risk, Cardiac Panel">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Blurb Content *</div>
+      <textarea class="modal-textarea" id="mContent" placeholder="Enter the pre-approved communication text…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel-modal" onclick="closeModal()">Cancel</button>
+      <button class="btn-save-modal" onclick="saveBlurb()">Save Blurb</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var _filter = 'all';
+var _editId = null;
+
+var BLURBS = [
+  {id:1, title:'BRCA1/2 Positive Result — Patient Introduction', category:'hereditary', product:'BRCA Hereditary Risk', author:'Lisa Park', updated:'Jun 15, 2026',
+   content:'Thank you for speaking with me today regarding your BRCA1/2 test results. A pathogenic variant was identified, which means there is an increased lifetime risk for breast and ovarian cancer. We discussed the implications of this finding, surveillance recommendations, and options for risk reduction including enhanced screening protocols and preventive surgical options. I have included a summary of our discussion below and next steps for your primary care provider.'},
+  {id:2, title:'BRCA1/2 Negative Result — Reassurance and Follow-up', category:'hereditary', product:'BRCA Hereditary Risk', author:'Lisa Park', updated:'Jun 15, 2026',
+   content:'Your BRCA1/2 genetic testing did not identify a pathogenic or likely pathogenic variant. A negative result significantly reduces (but does not eliminate) your risk for hereditary breast and ovarian cancer syndrome. We recommend continuing with standard population-based cancer screening as recommended by your primary care provider.'},
+  {id:3, title:'Variant of Uncertain Significance (VUS) Explanation', category:'hereditary', product:'BRCA Hereditary Risk', author:'Stephanie W.', updated:'Jun 20, 2026',
+   content:'Your testing identified a Variant of Uncertain Significance (VUS). This means a change was found in the gene, but there is currently insufficient evidence to determine whether this variant increases cancer risk. A VUS is not the same as a positive result. We will continue to monitor new research on this variant and will contact you if the classification changes. No clinical management changes are recommended based on a VUS at this time.'},
+  {id:4, title:'Lynch Syndrome — Positive Result Summary', category:'cancer', product:'Colorectal / Lynch Panel', author:'Lisa Park', updated:'May 30, 2026',
+   content:'Testing has confirmed a diagnosis of Lynch syndrome. This hereditary condition significantly increases your risk for colorectal cancer as well as several other cancers including uterine, ovarian, and urinary tract. We discussed the importance of increased surveillance, starting with colonoscopy every 1–2 years. Cascade testing is strongly recommended for first-degree relatives. A letter will be sent to your gastroenterologist with our recommendations.'},
+  {id:5, title:'Hereditary Breast and Ovarian Cancer — Family Notification Guidance', category:'hereditary', product:'BRCA Hereditary Risk', author:'Stephanie W.', updated:'Jun 10, 2026',
+   content:'Because hereditary variants can be shared among family members, we encourage you to share this information with your first-degree relatives (parents, siblings, and children). Genetic testing is available for at-risk family members and can provide important information about their own health. We have included a family notification letter that you may share, and our team is available to speak with family members who have questions about testing.'},
+  {id:6, title:'Long QT Syndrome — Post-Consult Summary', category:'cardiac', product:'Inherited Cardiac Risk', author:'Lisa Park', updated:'Jun 1, 2026',
+   content:'Your genetic testing has identified a pathogenic variant associated with Long QT Syndrome (LQTS). This condition affects the heart\'s electrical system and can increase the risk of dangerous heart rhythms. We strongly recommend immediate follow-up with a cardiologist or electrophysiologist. Please avoid QT-prolonging medications (a list has been provided) and strenuous physical activity until cardiology evaluation is complete.'},
+  {id:7, title:'Cardiac Panel — Negative Result', category:'cardiac', product:'Inherited Cardiac Risk', author:'Lisa Park', updated:'May 28, 2026',
+   content:'Your inherited cardiac risk panel did not identify a pathogenic or likely pathogenic variant in the genes tested. A negative result reduces the likelihood of a hereditary cause for your cardiac condition, though it does not rule it out entirely, as some variants may not be detectable with current testing. Please continue follow-up care with your cardiologist as recommended.'},
+  {id:8, title:'Prenatal Cell-Free DNA — High Risk Result', category:'prenatal', product:'Prenatal Genetic Counseling', author:'Stephanie W.', updated:'Jun 18, 2026',
+   content:'Your cell-free DNA (cfDNA) screening returned a high-risk result for Trisomy 21. It is important to understand that this is a screening test, not a diagnostic test. A high-risk result means there is an increased probability, not a certainty. We discussed the option of diagnostic testing (chorionic villus sampling or amniocentesis) to confirm or rule out this finding. Please discuss these options with your OB provider and contact our team with any questions.'},
+  {id:9, title:'Prenatal Carrier Screening — Both Partners Carriers', category:'prenatal', product:'Prenatal Genetic Counseling', author:'Stephanie W.', updated:'Jun 5, 2026',
+   content:'Carrier screening has identified that both you and your partner carry one copy of a variant in the same autosomal recessive condition. This means there is a 25% chance with each pregnancy that the baby could be affected. We discussed the reproductive options available to you, including prenatal diagnosis, preimplantation genetic testing (PGT-M), and other family planning considerations. Please contact our office to schedule a follow-up to discuss next steps.'},
+  {id:10, title:'Pediatric Genetic Evaluation — Diagnostic Odyssey Closure', category:'pediatric', product:'Pediatric Genetics', author:'Lisa Park', updated:'Jun 22, 2026',
+   content:'After comprehensive genetic evaluation, a molecular diagnosis has been identified that explains your child\'s clinical features. We understand that this journey has been challenging, and we hope that having a diagnosis provides some clarity. With a confirmed diagnosis, we can now connect you with appropriate specialists, support resources, and provide guidance on recurrence risk for future pregnancies. A detailed summary is enclosed for your child\'s care team.'},
+  {id:11, title:'No Diagnosis Found — Exome Sequencing', category:'pediatric', product:'Pediatric Genetics', author:'Lisa Park', updated:'Jun 8, 2026',
+   content:'Whole exome sequencing did not identify a molecular diagnosis to explain your child\'s condition. While this result is frustrating, advances in genomic technology and expanding knowledge of disease-causing variants mean that re-analysis in 2–3 years may yield a result. We recommend staying connected with our team for updates and have enrolled your family in our re-contact registry. We are here to continue supporting your family.'},
+  {id:12, title:'HIPAA Verification Required — Patient Email Contact', category:'general', product:'All', author:'Stephanie W.', updated:'Jun 25, 2026',
+   content:'Before we can discuss your genetic testing results or any protected health information via email, we need to verify your identity. Please reply to this message with your date of birth and the last four digits of your Social Security Number to confirm your identity. Alternatively, you may call our office directly at the number provided, where we can verify your identity and discuss your results securely.'},
+  {id:13, title:'Appointment Confirmation — GC Consult', category:'general', product:'All', author:'Stephanie W.', updated:'Jun 12, 2026',
+   content:'This is a confirmation for your upcoming genetic counseling appointment. Please be prepared with a complete family history (3 generations if possible), any prior genetic testing records, and a list of current medications. Your appointment will take approximately 60 minutes. If you need to reschedule, please contact our office at least 24 hours in advance.'},
+  {id:14, title:'48-Hour Report Submission Notice — GC to GCA', category:'general', product:'Internal', author:'Priya Sharma', updated:'Jun 28, 2026',
+   content:'Please note that genetic counseling reports must be submitted within 48 business hours of the completed consultation. Reports submitted after this window require supervisor notification. If you anticipate a delay due to case complexity, please flag the case in the platform and note the expected submission date in the activity log.'},
+  {id:15, title:'Pre-Test Counseling — Informed Consent Summary', category:'hereditary', product:'BRCA Hereditary Risk', author:'Lisa Park', updated:'Jun 3, 2026',
+   content:'Prior to proceeding with genetic testing, we reviewed the purpose of testing, the types of results you may receive (positive, negative, VUS), and the potential implications for you and your family members. You indicated understanding of the voluntary nature of this testing. Written informed consent has been obtained and is documented in your chart. If you have questions at any time, please contact our genetics team.'},
+  {id:16, title:'Second Opinion Request — Existing Report Received', category:'general', product:'All', author:'Stephanie W.', updated:'Jun 29, 2026',
+   content:'Thank you for sharing your prior genetic report with our team. We have received and reviewed the documentation. One of our genetic counselors will contact you within 2–3 business days to schedule a second opinion consultation. Please ensure you have access to the original lab report, including any variant classification details, for our discussion.'},
+  {id:17, title:'FAP / APC Variant — Risk and Surveillance Summary', category:'cancer', product:'Colorectal / Lynch Panel', author:'Lisa Park', updated:'May 25, 2026',
+   content:'Testing identified a pathogenic variant in the APC gene, consistent with Familial Adenomatous Polyposis (FAP). This condition significantly increases your risk for colorectal cancer, typically presenting as hundreds to thousands of polyps in the colon. Annual flexible sigmoidoscopy or colonoscopy beginning in adolescence is recommended. Prophylactic colectomy is often considered by adulthood. We have sent a referral to a GI specialist experienced in hereditary colon cancer syndromes.'},
+  {id:18, title:'MLPA / Deletion Variant Explanation', category:'hereditary', product:'BRCA Hereditary Risk', author:'Lisa Park', updated:'Jun 14, 2026',
+   content:'Your testing identified a large deletion in the BRCA2 gene detected by MLPA (Multiplex Ligation-dependent Probe Amplification) analysis. Large deletions are a type of pathogenic variant that is not always detectable by standard sequencing. The clinical implications are the same as other pathogenic BRCA2 variants — an increased risk for breast and ovarian cancer. Cascade testing for family members should include MLPA analysis specifically.'},
+];
+
+var _blurbs = BLURBS.slice();
+
+function tagClass(cat) {
+  return {hereditary:'tag-hereditary', cardiac:'tag-cardiac', cancer:'tag-cancer', prenatal:'tag-prenatal', general:'tag-general', pediatric:'tag-pediatric'}[cat] || 'tag-general';
+}
+function tagLabel(cat) {
+  return {hereditary:'Hereditary Risk', cardiac:'Cardiac', cancer:'Cancer', prenatal:'Prenatal', general:'General', pediatric:'Pediatric'}[cat] || cat;
+}
+
+function setFilter(f, btn) {
+  _filter = f;
+  document.querySelectorAll('.filter-chip').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderBlurbs();
+}
+
+function filterBlurbs() { renderBlurbs(); }
+
+function renderBlurbs() {
+  var search = (document.getElementById('blurbSearch').value || '').toLowerCase();
+  var filtered = _blurbs.filter(function(b) {
+    var matchCat = _filter === 'all' || b.category === _filter;
+    var matchSearch = !search || (b.title+b.content+b.product).toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  var grid = document.getElementById('blurbGrid');
+  var empty = document.getElementById('blurbEmpty');
+  document.getElementById('blurbCount').textContent = filtered.length + ' blurb' + (filtered.length===1?'':'s');
+  if (!filtered.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = filtered.map(function(b) {
+    return '<div class="blurb-card" id="bc'+b.id+'">'
+      + '<div class="blurb-header"><div class="blurb-title">'+b.title+'</div><span class="blurb-tag '+tagClass(b.category)+'">'+tagLabel(b.category)+'</span></div>'
+      + '<div class="blurb-body" id="bb'+b.id+'">'+b.content+'</div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div class="blurb-meta"><span>'+b.product+'</span><span>'+b.author+'</span><span>'+b.updated+'</span></div>'
+      + '<button class="btn-expand" onclick="toggleExpand('+b.id+')">Expand</button></div>'
+      + '<div class="blurb-actions">'
+      + '<button class="btn-blurb btn-copy" onclick="copyBlurb('+b.id+')">📋 Copy</button>'
+      + '<button class="btn-blurb btn-edit" onclick="editBlurb('+b.id+')">Edit</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+function toggleExpand(id) {
+  var el = document.getElementById('bb'+id);
+  var btn = el.parentElement.querySelector('.btn-expand');
+  if (el.classList.contains('expanded')) { el.classList.remove('expanded'); btn.textContent='Expand'; }
+  else { el.classList.add('expanded'); btn.textContent='Collapse'; }
+}
+
+function copyBlurb(id) {
+  var b = _blurbs.find(function(x){ return x.id===id; });
+  if (!b) return;
+  navigator.clipboard.writeText(b.content).then(function(){
+    showToast('Copied to clipboard');
+  }).catch(function(){
+    showToast('Content ready to paste');
+  });
+}
+
+function openModal(blurb) {
+  _editId = blurb ? blurb.id : null;
+  document.getElementById('modalTitle').textContent = blurb ? 'Edit Blurb' : 'New Blurb';
+  document.getElementById('mTitle').value = blurb ? blurb.title : '';
+  document.getElementById('mCategory').value = blurb ? blurb.category : 'hereditary';
+  document.getElementById('mProduct').value = blurb ? blurb.product : '';
+  document.getElementById('mContent').value = blurb ? blurb.content : '';
+  document.getElementById('blurbModal').classList.add('open');
+}
+function editBlurb(id) {
+  openModal(_blurbs.find(function(b){ return b.id===id; }));
+}
+function closeModal() {
+  document.getElementById('blurbModal').classList.remove('open');
+  _editId = null;
+}
+function saveBlurb() {
+  var title = document.getElementById('mTitle').value.trim();
+  var content = document.getElementById('mContent').value.trim();
+  if (!title || !content) { alert('Title and content are required.'); return; }
+  var today = new Date(); var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var dateStr = months[today.getMonth()]+' '+today.getDate()+', '+today.getFullYear();
+  if (_editId) {
+    var idx = _blurbs.findIndex(function(b){ return b.id===_editId; });
+    if (idx > -1) {
+      _blurbs[idx].title = title;
+      _blurbs[idx].category = document.getElementById('mCategory').value;
+      _blurbs[idx].product = document.getElementById('mProduct').value || 'All';
+      _blurbs[idx].content = content;
+      _blurbs[idx].updated = dateStr;
+    }
+    showToast('Blurb updated');
+  } else {
+    var newId = Math.max.apply(null, _blurbs.map(function(b){return b.id;}))+1;
+    _blurbs.unshift({id:newId, title:title, category:document.getElementById('mCategory').value,
+      product:document.getElementById('mProduct').value||'All', author:'You', updated:dateStr, content:content});
+    showToast('Blurb saved');
+  }
+  closeModal(); renderBlurbs();
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(function(){ t.style.display='none'; }, 2500);
+}
+
+document.getElementById('blurbModal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+
+renderBlurbs();
+</script>
+{% endblock %}

@@ -194,6 +194,9 @@ def inject_sidebar_nav():
         'provider_ma': [
             ('My Dashboard',  '/provider/ma',              'home',      ['/provider/ma']),
             ('MA Queue',      '/provider/ma/queue',         'clipboard', ['/provider/ma/queue']),
+            ('Titer Queue',   '/provider/rn/titers',        'clipboard', ['/provider/rn/titers']),
+            ('On-Call Sched.','/provider/rn/oncall',        'calendar',  ['/provider/rn/oncall']),
+            ('DXS Audit',     '/provider/rn/audit',         'clipboard', ['/provider/rn/audit']),
             ('PCP Follow-Up', '/provider/ma/followup',      'clipboard', ['/provider/ma/followup']),
             ('Referral Tracker', '/provider/ma/referrals', 'clipboard', ['/provider/ma/referrals']),
             ('Patient Queue', '/provider/queue',            'users',     ['/provider/queue']),
@@ -258,6 +261,7 @@ def inject_sidebar_nav():
             ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
             ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
             ('Thyroid Program','/care-team/psr/thyroid-queue',    'clipboard', ['/care-team/psr/thyroid-queue']),
+            ('GC Queue',       '/provider/gc/queue',              'users',     ['/provider/gc/queue']),
             ('Patient Queue',  '/provider/queue',                 'users',     ['/provider/queue']),
             ('Patient Mgmt',   '/provider/patient-management',    'clipboard', ['/provider/patient-management']),
             ('Network Schedule','/provider/schedule',             'calendar',  ['/provider/schedule']),

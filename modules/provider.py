@@ -258,6 +258,10 @@ def gca_dashboard():
 def gca_consult_prep_queue():
     return render_template("provider/gca_consult_prep.html")
 
+@bp.route("/blurbs")
+def blurb_library():
+    return render_template("provider/blurbs.html")
+
 @bp.route("/doh")
 def doh_dashboard():
     return render_template("provider/doh_dashboard.html")

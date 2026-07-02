@@ -1347,54 +1347,211 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <div class="step-help-icon">🔥</div>
           <div class="step-help-content">
             <div class="step-help-title">Why this step exists</div>
-            <div class="step-help-body">The Documentation Template defines the structure of the clinical note the provider completes after the consult. Standardized templates ensure all required clinical elements are captured, support regulatory audits, and enable consistent quality review. For genetics, documentation templates include sections for variant interpretation, patient education, and follow-up recommendations.
+            <div class="step-help-body">The Documentation Template defines the structure of the clinical note the provider completes after the consult. Standardized templates ensure all required clinical elements are captured, support regulatory audits, and enable consistent quality review. For genetics, documentation templates include sections for variant interpretation, patient education, family history, and follow-up recommendations. GC templates are separate from medical visit templates and are only shown when the ecosystem is set to Genetics.
             </div>
           </div>
         </div>
         <div id="docTplBanner" style="display:none;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400E;margin-bottom:14px;">&#10022; Template auto-suggested based on care product name. Confirm or change below.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
-          <label id="docTplCard1" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
-            <input type="radio" name="docTemplate" value="a1c_em" onchange="selectDocTpl(1)" style="position:absolute;top:12px;right:12px;accent-color:#6B21A8;width:16px;height:16px;">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
-              <span style="font-size:13px;font-weight:700;color:#111827;">A1C E&amp;M Template</span>
-              <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#EDE9FE;color:#6B21A8;flex-shrink:0;">HEDIS</span>
-            </div>
-            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Chronic disease management — diabetes, glycemic control, HEDIS CDC measures</div>
-            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; HPI &middot; ROS &middot; Vitals &middot; Labs &middot; Assessment &middot; Plan &middot; HEDIS CDC (7) &middot; MDM/Billing</div>
-          </label>
-          <label id="docTplCard2" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
-            <input type="radio" name="docTemplate" value="awv" onchange="selectDocTpl(2)" style="position:absolute;top:12px;right:12px;accent-color:#065F46;width:16px;height:16px;">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
-              <span style="font-size:13px;font-weight:700;color:#111827;">Annual Wellness Visit Template</span>
-              <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#D1FAE5;color:#065F46;flex-shrink:0;">HEDIS</span>
-            </div>
-            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Preventive care — EverlyCare Wellness, HEDIS gap closure, PRAPARE screener</div>
-            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; Medication Reconciliation &middot; Katz ADL &middot; PRAPARE &middot; Assessment &middot; HEDIS Gap Closure (11) &middot; Plan/Orders &middot; MDM/Billing</div>
-          </label>
-          <label id="docTplCard3" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
-            <input type="radio" name="docTemplate" value="soap" onchange="selectDocTpl(3)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
-              <span style="font-size:13px;font-weight:700;color:#111827;">Standard SOAP Note</span>
-            </div>
-            <div style="font-size:12px;color:#6B7280;line-height:1.4;">General purpose — Subjective, Objective, Assessment, Plan</div>
-            <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Subjective &middot; Objective &middot; Assessment &middot; Plan</div>
-          </label>
-          <label id="docTplCard4" style="display:flex;flex-direction:column;gap:8px;background:#EFF6FF;border:2px solid #1D4ED8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
-            <input type="radio" name="docTemplate" value="none" checked onchange="selectDocTpl(4)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
-            <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
-              <span style="font-size:13px;font-weight:700;color:#111827;">No Template</span>
-            </div>
-            <div style="font-size:12px;color:#6B7280;line-height:1.4;">Documentation not required for this care product</div>
-            <div style="font-size:11px;color:#9CA3AF;font-style:italic;margin-top:2px;">Providers will not see a Documentation tab for this care product</div>
-          </label>
+
+        <!-- Medical Templates (shown for non-Genetics ecosystems) -->
+        <div id="medicalTplSection">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:10px;">Medical Visit Templates</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <label id="docTplCard1" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="docTemplate" value="a1c_em" onchange="selectDocTpl(1)" style="position:absolute;top:12px;right:12px;accent-color:#6B21A8;width:16px;height:16px;">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">A1C E&amp;M Template</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#EDE9FE;color:#6B21A8;flex-shrink:0;">HEDIS</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">Chronic disease management — diabetes, glycemic control, HEDIS CDC measures</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; HPI &middot; ROS &middot; Vitals &middot; Labs &middot; Assessment &middot; Plan &middot; HEDIS CDC (7) &middot; MDM/Billing</div>
+            </label>
+            <label id="docTplCard2" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="docTemplate" value="awv" onchange="selectDocTpl(2)" style="position:absolute;top:12px;right:12px;accent-color:#065F46;width:16px;height:16px;">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Annual Wellness Visit Template</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#D1FAE5;color:#065F46;flex-shrink:0;">HEDIS</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">Preventive care — EverlyCare Wellness, HEDIS gap closure, PRAPARE screener</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Chief Complaint &middot; Medication Reconciliation &middot; Katz ADL &middot; PRAPARE &middot; Assessment &middot; HEDIS Gap Closure (11) &middot; Plan/Orders &middot; MDM/Billing</div>
+            </label>
+            <label id="docTplCard3" style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="docTemplate" value="soap" onchange="selectDocTpl(3)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Standard SOAP Note</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">General purpose — Subjective, Objective, Assessment, Plan</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Subjective &middot; Objective &middot; Assessment &middot; Plan</div>
+            </label>
+            <label id="docTplCard4" style="display:flex;flex-direction:column;gap:8px;background:#EFF6FF;border:2px solid #1D4ED8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="docTemplate" value="none" checked onchange="selectDocTpl(4)" style="position:absolute;top:12px;right:12px;accent-color:#1D4ED8;width:16px;height:16px;">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">No Template</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">Documentation not required for this care product</div>
+              <div style="font-size:11px;color:#9CA3AF;font-style:italic;margin-top:2px;">Providers will not see a Documentation tab for this care product</div>
+            </label>
+          </div>
         </div>
-        <div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;">
+
+        <!-- GC Templates (shown when ecosystem = Genetics) -->
+        <div id="gcTplSection" style="display:none;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#5B21B6;">Genetics Consult Templates</div>
+            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#EDE9FE;color:#5B21B6;">Genetics Ecosystem</span>
+          </div>
+          <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:14px 16px;font-size:12px;color:#4C1D95;margin-bottom:12px;">
+            GC templates are separate from medical visit templates. The template selected here will appear in the GC's documentation tab after completing a consult. Pre-test and post-test templates are tracked separately and mapped to the consult type in the Automated Template Mapping section below.
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+            <label style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="gcDocTemplate" value="gc_hereditary" style="position:absolute;top:12px;right:12px;accent-color:#5B21B6;width:16px;height:16px;" onchange="selectGcTpl(this)">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Hereditary Risk Consult Note</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#EDE9FE;color:#5B21B6;flex-shrink:0;">GC</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">BRCA, Lynch syndrome, hereditary cancer panels — includes variant interpretation and risk counseling</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Reason for Referral &middot; Family History (3-gen) &middot; Personal Hx &middot; Risk Assessment &middot; Genetic Test Results &middot; Variant Classification &middot; Recommendations &middot; Patient Education &middot; Follow-up Plan</div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="gcDocTemplate" value="gc_cardiac" style="position:absolute;top:12px;right:12px;accent-color:#5B21B6;width:16px;height:16px;" onchange="selectGcTpl(this)">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Inherited Cardiac Risk Note</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#DBEAFE;color:#1D4ED8;flex-shrink:0;">GC</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">Long QT, HCM, arrhythmia panels — medication flags and cardiology referral workflow</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Reason for Referral &middot; Cardiac Hx &middot; Family Hx &middot; Test Results &middot; QTc Flags &middot; Risk Summary &middot; Specialist Referral &middot; Patient Education</div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="gcDocTemplate" value="gc_prenatal" style="position:absolute;top:12px;right:12px;accent-color:#5B21B6;width:16px;height:16px;" onchange="selectGcTpl(this)">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Prenatal Genetic Counseling Note</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#D1FAE5;color:#065F46;flex-shrink:0;">GC</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">cfDNA, carrier screening, prenatal panels — reproductive options and OB coordination</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Gestational Age &middot; Carrier Status &middot; cfDNA Result &middot; Risk Calculation &middot; Reproductive Options &middot; OB Referral &middot; Consent Documented &middot; Patient Education</div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;background:#fff;border:2px solid #E5E0D8;border-radius:10px;padding:16px;cursor:pointer;position:relative;">
+              <input type="radio" name="gcDocTemplate" value="gc_pediatric" style="position:absolute;top:12px;right:12px;accent-color:#5B21B6;width:16px;height:16px;" onchange="selectGcTpl(this)">
+              <div style="display:flex;align-items:center;gap:8px;padding-right:24px;">
+                <span style="font-size:13px;font-weight:700;color:#111827;">Pediatric Genetics Note</span>
+                <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:#FEF3C7;color:#92400E;flex-shrink:0;">GC</span>
+              </div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.4;">Pediatric genetic evaluation, dysmorphology, exome/genome sequencing results</div>
+              <div style="font-size:11px;color:#374151;line-height:1.6;margin-top:2px;"><span style="font-weight:600;">Sections:</span> Developmental Hx &middot; Family Hx &middot; Dysmorphic Features &middot; Test Results &middot; Diagnosis &middot; Specialist Referrals &middot; Recurrence Risk &middot; Support Resources</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Template Preview -->
+        <div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;margin-bottom:20px;">
           <div onclick="toggleDocTplPreview()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;cursor:pointer;background:#fff;user-select:none;">
             <span style="font-size:13px;font-weight:600;color:#374151;flex:1;">Preview full template structure</span>
             <span id="docTplChev" style="color:#9CA3AF;font-size:13px;transition:transform 0.2s;">&#9660;</span>
           </div>
           <div id="docTplPreviewBody" style="display:none;border-top:1px solid #E5E0D8;background:#FAFAFA;">
             <div id="docTplPreviewContent" style="padding:12px 16px;"></div>
+          </div>
+        </div>
+
+        <!-- Automated Template Mapping -->
+        <div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;">
+          <div onclick="toggleTplMapping()" style="display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;background:#F9F8F6;user-select:none;border-bottom:1px solid #E5E0D8;" id="tplMappingHeader">
+            <span style="font-size:14px;">🗂️</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;font-weight:700;color:#111827;">Automated Template Mapping</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:1px;">Define which template loads automatically based on consult type and result category</div>
+            </div>
+            <span id="tplMappingChev" style="color:#9CA3AF;font-size:13px;">&#9660;</span>
+          </div>
+          <div id="tplMappingBody" style="display:none;padding:16px 18px;background:#fff;">
+            <div style="font-size:12px;color:#6B7280;margin-bottom:14px;line-height:1.5;">
+              When automated template mapping is enabled, the system will pre-select the appropriate documentation template when a provider or GC opens a consult note, based on the consult type and result category. This reduces documentation errors and speeds up charting.
+            </div>
+
+            <!-- Mapping toggle -->
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;margin-bottom:16px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                <input type="checkbox" id="autoTplMappingToggle" checked style="width:16px;height:16px;accent-color:#059669;">
+                <span style="font-size:13px;font-weight:600;color:#065F46;">Enable automated template mapping for this care product</span>
+              </label>
+            </div>
+
+            <!-- Mapping table -->
+            <div id="autoTplMappingTable" style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                <thead>
+                  <tr style="background:#F9F8F6;border-bottom:1px solid #E5E0D8;">
+                    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Consult Type</th>
+                    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Result / Stage</th>
+                    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Auto-Loaded Template</th>
+                    <th style="padding:10px 14px;text-align:left;font-weight:700;color:#374151;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Override Allowed</th>
+                  </tr>
+                </thead>
+                <tbody id="tplMappingRows">
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 14px;color:#374151;">Pre-Test Consult</td>
+                    <td style="padding:10px 14px;color:#374151;">All</td>
+                    <td style="padding:10px 14px;">
+                      <select style="border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:#111827;">
+                        <option>Pre-Test Counseling Note</option>
+                        <option>Hereditary Risk Consult Note</option>
+                        <option>Standard SOAP Note</option>
+                      </select>
+                    </td>
+                    <td style="padding:10px 14px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 14px;color:#374151;">Post-Test — Positive Result</td>
+                    <td style="padding:10px 14px;color:#374151;">Pathogenic / Likely Pathogenic</td>
+                    <td style="padding:10px 14px;">
+                      <select style="border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:#111827;">
+                        <option>Hereditary Risk Consult Note</option>
+                        <option>Inherited Cardiac Risk Note</option>
+                        <option>Prenatal Genetic Counseling Note</option>
+                      </select>
+                    </td>
+                    <td style="padding:10px 14px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 14px;color:#374151;">Post-Test — Negative Result</td>
+                    <td style="padding:10px 14px;color:#374151;">Benign / Likely Benign</td>
+                    <td style="padding:10px 14px;">
+                      <select style="border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:#111827;">
+                        <option>Hereditary Risk Consult Note</option>
+                        <option>Standard SOAP Note</option>
+                      </select>
+                    </td>
+                    <td style="padding:10px 14px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #F3F4F6;">
+                    <td style="padding:10px 14px;color:#374151;">Post-Test — VUS</td>
+                    <td style="padding:10px 14px;color:#374151;">Variant of Uncertain Significance</td>
+                    <td style="padding:10px 14px;">
+                      <select style="border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:#111827;">
+                        <option>Hereditary Risk Consult Note</option>
+                        <option>Standard SOAP Note</option>
+                      </select>
+                    </td>
+                    <td style="padding:10px 14px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 14px;color:#374151;">Async / Report Review</td>
+                    <td style="padding:10px 14px;color:#374151;">GCA Report Review</td>
+                    <td style="padding:10px 14px;">
+                      <select style="border:1px solid #E5E0D8;border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;color:#111827;">
+                        <option>GC Report Review Note</option>
+                        <option>Hereditary Risk Consult Note</option>
+                      </select>
+                    </td>
+                    <td style="padding:10px 14px;"><input type="checkbox" style="accent-color:#6B21A8;"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:10px;font-size:11px;color:#9CA3AF;">
+              Auto-loaded templates can be overridden by the provider before saving the note if Override is enabled. Changes to mapping take effect on new consults only.
+            </div>
           </div>
         </div>
       </div>
@@ -2368,6 +2525,96 @@ function buildReview() {
   });
 }
 
+
+// ── Documentation Template (Step 14) ────────────────────────────────────────
+var docTplSelected = 4; // default = No Template
+var docTplLabels = { 1:'A1C E&M Template', 2:'Annual Wellness Visit Template', 3:'Standard SOAP Note', 4:'No Template',
+  gc_hereditary:'Hereditary Risk Consult Note', gc_cardiac:'Inherited Cardiac Risk Note',
+  gc_prenatal:'Prenatal Genetic Counseling Note', gc_pediatric:'Pediatric Genetics Note' };
+
+var DOC_TPL_SECTIONS = {
+  1: ['Chief Complaint','HPI','Review of Systems','Vitals / Measurements','Lab Results (A1C, eGFR, LDL)','Assessment','Plan','HEDIS CDC Measures (7)','MDM / Billing Code'],
+  2: ['Chief Complaint','Medication Reconciliation','Katz ADL Index','PRAPARE Screener','Assessment','HEDIS Gap Closure (11 measures)','Plan / Orders','MDM / Billing Code'],
+  3: ['Subjective','Objective','Assessment','Plan'],
+  4: [],
+  gc_hereditary: ['Reason for Referral','Family History (3-generation pedigree)','Personal History','Risk Assessment','Genetic Test Results','Variant Classification','Recommendations','Patient Education Summary','Follow-up Plan'],
+  gc_cardiac: ['Reason for Referral','Cardiac History','Family History','Test Results','QTc / Medication Flags','Risk Summary','Specialist Referral','Patient Education'],
+  gc_prenatal: ['Gestational Age','Carrier Status','cfDNA Screening Result','Risk Calculation','Reproductive Options','OB Referral','Consent Documented','Patient Education'],
+  gc_pediatric: ['Developmental History','Family History','Dysmorphic Features','Test Results / Diagnosis','Specialist Referrals','Recurrence Risk','Support Resources'],
+};
+
+function selectDocTpl(idx) {
+  docTplSelected = idx;
+  [1,2,3,4].forEach(function(i) {
+    var card = document.getElementById('docTplCard'+i);
+    if (!card) return;
+    card.style.border = (i===idx) ? '2px solid #6B21A8' : '2px solid #E5E0D8';
+    card.style.background = (i===idx) ? '#F5F3FF' : '#fff';
+  });
+  updateDocTplPreview();
+}
+
+function selectGcTpl(radio) {
+  docTplSelected = radio.value;
+  updateDocTplPreview();
+}
+
+function checkDocTplAutoSelect() {
+  // Show GC vs Medical templates based on ecosystem selection
+  var isGC = document.querySelector('input[name="ecoType"][value="genetics"]') &&
+             document.querySelector('input[name="ecoType"][value="genetics"]').checked;
+  // Fallback: check _ecoSelected (0=Medical,1=Genetics)
+  var gcMode = isGC || (_ecoSelected === 1);
+  document.getElementById('medicalTplSection').style.display = gcMode ? 'none' : '';
+  document.getElementById('gcTplSection').style.display = gcMode ? '' : 'none';
+  // Auto-suggest banner
+  var productName = (document.getElementById('s1_name') ? document.getElementById('s1_name').value : '').toLowerCase();
+  if (!gcMode) {
+    var suggested = null;
+    if (productName.indexOf('a1c') > -1 || productName.indexOf('diabetes') > -1) suggested = 1;
+    else if (productName.indexOf('wellness') > -1 || productName.indexOf('awv') > -1) suggested = 2;
+    if (suggested) { selectDocTpl(suggested); document.getElementById('docTplBanner').style.display = ''; }
+    else document.getElementById('docTplBanner').style.display = 'none';
+  } else {
+    document.getElementById('docTplBanner').style.display = 'none';
+  }
+}
+
+function toggleDocTplPreview() {
+  var body = document.getElementById('docTplPreviewBody');
+  var chev = document.getElementById('docTplChev');
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+  if (!open) updateDocTplPreview();
+}
+
+function updateDocTplPreview() {
+  var content = document.getElementById('docTplPreviewContent');
+  if (!content || document.getElementById('docTplPreviewBody').style.display === 'none') return;
+  var key = docTplSelected;
+  var sections = DOC_TPL_SECTIONS[key] || [];
+  if (!sections.length) {
+    content.innerHTML = '<div style="font-size:12px;color:#9CA3AF;font-style:italic;">No template selected — documentation section will not appear for providers.</div>';
+    return;
+  }
+  var label = docTplLabels[key] || 'Selected Template';
+  content.innerHTML = '<div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">' + label + '</div>' +
+    sections.map(function(s, i) {
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #F3F4F6;font-size:12px;color:#374151;">' +
+        '<span style="width:20px;height:20px;background:#EDE9FE;color:#5B21B6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">' + (i+1) + '</span>' +
+        '<span>' + s + '</span></div>';
+    }).join('');
+}
+
+function toggleTplMapping() {
+  var body = document.getElementById('tplMappingBody');
+  var chev = document.getElementById('tplMappingChev');
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+// ── End Documentation Template ───────────────────────────────────────────────
 
 // Ecosystem Classification card selection
 var _ecoSelected = 1;
