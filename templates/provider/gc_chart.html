@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}GC Chart — Jennifer Walsh | Telehealth{% endblock %}
+{% block title %}GC Chart | Telehealth{% endblock %}
 {% block head %}
 <style>
 /* ── Layout ── */
@@ -25,6 +25,12 @@
 .gc-badge-pathogenic { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
 .gc-badge-program { background: #EDE9FE; color: #6B21A8; border-color: #C4B5FD; }
 .gc-badge-status { background: #FFF8E1; color: #92400E; border-color: #FDE68A; }
+.gc-badge-vus { background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
+.gc-badge-scheduled { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+.gc-badge-pretest { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
+.gc-badge-pending { background: #FFF8E1; color: #92400E; border-color: #FDE68A; }
+.gc-alert-info { background: #FFF7ED; border-bottom: 2px solid #FED7AA; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #C2410C; font-weight: 600; flex-shrink: 0; }
+.gc-alert-pretest { background: #F0FDF4; border-bottom: 2px solid #BBF7D0; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #15803D; font-weight: 600; flex-shrink: 0; }
 .gc-header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px; }
 .btn-primary { background: #6B21A8; color: #fff; }
@@ -746,12 +752,101 @@ NEXT STEPS:
 {% endblock %}
 {% block scripts %}
 <script>
+// ── Demo Patient Registry ─────────────────────────────────────────────────────
+var GC_PATIENTS = {
+  1: {
+    initials: 'JW',
+    name: 'Jennifer Walsh',
+    meta: '42F · DOB: 03/15/1982 · MRN: EW-004821 · CST-2026-10901 · TX — Licensed ✓',
+    alertClass: 'gc-alert',
+    alert: 'PATHOGENIC Variant Identified — BRCA1 c.5266dupC · Results disclosure required · Post-disclosure care plan pending',
+    badges: [
+      {text: '⚠ BRCA1 Pathogenic', cls: 'gc-badge-pathogenic'},
+      {text: 'BRCA Counseling', cls: 'gc-badge-program'},
+      {text: 'Disclosure Pending', cls: 'gc-badge-status'},
+    ],
+    primaryBtn: 'Start Disclosure Session',
+    primaryAction: "gcToast('Starting disclosure session — timer started')",
+  },
+  2: {
+    initials: 'DM',
+    name: 'David Morales',
+    meta: '38M · DOB: 09/22/1985 · MRN: EW-008234 · CST-2026-11042 · CA — Licensed ✓',
+    alertClass: 'gc-alert gc-alert-info',
+    alert: 'Variant of Uncertain Significance — BRCA2 c.7397T>C · VUS counseling session scheduled · Family cascade testing recommended',
+    badges: [
+      {text: '⬡ BRCA2 VUS', cls: 'gc-badge-vus'},
+      {text: 'BRCA Counseling', cls: 'gc-badge-program'},
+      {text: 'Results Session Scheduled', cls: 'gc-badge-scheduled'},
+    ],
+    primaryBtn: 'Start Results Session',
+    primaryAction: "gcToast('Opening results delivery session for David Morales')",
+  },
+  3: {
+    initials: 'AP',
+    name: 'Amara Patel',
+    meta: '29F · DOB: 06/08/1995 · MRN: EW-011507 · CST-2026-11189 · FL — Licensed ✓',
+    alertClass: 'gc-alert gc-alert-pretest',
+    alert: 'Pre-Test Consult — Panel not yet ordered · Informed consent obtained · Awaiting lab order authorization',
+    badges: [
+      {text: '○ Pre-Test', cls: 'gc-badge-pretest'},
+      {text: 'Hereditary Cardiac Risk', cls: 'gc-badge-program'},
+      {text: 'Lab Order Pending', cls: 'gc-badge-pending'},
+    ],
+    primaryBtn: 'Submit Lab Order',
+    primaryAction: "gcToast('Opening lab order authorization for Amara Patel')",
+  },
+};
+
+// Render patient-specific header from Flask-injected patient_id
+var PATIENT_ID = {{ patient_id }};
+var pt = GC_PATIENTS[PATIENT_ID] || GC_PATIENTS[1];
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Update page title
+  document.title = 'GC Chart — ' + pt.name + ' | Telehealth';
+
+  // Avatar
+  var av = document.querySelector('.gc-avatar');
+  if (av) av.textContent = pt.initials;
+
+  // Name + meta
+  var nm = document.querySelector('.gc-patient-name');
+  if (nm) nm.textContent = pt.name;
+  var meta = document.querySelector('.gc-patient-meta');
+  if (meta) meta.textContent = pt.meta;
+
+  // Alert bar
+  var alertEl = document.querySelector('.gc-alert');
+  if (alertEl) {
+    alertEl.className = pt.alertClass;
+    alertEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ' + pt.alert;
+  }
+
+  // Badges
+  var badgesEl = document.querySelector('.gc-badges');
+  if (badgesEl) {
+    badgesEl.innerHTML = pt.badges.map(function(b) {
+      return '<span class="gc-badge ' + b.cls + '">' + b.text + '</span>';
+    }).join('');
+  }
+
+  // Primary action button
+  var primBtn = document.querySelector('.gc-header-actions .btn-primary');
+  if (primBtn) {
+    primBtn.textContent = pt.primaryBtn;
+    primBtn.setAttribute('onclick', pt.primaryAction);
+  }
+
+  // Message button patient name
+  var msgBtn = document.querySelector('.gc-header-actions .btn-outline');
+  if (msgBtn) msgBtn.setAttribute('onclick', "gcToast('Message sent to " + pt.name + "')");
+});
+// ── End Patient Registry ───────────────────────────────────────────────────────
+
 function switchTab(name, el) {
-  // Hide all tab bodies
   document.querySelectorAll('.gc-body').forEach(function(b){ b.style.display = 'none'; });
-  // Deactivate all tabs
   document.querySelectorAll('.gc-tab').forEach(function(t){ t.classList.remove('active'); });
-  // Show selected
   var panel = document.getElementById('tab-' + name);
   if (panel) panel.style.display = 'flex';
   el.classList.add('active');

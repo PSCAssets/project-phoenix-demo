@@ -325,12 +325,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             </td>
           </tr>
           <!-- Assigned rows -->
-          <tr data-state="NY" data-stype="Results Delivery 45">
-            <td>D.W. · 61M</td>
-            <td>Hereditary Cancer Panel</td>
+          <tr data-state="TX" data-stype="Results Delivery 45">
+            <td>J.W. · 42F</td>
+            <td>BRCA1/2 Full Seq + Del/Dup</td>
             <td><span class="badge badge-inprog">Results Delivery 45</span></td>
-            <td><span class="badge-state">NY</span></td>
-            <td>Quest Diagnostics</td>
+            <td><span class="badge-state">TX</span></td>
+            <td>GeneDx</td>
             <td>—</td>
             <td>Today 10:30 AM</td>
             <td><span class="badge badge-inprog">In Progress</span></td>
@@ -340,32 +340,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
               <button class="escalate-btn" onclick="gcEscalate(this)" title="Escalate">↑</button>
             </td>
           </tr>
-          <tr data-state="FL" data-stype="Results Delivery PGx">
-            <td>A.M. · 44F</td>
-            <td>Pharmacogenomics Panel</td>
-            <td><span class="badge" style="background:#F0FDF4;color:#15803D;border:1px solid #86EFAC;">Results Delivery PGx</span></td>
-            <td><span class="badge-state">FL</span></td>
-            <td>Fulgent Genetics</td>
+          <tr data-state="CA" data-stype="Results Delivery 30">
+            <td>D.M. · 38M</td>
+            <td>BRCA1/2 Full Seq + Del/Dup</td>
+            <td><span class="badge" style="background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;">Results Delivery 30 — VUS</span></td>
+            <td><span class="badge-state">CA</span></td>
+            <td>Invitae</td>
             <td>—</td>
             <td>Today 1:00 PM</td>
             <td><span class="badge badge-assigned">Scheduled</span></td>
             <td class="actions-cell">
-              <button class="view-btn" onclick="window.location.href='/provider/gc/chart/1'">View</button>
+              <button class="view-btn" onclick="window.location.href='/provider/gc/chart/2'">View</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 6)">Route</button>
               <button class="escalate-btn" onclick="gcEscalate(this)" title="Escalate">↑</button>
             </td>
           </tr>
-          <tr data-state="CT" data-stype="Pre-Test Consult 45">
-            <td>L.C. · 29F</td>
-            <td>Hereditary Cancer Panel</td>
+          <tr data-state="FL" data-stype="Pre-Test Consult 45">
+            <td>A.P. · 29F</td>
+            <td>Inherited Cardiac Risk Panel</td>
             <td><span class="badge badge-new">Pre-Test Consult 45</span></td>
-            <td><span class="badge-state">CT</span></td>
-            <td>MyHeritage Health</td>
+            <td><span class="badge-state">FL</span></td>
+            <td>Blueprint Genetics</td>
             <td>—</td>
             <td>Today 3:15 PM</td>
             <td><span class="badge badge-assigned">Scheduled</span></td>
             <td class="actions-cell">
-              <button class="view-btn" onclick="window.location.href='/provider/gc/chart/1'">View</button>
+              <button class="view-btn" onclick="window.location.href='/provider/gc/chart/3'">View</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 7)">Route</button>
               <button class="escalate-btn" onclick="gcEscalate(this)" title="Escalate">↑</button>
             </td>
@@ -615,7 +615,12 @@ function openConsultDetail(patient, svc, partner, state) {
 function openChart() {
   closeModal('consultModal');
   showToast('Opening patient chart…');
-  setTimeout(function(){ window.location.href = '/provider/gc/chart/1'; }, 800);
+  var btn = gcTakeBtn;
+  var row = btn ? btn.closest('tr') : null;
+  var ptCell = row ? row.cells[0].textContent.trim() : '';
+  // Map initials to patient IDs for demo
+  var pid = ptCell.startsWith('J.W') ? 1 : ptCell.startsWith('D.M') ? 2 : ptCell.startsWith('A.P') ? 3 : 1;
+  setTimeout(function(){ window.location.href = '/provider/gc/chart/' + pid; }, 800);
 }
 
 function setStateFilter(state, btn) {
