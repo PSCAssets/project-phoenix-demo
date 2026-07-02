@@ -128,9 +128,9 @@ def inject_sidebar_nav():
     role  = session.get('role', '')
     _path = _req.path
 
-    # Admin, patient, and care_team portals have their own sidebars — never show the global g-sidebar
-    # Exception: provider_psr uses the global sidebar across all pages for consistency
-    if _req.blueprint in ('admin', 'patient', 'care_team') and role != 'provider_psr':
+    # Admin and patient portals have their own sidebars — never show the global g-sidebar
+    # care_team and provider_psr both use the global g-sidebar for consistency across all pages
+    if _req.blueprint in ('admin', 'patient') and role not in ('provider_psr', 'care_team', 'care_team_gaps'):
         return dict(sidebar_nav=[], user_role=role)
 
     # Index page (login screen) — no sidebar
@@ -257,6 +257,9 @@ def inject_sidebar_nav():
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
+        'care_team_gaps': [
+            ('Dashboard',     '/care-team/gaps',         'home',      ['/care-team/gaps']),
+        ],
         'provider_psr': [
             ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
             ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
@@ -267,9 +270,6 @@ def inject_sidebar_nav():
             ('Network Schedule','/provider/schedule',             'calendar',  ['/provider/schedule']),
             ('Messages',       '/provider/messages',              'message',   ['/provider/messages']),
             ('Settings',       '/provider/settings',              'settings',  ['/provider/settings']),
-        ],
-        'care_team_gaps': [
-            ('Dashboard',     '/care-team/gaps',         'home',      ['/care-team/gaps']),
         ],
         'scheduler': [
             ('Dashboard',     '/scheduler/',             'home',      ['/scheduler/']),
