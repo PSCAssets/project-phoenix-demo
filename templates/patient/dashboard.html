@@ -8,6 +8,29 @@
     --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
     --amber: #D97706; --amber-bg: #FFFBEB; --blue: #2D5C2E; --blue-bg: #F2EDE4;
   }
+  /* ── Humana theme overrides (applied via .theme-humana on body) ── */
+  .theme-humana { --navy: #003087; --green: #0070CE; --green-dark: #005BAA; --green-light: #EBF4FF; --border: #C5D8F0; --bg: #F5F9FF; --blue: #003087; --blue-bg: #EBF4FF; }
+  .theme-humana .sidenav { background: #003087; }
+  .theme-humana .nav-item.active { background: rgba(0,112,206,0.25); }
+  .theme-humana .nav-item.active::before { background: #0070CE; }
+  .theme-humana .nav-logo-text { color: #fff; }
+  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C5D8F0; }
+  .theme-humana .topbar-title { color: #003087; }
+  .theme-humana .nav-logo { border-bottom-color: rgba(255,255,255,0.15); }
+
+  /* Care product selector chip */
+  .cp-selector-wrap { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 20px; background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--navy); white-space: nowrap; position: relative; }
+  .cp-selector-wrap:hover { border-color: var(--green); }
+  .cp-selector-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .cp-dropdown { position: absolute; top: calc(100% + 6px); right: 0; min-width: 240px; background: #fff; border: 1.5px solid #E5E0D8; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.12); z-index: 200; overflow: hidden; display: none; }
+  .cp-dropdown.open { display: block; }
+  .cp-option { display: flex; align-items: center; gap: 10px; padding: 11px 14px; font-size: 13px; color: #374151; cursor: pointer; border-bottom: 1px solid #F3F4F6; }
+  .cp-option:last-child { border-bottom: none; }
+  .cp-option:hover { background: #F9FAFB; }
+  .cp-option.active { background: #EBF4FF; color: #003087; font-weight: 700; }
+  .cp-option-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cp-option-label { flex: 1; }
+  .cp-option-sub { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
   .sidenav { width: 240px; background: var(--navy); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
@@ -84,7 +107,10 @@
 {% endblock %}
 {% block content %}
   <aside class="sidenav">
-    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Patient Portal</div></div>
+    <div class="nav-logo" id="sideNavLogo">
+      <div class="nav-logo-text" id="logoMain">Everlywell</div>
+      <div class="nav-logo-sub" id="logoSub">Patient Portal</div>
+    </div>
     <div class="nav-user">
       <div class="nav-avatar" style="background:#0EA5E9">JR</div>
       <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
@@ -107,6 +133,39 @@
     <div class="topbar">
       <div class="topbar-title">Dashboard</div>
       <span style="font-size:13px;color:var(--gray)">Good morning, Jamie 👋</span>
+      <!-- Care Product Selector -->
+      <div style="position:relative;margin-left:auto;" id="cpSelectorWrap">
+        <div class="cp-selector-wrap" onclick="toggleCpDropdown(event)" id="cpSelectorChip">
+          <span class="cp-selector-dot" id="cpSelectorDot"></span>
+          <span id="cpSelectorLabel">A1C Management</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="cp-dropdown" id="cpDropdown">
+          <div style="padding:8px 14px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;">Switch Care Product</div>
+          <div class="cp-option active" onclick="selectCareProduct('a1c')" id="cpOpt-a1c">
+            <span class="cp-option-dot" style="background:#3E8168;"></span>
+            <div class="cp-option-label">
+              <div>A1C Management</div>
+              <div class="cp-option-sub">Everlywell · Active</div>
+            </div>
+            <span style="font-size:11px;color:#3E8168;">✓</span>
+          </div>
+          <div class="cp-option" onclick="selectCareProduct('humana')" id="cpOpt-humana">
+            <span class="cp-option-dot" style="background:#0070CE;"></span>
+            <div class="cp-option-label">
+              <div>A1C Management</div>
+              <div class="cp-option-sub">Humana · Active</div>
+            </div>
+          </div>
+          <div class="cp-option" onclick="selectCareProduct('awv')" id="cpOpt-awv">
+            <span class="cp-option-dot" style="background:#D97706;"></span>
+            <div class="cp-option-label">
+              <div>Annual Wellness Visit</div>
+              <div class="cp-option-sub">Everlywell · Pending</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="content">
       <!-- Message Banner -->
@@ -233,4 +292,86 @@
       </div>
     </div>
   </div>
+{% endblock %}
+{% block scripts %}
+<script>
+var CARE_PRODUCTS = {
+  a1c: {
+    label: 'A1C Management',
+    dotColor: '#3E8168',
+    theme: null,         // default Everlywell theme
+    logoMain: 'Everlywell',
+    logoSub: 'Patient Portal',
+    greeting: 'Good morning, Jamie 👋',
+  },
+  humana: {
+    label: 'Humana · A1C Management',
+    dotColor: '#0070CE',
+    theme: 'humana',
+    logoMain: 'Humana',
+    logoSub: 'Powered by Everlywell',
+    greeting: 'Good morning, Jamie 👋',
+  },
+  awv: {
+    label: 'Annual Wellness Visit',
+    dotColor: '#D97706',
+    theme: null,
+    logoMain: 'Everlywell',
+    logoSub: 'Patient Portal',
+    greeting: 'Good morning, Jamie 👋',
+  },
+};
+
+var _activeCp = 'a1c';
+
+function selectCareProduct(key) {
+  _activeCp = key;
+  var cp = CARE_PRODUCTS[key];
+  if (!cp) return;
+
+  // Update selector chip
+  document.getElementById('cpSelectorLabel').textContent = cp.label;
+  document.getElementById('cpSelectorDot').style.background = cp.dotColor;
+
+  // Update active state in dropdown
+  ['a1c','humana','awv'].forEach(function(k) {
+    var opt = document.getElementById('cpOpt-' + k);
+    if (!opt) return;
+    opt.classList.toggle('active', k === key);
+    var tick = opt.querySelector('span:last-child');
+    if (tick) tick.style.display = (k === key) ? '' : 'none';
+  });
+
+  // Apply / remove body theme class
+  document.body.classList.remove('theme-humana');
+  if (cp.theme) document.body.classList.add('theme-' + cp.theme);
+
+  // Update sidebar logo
+  var logoMain = document.getElementById('logoMain');
+  var logoSub  = document.getElementById('logoSub');
+  if (logoMain) logoMain.textContent = cp.logoMain;
+  if (logoSub)  logoSub.textContent  = cp.logoSub;
+
+  closeCpDropdown();
+}
+
+function toggleCpDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('cpDropdown').classList.toggle('open');
+}
+function closeCpDropdown() {
+  document.getElementById('cpDropdown').classList.remove('open');
+}
+document.addEventListener('click', closeCpDropdown);
+
+// Init — ensure tick marks are correct on load
+document.addEventListener('DOMContentLoaded', function() {
+  ['humana','awv'].forEach(function(k) {
+    var opt = document.getElementById('cpOpt-' + k);
+    if (!opt) return;
+    var tick = opt.querySelector('span:last-child');
+    if (tick) tick.style.display = 'none';
+  });
+});
+</script>
 {% endblock %}
