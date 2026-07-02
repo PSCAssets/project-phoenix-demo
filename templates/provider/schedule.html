@@ -209,6 +209,7 @@
   <!-- Multi-provider filter panel -->
   <div class="sched-filter-panel">
     <div class="filter-row">
+      {% if session.get('role') not in ('provider_gc',) %}
       <div class="filter-group">
         <span class="filter-label">State</span>
         <select class="state-select" id="stateFilter" onchange="filterByState(this.value)">
@@ -234,9 +235,10 @@
         </select>
       </div>
       <div class="filter-divider"></div>
+      {% endif %}
       <span class="filter-label">Providers (up to 5)</span>
       <div class="chip-list" id="providerChips"></div>
-      {% if session.get('role') not in ('provider_md', 'provider_np') %}
+      {% if session.get('role') not in ('provider_md', 'provider_np', 'provider_gc') %}
       <div style="position:relative;">
         <button onclick="toggleAddProviderDropdown(event)" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:#F5F3FF;border:1.5px solid #D8B4FE;border-radius:7px;font-size:12px;font-weight:600;color:#6B21A8;cursor:pointer;white-space:nowrap;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

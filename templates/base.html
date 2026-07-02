@@ -105,8 +105,29 @@
     </div>
     <div class="nav-user">
       {% if session.get('role') and request.blueprint != 'patient' %}{% set _r = session.get('role') %}
+      {% set _role_titles = {
+        'provider_md': 'Physician (MD)',
+        'provider_np': 'Nurse Practitioner',
+        'provider_rn': 'Lead RN',
+        'provider_ma': 'Medical Assistant',
+        'provider_gc': 'Genetic Counselor',
+        'provider_gca': 'GC Assistant',
+        'provider_doh': 'DOH Coordinator',
+        'provider_psr': 'PSS Team Manager',
+        'provider_manager': 'MA / RN Team Manager',
+        'scheduler': 'Scheduling Coordinator',
+        'care_team': 'Care Team',
+        'care_team_gaps': 'Gaps in Care',
+        'admin': 'Platform Admin',
+        'gc_admin': 'GC Administrator',
+        'qa_reviewer': 'QA Reviewer',
+      } %}
       <div class="nav-session-user">
-        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% elif _r == 'gc_admin' %}DC{% elif _r == 'qa_reviewer' %}RC{% else %}??{% endif %}</div>
+        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% elif _r == 'gc_admin' %}ME{% elif _r == 'qa_reviewer' %}RC{% else %}??{% endif %}</div>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <span style="color:rgba(255,255,255,0.95);font-size:12px;font-weight:600;white-space:nowrap;line-height:1.2;">{{ session.get('display_name', '') }}</span>
+          {% if _role_titles.get(_r) %}<span style="color:rgba(255,255,255,0.55);font-size:10px;white-space:nowrap;line-height:1.2;">{{ _role_titles[_r] }}</span>{% endif %}
+        </div>
       </div>
       {% endif %}
       {% if request.blueprint == 'patient' %}
