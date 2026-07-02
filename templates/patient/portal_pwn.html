@@ -112,6 +112,63 @@
   }
   .status-scheduled { background: #DBEAFE; color: #1D4ED8; }
   .status-results   { background: #D1FAE5; color: #065F46; }
+
+  /* Abnormal result alert banner */
+  .abnormal-alert {
+    background: #FFFBEB;
+    border: 1.5px solid #FCD34D;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  .abnormal-alert-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+  .abnormal-alert-body { flex: 1; }
+  .abnormal-alert-title { font-size: 14px; font-weight: 700; color: #92400E; margin-bottom: 4px; }
+  .abnormal-alert-desc { font-size: 13px; color: #78350F; line-height: 1.5; }
+  .abnormal-alert-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-alert-primary { background: #D97706; color: #fff; border: none; border-radius: 7px; padding: 8px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
+  .btn-alert-primary:hover { background: #B45309; }
+  .btn-alert-secondary { background: #fff; color: #92400E; border: 1.5px solid #FCD34D; border-radius: 7px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-alert-secondary:hover { background: #FFFBEB; }
+
+  /* Consult scheduling modal */
+  .consult-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+  .consult-modal-overlay.open { display: flex; }
+  .consult-modal { background: #fff; border-radius: 14px; width: 560px; max-width: 95vw; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.2); }
+  .consult-modal-header { padding: 22px 24px 16px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; justify-content: space-between; }
+  .consult-modal-title { font-size: 16px; font-weight: 700; color: #0A2F5C; }
+  .consult-modal-close { background: none; border: none; font-size: 22px; color: #9CA3AF; cursor: pointer; line-height: 1; }
+  .consult-modal-close:hover { color: #374151; }
+  .step-indicator { display: flex; align-items: center; gap: 0; padding: 14px 24px; border-bottom: 1px solid #E5E7EB; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .step-dot.done { background: #0A2F5C; color: #fff; }
+  .step-dot.active { background: #0A2F5C; color: #fff; outline: 3px solid #BFDBFE; }
+  .step-dot.pending { background: #F3F4F6; color: #9CA3AF; border: 1.5px solid #E5E7EB; }
+  .step-line { flex: 1; height: 2px; background: #E5E7EB; margin: 0 6px; }
+  .step-line.done { background: #0A2F5C; }
+  .step-label { font-size: 11px; color: #6B7280; text-align: center; margin-top: 4px; }
+  .consult-modal-body { padding: 22px 24px; }
+  .consult-modal-footer { padding: 16px 24px; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; }
+  .topic-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .topic-item:hover { border-color: #93C5FD; background: #F0F9FF; }
+  .topic-item.selected { border-color: #0A2F5C; background: #EFF6FF; }
+  .topic-item input[type=checkbox] { width: 16px; height: 16px; margin-top: 2px; accent-color: #0A2F5C; flex-shrink: 0; cursor: pointer; }
+  .topic-item-label { font-size: 13px; font-weight: 600; color: #111827; }
+  .topic-item-sub { font-size: 12px; color: #6B7280; margin-top: 2px; }
+  .topic-abnormal-badge { display: inline-block; font-size: 10px; font-weight: 700; background: #FFFBEB; color: #92400E; border: 1px solid #FCD34D; border-radius: 4px; padding: 1px 6px; margin-left: 6px; }
+  .consult-type-option { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1.5px solid #E5E7EB; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
+  .consult-type-option:hover { border-color: #93C5FD; background: #F0F9FF; }
+  .consult-type-option.selected { border-color: #0A2F5C; background: #EFF6FF; }
+  .consult-type-option input[type=radio] { accent-color: #0A2F5C; width: 16px; height: 16px; }
+  .confirm-check { font-size: 52px; text-align: center; margin-bottom: 12px; }
+  .confirm-id { font-family: monospace; background: #F3F4F6; border-radius: 6px; padding: 6px 14px; font-size: 13px; font-weight: 700; color: #374151; display: inline-block; margin: 8px 0; }
+  .confirm-topic-list { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px 16px; margin-top: 14px; }
+  .confirm-topic-list-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #1E3A5F; margin-bottom: 8px; }
+  .confirm-topic-row { font-size: 13px; color: #374151; padding: 3px 0; border-bottom: 1px solid #DBEAFE; }
+  .confirm-topic-row:last-child { border-bottom: none; }
   .consult-meta { font-size: 12px; color: #6B7280; margin-bottom: 4px; }
   .consult-meta strong { color: #374151; font-weight: 600; }
 
@@ -289,6 +346,20 @@
 
       <!-- ── DASHBOARD ── -->
       <div class="section-panel active" id="panel-dashboard">
+
+        <!-- Abnormal result alert -->
+        <div class="abnormal-alert" id="abnormalAlert">
+          <div class="abnormal-alert-icon">⚠️</div>
+          <div class="abnormal-alert-body">
+            <div class="abnormal-alert-title">Action Recommended — Abnormal Result Requires Consultation</div>
+            <div class="abnormal-alert-desc">Your <strong>BRCA2 panel</strong> returned a <strong>Variant of Uncertain Significance (VUS)</strong>. A consultation with your genetic counselor is recommended to review this result and discuss next steps.</div>
+            <div class="abnormal-alert-actions">
+              <button class="btn-alert-primary" onclick="openConsultModal()">Schedule Consultation</button>
+              <button class="btn-alert-secondary" onclick="showSection('labs', document.querySelector('.nav-item:nth-child(3)'))">View Result Details</button>
+            </div>
+          </div>
+        </div>
+
         <div class="section-label">Consultation History</div>
 
         <!-- Consult 1: Pre-Test -->
@@ -577,7 +648,7 @@
           <strong>Questions about your results?</strong> Your genetic counselor, Dr. Sarah Lee, is available via secure message or you can schedule a follow-up consultation.
           <div style="margin-top:10px;display:flex;gap:10px;">
             <button class="btn-primary-pwn" onclick="showSection('messages', document.querySelector('.nav-item:nth-child(4)'))">Send a Message</button>
-            <button class="btn-outline-pwn" onclick="alert('Scheduling follow-up...')">Schedule Follow-Up</button>
+            <button class="btn-outline-pwn" onclick="openConsultModal()">Schedule Follow-Up</button>
           </div>
         </div>
       </div>
@@ -737,6 +808,146 @@
     <a href="#">Terms of Use</a>
   </footer>
 
+<!-- Consult Scheduling Modal -->
+<div class="consult-modal-overlay" id="consultModal">
+  <div class="consult-modal">
+    <div class="consult-modal-header">
+      <div class="consult-modal-title" id="consultModalTitle">Schedule a Consultation</div>
+      <button class="consult-modal-close" onclick="closeConsultModal()">&#215;</button>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator" id="stepIndicator">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="step-dot active" id="stepDot1">1</div>
+        <div class="step-label">Topics</div>
+      </div>
+      <div class="step-line" id="stepLine1"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="step-dot pending" id="stepDot2">2</div>
+        <div class="step-label">Details</div>
+      </div>
+      <div class="step-line" id="stepLine2"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <div class="step-dot pending" id="stepDot3">3</div>
+        <div class="step-label">Confirm</div>
+      </div>
+    </div>
+
+    <!-- Step 1: Topic Selection -->
+    <div class="consult-modal-body" id="step1">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:6px;">What would you like your genetic counselor to focus on?</div>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:16px;">Select all that apply. Your selections will be shared with Dr. Sarah Lee before your session.</div>
+
+      <div class="topic-item selected" id="topic-brca2" onclick="toggleTopic(this)">
+        <input type="checkbox" checked id="cb-brca2">
+        <div>
+          <div class="topic-item-label">BRCA2 — Variant of Uncertain Significance (VUS) <span class="topic-abnormal-badge">⚠ Abnormal Result</span></div>
+          <div class="topic-item-sub">Understanding what this result means for my health and cancer risk</div>
+        </div>
+      </div>
+      <div class="topic-item" id="topic-family" onclick="toggleTopic(this)">
+        <input type="checkbox" id="cb-family">
+        <div>
+          <div class="topic-item-label">Family history implications</div>
+          <div class="topic-item-sub">How this result may affect my family members and cascade testing options</div>
+        </div>
+      </div>
+      <div class="topic-item" id="topic-risk" onclick="toggleTopic(this)">
+        <input type="checkbox" id="cb-risk">
+        <div>
+          <div class="topic-item-label">Risk management options</div>
+          <div class="topic-item-sub">Surveillance protocols, preventive measures, and lifestyle guidance</div>
+        </div>
+      </div>
+      <div class="topic-item" id="topic-cascade" onclick="toggleTopic(this)">
+        <input type="checkbox" id="cb-cascade">
+        <div>
+          <div class="topic-item-label">Cascade testing for relatives</div>
+          <div class="topic-item-sub">How to arrange genetic testing for my family members</div>
+        </div>
+      </div>
+      <div class="topic-item" id="topic-psych" onclick="toggleTopic(this)">
+        <input type="checkbox" id="cb-psych">
+        <div>
+          <div class="topic-item-label">Emotional &amp; psychosocial support</div>
+          <div class="topic-item-sub">Coping with genetic information and support resources</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Anything else you'd like your counselor to know? <span style="font-weight:400;color:#9CA3AF;">(optional)</span></div>
+        <textarea id="topicNotes" rows="3" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;resize:vertical;" placeholder="e.g. I've been reading about BRCA2 and have specific questions about my surveillance options…" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'"></textarea>
+      </div>
+    </div>
+    <div class="consult-modal-footer" id="step1Footer">
+      <div style="font-size:12px;color:#9CA3AF;">Step 1 of 3</div>
+      <button class="btn-primary-pwn" onclick="goToStep(2)" style="background:#0A2F5C;border-radius:7px;padding:9px 22px;font-size:13px;">Next →</button>
+    </div>
+
+    <!-- Step 2: Consult Details -->
+    <div class="consult-modal-body" id="step2" style="display:none;">
+      <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:16px;">How would you like to meet?</div>
+      <div class="consult-type-option selected" id="ct-video" onclick="selectConsultType('video', this)">
+        <input type="radio" name="consultType" value="video" checked>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#111827;">📹 Video Call</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Secure video session — recommended for result reviews</div>
+        </div>
+      </div>
+      <div class="consult-type-option" id="ct-phone" onclick="selectConsultType('phone', this)">
+        <input type="radio" name="consultType" value="phone">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#111827;">📞 Phone Call</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Audio only — counselor calls you at your number on file</div>
+        </div>
+      </div>
+      <div class="consult-type-option" id="ct-async" onclick="selectConsultType('async', this)">
+        <input type="radio" name="consultType" value="async">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#111827;">💬 Async Message</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Exchange secure messages at your own pace — 48hr response time</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Preferred date</div>
+          <input type="date" id="preferredDate" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Preferred time</div>
+          <select id="preferredTime" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+            <option>Morning (8 AM – 12 PM)</option>
+            <option>Afternoon (12 PM – 4 PM)</option>
+            <option>Evening (4 PM – 7 PM)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="consult-modal-footer" id="step2Footer" style="display:none;">
+      <button onclick="goToStep(1)" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;">← Back</button>
+      <div style="font-size:12px;color:#9CA3AF;">Step 2 of 3</div>
+      <button class="btn-primary-pwn" onclick="goToStep(3)" style="background:#0A2F5C;border-radius:7px;padding:9px 22px;font-size:13px;">Review &amp; Confirm →</button>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div class="consult-modal-body" id="step3" style="display:none;text-align:center;">
+      <div class="confirm-check">✅</div>
+      <div style="font-size:18px;font-weight:700;color:#111827;margin-bottom:6px;">Consultation Requested</div>
+      <div style="font-size:13px;color:#6B7280;margin-bottom:6px;">Your care team will confirm your appointment within 1 business day.</div>
+      <div class="confirm-id" id="confirmId">PWN-REQ-XXXXXX</div>
+      <div style="font-size:12px;color:#6B7280;margin-bottom:4px;">A confirmation has been sent to <strong>jennifer.adams@email.com</strong></div>
+      <div class="confirm-topic-list" id="confirmTopicList">
+        <div class="confirm-topic-list-title">Topics shared with Dr. Sarah Lee</div>
+      </div>
+    </div>
+    <div class="consult-modal-footer" id="step3Footer" style="display:none;justify-content:center;">
+      <button class="btn-primary-pwn" onclick="closeConsultModal(true)" style="background:#0A2F5C;border-radius:7px;padding:10px 32px;font-size:13px;">Done</button>
+    </div>
+
+  </div>
+</div>
+
 <script>
 function showSection(id, navEl) {
   // Hide all panels
@@ -760,6 +971,101 @@ function toggleMessage(id) {
 
 function downloadReport() {
   alert('Downloading PWN Health report PDF...\n\nIn production, this would generate and download the consultation summary report.');
+}
+
+// ── Consult Scheduling Modal ──────────────────────────────────
+var _currentStep = 1;
+var _consultTopicLabels = {
+  'topic-brca2':  'BRCA2 — Variant of Uncertain Significance (VUS)',
+  'topic-family': 'Family history implications',
+  'topic-risk':   'Risk management options',
+  'topic-cascade':'Cascade testing for relatives',
+  'topic-psych':  'Emotional & psychosocial support'
+};
+
+function openConsultModal() {
+  _currentStep = 1;
+  document.getElementById('consultModal').classList.add('open');
+  showStep(1);
+}
+
+function closeConsultModal(dismissed) {
+  document.getElementById('consultModal').classList.remove('open');
+  if (dismissed) {
+    // Hide the abnormal alert after scheduling
+    var alert = document.getElementById('abnormalAlert');
+    if (alert) {
+      alert.style.background = '#F0FDF4';
+      alert.style.borderColor = '#86EFAC';
+      alert.querySelector('.abnormal-alert-title').style.color = '#065F46';
+      alert.querySelector('.abnormal-alert-title').textContent = '✓ Consultation Requested — Confirmation sent to jennifer.adams@email.com';
+      alert.querySelector('.abnormal-alert-desc').textContent = 'Your genetic counselor will confirm within 1 business day. Your selected topics have been shared.';
+      alert.querySelector('.abnormal-alert-actions').style.display = 'none';
+    }
+  }
+}
+
+function showStep(n) {
+  [1,2,3].forEach(function(i) {
+    var body = document.getElementById('step'+i);
+    var foot = document.getElementById('step'+i+'Footer');
+    if (body) body.style.display = (i===n) ? '' : 'none';
+    if (foot) foot.style.display = (i===n) ? '' : 'none';
+    var dot = document.getElementById('stepDot'+i);
+    if (dot) {
+      dot.className = 'step-dot ' + (i < n ? 'done' : i === n ? 'active' : 'pending');
+      dot.textContent = i < n ? '✓' : i;
+    }
+    var line = document.getElementById('stepLine'+i);
+    if (line) line.className = 'step-line' + (i < n ? ' done' : '');
+  });
+  _currentStep = n;
+}
+
+function goToStep(n) {
+  if (n === 3) buildConfirmation();
+  showStep(n);
+}
+
+function toggleTopic(el) {
+  el.classList.toggle('selected');
+  var cb = el.querySelector('input[type=checkbox]');
+  if (cb) cb.checked = el.classList.contains('selected');
+}
+
+function selectConsultType(val, el) {
+  document.querySelectorAll('.consult-type-option').forEach(function(o) { o.classList.remove('selected'); });
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked = true;
+}
+
+function buildConfirmation() {
+  var reqId = 'PWN-REQ-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  document.getElementById('confirmId').textContent = reqId;
+  var topicList = document.getElementById('confirmTopicList');
+  topicList.innerHTML = '<div class="confirm-topic-list-title">Topics shared with Dr. Sarah Lee</div>';
+  var hasTopics = false;
+  Object.keys(_consultTopicLabels).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el && el.classList.contains('selected')) {
+      var row = document.createElement('div');
+      row.className = 'confirm-topic-row';
+      row.textContent = '• ' + _consultTopicLabels[id];
+      topicList.appendChild(row);
+      hasTopics = true;
+    }
+  });
+  var notes = document.getElementById('topicNotes').value.trim();
+  if (notes) {
+    var row = document.createElement('div');
+    row.className = 'confirm-topic-row';
+    row.textContent = '• Notes: ' + notes.substr(0, 80) + (notes.length > 80 ? '…' : '');
+    topicList.appendChild(row);
+    hasTopics = true;
+  }
+  if (!hasTopics) {
+    topicList.innerHTML += '<div class="confirm-topic-row" style="color:#9CA3AF;">No specific topics selected</div>';
+  }
 }
 
 function filterConsults() {
