@@ -170,7 +170,7 @@
         }
       </style>
       {% endif %}
-      <a href="{{ url_for('logout') }}" class="nav-switch">Switch user</a>
+      {% if request.blueprint != 'patient' %}<a href="{{ url_for('logout') }}" class="nav-switch">Switch user</a>{% endif %}
       <span class="nav-badge">Demo Mode</span>
     </div>
   </nav>
