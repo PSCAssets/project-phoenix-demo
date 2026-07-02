@@ -446,6 +446,16 @@ PAGE_GUIDES = [
         "section_key":    '[{"icon": "\\u2795", "text": "New Patient tab opens by default \\u2014 optimized for the most common intake workflow. Switch to Patient Search if the patient may already be in the system to avoid duplicate records."}, {"icon": "\\ud83c\\udfe5", "text": "Member Lookup tab \\u2014 for health plan members referred by a payer partner (Humana, Grail, Elevance) who are not yet in the Everlywell system. Pulling by member ID pre-fills demographics from the payer record."}, {"icon": "\\ud83d\\uddd3", "text": "Schedule Consult \\u2014 launches the scheduling modal pre-loaded with the patient record. This is the fastest path from intake to appointment for any authorized role."}]',
     },
     {
+        "page_key":       'care_team.queue',
+        "portal":         'Care Team',
+        "user_role":      'care_team',
+        "title":          'Care Team Queue',
+        "header_color":   '#6B21A8',
+        "section_what":   '["All unassigned tasks across the care team in a single view — Pull any task directly or route it to a specific team member", "Tasks span all categories: Follow-up, Care Coordination, Education Q, and Async Consult support", "Priority and urgency indicators (Critical, High, Normal) surface the most time-sensitive items first", "Tasks assigned to you also appear on My Dashboard — the queue is the shared team backlog"]',
+        "section_solves": '["Previously no shared queue existed — tasks were tracked in spreadsheets, Slack messages, or not at all", "Now any care team member can pull from the queue or route tasks to the right teammate without a manager intermediary", "Previously urgent patient needs could sit unaddressed if the assigned person was unavailable — now anyone can take ownership"]',
+        "section_key":    '["Take — pulls the task to your name and removes it from the unassigned queue. It then appears on your My Dashboard", "Route — assigns the task to a specific care team member without pulling it yourself. Used when you can see the right person for the job", "View — opens the patient record or consult detail associated with the task for context before deciding"]',
+    },
+    {
         "page_key":       'care_team.psr_queue',
         "portal":         'Care Team — PSS',
         "user_role":      'provider_psr',
