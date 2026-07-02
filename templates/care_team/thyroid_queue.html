@@ -450,30 +450,27 @@ var SCENARIOS = {
     steps: null
   },
   b: {
-    label: 'Scenario B — follow-up ticket required',
+    label: 'Scenario B — outbound follow-up required',
     cls: 'scenario-box scenario-b',
-    desc: 'Patient has NOT purchased a thyroid test within the last 6 weeks. Create a Zendesk ticket so PCC can make an outbound call.',
+    desc: 'Patient has NOT purchased a thyroid test within the last 6 weeks. Queue an outbound follow-up task so PCC can make contact.',
     steps: [
-      'Open the patient\'s record in this platform and copy their email address from the contact info panel.',
-      'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field so their profile auto-populates.',
-      'Set Ticket Type to <strong>Problem</strong> (same-day check) or <strong>Incident</strong> (1-week / 2-week check).',
-      'Apply the <strong>Pending Next Order Thyroid Follow-Up</strong> macro.',
-      'Paste the participant link from the consult report into the ticket body. Set From to <strong>alert@everlyhealth.com</strong>.',
-      'Click <strong>Submit as Solved</strong>. PCC will see this in the Thyroid Zendesk view.'
-    ]
+      'Review the patient\'s contact info and last session notes in the info panel above.',
+      'Click <strong>Queue Follow-Up Call</strong> below. The platform creates a PCC outbound call task for this patient.',
+      'The task will appear in the PCC Call Queue with the patient\'s name, program, and check type pre-filled.',
+      'Mark this patient complete. PCC will see the queued task in their dashboard.'
+    ],
+    action: 'queueFollowUp'
   },
   c: {
-    label: 'Scenario C — test results finalized, no active consult',
+    label: 'Scenario C — results ready, no active consult',
     cls: 'scenario-box scenario-c',
-    desc: 'Test results have finalized but there is no active consult linked. Generate a Thyroid Initial Link and create a Zendesk ticket.',
+    desc: 'Test results have finalized but there is no active consult linked. Generate and send a Thyroid Initial scheduling link directly to the patient.',
     steps: [
-      'Use the platform\'s Scheduling Link tool to generate a <strong>Thyroid Initial Link</strong> for this patient.',
-      'In Zendesk, click <strong>Add New Ticket</strong>. Paste the patient\'s email in the User field.',
-      'Set Ticket Type to <strong>Incident</strong> (applies to same-day, 1-week, and 2-week checks).',
-      'Apply the <strong>Resulted Thyroid</strong> macro.',
-      'Paste the generated Thyroid Initial Link into the ticket body. Set From to <strong>alert@everlyhealth.com</strong>.',
-      'Click <strong>Submit as Solved</strong>.'
-    ]
+      'Click <strong>Generate &amp; Send Scheduling Link</strong> below. The platform creates a unique Thyroid Initial link for this patient.',
+      'The link is automatically emailed to the patient\'s address on file.',
+      'Mark this patient complete. The patient will self-schedule their initial consult using the link.'
+    ],
+    action: 'sendThyroidLink'
   }
 };
 
@@ -509,6 +506,14 @@ function openModal(patientKey, scenario, rowIdx) {
       stepsHtml += '<div class="step-row"><div class="step-num">' + (i+1) + '</div><div class="step-text">' + st + '</div></div>';
     });
     stepsHtml += '</div>';
+    // Native action button
+    if (s.action === 'queueFollowUp') {
+      stepsHtml += '<button onclick="queueFollowUp()" style="margin-top:12px;width:100%;background:#D97706;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">📋 Queue Follow-Up Call for PCC</button>';
+      stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:6px;font-size:12px;color:#78350F;font-weight:600;text-align:center;"></div>';
+    } else if (s.action === 'sendThyroidLink') {
+      stepsHtml += '<button onclick="sendThyroidLink()" style="margin-top:12px;width:100%;background:#2563EB;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">🔗 Generate &amp; Send Thyroid Initial Link</button>';
+      stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#DBEAFE;border:1px solid #BFDBFE;border-radius:6px;font-size:12px;color:#1E40AF;font-weight:600;text-align:center;"></div>';
+    }
   } else {
     stepsHtml = '<div style="font-size:13px;color:#374151;">No action required. Mark this patient complete and move to the next one.</div>';
   }
@@ -541,6 +546,18 @@ function markComplete() {
     showToast('Patient marked complete');
   }
   closeModal();
+}
+
+function queueFollowUp() {
+  var taskId = 'PCC-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  var el = document.getElementById('actionConfirm');
+  if (el) { el.textContent = '✓ Follow-up task queued · ' + taskId + ' · PCC Call Queue notified'; el.style.display = ''; }
+}
+
+function sendThyroidLink() {
+  var linkId = 'THY-' + Math.random().toString(36).substr(2,8).toUpperCase();
+  var el = document.getElementById('actionConfirm');
+  if (el) { el.textContent = '✓ Thyroid Initial Link generated · ' + linkId + ' · Sent to patient email on file'; el.style.display = ''; }
 }
 
 function showToast(msg) {

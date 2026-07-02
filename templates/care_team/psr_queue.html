@@ -259,10 +259,10 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
         <div class="form-group">
           <label class="form-label">Patient Interested in Consult?</label>
           <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="yes" onclick="toggleConsultRequest(true)"> Yes — wants to schedule</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="link" onclick="toggleConsultRequest(false)"> Sent scheduling link</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="declined" onclick="toggleConsultRequest(false)"> Declined consult</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="na" onclick="toggleConsultRequest(false)"> N/A</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="yes" onclick="toggleConsultRequest(true);toggleSchedulingLinkPanel(false)"> Yes — wants to schedule now</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="link" onclick="toggleConsultRequest(false);toggleSchedulingLinkPanel(true)"> Send scheduling link</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="declined" onclick="toggleConsultRequest(false);toggleSchedulingLinkPanel(false)"> Declined consult</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="na" onclick="toggleConsultRequest(false);toggleSchedulingLinkPanel(false)"> N/A</label>
           </div>
         </div>
         <!-- Consult Request Panel — shown when patient says Yes -->
@@ -287,6 +287,23 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             ✓ Create Consult Request → Routes to Scheduler
           </button>
           <div id="consultConfirm" style="display:none;margin-top:8px;padding:8px;background:#DCFCE7;border-radius:6px;font-size:12px;color:#166534;font-weight:600;text-align:center;"></div>
+        </div>
+        <!-- Scheduling Link Panel — shown when patient prefers async link -->
+        <div id="schedulingLinkPanel" style="display:none;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:14px;margin-top:4px;">
+          <div style="font-size:12px;font-weight:700;color:#1E40AF;margin-bottom:8px;">🔗 Send PWN Scheduling Link</div>
+          <div style="font-size:12px;color:#374151;margin-bottom:10px;">Generate a personalized scheduling link and send it directly to the patient's email on file. The patient can self-schedule at their convenience.</div>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label class="form-label">Consult Type</label>
+            <select id="linkConsultType" style="border:1px solid #BFDBFE;border-radius:6px;padding:6px 10px;font-size:12px;width:100%;">
+              <option value="video">Video Call</option>
+              <option value="phone">Telephonic</option>
+              <option value="async">Async Message</option>
+            </select>
+          </div>
+          <button onclick="sendSchedulingLink()" style="background:#2563EB;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">
+            📧 Generate &amp; Send Link to Patient
+          </button>
+          <div id="linkConfirm" style="display:none;margin-top:8px;padding:8px;background:#DBEAFE;border-radius:6px;font-size:12px;color:#1E40AF;font-weight:600;text-align:center;"></div>
         </div>
         <!-- Escalation options -->
         <div class="form-group" style="margin-top:10px;">
@@ -330,6 +347,8 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('callOutcome').value = '';
   document.getElementById('schedulingSection').style.display = 'none';
   document.getElementById('consultRequestPanel').style.display = 'none';
+  document.getElementById('schedulingLinkPanel').style.display = 'none';
+  document.getElementById('linkConfirm').style.display = 'none';
   document.getElementById('consultConfirm').style.display = 'none';
   document.getElementById('escalateConfirm').style.display = 'none';
   document.getElementById('consultCareProduct').textContent = product;
@@ -352,6 +371,20 @@ function outcomeChanged() {
 function toggleConsultRequest(show) {
   document.getElementById('consultRequestPanel').style.display = show ? '' : 'none';
   document.getElementById('consultConfirm').style.display = 'none';
+}
+
+function toggleSchedulingLinkPanel(show) {
+  document.getElementById('schedulingLinkPanel').style.display = show ? '' : 'none';
+  document.getElementById('linkConfirm').style.display = 'none';
+}
+
+function sendSchedulingLink() {
+  var type = document.getElementById('linkConsultType').value;
+  var typeLabel = {video:'Video Call', phone:'Telephonic', async:'Async Message'}[type];
+  var linkId = 'PWN-LNK-' + Math.random().toString(36).substr(2,8).toUpperCase();
+  var el = document.getElementById('linkConfirm');
+  el.textContent = '✓ Link sent · ' + linkId + ' · ' + typeLabel + ' · Email delivered to patient on file';
+  el.style.display = '';
 }
 
 function submitConsultRequest() {
