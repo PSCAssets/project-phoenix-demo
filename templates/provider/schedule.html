@@ -236,6 +236,7 @@
       <div class="filter-divider"></div>
       <span class="filter-label">Providers (up to 5)</span>
       <div class="chip-list" id="providerChips"></div>
+      {% if session.get('role') not in ('provider_md', 'provider_np') %}
       <div style="position:relative;">
         <button onclick="toggleAddProviderDropdown(event)" style="display:flex;align-items:center;gap:5px;padding:5px 12px;background:#F5F3FF;border:1.5px solid #D8B4FE;border-radius:7px;font-size:12px;font-weight:600;color:#6B21A8;cursor:pointer;white-space:nowrap;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -243,6 +244,7 @@
         </button>
         <div id="addProviderDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:220px;background:#fff;border:1.5px solid #E5E0D8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.1);z-index:500;overflow:hidden;"></div>
       </div>
+      {% endif %}
     </div>
   </div>
 
