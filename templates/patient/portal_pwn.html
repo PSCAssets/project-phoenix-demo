@@ -293,6 +293,40 @@
   input:checked + .slider { background: #0A2F5C; }
   input:checked + .slider:before { transform: translateX(16px); }
 
+  /* Help guide button */
+  .help-guide-btn { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.35); color: #fff; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .help-guide-btn:hover { background: rgba(255,255,255,0.25); }
+
+  /* Help guide modal */
+  .help-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: flex-start; justify-content: flex-end; padding: 70px 24px 24px; }
+  .help-overlay.open { display: flex; }
+  .help-panel { background: #fff; border-radius: 14px; width: 400px; max-height: calc(100vh - 100px); overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+  .help-panel-header { background: #0A2F5C; color: #fff; padding: 18px 20px 14px; border-radius: 14px 14px 0 0; display: flex; align-items: center; justify-content: space-between; }
+  .help-panel-title { font-size: 15px; font-weight: 700; }
+  .help-panel-sub { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .help-panel-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 20px; cursor: pointer; line-height: 1; }
+  .help-panel-close:hover { color: #fff; }
+  .help-section { padding: 16px 20px; border-bottom: 1px solid #F3F4F6; }
+  .help-section:last-child { border-bottom: none; }
+  .help-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #0A2F5C; margin-bottom: 10px; }
+  .help-item { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #374151; line-height: 1.5; }
+  .help-item:last-child { margin-bottom: 0; }
+  .help-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+  .help-flow-step { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+  .help-flow-num { width: 22px; height: 22px; background: #0A2F5C; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+  .help-flow-text { font-size: 13px; color: #374151; line-height: 1.5; }
+  .help-badge { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 4px; }
+  .help-badge-video { background: #EFF6FF; color: #1D4ED8; }
+  .help-badge-phone { background: #F0FDF4; color: #15803D; }
+  .help-badge-async { background: #FFF7ED; color: #C2410C; }
+
+  /* On-demand section inside Step 2 */
+  .delivery-toggle { display: flex; gap: 0; border: 1.5px solid #E5E7EB; border-radius: 8px; overflow: hidden; margin: 14px 0 10px; }
+  .delivery-tab { flex: 1; padding: 9px 10px; text-align: center; font-size: 12px; font-weight: 600; cursor: pointer; background: #fff; color: #6B7280; border: none; transition: all 0.15s; }
+  .delivery-tab.active { background: #0A2F5C; color: #fff; }
+  .on-demand-box { background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 8px; padding: 14px; }
+  .on-demand-box-async { background: #FFF7ED; border-color: #FED7AA; }
+
   /* Footer */
   .portal-footer {
     background: #F9FAFB;
@@ -321,6 +355,10 @@
     </a>
     <div class="header-title">Patient Portal</div>
     <div class="header-user">
+      <button class="help-guide-btn" onclick="openHelpGuide()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        How It Works
+      </button>
       <span class="patient-name">Jennifer Adams</span>
       <a href="/pwn/login">Logout</a>
     </div>
@@ -808,6 +846,64 @@
     <a href="#">Terms of Use</a>
   </footer>
 
+<!-- Help Guide Panel -->
+<div class="help-overlay" id="helpOverlay" onclick="closeHelpIfOutside(event)">
+  <div class="help-panel" id="helpPanel">
+    <div class="help-panel-header">
+      <div>
+        <div class="help-panel-title">How Your Patient Portal Works</div>
+        <div class="help-panel-sub">PWN Health — Genetic Counseling Platform</div>
+      </div>
+      <button class="help-panel-close" onclick="closeHelpGuide()">&#215;</button>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">What this portal does</div>
+      <div class="help-item"><span class="help-icon">🧬</span><span>View your genetic test results and lab reports as soon as they're available.</span></div>
+      <div class="help-item"><span class="help-icon">📋</span><span>Manage your consultations — schedule new sessions, join upcoming calls, and review history.</span></div>
+      <div class="help-item"><span class="help-icon">💬</span><span>Send and receive secure messages with your genetic counselor between sessions.</span></div>
+      <div class="help-item"><span class="help-icon">⚠️</span><span>When a result requires attention, you'll see an alert on your dashboard with a direct action to schedule a review consult.</span></div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">Consult types</div>
+      <div class="help-item">
+        <span class="help-icon">📹</span>
+        <span><strong>Video Call</strong> <span class="help-badge help-badge-video">Scheduled only</span><br>A live, face-to-face video session with your genetic counselor. Recommended for initial result reviews and detailed discussions. Must be scheduled in advance — we confirm within 1 business day.</span>
+      </div>
+      <div class="help-item">
+        <span class="help-icon">📞</span>
+        <span><strong>Phone Call</strong> <span class="help-badge help-badge-phone">Scheduled or On Demand</span><br>Your counselor calls your number on file. Choose a scheduled time or request an on-demand call — estimated wait 10–20 minutes.</span>
+      </div>
+      <div class="help-item">
+        <span class="help-icon">💬</span>
+        <span><strong>Async Message</strong> <span class="help-badge help-badge-async">On Demand or Preferred Window</span><br>Submit your questions now and receive a detailed written response in your secure inbox. Response guaranteed within <strong>72 hours</strong>.</span>
+      </div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">Scheduling a consult — step by step</div>
+      <div class="help-flow-step"><div class="help-flow-num">1</div><div class="help-flow-text"><strong>Select your topics</strong> — Tell your counselor what you want covered. Your abnormal results are pre-populated; add family history, risk options, or anything else.</div></div>
+      <div class="help-flow-step"><div class="help-flow-num">2</div><div class="help-flow-text"><strong>Choose consult type &amp; delivery</strong> — Pick Video (scheduled), Phone (scheduled or on demand), or Async (send now or preferred window).</div></div>
+      <div class="help-flow-step"><div class="help-flow-num">3</div><div class="help-flow-text"><strong>Confirm</strong> — Review your selections. A unique request ID is generated and a confirmation is sent to your email. Your topics are shared with your counselor before the session.</div></div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">On Demand vs. Scheduled</div>
+      <div class="help-item"><span class="help-icon">⚡</span><span><strong>On Demand (Phone)</strong> — Submit now; the next available counselor calls you within 10–20 minutes. No appointment needed.</span></div>
+      <div class="help-item"><span class="help-icon">⚡</span><span><strong>On Demand (Async)</strong> — Submit your questions immediately; receive a written response within 72 hours, any time of day.</span></div>
+      <div class="help-item"><span class="help-icon">📅</span><span><strong>Scheduled</strong> — Choose your preferred date and time window. We confirm within 1 business day and send a calendar invite.</span></div>
+    </div>
+
+    <div class="help-section">
+      <div class="help-section-title">After your consult</div>
+      <div class="help-item"><span class="help-icon">📄</span><span>A session summary is added to your Consultation History within 1–2 business days.</span></div>
+      <div class="help-item"><span class="help-icon">🔬</span><span>Any follow-up lab orders or referrals will appear in your Lab Results section.</span></div>
+      <div class="help-item"><span class="help-icon">📬</span><span>If further action is needed, your counselor will message you directly through the secure portal.</span></div>
+    </div>
+  </div>
+</div>
+
 <!-- Consult Scheduling Modal -->
 <div class="consult-modal-overlay" id="consultModal">
   <div class="consult-modal">
@@ -892,35 +988,105 @@
         <input type="radio" name="consultType" value="video" checked>
         <div>
           <div style="font-size:13px;font-weight:600;color:#111827;">📹 Video Call</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Secure video session — recommended for result reviews</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Secure video session — recommended for result reviews. Must be scheduled in advance.</div>
         </div>
       </div>
       <div class="consult-type-option" id="ct-phone" onclick="selectConsultType('phone', this)">
         <input type="radio" name="consultType" value="phone">
         <div>
           <div style="font-size:13px;font-weight:600;color:#111827;">📞 Phone Call</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Audio only — counselor calls you at your number on file</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Counselor calls you at your number on file. Schedule in advance or connect on demand.</div>
         </div>
       </div>
       <div class="consult-type-option" id="ct-async" onclick="selectConsultType('async', this)">
         <input type="radio" name="consultType" value="async">
         <div>
           <div style="font-size:13px;font-weight:600;color:#111827;">💬 Async Message</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Exchange secure messages at your own pace — 48hr response time</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Send your questions now and receive a detailed written response within 72 hours.</div>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Preferred date</div>
-          <input type="date" id="preferredDate" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+
+      <!-- Scheduled always: Video -->
+      <div id="deliveryVideo" style="margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;">Select a date and time</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred date</div>
+            <input type="date" id="preferredDateVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred time</div>
+            <select id="preferredTimeVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+              <option>Morning (8 AM – 12 PM)</option>
+              <option>Afternoon (12 PM – 4 PM)</option>
+              <option>Evening (4 PM – 7 PM)</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">Preferred time</div>
-          <select id="preferredTime" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
-            <option>Morning (8 AM – 12 PM)</option>
-            <option>Afternoon (12 PM – 4 PM)</option>
-            <option>Evening (4 PM – 7 PM)</option>
-          </select>
+        <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">📅 We'll confirm your appointment within 1 business day and send a calendar invite.</div>
+      </div>
+
+      <!-- Phone: Scheduled or On Demand toggle -->
+      <div id="deliveryPhone" style="display:none;margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">When would you like your call?</div>
+        <div class="delivery-toggle">
+          <button class="delivery-tab active" id="phoneTab-scheduled" onclick="setDelivery('phone','scheduled')">📅 Schedule a Time</button>
+          <button class="delivery-tab" id="phoneTab-ondemand" onclick="setDelivery('phone','ondemand')">⚡ On Demand</button>
+        </div>
+        <div id="phoneScheduled">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred date</div>
+              <input type="date" id="preferredDatePhone" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred time</div>
+              <select id="preferredTimePhone" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+                <option>Morning (8 AM – 12 PM)</option>
+                <option>Afternoon (12 PM – 4 PM)</option>
+                <option>Evening (4 PM – 7 PM)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">📅 We'll confirm your appointment within 1 business day.</div>
+        </div>
+        <div id="phoneOnDemand" style="display:none;">
+          <div class="on-demand-box">
+            <div style="font-size:13px;font-weight:700;color:#065F46;margin-bottom:6px;">⚡ Connect Now — Next Available Counselor</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">Your call request will be sent immediately to the next available genetic counselor. Estimated wait time: <strong>10–20 minutes</strong>.<br><br>Your counselor will call <strong>(512) 555-0291</strong> — your number on file.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Async: On Demand or Scheduled toggle -->
+      <div id="deliveryAsync" style="display:none;margin-top:14px;">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">When would you like a response?</div>
+        <div class="delivery-toggle">
+          <button class="delivery-tab active" id="asyncTab-ondemand" onclick="setDelivery('async','ondemand')">⚡ Send Now</button>
+          <button class="delivery-tab" id="asyncTab-scheduled" onclick="setDelivery('async','scheduled')">📅 Preferred Window</button>
+        </div>
+        <div id="asyncOnDemand">
+          <div class="on-demand-box on-demand-box-async">
+            <div style="font-size:13px;font-weight:700;color:#C2410C;margin-bottom:6px;">⚡ Submit Now — 72-Hour Response</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">Your questions and selected topics will be sent immediately to Dr. Sarah Lee. You'll receive a detailed written response to your secure inbox within <strong>72 hours</strong>.</div>
+          </div>
+        </div>
+        <div id="asyncScheduled" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred contact date</div>
+              <input type="date" id="preferredDateAsync" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred window</div>
+              <select id="preferredTimeAsync" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+                <option>Morning (8 AM – 12 PM)</option>
+                <option>Afternoon (12 PM – 4 PM)</option>
+                <option>Evening (4 PM – 7 PM)</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">Response guaranteed within 72 hours of your preferred start window.</div>
         </div>
       </div>
     </div>
@@ -973,8 +1139,15 @@ function downloadReport() {
   alert('Downloading PWN Health report PDF...\n\nIn production, this would generate and download the consultation summary report.');
 }
 
+// ── Help Guide ────────────────────────────────────────────────
+function openHelpGuide() { document.getElementById('helpOverlay').classList.add('open'); }
+function closeHelpGuide() { document.getElementById('helpOverlay').classList.remove('open'); }
+function closeHelpIfOutside(e) { if (e.target === document.getElementById('helpOverlay')) closeHelpGuide(); }
+
 // ── Consult Scheduling Modal ──────────────────────────────────
 var _currentStep = 1;
+var _consultType = 'video';   // video | phone | async
+var _delivery    = 'scheduled'; // scheduled | ondemand
 var _consultTopicLabels = {
   'topic-brca2':  'BRCA2 — Variant of Uncertain Significance (VUS)',
   'topic-family': 'Family history implications',
@@ -1037,11 +1210,52 @@ function selectConsultType(val, el) {
   document.querySelectorAll('.consult-type-option').forEach(function(o) { o.classList.remove('selected'); });
   el.classList.add('selected');
   el.querySelector('input[type=radio]').checked = true;
+  _consultType = val;
+  // Show the right delivery section
+  document.getElementById('deliveryVideo').style.display  = val === 'video'  ? '' : 'none';
+  document.getElementById('deliveryPhone').style.display  = val === 'phone'  ? '' : 'none';
+  document.getElementById('deliveryAsync').style.display  = val === 'async'  ? '' : 'none';
+  // Reset delivery choice defaults
+  if (val === 'phone') { setDelivery('phone','scheduled'); }
+  if (val === 'async') { setDelivery('async','ondemand'); }
+  if (val === 'video') { _delivery = 'scheduled'; }
+}
+
+function setDelivery(type, mode) {
+  _delivery = mode;
+  if (type === 'phone') {
+    document.getElementById('phoneTab-scheduled').className = 'delivery-tab' + (mode==='scheduled' ? ' active' : '');
+    document.getElementById('phoneTab-ondemand').className  = 'delivery-tab' + (mode==='ondemand'  ? ' active' : '');
+    document.getElementById('phoneScheduled').style.display  = mode === 'scheduled' ? '' : 'none';
+    document.getElementById('phoneOnDemand').style.display   = mode === 'ondemand'  ? '' : 'none';
+  } else if (type === 'async') {
+    document.getElementById('asyncTab-ondemand').className  = 'delivery-tab' + (mode==='ondemand'  ? ' active' : '');
+    document.getElementById('asyncTab-scheduled').className = 'delivery-tab' + (mode==='scheduled' ? ' active' : '');
+    document.getElementById('asyncOnDemand').style.display  = mode === 'ondemand'  ? '' : 'none';
+    document.getElementById('asyncScheduled').style.display = mode === 'scheduled' ? '' : 'none';
+  }
 }
 
 function buildConfirmation() {
   var reqId = 'PWN-REQ-' + Math.random().toString(36).substr(2,6).toUpperCase();
   document.getElementById('confirmId').textContent = reqId;
+
+  // Update title/message based on type + delivery
+  var titleEl = document.querySelector('#step3 div:nth-child(2)');
+  var descEl  = document.querySelector('#step3 div:nth-child(3)');
+  if (_consultType === 'video' || _delivery === 'scheduled') {
+    if (titleEl) titleEl.textContent = 'Consultation Requested';
+    if (descEl) descEl.textContent = 'Your care team will confirm your appointment within 1 business day and send a calendar invite.';
+    document.querySelector('.confirm-check').textContent = '✅';
+  } else if (_consultType === 'phone' && _delivery === 'ondemand') {
+    if (titleEl) titleEl.textContent = 'On Demand Call Requested';
+    if (descEl) descEl.textContent = 'The next available genetic counselor will call (512) 555-0291 within 10–20 minutes.';
+    document.querySelector('.confirm-check').textContent = '📞';
+  } else if (_consultType === 'async' && _delivery === 'ondemand') {
+    if (titleEl) titleEl.textContent = 'Message Sent — 72-Hour Response';
+    if (descEl) descEl.textContent = 'Your questions and topics have been submitted. Dr. Sarah Lee will respond in your secure inbox within 72 hours.';
+    document.querySelector('.confirm-check').textContent = '💬';
+  }
   var topicList = document.getElementById('confirmTopicList');
   topicList.innerHTML = '<div class="confirm-topic-list-title">Topics shared with Dr. Sarah Lee</div>';
   var hasTopics = false;
