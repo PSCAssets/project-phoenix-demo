@@ -734,7 +734,7 @@ function renderCalendar() {
         el.style.border = '1px solid #E5E0D8';
         el.innerHTML = '<div class="appt-title" style="color:#6B7280;">'+label+'</div>';
       } else {
-        el.style.background = col.apptBg;
+        el.style.background = col.bg; // solid — prevents avail-block text bleeding through
         el.style.border = '1.5px solid '+col.apptBorder;
         el.style.borderLeft = '3px solid '+col.apptBorder;
         el.style.borderRadius = '5px';
