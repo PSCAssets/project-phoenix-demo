@@ -206,7 +206,8 @@
       </div>
     </div>
   </div>
-  <!-- Multi-provider filter panel -->
+  <!-- Multi-provider filter panel (hidden for provider's own My Schedule view) -->
+  {% if session.get('role') not in ('provider_md', 'provider_np') %}
   <div class="sched-filter-panel">
     <div class="filter-row">
       {% if session.get('role') not in ('provider_gc',) %}
@@ -249,6 +250,7 @@
       {% endif %}
     </div>
   </div>
+  {% endif %}
 
   <!-- Avail summary bar -->
   <div class="sched-avail-bar" id="availBar"></div>
