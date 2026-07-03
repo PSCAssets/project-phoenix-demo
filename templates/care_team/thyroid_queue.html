@@ -495,7 +495,17 @@ var PATIENTS = {
 function openModal(patientKey, scenario, rowIdx) {
   currentRowIdx = rowIdx;
   var p = PATIENTS[patientKey];
-  var s = SCENARIOS[scenario];
+  var s = JSON.parse(JSON.stringify(SCENARIOS[scenario])); // shallow copy so we can override
+  // For Scenario B same-day patients, the session is the touchpoint — override label/desc/steps
+  if (scenario === 'b' && p.check === 'Same-day') {
+    s.label = 'Scenario B — session today, flag for review';
+    s.desc = 'Patient has NOT purchased a thyroid test within the last 6 weeks, but has a same-day session scheduled today. The session itself is the touchpoint — flag for the provider to address during the visit.';
+    s.steps = [
+      'Review the patient\'s contact info and last session notes in the info panel above.',
+      'Click <strong>Flag for Today\'s Session</strong> below. The provider will be notified to address the missing test during today\'s visit.',
+      'Mark this patient complete once flagged.'
+    ];
+  }
   document.getElementById('modalTitle').textContent = 'Thyroid history — ' + p.name;
   document.getElementById('modalSub').textContent = p.check + ' check · Last session ' + p.lastSession;
 
@@ -508,8 +518,13 @@ function openModal(patientKey, scenario, rowIdx) {
     stepsHtml += '</div>';
     // Native action button
     if (s.action === 'queueFollowUp') {
-      stepsHtml += '<button onclick="queueFollowUp()" style="margin-top:12px;width:100%;background:#D97706;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">📋 Queue Follow-Up Call for PCC</button>';
-      stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:6px;font-size:12px;color:#78350F;font-weight:600;text-align:center;"></div>';
+      if (p.check === 'Same-day') {
+        stepsHtml += '<button onclick="flagForSession()" style="margin-top:12px;width:100%;background:#059669;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">📌 Flag for Today\'s Session</button>';
+        stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:6px;font-size:12px;color:#065F46;font-weight:600;text-align:center;"></div>';
+      } else {
+        stepsHtml += '<button onclick="queueFollowUp()" style="margin-top:12px;width:100%;background:#D97706;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">📋 Queue Follow-Up Call for PCC</button>';
+        stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#FFFBEB;border:1px solid #FCD34D;border-radius:6px;font-size:12px;color:#78350F;font-weight:600;text-align:center;"></div>';
+      }
     } else if (s.action === 'sendThyroidLink') {
       stepsHtml += '<button onclick="sendThyroidLink()" style="margin-top:12px;width:100%;background:#2563EB;color:#fff;border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;">🔗 Generate &amp; Send Thyroid Initial Link</button>';
       stepsHtml += '<div id="actionConfirm" style="display:none;margin-top:8px;padding:8px;background:#DBEAFE;border:1px solid #BFDBFE;border-radius:6px;font-size:12px;color:#1E40AF;font-weight:600;text-align:center;"></div>';
@@ -552,6 +567,11 @@ function queueFollowUp() {
   var taskId = 'PCC-' + Math.random().toString(36).substr(2,6).toUpperCase();
   var el = document.getElementById('actionConfirm');
   if (el) { el.textContent = '✓ Follow-up task queued · ' + taskId + ' · PCC Call Queue notified'; el.style.display = ''; }
+}
+
+function flagForSession() {
+  var el = document.getElementById('actionConfirm');
+  if (el) { el.textContent = '📌 Flagged for today\'s session · Provider notified · Address missing test during visit'; el.style.display = ''; }
 }
 
 function sendThyroidLink() {
