@@ -496,27 +496,27 @@ function getVisibleProviders() {
 
 function renderChips() {
   var list = document.getElementById('providerChips');
-  if (!list) return;
-  list.innerHTML = '';
-  // Only show selected (active) providers as chips, each with × remove
-  selectedProviders.forEach(function(pid) {
-    var p = PROVIDERS.find(function(x){ return x.id === pid; });
-    if (!p) return;
-    var ci = assignColor(pid);
-    var col = PROV_COLORS[ci];
-    var chip = document.createElement('span');
-    chip.className = 'prov-chip chip-active';
-    chip.style.background = col.bg;
-    chip.style.borderColor = col.border;
-    chip.style.color = col.text;
-    chip.innerHTML = '<span class="prov-dot" style="background:' + col.dot + '"></span>' +
-      p.name + ' <span style="font-size:10px;opacity:0.7;">· ' + p.state + '</span>' +
-      '<button onclick="removeProvider(' + pid + ');event.stopPropagation();" style="margin-left:6px;background:none;border:none;cursor:pointer;color:' + col.text + ';font-size:14px;line-height:1;padding:0 2px;opacity:0.7;" title="Remove">&times;</button>';
-    list.appendChild(chip);
-  });
-
-  // Update add-provider dropdown options
-  refreshAddProviderDropdown();
+  if (list) {
+    list.innerHTML = '';
+    // Only show selected (active) providers as chips, each with × remove
+    selectedProviders.forEach(function(pid) {
+      var p = PROVIDERS.find(function(x){ return x.id === pid; });
+      if (!p) return;
+      var ci = assignColor(pid);
+      var col = PROV_COLORS[ci];
+      var chip = document.createElement('span');
+      chip.className = 'prov-chip chip-active';
+      chip.style.background = col.bg;
+      chip.style.borderColor = col.border;
+      chip.style.color = col.text;
+      chip.innerHTML = '<span class="prov-dot" style="background:' + col.dot + '"></span>' +
+        p.name + ' <span style="font-size:10px;opacity:0.7;">· ' + p.state + '</span>' +
+        '<button onclick="removeProvider(' + pid + ');event.stopPropagation();" style="margin-left:6px;background:none;border:none;cursor:pointer;color:' + col.text + ';font-size:14px;line-height:1;padding:0 2px;opacity:0.7;" title="Remove">&times;</button>';
+      list.appendChild(chip);
+    });
+    // Update add-provider dropdown options
+    refreshAddProviderDropdown();
+  }
 
   // Update topbar label
   var lbl = document.getElementById('schedProviderLabel');
