@@ -5,11 +5,6 @@ import logging
 import requests
 from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, session, redirect, url_for, request
-from supabase import create_client
-
-_SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
-_SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
-_supabase = create_client(_SUPABASE_URL, _SUPABASE_KEY) if _SUPABASE_URL and _SUPABASE_KEY else None
 from modules import provider, patient, admin, care_team, scheduler
 import workflow_config
 
@@ -38,59 +33,63 @@ try:
 except Exception as _e:
     print(f"[startup] page guide seed skipped: {_e}")
 
-# ── Supabase access log (persists across Render restarts) ─────────────────────
-_SUPABASE_URL = os.environ.get('SUPABASE_URL', '').rstrip('/')
-_SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+# ── Access log (SQLite-backed, reliable on Render) ────────────────────────────
+def _init_access_log():
+    """Create access_log table in project_phoenix.db if it doesn't exist."""
+    try:
+        with sqlite3.connect(_DB_PATH) as conn:
+            conn.execute('''
+                CREATE TABLE IF NOT EXISTS access_log (
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                    timestamp  TEXT    NOT NULL,
+                    name       TEXT    NOT NULL,
+                    email      TEXT    NOT NULL,
+                    ip         TEXT,
+                    login_num  INTEGER DEFAULT 1
+                )
+            ''')
+            conn.commit()
+    except Exception as e:
+        logging.error('access_log init failed: %s', e)
 
-def _sb_headers():
-    return {
-        'apikey':        _SUPABASE_KEY,
-        'Authorization': f'Bearer {_SUPABASE_KEY}',
-        'Content-Type':  'application/json',
-    }
+_init_access_log()
 
 def _record_gate_access(name, email, ip):
-    """Persist one login to Supabase, increment that user's total count."""
+    """Write one login record to SQLite access_log and send email notification."""
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    login_num = 1
     try:
-        resp = requests.get(
-            f'{_SUPABASE_URL}/rest/v1/access_log',
-            params={'email': f'eq.{email}', 'select': 'id'},
-            headers=_sb_headers(), timeout=5
-        )
-        login_num = len(resp.json()) + 1 if resp.ok else 1
-        requests.post(
-            f'{_SUPABASE_URL}/rest/v1/access_log',
-            json={'timestamp': ts, 'name': name, 'email': email, 'ip': ip, 'login_num': login_num},
-            headers={**_sb_headers(), 'Prefer': 'return=minimal'}, timeout=5
-        )
+        with sqlite3.connect(_DB_PATH) as conn:
+            cur = conn.cursor()
+            cur.execute('SELECT COUNT(*) FROM access_log WHERE email = ?', (email,))
+            login_num = (cur.fetchone()[0] or 0) + 1
+            cur.execute(
+                'INSERT INTO access_log (timestamp, name, email, ip, login_num) VALUES (?,?,?,?,?)',
+                (ts, name, email, ip, login_num)
+            )
+            conn.commit()
     except Exception as e:
-        logging.error('DEMO_ACCESS write failed: %s', e)
-        login_num = 1
-    if _supabase:
-        try:
-            _supabase.table('access_log').insert({
-                'timestamp': ts,
-                'email':     email,
-                'ip':        ip,
-                'login_num': login_num,
-            }).execute()
-            logging.info('Supabase write OK — %s login #%d', email, login_num)
-        except Exception as e:
-            logging.warning('Supabase insert failed: %s', e)
+        logging.error('access_log write failed: %s', e)
 
-    # Send email notification via Resend
+    # Email notification via Resend
     try:
-        import requests as _req
-        _req.post('https://api.resend.com/emails', 
-            headers={'Authorization': 'Bearer re_8PxamR2S_LnumH7ac2B4EmDqeHTKzpWxe', 'Content-Type': 'application/json'},
-            json={'from': 'onboarding@resend.dev', 'to': ['justin.woller@everlywell.com'],
+        requests.post(
+            'https://api.resend.com/emails',
+            headers={'Authorization': 'Bearer re_8PxamR2S_LnumH7ac2B4EmDqeHTKzpWxe',
+                     'Content-Type': 'application/json'},
+            json={'from': 'onboarding@resend.dev',
+                  'to': ['justin.woller@everlywell.com'],
                   'subject': f'Phoenix Demo Login — {name}',
-                  'html': f'<p><b>Name:</b> {name}</p><p><b>Email:</b> {email}</p><p><b>IP:</b> {ip}</p><p><b>Login #:</b> {login_num}</p><p><b>Time:</b> {ts}</p>'},
+                  'html': (f'<p><b>Name:</b> {name}</p>'
+                           f'<p><b>Email:</b> {email}</p>'
+                           f'<p><b>IP:</b> {ip}</p>'
+                           f'<p><b>Login #:</b> {login_num}</p>'
+                           f'<p><b>Time:</b> {ts}</p>')},
             timeout=5)
-    except Exception as _e:
-        logging.warning('Resend email failed: %s', _e)
-    logging.info('DEMO_ACCESS | %s | %s | %s | login #%d | ip:%s', ts, name, email, login_num, ip)
+    except Exception as e:
+        logging.warning('Resend email failed: %s', e)
+
+    logging.info('DEMO_ACCESS | %s | %s | login #%d | ip:%s', ts, email, login_num, ip)
     return ts, login_num
 
 
@@ -162,7 +161,7 @@ def inject_sidebar_nav():
         'provider_md': [
             ('Dashboard',     '/provider/',              'home',      ['/provider/', '/provider/dashboard', '/provider/chart']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
-            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
+            ('My Schedule',   '/provider/schedule',       'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
             ('Lab Auth',      '/provider/lab-auth',       'flask',     ['/provider/lab-auth']),
@@ -173,7 +172,7 @@ def inject_sidebar_nav():
         'provider_np': [
             ('Dashboard',     '/provider/np',            'home',      ['/provider/np']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
-            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
+            ('My Schedule',   '/provider/schedule',       'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
@@ -354,14 +353,13 @@ def gate_login_post():
 
 @app.route('/demo-access/log')
 def gate_access_log():
-    """Access log dashboard — usage stats + full login history (Supabase-backed)."""
+    """Access log dashboard — usage stats + full login history (SQLite-backed)."""
     try:
-        resp = requests.get(
-            f'{_SUPABASE_URL}/rest/v1/access_log',
-            params={'select': '*', 'order': 'id.desc'},
-            headers=_sb_headers(), timeout=10
-        )
-        rows = resp.json() if resp.ok else []
+        with sqlite3.connect(_DB_PATH) as conn:
+            conn.row_factory = sqlite3.Row
+            cur = conn.cursor()
+            cur.execute('SELECT * FROM access_log ORDER BY id DESC')
+            rows = [dict(r) for r in cur.fetchall()]
     except Exception as e:
         logging.error('DEMO_ACCESS read failed: %s', e)
         rows = []
