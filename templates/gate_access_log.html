@@ -257,17 +257,24 @@
           <th>Date &amp; Time (UTC)</th>
           <th>Name</th>
           <th>Email</th>
-          <th style="text-align:center;">Session #</th>
+          <th>Activity</th>
           <th>IP Address</th>
         </tr>
       </thead>
       <tbody>
         {% for e in entries %}
+        {% set atype = e.get('activity_type') or ('gate_login' if e.login_num > 0 else 'persona') %}
         <tr>
           <td class="td-ts">{{ e.timestamp }}</td>
           <td class="td-name">{{ e.name }}</td>
           <td class="td-email">{{ e.email }}</td>
-          <td class="td-num"><span class="badge-sessions">#{{ e.login_num }}</span></td>
+          <td class="td-num">
+            {% if atype == 'gate_login' %}
+              <span class="badge-sessions" title="Gate sign-in #{{ e.login_num }}">🔐 Sign-in #{{ e.login_num }}</span>
+            {% else %}
+              <span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;">{{ atype }}</span>
+            {% endif %}
+          </td>
           <td class="td-ip">{{ e.ip }}</td>
         </tr>
         {% endfor %}

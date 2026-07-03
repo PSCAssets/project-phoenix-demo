@@ -125,6 +125,43 @@ def _record_gate_access(name, email, ip):
     logging.info('DEMO_ACCESS | %s | %s | login #%d | ip:%s', ts, email, login_num, ip)
     return ts, login_num
 
+def _record_persona_switch(role, display_name):
+    """Log which demo persona was accessed during a session."""
+    gate_name  = session.get('gate_name', 'Unknown')
+    gate_email = session.get('gate_email', 'unknown@everlywell.com')
+    if not gate_email or gate_email == 'unknown@everlywell.com':
+        return  # not a gated session, skip
+    ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr or 'unknown').split(',')[0].strip()
+    record = {
+        'timestamp':     ts,
+        'name':          gate_name,
+        'email':         gate_email,
+        'ip':            ip,
+        'login_num':     0,
+        'activity_type': f'persona: {display_name}',
+    }
+    # Write to Supabase
+    if _SUPABASE_URL and _SUPABASE_KEY:
+        try:
+            requests.post(
+                f'{_SUPABASE_URL}/rest/v1/access_log',
+                json=record, headers=_sb_headers(), timeout=5
+            )
+        except Exception as e:
+            logging.warning('Supabase persona log failed: %s', e)
+    # Write to SQLite
+    try:
+        with sqlite3.connect(_DB_PATH) as conn:
+            conn.execute(
+                'INSERT INTO access_log (timestamp, name, email, ip, login_num) VALUES (?,?,?,?,?)',
+                (ts, gate_name, gate_email, ip, 0)
+            )
+            conn.commit()
+    except Exception:
+        pass
+    logging.info('PERSONA | %s | %s → %s', ts, gate_email, display_name)
+
 
 # ── Page guide (Phoenix icon help modal) ──────────────────────────────────
 @app.context_processor
@@ -495,9 +532,11 @@ def index():
 def login(role):
     if role not in ROLE_DESTINATIONS:
         return redirect(url_for('index'))
+    display = ROLE_NAMES.get(role, role)
     session.permanent = True
     session['role'] = role
-    session['display_name'] = ROLE_NAMES.get(role, role)
+    session['display_name'] = display
+    _record_persona_switch(role, display)
     return redirect(url_for(ROLE_DESTINATIONS[role]))
 
 @app.route("/login", methods=["POST"])
@@ -505,19 +544,33 @@ def login_post():
     role = request.form.get("role", "")
     if role not in ROLE_DESTINATIONS:
         return redirect(url_for('index'))
+    display = ROLE_NAMES.get(role, role)
     session.permanent = True
     session['role'] = role
-    session['display_name'] = ROLE_NAMES.get(role, role)
+    session['display_name'] = display
+    _record_persona_switch(role, display)
     return redirect(url_for(ROLE_DESTINATIONS[role]))
 
 @app.route("/switch-user", methods=["POST"])
 def switch_user():
     role = request.form.get("role", "")
     if role in ROLE_DESTINATIONS:
+        display = ROLE_NAMES.get(role, role)
+        gate_name  = session.get('gate_name')
+        gate_email = session.get('gate_email')
+        gate_ts    = session.get('gate_timestamp')
+        gate_num   = session.get('gate_login_num')
         session.clear()
         session.permanent = True
-        session['role'] = role
-        session['display_name'] = ROLE_NAMES.get(role, role)
+        session['role']             = role
+        session['display_name']     = display
+        session['gate_name']        = gate_name
+        session['gate_email']       = gate_email
+        session['gate_timestamp']   = gate_ts
+        session['gate_login_num']   = gate_num
+        session['gate_verified']    = True
+        session['gate_last_activity'] = time.time()
+        _record_persona_switch(role, display)
         return redirect(url_for(ROLE_DESTINATIONS[role]))
     return redirect(url_for('index'))
 
