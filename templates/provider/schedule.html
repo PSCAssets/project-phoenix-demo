@@ -655,9 +655,61 @@ function clearAllProviders() {
   renderChips();
 }
 
+// Per-provider availability blocks [colIdx, startHour, endHour, colorClass, blockName, timeRange, pills[]]
+var AVAIL_BLOCKS_BY_PROV = {
+  0: [ // Dr. Sarah Lee, MD
+    [0,  8, 12, 'teal', 'Morning Block',   '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+    [1,  8, 12, 'teal', 'Morning Block',   '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+    [2, 13, 15, 'blue', 'Afternoon Block', '1:00 PM – 3:00 PM',  ['🎥 Video']],
+    [3,  9, 12, 'teal', 'Morning Block',   '9:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+    [4, 14, 16, 'blue', 'Afternoon Block', '2:00 PM – 4:00 PM',  ['🎥 Video']],
+  ],
+  2: [ // Maria Rodriguez, NP
+    [0,  8, 10, 'teal', 'Morning Block',   '8:00 AM – 10:00 AM', ['📞 Phone']],
+    [1,  9, 11, 'teal', 'Morning Block',   '9:00 AM – 11:00 AM', ['📞 Phone', '🎥 Video']],
+    [1, 14, 16, 'blue', 'Afternoon Block', '2:00 PM – 4:00 PM',  ['🎥 Video']],
+    [2, 10, 14, 'blue', 'Midday Block',    '10:00 AM – 2:00 PM', ['🎥 Video']],
+    [3,  8, 12, 'teal', 'Morning Block',   '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
+    [4, 10, 12, 'teal', 'Morning Block',   '10:00 AM – 12:00 PM',['🎥 Video']],
+  ],
+  8: [ // Lisa Park, MS CGC
+    [0,  9, 13, 'teal', 'Morning Block',   '9:00 AM – 1:00 PM',  ['📞 Phone', '🎥 Video']],
+    [1,  9, 12, 'teal', 'Morning Block',   '9:00 AM – 12:00 PM', ['📞 Phone']],
+    [2,  9, 11, 'teal', 'Morning Block',   '9:00 AM – 11:00 AM', ['🎥 Video']],
+    [2, 14, 16, 'blue', 'Afternoon Block', '2:00 PM – 4:00 PM',  ['🎥 Video']],
+    [3, 10, 14, 'blue', 'Midday Block',    '10:00 AM – 2:00 PM', ['📞 Phone', '🎥 Video']],
+    [4,  9, 13, 'teal', 'Morning Block',   '9:00 AM – 1:00 PM',  ['📞 Phone', '🎥 Video']],
+  ],
+};
+
+function renderAvailBlocks() {
+  if (selectedProviders.length !== 1) return; // only for single-provider My Schedule view
+  var pid = selectedProviders[0];
+  var blocks = AVAIL_BLOCKS_BY_PROV[pid];
+  if (!blocks) return;
+  blocks.forEach(function(entry) {
+    var colIdx=entry[0], sh=entry[1], eh=entry[2], color=entry[3];
+    var blockName=entry[4], timeRange=entry[5], pills=entry[6];
+    var col = document.getElementById('col' + colIdx);
+    if (!col) return;
+    var frame = document.createElement('div');
+    frame.className = 'avail-block avail-block-' + color;
+    frame.style.top    = ((sh - START_HOUR) * 2 * SLOT_H) + 'px';
+    frame.style.height = ((eh - sh) * 2 * SLOT_H) + 'px';
+    var pillsHtml = pills.map(function(p){ return '<span class="avail-block-pill">'+p+'</span>'; }).join('');
+    frame.innerHTML = '<div class="avail-block-inner"><div class="avail-block-name">'+blockName+'</div>'
+      + '<div class="avail-block-time">'+timeRange+'</div>'
+      + '<div class="avail-block-pills">'+pillsHtml+'</div></div>';
+    col.appendChild(frame);
+  });
+}
+
 function renderCalendar() {
   // Clear all appointment elements (keep slot backgrounds)
   document.querySelectorAll('.appt, .avail-block').forEach(function(el){ el.remove(); });
+
+  // Render availability blocks first (z-index 1, behind appointments at z-index 3)
+  renderAvailBlocks();
 
   // Re-render week view appointments for each selected provider
   selectedProviders.forEach(function(pid) {
@@ -931,33 +983,7 @@ const TYPE_LABELS = {
   'avail-pv': 'Available', 'avail-phone': 'Available', 'avail-video': 'Available'
 };
 
-// Fix 12: multi-hour availability blocks for all 5 days
-// Each entry: [colIdx, startHour, endHour, colorClass, blockName, timeRange, pills[]]
-const AVAIL_BLOCKS = [
-  [0, 8, 12, 'teal', 'Morning Block', '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
-  [1, 8, 12, 'teal', 'Morning Block', '8:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
-  [2, 13, 15, 'blue', 'Afternoon Block', '1:00 PM – 3:00 PM', ['🎥 Video']],
-  [3, 9, 12, 'teal', 'Morning Block', '9:00 AM – 12:00 PM', ['📞 Phone', '🎥 Video']],
-  [4, 14, 16, 'blue', 'Afternoon Block', '2:00 PM – 4:00 PM', ['🎥 Video']],
-];
-AVAIL_BLOCKS.forEach(function(entry) {
-  var colIdx = entry[0], sh = entry[1], eh = entry[2], color = entry[3];
-  var blockName = entry[4], timeRange = entry[5], pills = entry[6];
-  var col = document.getElementById('col' + colIdx);
-  if (!col) return;
-  var topOffset = (sh - START_HOUR) * 2 * SLOT_H;
-  var height = (eh - sh) * 2 * SLOT_H;
-  var frame = document.createElement('div');
-  frame.className = 'avail-block avail-block-' + color;
-  frame.style.top = topOffset + 'px';
-  frame.style.height = height + 'px';
-  var pillsHtml = pills.map(function(p) { return '<span class="avail-block-pill">' + p + '</span>'; }).join('');
-  frame.innerHTML = '<div class="avail-block-inner"><div class="avail-block-name">' + blockName + '</div><div class="avail-block-time">' + timeRange + '</div><div class="avail-block-pills">' + pillsHtml + '</div></div>';
-  col.appendChild(frame);
-});
-
-// Calendar rendered by renderCalendar() via provider chip selection
-// Called after DOMContentLoaded in provider JS above
+// Calendar rendered by renderCalendar() via renderChips() on DOMContentLoaded
 
 // Fix 14: Appointment detail modal
 var TYPE_LABEL_MAP = {
