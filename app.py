@@ -33,9 +33,20 @@ try:
 except Exception as _e:
     print(f"[startup] page guide seed skipped: {_e}")
 
-# ── Access log (SQLite-backed, reliable on Render) ────────────────────────────
+# ── Access log — SQLite (current session) + Supabase (permanent history) ──────
+_SUPABASE_URL = os.environ.get('SUPABASE_URL', '').rstrip('/')
+_SUPABASE_KEY = os.environ.get('SUPABASE_KEY', '')
+
+def _sb_headers():
+    return {
+        'apikey':        _SUPABASE_KEY,
+        'Authorization': f'Bearer {_SUPABASE_KEY}',
+        'Content-Type':  'application/json',
+        'Prefer':        'return=minimal',
+    }
+
 def _init_access_log():
-    """Create access_log table in project_phoenix.db if it doesn't exist."""
+    """Create access_log table in SQLite if it doesn't exist (session cache)."""
     try:
         with sqlite3.connect(_DB_PATH) as conn:
             conn.execute('''
@@ -55,23 +66,47 @@ def _init_access_log():
 _init_access_log()
 
 def _record_gate_access(name, email, ip):
-    """Write one login record to SQLite access_log and send email notification."""
+    """Write login to Supabase (permanent) + SQLite (session cache)."""
     ts = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
     login_num = 1
+
+    # ── 1. Supabase write (permanent across redeploys) ──────────────────────
+    if _SUPABASE_URL and _SUPABASE_KEY:
+        try:
+            # Get prior login count for this email
+            resp = requests.get(
+                f'{_SUPABASE_URL}/rest/v1/access_log',
+                params={'email': f'eq.{email}', 'select': 'id'},
+                headers=_sb_headers(), timeout=5
+            )
+            login_num = len(resp.json()) + 1 if resp.ok else 1
+            requests.post(
+                f'{_SUPABASE_URL}/rest/v1/access_log',
+                json={'timestamp': ts, 'name': name, 'email': email,
+                      'ip': ip, 'login_num': login_num},
+                headers=_sb_headers(), timeout=5
+            )
+            logging.info('Supabase write OK — %s login #%d', email, login_num)
+        except Exception as e:
+            logging.warning('Supabase write failed: %s', e)
+
+    # ── 2. SQLite write (session cache / fallback) ───────────────────────────
     try:
         with sqlite3.connect(_DB_PATH) as conn:
             cur = conn.cursor()
-            cur.execute('SELECT COUNT(*) FROM access_log WHERE email = ?', (email,))
-            login_num = (cur.fetchone()[0] or 0) + 1
+            if login_num == 1:  # Supabase unavailable — count locally
+                cur.execute('SELECT COUNT(*) FROM access_log WHERE email = ?', (email,))
+                login_num = (cur.fetchone()[0] or 0) + 1
             cur.execute(
-                'INSERT INTO access_log (timestamp, name, email, ip, login_num) VALUES (?,?,?,?,?)',
+                'INSERT INTO access_log (timestamp, name, email, ip, login_num) '
+                'VALUES (?,?,?,?,?)',
                 (ts, name, email, ip, login_num)
             )
             conn.commit()
     except Exception as e:
-        logging.error('access_log write failed: %s', e)
+        logging.error('SQLite access_log write failed: %s', e)
 
-    # Email notification via Resend
+    # ── 3. Email notification ────────────────────────────────────────────────
     try:
         requests.post(
             'https://api.resend.com/emails',
@@ -80,10 +115,8 @@ def _record_gate_access(name, email, ip):
             json={'from': 'onboarding@resend.dev',
                   'to': ['justin.woller@everlywell.com'],
                   'subject': f'Phoenix Demo Login — {name}',
-                  'html': (f'<p><b>Name:</b> {name}</p>'
-                           f'<p><b>Email:</b> {email}</p>'
-                           f'<p><b>IP:</b> {ip}</p>'
-                           f'<p><b>Login #:</b> {login_num}</p>'
+                  'html': (f'<p><b>Name:</b> {name}</p><p><b>Email:</b> {email}</p>'
+                           f'<p><b>IP:</b> {ip}</p><p><b>Login #:</b> {login_num}</p>'
                            f'<p><b>Time:</b> {ts}</p>')},
             timeout=5)
     except Exception as e:
@@ -354,15 +387,36 @@ def gate_login_post():
 @app.route('/demo-access/log')
 def gate_access_log():
     """Access log dashboard — usage stats + full login history (SQLite-backed)."""
-    try:
-        with sqlite3.connect(_DB_PATH) as conn:
-            conn.row_factory = sqlite3.Row
-            cur = conn.cursor()
-            cur.execute('SELECT * FROM access_log ORDER BY id DESC')
-            rows = [dict(r) for r in cur.fetchall()]
-    except Exception as e:
-        logging.error('DEMO_ACCESS read failed: %s', e)
-        rows = []
+    # Try Supabase first (permanent history), fall back to SQLite (session cache)
+    rows = []
+    if _SUPABASE_URL and _SUPABASE_KEY:
+        try:
+            resp = requests.get(
+                f'{_SUPABASE_URL}/rest/v1/access_log',
+                params={'select': '*', 'order': 'id.desc'},
+                headers={
+                    'apikey':        _SUPABASE_KEY,
+                    'Authorization': f'Bearer {_SUPABASE_KEY}',
+                },
+                timeout=10
+            )
+            if resp.ok:
+                rows = resp.json()
+                logging.info('Dashboard: loaded %d rows from Supabase', len(rows))
+        except Exception as e:
+            logging.warning('Supabase read failed, falling back to SQLite: %s', e)
+
+    if not rows:
+        try:
+            with sqlite3.connect(_DB_PATH) as conn:
+                conn.row_factory = sqlite3.Row
+                cur = conn.cursor()
+                cur.execute('SELECT * FROM access_log ORDER BY id DESC')
+                rows = [dict(r) for r in cur.fetchall()]
+                logging.info('Dashboard: loaded %d rows from SQLite fallback', len(rows))
+        except Exception as e:
+            logging.error('SQLite read also failed: %s', e)
+            rows = []
 
     # Build per-user summary in Python (iterate oldest→newest)
     user_map = {}
