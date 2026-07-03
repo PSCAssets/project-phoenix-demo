@@ -152,21 +152,21 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Pending</span></td>
             <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('M.J., 45F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="viewPatient('M.J., 45F')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('M.J., 45F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('M.J., 45F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',0,null)">View</button></td>
           </tr>
           <tr data-status="pending">
             <td>A.K. · 38F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>CA</td>
             <td><span class="badge badge-warn">Pending</span></td>
             <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('A.K., 38F','STI Panel','Abnormal','EW Direct','CA',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('A.K., 38F','STI Panel','Abnormal','EW Direct','CA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('A.K., 38F','STI Panel','Abnormal','EW Direct','CA',0,null)">View</button></td>
           </tr>
           <tr data-status="pending">
             <td>C.L. · 29F</td><td>A1C Management</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>NY</td>
             <td><span class="badge badge-hipaa">✓ Verified</span></td>
             <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('C.L., 29F','A1C Management','Borderline','Humana / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('C.L., 29F','A1C Management','Borderline','Humana / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('C.L., 29F','A1C Management','Borderline','Humana / EW','NY',0,null)">View</button></td>
           </tr>
           <!-- 2nd Attempt -->
           <tr class="priority-hi" data-status="attempt2">
@@ -174,21 +174,21 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-hipaa">✓ Verified</span></td>
             <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>Today 8:12 AM</td><td>1</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('R.S., 62M','Galleri Multi-Cancer','Abnormal','Grail / Elevance','FL',1)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('R.S., 62M','Galleri Multi-Cancer','Abnormal','Grail / Elevance','FL',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('R.S., 62M','Galleri Multi-Cancer','Abnormal','Grail / Elevance','FL',1,'CST-2026-10847 · Video Call · Pending Scheduling')">View</button></td>
           </tr>
           <tr data-status="attempt2">
             <td>P.W. · 71F</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>TX</td>
             <td><span class="badge badge-hipaa">✓ Verified</span></td>
             <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>Yesterday 3:41 PM</td><td>2</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('P.W., 71F','Annual Wellness Visit','Borderline','Humana / EW','TX',1)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('P.W., 71F','Annual Wellness Visit','Borderline','Humana / EW','TX',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('P.W., 71F','Annual Wellness Visit','Borderline','Humana / EW','TX',1,null)">View</button></td>
           </tr>
           <tr data-status="attempt2">
             <td>G.R. · 54M</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>NJ</td>
             <td><span class="badge badge-warn">Pending</span></td>
             <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
             <td>Today 9:05 AM</td><td>1</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('G.R., 54M','STI Panel','Abnormal','EW Direct','NJ',1)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" onclick="openCallModal('G.R., 54M','STI Panel','Abnormal','EW Direct','NJ',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('G.R., 54M','STI Panel','Abnormal','EW Direct','NJ',1,null)">View</button></td>
           </tr>
           <!-- 3rd Attempt -->
           <tr class="priority-hi" data-status="attempt3">
@@ -196,20 +196,20 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-hipaa">✓ Verified</span></td>
             <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td>
             <td>Today 8:50 AM</td><td>3</td><td><span class="badge" style="background:#FEF2F2;color:#7F1D1D;border:1px solid #FCA5A5;">Final Attempt</span></td>
-            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('T.B., 51M','Thyroid Panel','Abnormal','Humana / EW','TX',2)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('T.B., 51M','Thyroid Panel','Abnormal','Humana / EW','TX',2)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('T.B., 51M','Thyroid Panel','Abnormal','Humana / EW','TX',2,null)">View</button></td>
           </tr>
           <tr data-status="attempt3">
             <td>D.N. · 43F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>IL</td>
             <td><span class="badge badge-hipaa">✓ Verified</span></td>
             <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td>
             <td>Yesterday 2:00 PM</td><td>4</td><td><span class="badge" style="background:#FEF2F2;color:#7F1D1D;border:1px solid #FCA5A5;">Final Attempt</span></td>
-            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('D.N., 43F','Hereditary Cancer Panel','Abnormal','Quest / EW','IL',2)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td>
+            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('D.N., 43F','Hereditary Cancer Panel','Abnormal','Quest / EW','IL',2)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('D.N., 43F','Hereditary Cancer Panel','Abnormal','Quest / EW','IL',2,null)">View</button></td>
           </tr>
           <!-- More pending -->
-          <tr data-status="pending"><td>H.O. · 36F</td><td>A1C Management</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>GA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('H.O., 36F','A1C Management','Borderline','Humana / EW','GA',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td></tr>
-          <tr data-status="pending"><td>E.T. · 59M</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>VA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td></tr>
-          <tr data-status="pending"><td>F.M. · 47F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>WA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td></tr>
-          <tr data-status="pending"><td>J.V. · 44M</td><td>Thyroid Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>MA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0)">Log Call</button> <button class="btn-secondary" onclick="showToast('Opening patient record...')">View</button></td></tr>
+          <tr data-status="pending"><td>H.O. · 36F</td><td>A1C Management</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>GA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('H.O., 36F','A1C Management','Borderline','Humana / EW','GA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('H.O., 36F','A1C Management','Borderline','Humana / EW','GA',0,null)">View</button></td></tr>
+          <tr data-status="pending"><td>E.T. · 59M</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>VA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0,null)">View</button></td></tr>
+          <tr data-status="pending"><td>F.M. · 47F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>WA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0,null)">View</button></td></tr>
+          <tr data-status="pending"><td>J.V. · 44M</td><td>Thyroid Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>MA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0,null)">View</button></td></tr>
           <!-- Exhausted -->
           <tr class="exhausted-row" data-status="exhausted"><td>S.L. · 67F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>2 days ago</td><td>5</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 25')">Letter Sent ✓</button></td></tr>
           <tr class="exhausted-row" data-status="exhausted"><td>B.W. · 78M</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>FL</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>3 days ago</td><td>6</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 24')">Letter Sent ✓</button></td></tr>
@@ -219,6 +219,72 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
           <tr class="closed-row" data-status="closed"><td>O.M. · 49M</td><td>Thyroid Panel</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>TX</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td><td>Today 7:55 AM</td><td>2</td><td><span class="badge badge-ok">Reached — Declined</span></td><td><span style="font-size:12px;color:#6B7280;">Closed</span></td></tr>
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+
+<!-- Patient Detail Modal -->
+<div class="overlay" id="patientModal">
+  <div class="modal" style="width:580px;">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="ptModalName">Patient Record</div>
+        <div class="modal-sub" id="ptModalSub"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal('patientModal')">×</button>
+    </div>
+    <div class="modal-body">
+      <!-- Demographics -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
+          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">CLIENT / PARTNER</div>
+          <div style="font-size:13px;font-weight:600;color:#111827;" id="ptClient">—</div>
+        </div>
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
+          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">STATE</div>
+          <div style="font-size:13px;font-weight:600;color:#111827;" id="ptState">—</div>
+        </div>
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
+          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">RESULT STATUS</div>
+          <div style="font-size:13px;font-weight:600;" id="ptResult">—</div>
+        </div>
+      </div>
+      <!-- Test Info -->
+      <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+        <div style="background:#F3F4F6;padding:9px 14px;font-size:11px;font-weight:700;color:#374151;border-bottom:1px solid #E5E0D8;">TEST &amp; RESULT DETAILS</div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:#6B7280;">Care Product</span>
+            <span style="font-weight:600;color:#111827;" id="ptProduct">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:#6B7280;">Lab Resulted</span>
+            <span style="font-weight:600;color:#111827;" id="ptLabDate">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:#6B7280;">Ordering Provider</span>
+            <span style="font-weight:600;color:#111827;" id="ptProvider">—</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:#6B7280;">SLA Deadline</span>
+            <span style="font-weight:600;" id="ptSla">—</span>
+          </div>
+        </div>
+      </div>
+      <!-- Call History -->
+      <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+        <div style="background:#F3F4F6;padding:9px 14px;font-size:11px;font-weight:700;color:#374151;border-bottom:1px solid #E5E0D8;">OUTBOUND CALL HISTORY</div>
+        <div id="ptCallHistory" style="padding:12px 14px;font-size:12px;color:#374151;line-height:1.8;">—</div>
+      </div>
+      <!-- Consult Status -->
+      <div id="ptConsultSection" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E40AF;display:none;">
+        <div style="font-weight:700;margin-bottom:4px;">📋 Active Consult Request</div>
+        <div id="ptConsultDetail">—</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('patientModal')">Close</button>
+      <button class="btn-primary" id="ptLogCallBtn">📞 Log Call for This Patient</button>
     </div>
   </div>
 </div>
@@ -405,8 +471,56 @@ function escalate(type) {
   el.style.display = '';
 }
 
-function viewPatient(patient) {
-  showToast('Opening patient record: ' + patient);
+// Lookup table for demo call history per patient
+var _callHistory = {
+  'M.J., 45F': 'No prior attempts.',
+  'A.K., 38F': 'No prior attempts.',
+  'C.L., 29F': 'No prior attempts.',
+  'R.S., 62M': 'Jun 30 8:12 AM — Attempt 1 · No Answer · Voicemail left.',
+  'P.W., 71F': 'Jun 29 3:41 PM — Attempt 1 · No Answer.\nJun 30 9:00 AM — Attempt 2 · Left Voicemail.',
+  'G.R., 54M': 'Jun 30 9:05 AM — Attempt 1 · No Answer.',
+  'T.B., 51M': 'Jun 28 8:50 AM — Attempt 1 · No Answer.\nJun 29 11:00 AM — Attempt 2 · Left Voicemail.',
+  'D.N., 43F': 'Jun 28 2:00 PM — Attempt 1 · No Answer.\nJun 29 10:30 AM — Attempt 2 · No Answer.',
+  'H.O., 36F': 'No prior attempts.',
+  'E.T., 59M': 'No prior attempts.',
+  'F.M., 47F': 'No prior attempts.',
+  'J.V., 44M': 'No prior attempts.'
+};
+
+var _labDates = {
+  'M.J., 45F':'Jun 26, 2026','A.K., 38F':'Jun 27, 2026','C.L., 29F':'Jun 25, 2026',
+  'R.S., 62M':'Jun 28, 2026','P.W., 71F':'Jun 27, 2026','G.R., 54M':'Jun 29, 2026',
+  'T.B., 51M':'Jun 27, 2026','D.N., 43F':'Jun 28, 2026','H.O., 36F':'Jun 26, 2026',
+  'E.T., 59M':'Jun 25, 2026','F.M., 47F':'Jun 28, 2026','J.V., 44M':'Jun 27, 2026'
+};
+
+var _ptCallModalArgs = null;
+
+function openPatientModal(patient, product, result, client, state, attempts, consult) {
+  _ptCallModalArgs = {patient:patient, product:product, result:result, client:client, state:state, attempts:attempts};
+  document.getElementById('ptModalName').textContent = 'Patient Record — ' + patient;
+  document.getElementById('ptModalSub').textContent = product + ' · ' + result;
+  document.getElementById('ptClient').textContent = client;
+  document.getElementById('ptState').textContent = state;
+  var resEl = document.getElementById('ptResult');
+  resEl.textContent = result;
+  resEl.style.color = result === 'Abnormal' ? '#DC2626' : '#D97706';
+  document.getElementById('ptProduct').textContent = product;
+  document.getElementById('ptLabDate').textContent = _labDates[patient] || '—';
+  document.getElementById('ptProvider').textContent = 'Dr. Sarah Lee, MD';
+  var slaEl = document.getElementById('ptSla');
+  slaEl.textContent = attempts >= 2 ? 'OVERDUE — Final Attempt Required' : 'Jul 5, 2026 (3 business days)';
+  slaEl.style.color = attempts >= 2 ? '#DC2626' : '#374151';
+  var hist = (_callHistory[patient] || 'No prior attempts.').replace(/\n/g,'<br>');
+  document.getElementById('ptCallHistory').innerHTML = hist;
+  var csEl = document.getElementById('ptConsultSection');
+  var cdEl = document.getElementById('ptConsultDetail');
+  if (consult) { csEl.style.display=''; cdEl.textContent=consult; } else { csEl.style.display='none'; }
+  document.getElementById('ptLogCallBtn').onclick = function() {
+    closeModal('patientModal');
+    openCallModal(_ptCallModalArgs.patient,_ptCallModalArgs.product,_ptCallModalArgs.result,_ptCallModalArgs.client,_ptCallModalArgs.state,_ptCallModalArgs.attempts);
+  };
+  document.getElementById('patientModal').classList.add('open');
 }
 
 function logCall() {
