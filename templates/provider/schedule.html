@@ -207,7 +207,7 @@
     </div>
   </div>
   <!-- Multi-provider filter panel (hidden for provider's own My Schedule view) -->
-  {% if session.get('role') not in ('provider_md', 'provider_np') %}
+  {% if session.get('role') not in ('provider_md', 'provider_np', 'provider_gc') %}
   <div class="sched-filter-panel">
     <div class="filter-row">
       {% if session.get('role') not in ('provider_gc',) %}
