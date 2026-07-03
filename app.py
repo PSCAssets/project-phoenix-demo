@@ -144,10 +144,14 @@ def _record_persona_switch(role, display_name):
     # Write to Supabase
     if _SUPABASE_URL and _SUPABASE_KEY:
         try:
-            requests.post(
+            sb_resp = requests.post(
                 f'{_SUPABASE_URL}/rest/v1/access_log',
                 json=record, headers=_sb_headers(), timeout=5
             )
+            if not sb_resp.ok:
+                logging.warning('Supabase persona write %s: %s', sb_resp.status_code, sb_resp.text)
+            else:
+                logging.info('Supabase persona write OK — %s → %s', gate_email, display_name)
         except Exception as e:
             logging.warning('Supabase persona log failed: %s', e)
     # Write to SQLite
@@ -430,7 +434,7 @@ def gate_access_log():
         try:
             resp = requests.get(
                 f'{_SUPABASE_URL}/rest/v1/access_log',
-                params={'select': '*', 'order': 'id.desc'},
+                params={'select': '*', 'order': 'id.asc'},
                 headers={
                     'apikey':        _SUPABASE_KEY,
                     'Authorization': f'Bearer {_SUPABASE_KEY}',
@@ -448,7 +452,7 @@ def gate_access_log():
             with sqlite3.connect(_DB_PATH) as conn:
                 conn.row_factory = sqlite3.Row
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM access_log ORDER BY id DESC')
+                cur.execute('SELECT * FROM access_log ORDER BY id ASC')
                 rows = [dict(r) for r in cur.fetchall()]
                 logging.info('Dashboard: loaded %d rows from SQLite fallback', len(rows))
         except Exception as e:
@@ -498,7 +502,7 @@ ROLE_NAMES = {
     'care_team':        'Alex Kim',
     'patient':          'Marcus Johnson',
     'admin':            'Chris Navarro',
-    'qa_reviewer':      'Rachel Chen, QA Reviewer',
+    'qa_reviewer':      'Quinn Patel, QA Reviewer',
     'gc_admin':         'Morgan Ellis, GC Admin',
     'provider_manager': 'Riley Perrone, Team Manager',
     'provider_psr':     'Melanie Marmo, PSS Manager',
