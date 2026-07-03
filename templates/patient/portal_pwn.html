@@ -988,7 +988,7 @@
         <input type="radio" name="consultType" value="video" checked>
         <div>
           <div style="font-size:13px;font-weight:600;color:#111827;">📹 Video Call</div>
-          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Secure video session — recommended for result reviews. Must be scheduled in advance.</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:2px;">Secure video session — recommended for result reviews. Schedule in advance or request on demand.</div>
         </div>
       </div>
       <div class="consult-type-option" id="ct-phone" onclick="selectConsultType('phone', this)">
@@ -1006,24 +1006,36 @@
         </div>
       </div>
 
-      <!-- Scheduled always: Video -->
+      <!-- Video: Scheduled or On Demand toggle -->
       <div id="deliveryVideo" style="margin-top:14px;">
-        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;">Select a date and time</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div>
-            <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred date</div>
-            <input type="date" id="preferredDateVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">When would you like to meet?</div>
+        <div class="delivery-toggle">
+          <button class="delivery-tab active" id="videoTab-scheduled" onclick="setDelivery('video','scheduled')">📅 Schedule a Time</button>
+          <button class="delivery-tab" id="videoTab-ondemand" onclick="setDelivery('video','ondemand')">⚡ On Demand</button>
+        </div>
+        <div id="videoScheduled">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred date</div>
+              <input type="date" id="preferredDateVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
+            </div>
+            <div>
+              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred time</div>
+              <select id="preferredTimeVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
+                <option>Morning (8 AM – 12 PM)</option>
+                <option>Afternoon (12 PM – 4 PM)</option>
+                <option>Evening (4 PM – 7 PM)</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred time</div>
-            <select id="preferredTimeVideo" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
-              <option>Morning (8 AM – 12 PM)</option>
-              <option>Afternoon (12 PM – 4 PM)</option>
-              <option>Evening (4 PM – 7 PM)</option>
-            </select>
+          <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">📅 We'll confirm your appointment within 1 business day and send a calendar invite.</div>
+        </div>
+        <div id="videoOnDemand" style="display:none;">
+          <div class="on-demand-box">
+            <div style="font-size:13px;font-weight:700;color:#065F46;margin-bottom:6px;">⚡ Connect Now — Next Available Counselor</div>
+            <div style="font-size:12px;color:#374151;line-height:1.6;">Your video request will be sent to the next available genetic counselor. Estimated wait time: <strong>10–20 minutes</strong>.<br><br>You'll receive a secure video link at <strong>jennifer.adams@email.com</strong>.</div>
           </div>
         </div>
-        <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">📅 We'll confirm your appointment within 1 business day and send a calendar invite.</div>
       </div>
 
       <!-- Phone: Scheduled or On Demand toggle -->
@@ -1058,35 +1070,11 @@
         </div>
       </div>
 
-      <!-- Async: On Demand or Scheduled toggle -->
+      <!-- Async: Static 72-hour submit — no scheduling toggle -->
       <div id="deliveryAsync" style="display:none;margin-top:14px;">
-        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px;">When would you like a response?</div>
-        <div class="delivery-toggle">
-          <button class="delivery-tab active" id="asyncTab-ondemand" onclick="setDelivery('async','ondemand')">⚡ Send Now</button>
-          <button class="delivery-tab" id="asyncTab-scheduled" onclick="setDelivery('async','scheduled')">📅 Preferred Window</button>
-        </div>
-        <div id="asyncOnDemand">
-          <div class="on-demand-box on-demand-box-async">
-            <div style="font-size:13px;font-weight:700;color:#C2410C;margin-bottom:6px;">⚡ Submit Now — 72-Hour Response</div>
-            <div style="font-size:12px;color:#374151;line-height:1.6;">Your questions and selected topics will be sent immediately to Dr. Sarah Lee. You'll receive a detailed written response to your secure inbox within <strong>72 hours</strong>.</div>
-          </div>
-        </div>
-        <div id="asyncScheduled" style="display:none;">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div>
-              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred contact date</div>
-              <input type="date" id="preferredDateAsync" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;" onfocus="this.style.borderColor='#0A2F5C'" onblur="this.style.borderColor='#E5E7EB'">
-            </div>
-            <div>
-              <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:5px;">Preferred window</div>
-              <select id="preferredTimeAsync" style="width:100%;border:1px solid #E5E7EB;border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;">
-                <option>Morning (8 AM – 12 PM)</option>
-                <option>Afternoon (12 PM – 4 PM)</option>
-                <option>Evening (4 PM – 7 PM)</option>
-              </select>
-            </div>
-          </div>
-          <div style="margin-top:10px;font-size:12px;color:#6B7280;background:#F9FAFB;border-radius:7px;padding:9px 12px;">Response guaranteed within 72 hours of your preferred start window.</div>
+        <div class="on-demand-box on-demand-box-async">
+          <div style="font-size:13px;font-weight:700;color:#C2410C;margin-bottom:6px;">💬 72-Hour Written Response</div>
+          <div style="font-size:12px;color:#374151;line-height:1.6;">Submit your questions and selected topics now. Dr. Sarah Lee will review and send a detailed written response to your secure inbox within <strong>72 hours</strong>.<br><br>No scheduling needed — respond at your convenience.</div>
         </div>
       </div>
     </div>
@@ -1216,13 +1204,19 @@ function selectConsultType(val, el) {
   document.getElementById('deliveryPhone').style.display  = val === 'phone'  ? '' : 'none';
   document.getElementById('deliveryAsync').style.display  = val === 'async'  ? '' : 'none';
   // Reset delivery choice defaults
+  if (val === 'video') { setDelivery('video','scheduled'); }
   if (val === 'phone') { setDelivery('phone','scheduled'); }
-  if (val === 'async') { setDelivery('async','ondemand'); }
-  if (val === 'video') { _delivery = 'scheduled'; }
+  // async has no delivery toggle
 }
 
 function setDelivery(type, mode) {
   _delivery = mode;
+  if (type === 'video') {
+    document.getElementById('videoTab-scheduled').className = 'delivery-tab' + (mode==='scheduled' ? ' active' : '');
+    document.getElementById('videoTab-ondemand').className  = 'delivery-tab' + (mode==='ondemand'  ? ' active' : '');
+    document.getElementById('videoScheduled').style.display  = mode === 'scheduled' ? '' : 'none';
+    document.getElementById('videoOnDemand').style.display   = mode === 'ondemand'  ? '' : 'none';
+  }
   if (type === 'phone') {
     document.getElementById('phoneTab-scheduled').className = 'delivery-tab' + (mode==='scheduled' ? ' active' : '');
     document.getElementById('phoneTab-ondemand').className  = 'delivery-tab' + (mode==='ondemand'  ? ' active' : '');
@@ -1243,18 +1237,22 @@ function buildConfirmation() {
   // Update title/message based on type + delivery
   var titleEl = document.querySelector('#step3 div:nth-child(2)');
   var descEl  = document.querySelector('#step3 div:nth-child(3)');
-  if (_consultType === 'video' || _delivery === 'scheduled') {
-    if (titleEl) titleEl.textContent = 'Consultation Requested';
-    if (descEl) descEl.textContent = 'Your care team will confirm your appointment within 1 business day and send a calendar invite.';
-    document.querySelector('.confirm-check').textContent = '✅';
-  } else if (_consultType === 'phone' && _delivery === 'ondemand') {
-    if (titleEl) titleEl.textContent = 'On Demand Call Requested';
-    if (descEl) descEl.textContent = 'The next available genetic counselor will call (512) 555-0291 within 10–20 minutes.';
-    document.querySelector('.confirm-check').textContent = '📞';
-  } else if (_consultType === 'async' && _delivery === 'ondemand') {
+  if (_consultType === 'async') {
     if (titleEl) titleEl.textContent = 'Message Sent — 72-Hour Response';
     if (descEl) descEl.textContent = 'Your questions and topics have been submitted. Dr. Sarah Lee will respond in your secure inbox within 72 hours.';
     document.querySelector('.confirm-check').textContent = '💬';
+  } else if (_delivery === 'ondemand' && _consultType === 'video') {
+    if (titleEl) titleEl.textContent = 'On Demand Video Requested';
+    if (descEl) descEl.textContent = 'Your request has been sent to the next available genetic counselor. A secure video link will be emailed to jennifer.adams@email.com within 10–20 minutes.';
+    document.querySelector('.confirm-check').textContent = '📹';
+  } else if (_delivery === 'ondemand' && _consultType === 'phone') {
+    if (titleEl) titleEl.textContent = 'On Demand Call Requested';
+    if (descEl) descEl.textContent = 'The next available genetic counselor will call (512) 555-0291 within 10–20 minutes.';
+    document.querySelector('.confirm-check').textContent = '📞';
+  } else {
+    if (titleEl) titleEl.textContent = 'Consultation Requested';
+    if (descEl) descEl.textContent = 'Your care team will confirm your appointment within 1 business day and send a calendar invite.';
+    document.querySelector('.confirm-check').textContent = '✅';
   }
   var topicList = document.getElementById('confirmTopicList');
   topicList.innerHTML = '<div class="confirm-topic-list-title">Topics shared with Dr. Sarah Lee</div>';
