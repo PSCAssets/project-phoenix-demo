@@ -433,7 +433,7 @@ def gate_access_log():
         try:
             resp = requests.get(
                 f'{_SUPABASE_URL}/rest/v1/access_log',
-                params={'select': '*', 'order': 'id.asc'},
+                params={'select': '*', 'order': 'id.desc'},
                 headers={
                     'apikey':        _SUPABASE_KEY,
                     'Authorization': f'Bearer {_SUPABASE_KEY}',
@@ -451,7 +451,7 @@ def gate_access_log():
             with sqlite3.connect(_DB_PATH) as conn:
                 conn.row_factory = sqlite3.Row
                 cur = conn.cursor()
-                cur.execute('SELECT * FROM access_log ORDER BY id ASC')
+                cur.execute('SELECT * FROM access_log ORDER BY id DESC')
                 rows = [dict(r) for r in cur.fetchall()]
                 logging.info('Dashboard: loaded %d rows from SQLite fallback', len(rows))
         except Exception as e:
