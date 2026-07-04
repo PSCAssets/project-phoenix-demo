@@ -144,14 +144,13 @@ def _record_persona_switch(role, display_name):
     # Write to Supabase
     if _SUPABASE_URL and _SUPABASE_KEY:
         try:
+            hdrs = dict(_sb_headers())
+            hdrs['Prefer'] = 'return=representation'  # get back what was stored
             sb_resp = requests.post(
                 f'{_SUPABASE_URL}/rest/v1/access_log',
-                json=record, headers=_sb_headers(), timeout=5
+                json=record, headers=hdrs, timeout=5
             )
-            if not sb_resp.ok:
-                logging.warning('Supabase persona write %s: %s', sb_resp.status_code, sb_resp.text)
-            else:
-                logging.info('Supabase persona write OK — %s → %s', gate_email, display_name)
+            logging.info('Supabase persona write %s | body: %s', sb_resp.status_code, sb_resp.text[:500])
         except Exception as e:
             logging.warning('Supabase persona log failed: %s', e)
     # Write to SQLite
