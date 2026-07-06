@@ -150,7 +150,7 @@ def _record_persona_switch(role, display_name):
                 f'{_SUPABASE_URL}/rest/v1/access_log',
                 json=record, headers=hdrs, timeout=5
             )
-            logging.info('Supabase persona write %s | body: %s', sb_resp.status_code, sb_resp.text[:500])
+            logging.warning('SB_PERSONA_WRITE %s | %s', sb_resp.status_code, sb_resp.text[:500])
         except Exception as e:
             logging.warning('Supabase persona log failed: %s', e)
     # Write to SQLite
