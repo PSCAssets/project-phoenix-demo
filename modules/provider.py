@@ -256,7 +256,15 @@ def gca_dashboard():
 
 @bp.route("/gca/consult-prep")
 def gca_consult_prep_queue():
+    return render_template("provider/gca_consult_prep_list.html")
+
+@bp.route("/gca/consult-prep/detail")
+def gca_consult_prep_detail():
     return render_template("provider/gca_consult_prep.html")
+
+@bp.route("/gca/queue")
+def gca_task_queue():
+    return render_template("provider/gca_queue.html")
 
 @bp.route("/blurbs")
 def blurb_library():

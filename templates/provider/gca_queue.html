@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% block title %}GCA Task Queue{% endblock %}
+{% block head %}
+<style>
+:root {
+  --purple:#6B21A8; --purple-light:#F3E8FF;
+  --amber:#D97706; --amber-light:#FEF3C7;
+  --green:#059669; --green-light:#D1FAE5;
+  --red:#DC2626; --red-light:#FEE2E2;
+  --blue:#2563EB; --blue-light:#EFF6FF;
+  --bg:#FAF7F2; --border:#E5E0D8; --white:#FFFFFF;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+
+.topbar { position:fixed; top:0; left:56px; right:0; height:56px; background:#6B21A8; display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar-title { color:white; font-weight:600; font-size:16px; }
+.topbar-subtitle { color:rgba(255,255,255,0.5); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.live-dot { background:rgba(255,255,255,0.15); color:rgba(255,255,255,0.9); font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:0.05em; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#4C1D95; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; }
+.topbar { top:60px !important; }
+.main { margin-left:56px; margin-top:116px; padding:24px 28px; }
+
+.stat-grid { display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap; }
+.stat-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 18px; min-width:110px; }
+.stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; margin-bottom:4px; }
+.stat-val { font-size:24px; font-weight:800; }
+
+.info-banner { background:#EDE9FE; border:1px solid #C4B5FD; border-radius:8px; padding:10px 14px; margin-bottom:14px; font-size:12px; color:#4C1D95; }
+
+/* Tabs */
+.tabs { display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:0; }
+.tab { padding:10px 16px; font-size:13px; font-weight:600; color:#6B7280; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; white-space:nowrap; }
+.tab:hover { color:#6B21A8; }
+.tab.active { color:#6B21A8; border-bottom-color:#6B21A8; }
+.tab-count { display:inline-block; padding:1px 6px; border-radius:20px; font-size:11px; font-weight:700; margin-left:5px; }
+.tc-default { background:#F3F4F6; color:#374151; }
+.tc-amber  { background:var(--amber-light); color:var(--amber); }
+.tc-red    { background:var(--red-light); color:var(--red); }
+.tc-purple { background:var(--purple-light); color:var(--purple); }
+
+.queue-widget { background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+
+.filter-bar { display:flex; gap:10px; align-items:center; padding:10px 14px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+.filter-label { font-size:12px; font-weight:600; color:#6B7280; }
+.filter-bar select, .filter-bar input { height:32px; border:1px solid var(--border); border-radius:6px; padding:0 10px; font-size:12px; background:#fff; color:#111827; }
+.filter-bar input { width:200px; }
+
+table { width:100%; border-collapse:collapse; }
+th { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; padding:10px 14px; border-bottom:1px solid var(--border); text-align:left; }
+td { font-size:13px; padding:11px 14px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:#FAFAFA; }
+
+.pt-id { font-family:monospace; font-size:11px; font-weight:700; color:#9CA3AF; }
+.pt-name { font-weight:600; color:#111827; }
+.pt-meta { font-size:11px; color:#9CA3AF; margin-top:1px; }
+
+.badge { display:inline-block; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.badge-purple { background:var(--purple-light); color:var(--purple); }
+.badge-amber  { background:var(--amber-light); color:var(--amber); }
+.badge-green  { background:var(--green-light); color:var(--green); }
+.badge-red    { background:var(--red-light); color:var(--red); }
+.badge-blue   { background:var(--blue-light); color:var(--blue); }
+.badge-gray   { background:#F3F4F6; color:#6B7280; }
+
+.pri-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+.pri-high { background:var(--red); }
+.pri-med  { background:var(--amber); }
+.pri-low  { background:#9CA3AF; }
+
+.action-btn { padding:5px 11px; border-radius:6px; border:none; font-size:12px; font-weight:600; cursor:pointer; margin-right:3px; }
+.btn-purple { background:#6B21A8; color:white; }
+.btn-purple:hover { background:#581C87; }
+.btn-blue { background:var(--blue-light); color:var(--blue); }
+.btn-blue:hover { background:#DBEAFE; }
+.btn-gray { background:#F1F5F9; color:#475569; }
+.btn-gray:hover { background:#E2E8F0; }
+
+.empty-state { padding:48px; text-align:center; color:#9CA3AF; font-size:13px; }
+
+.routed-by { font-size:11px; color:#6B7280; }
+.routed-role { font-size:10px; font-weight:700; text-transform:uppercase; color:#9CA3AF; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:12px; padding:24px; width:460px; max-width:90vw; }
+.modal-title { font-size:15px; font-weight:700; color:#111827; margin-bottom:4px; }
+.modal-sub { font-size:12px; color:#9CA3AF; margin-bottom:16px; }
+.modal-section { margin-bottom:12px; }
+.modal-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; margin-bottom:5px; }
+.modal-field { font-size:13px; color:#111827; font-weight:600; }
+.modal-note { font-size:12px; color:#6B7280; margin-top:3px; }
+.route-option { display:flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--border); border-radius:7px; cursor:pointer; font-size:13px; margin-bottom:6px; }
+.route-option:last-child { margin-bottom:0; background:var(--amber-light); border-color:#FCD34D; }
+.route-option input { accent-color:#6B21A8; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+.btn-primary { padding:8px 18px; background:#6B21A8; color:white; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-cancel { padding:8px 18px; background:#F3F4F6; color:#374151; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+textarea.modal-input { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 10px; font-size:13px; resize:vertical; min-height:64px; }
+</style>
+{% endblock %}
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">GCA Task Queue</div>
+    <div class="topbar-subtitle">Genetic Counseling Assistant · Shared Queue</div>
+  </div>
+  <div class="topbar-right">
+    <span class="live-dot">LIVE</span>
+    <span>Morgan Ellis, GCA</span>
+    <div class="avatar">ME</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Queue</div>
+      <div class="stat-val" style="color:#6B21A8;">11</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unassigned</div>
+      <div class="stat-val" style="color:#D97706;">4</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">POA Pending</div>
+      <div class="stat-val" style="color:#DC2626;">2</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Blurb Reviews</div>
+      <div class="stat-val" style="color:#2563EB;">3</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Stage Gates</div>
+      <div class="stat-val" style="color:#059669;">2</div>
+    </div>
+  </div>
+
+  <div class="info-banner">
+    <strong>📋 GCA Queue</strong> — Tasks arrive when RNs, Providers, or stage-gate logic route patients requiring GCA action. Take a task to claim it; route it to another GCA or escalate to a GC provider.
+  </div>
+
+  <div class="queue-widget">
+    <div class="tabs">
+      <div class="tab active" onclick="setTab('all',this)">All <span class="tab-count tc-default" id="tc-all">11</span></div>
+      <div class="tab" onclick="setTab('consult',this)">Consult Prep <span class="tab-count tc-purple" id="tc-consult">3</span></div>
+      <div class="tab" onclick="setTab('poa',this)">POA Verification <span class="tab-count tc-red" id="tc-poa">2</span></div>
+      <div class="tab" onclick="setTab('report',this)">Report Review <span class="tab-count tc-default" id="tc-report">2</span></div>
+      <div class="tab" onclick="setTab('blurb',this)">Blurb Review <span class="tab-count tc-amber" id="tc-blurb">3</span></div>
+      <div class="tab" onclick="setTab('stage',this)">Stage Gate <span class="tab-count tc-default" id="tc-stage">1</span></div>
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">Priority</span>
+      <select id="f-pri" onchange="renderRows()">
+        <option value="">All</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <span class="filter-label">Assigned</span>
+      <select id="f-assigned" onchange="renderRows()">
+        <option value="">All</option>
+        <option value="Me">Assigned to Me</option>
+        <option value="Unassigned">Unassigned</option>
+      </select>
+      <input id="f-search" placeholder="Search patient or task…" oninput="renderRows()">
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Task Type</th>
+          <th>Priority</th>
+          <th>Routed By</th>
+          <th>Due</th>
+          <th>Assigned To</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="queue-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none;">No tasks match the current filters.</div>
+  </div>
+
+</main>
+
+<!-- Route Modal -->
+<div class="modal-overlay" id="routeModal">
+  <div class="modal">
+    <div class="modal-title">Route Task</div>
+    <div class="modal-sub" id="rm-sub">—</div>
+    <div class="modal-section">
+      <div class="modal-label">Route to</div>
+      <label class="route-option"><input type="radio" name="route" value="ME"> Morgan Ellis, GCA (me — 5 open tasks)</label>
+      <label class="route-option"><input type="radio" name="route" value="KW"> Kayla Walsh, GCA (3 open tasks)</label>
+      <label class="route-option"><input type="radio" name="route" value="RB"> Ryan Brooks, GCA (7 open tasks)</label>
+      <label class="route-option"><input type="radio" name="route" value="GC"> ⚑ Escalate to GC Provider Queue</label>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Note (optional)</div>
+      <textarea class="modal-input" id="rm-note" placeholder="Add context for the recipient…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('routeModal')">Cancel</button>
+      <button class="btn-primary" onclick="confirmRoute()">Confirm Route</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Modal -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-title" id="vm-title">—</div>
+    <div class="modal-sub" id="vm-sub">—</div>
+    <div class="modal-section">
+      <div class="modal-label">Task Type</div>
+      <div class="modal-field" id="vm-type">—</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Routed By</div>
+      <div class="modal-field" id="vm-routed">—</div>
+      <div class="modal-note" id="vm-reason">—</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Due</div>
+      <div class="modal-field" id="vm-due">—</div>
+    </div>
+    <div class="modal-section" id="vm-note-section">
+      <div class="modal-label">Routing Note</div>
+      <div class="modal-note" id="vm-routing-note">—</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('viewModal')">Close</button>
+      <button class="btn-primary" id="vm-action-btn">Open Task →</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+var tasks = [
+  // Consult Prep
+  {id:'PT-2026-00142', name:'Marcus Johnson', type:'Consult Prep', typeKey:'consult', pri:'High', priKey:'high', routedBy:'James Thompson, RN', routedRole:'RN', reason:'Patient enrolled in hereditary cancer program — needs pre-consult prep before Jul 10 consult.', due:'Jul 10, 2026', dueUrgent:true, assigned:'Morgan Ellis', status:'In Progress', note:''},
+  {id:'PT-2026-00178', name:'Sandra Torres',  type:'Consult Prep', typeKey:'consult', pri:'Medium', priKey:'med', routedBy:'Dr. Sarah Lee, MD', routedRole:'Provider', reason:'BRCA 1/2 result ready for consult — patient in TX.', due:'Jul 11, 2026', dueUrgent:false, assigned:'Morgan Ellis', status:'Assigned', note:''},
+  {id:'PT-2026-00231', name:'Tammy Nguyen',   type:'Consult Prep', typeKey:'consult', pri:'Medium', priKey:'med', routedBy:'Stage Gate — Auto', routedRole:'System', reason:'Patient completed intake and testing. Stage gate triggered GCA prep task.', due:'Jul 16, 2026', dueUrgent:false, assigned:'', status:'Unassigned', note:''},
+  // POA Verification
+  {id:'PT-2026-00190', name:'Harold Kim',     type:'POA Verification', typeKey:'poa', pri:'High', priKey:'high', routedBy:'Maria Rodriguez, NP', routedRole:'NP', reason:'Patient has cognitive decline — POA documentation required before consult proceeds.', due:'Jul 9, 2026', dueUrgent:true, assigned:'', status:'Unassigned', note:''},
+  {id:'PT-2026-00204', name:'Denise Walters', type:'POA Verification', typeKey:'poa', pri:'High', priKey:'high', routedBy:'James Thompson, RN', routedRole:'RN', reason:'POA indicated during intake call. Must be verified before scheduling.', due:'Jul 10, 2026', dueUrgent:true, assigned:'Morgan Ellis', status:'Assigned', note:''},
+  // Report Review
+  {id:'PT-2026-00155', name:'Carlos Medina',  type:'Report Review', typeKey:'report', pri:'Medium', priKey:'med', routedBy:'Stage Gate — Auto', routedRole:'System', reason:'Genetic report completed by lab. GCA review required before delivery to patient.', due:'Jul 12, 2026', dueUrgent:false, assigned:'Morgan Ellis', status:'In Progress', note:''},
+  {id:'PT-2026-00219', name:'Priscilla Grant', type:'Report Review', typeKey:'report', pri:'Low', priKey:'low', routedBy:'Stage Gate — Auto', routedRole:'System', reason:'Report finalized. Routine review — no flags noted by lab.', due:'Jul 15, 2026', dueUrgent:false, assigned:'', status:'Unassigned', note:''},
+  // Blurb Review
+  {id:'BLURB-2026-041', name:'BRCA 1 — VUS Result', type:'Blurb Review', typeKey:'blurb', pri:'Medium', priKey:'med', routedBy:'Dr. Lisa Park, GC', routedRole:'GC Provider', reason:'Requesting new blurb language for VUS finding in BRCA 1. Current language unclear for patient literacy level.', due:'Jul 11, 2026', dueUrgent:false, assigned:'Morgan Ellis', status:'Assigned', note:'Draft attached in Blurb Library.'},
+  {id:'BLURB-2026-042', name:'Hereditary Cancer — Negative', type:'Blurb Review', typeKey:'blurb', pri:'Low', priKey:'low', routedBy:'Dr. Lisa Park, GC', routedRole:'GC Provider', reason:'Update to existing negative result blurb — language revision request.', due:'Jul 14, 2026', dueUrgent:false, assigned:'', status:'Unassigned', note:''},
+  {id:'BLURB-2026-043', name:'Cardio Panel — Pathogenic', type:'Blurb Review', typeKey:'blurb', pri:'High', priKey:'high', routedBy:'Dr. James Okafor, GC', routedRole:'GC Provider', reason:'Pathogenic variant finding — new blurb needed urgently for patient communication.', due:'Jul 9, 2026', dueUrgent:true, assigned:'', status:'Unassigned', note:''},
+  // Stage Gate
+  {id:'PT-2026-00247', name:'Rachel Simmons', type:'Stage Gate', typeKey:'stage', pri:'Medium', priKey:'med', routedBy:'Stage Gate — Auto', routedRole:'System', reason:'Patient completed pre-consult intake. Awaiting GCA confirmation before moving to scheduling stage.', due:'Jul 13, 2026', dueUrgent:false, assigned:'Morgan Ellis', status:'Assigned', note:''},
+];
+
+var currentTab = 'all';
+var routeTarget = null;
+
+function setTab(key, el) {
+  currentTab = key;
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  renderRows();
+}
+
+function renderRows() {
+  var fp = document.getElementById('f-pri').value;
+  var fa = document.getElementById('f-assigned').value;
+  var fq = document.getElementById('f-search').value.toLowerCase();
+  var filtered = tasks.filter(function(r) {
+    if (currentTab !== 'all' && r.typeKey !== currentTab) return false;
+    if (fp && r.pri !== fp) return false;
+    if (fa === 'Me' && r.assigned !== 'Morgan Ellis') return false;
+    if (fa === 'Unassigned' && r.assigned !== '') return false;
+    if (fq && r.name.toLowerCase().indexOf(fq) === -1 && r.id.toLowerCase().indexOf(fq) === -1 && r.type.toLowerCase().indexOf(fq) === -1) return false;
+    return true;
+  });
+
+  var tbody = document.getElementById('queue-body');
+  document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
+
+  tbody.innerHTML = filtered.map(function(r) {
+    var typeBadge = {
+      consult: '<span class="badge badge-purple">Consult Prep</span>',
+      poa:     '<span class="badge badge-red">POA Verification</span>',
+      report:  '<span class="badge badge-gray">Report Review</span>',
+      blurb:   '<span class="badge badge-amber">Blurb Review</span>',
+      stage:   '<span class="badge badge-green">Stage Gate</span>',
+    }[r.typeKey];
+    var statusBadge = r.status === 'In Progress'
+      ? '<span class="badge badge-purple">In Progress</span>'
+      : r.status === 'Assigned'
+      ? '<span class="badge badge-green">Assigned</span>'
+      : '<span class="badge badge-amber">Unassigned</span>';
+    var dueStr = r.dueUrgent
+      ? '<span style="color:#DC2626;font-weight:600;">' + r.due + '</span> <span style="font-size:10px;background:#FEE2E2;color:#991B1B;padding:2px 5px;border-radius:4px;font-weight:700;">URGENT</span>'
+      : r.due;
+    var routedRole = '<div class="routed-by">' + r.routedBy + '</div><div class="routed-role">' + r.routedRole + '</div>';
+    var actions = '';
+    if (r.status === 'Unassigned') {
+      actions += '<button class="action-btn btn-purple" onclick="takeTask(\'' + r.id + '\')">Take</button>';
+    }
+    actions += '<button class="action-btn btn-blue" onclick="openRoute(\'' + r.id + '\')">Route</button>';
+    actions += '<button class="action-btn btn-gray" onclick="openView(' + JSON.stringify(r).replace(/'/g,"&#39;") + ')">View</button>';
+    return '<tr>'
+      + '<td><div class="pt-id">' + r.id + '</div><div class="pt-name">' + r.name + '</div></td>'
+      + '<td>' + typeBadge + '</td>'
+      + '<td><span class="pri-dot pri-' + r.priKey + '"></span>' + r.pri + '</td>'
+      + '<td>' + routedRole + '</td>'
+      + '<td>' + dueStr + '</td>'
+      + '<td style="font-size:13px;color:' + (r.assigned ? '#111827' : '#9CA3AF') + ';">' + (r.assigned || '—') + '</td>'
+      + '<td>' + statusBadge + '</td>'
+      + '<td style="white-space:nowrap;">' + actions + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function takeTask(id) {
+  var r = tasks.find(function(x) { return x.id === id; });
+  if (!r) return;
+  r.assigned = 'Morgan Ellis';
+  r.status = 'Assigned';
+  renderRows();
+  showToast('✓ Task taken — ' + r.name + ' assigned to you.');
+}
+
+function openRoute(id) {
+  routeTarget = id;
+  var r = tasks.find(function(x) { return x.id === id; });
+  document.getElementById('rm-sub').textContent = r.name + ' · ' + r.type;
+  document.getElementById('rm-note').value = '';
+  document.querySelectorAll('input[name="route"]').forEach(function(i) { i.checked = false; });
+  document.getElementById('routeModal').classList.add('open');
+}
+
+function confirmRoute() {
+  var sel = document.querySelector('input[name="route"]:checked');
+  if (!sel) { alert('Please select a routing destination.'); return; }
+  var r = tasks.find(function(x) { return x.id === routeTarget; });
+  var dest = sel.value === 'ME' ? 'Morgan Ellis, GCA'
+           : sel.value === 'KW' ? 'Kayla Walsh, GCA'
+           : sel.value === 'RB' ? 'Ryan Brooks, GCA'
+           : 'GC Provider Queue';
+  if (sel.value === 'GC') {
+    r.assigned = '';
+    r.status = 'Unassigned';
+  } else {
+    r.assigned = dest.split(',')[0];
+    r.status = 'Assigned';
+  }
+  closeModal('routeModal');
+  renderRows();
+  showToast('✓ Task routed to ' + dest + '. They have been notified.');
+}
+
+function openView(r) {
+  document.getElementById('vm-title').textContent = r.name;
+  document.getElementById('vm-sub').textContent = r.id + ' · ' + r.type;
+  document.getElementById('vm-type').textContent = r.type;
+  document.getElementById('vm-routed').textContent = r.routedBy;
+  document.getElementById('vm-reason').textContent = r.reason;
+  document.getElementById('vm-due').textContent = r.due + (r.dueUrgent ? ' ⚠ URGENT' : '');
+  document.getElementById('vm-routing-note').textContent = r.note || '—';
+  var actionBtn = document.getElementById('vm-action-btn');
+  if (r.typeKey === 'consult') {
+    actionBtn.textContent = 'Open Consult Prep →';
+    actionBtn.onclick = function() { window.location.href = '/provider/gca/consult-prep'; };
+  } else if (r.typeKey === 'blurb') {
+    actionBtn.textContent = 'Open Blurb Library →';
+    actionBtn.onclick = function() { window.location.href = '/provider/blurbs'; };
+  } else {
+    actionBtn.textContent = 'View Patient →';
+    actionBtn.onclick = function() { window.location.href = '/provider/patient-management?flow=search'; };
+  }
+  document.getElementById('viewModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#111827;color:white;padding:10px 16px;border-radius:8px;font-size:13px;z-index:999;font-weight:600;';
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 3500);
+}
+
+renderRows();
+</script>
+{% endraw %}
+{% endblock %}

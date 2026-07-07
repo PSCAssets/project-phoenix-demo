@@ -284,7 +284,8 @@ def inject_sidebar_nav():
         ],
         'provider_gca': [
             ('My Dashboard',   '/provider/gca',              'home',      ['/provider/gca']),
-            ('Consult Prep',   '/provider/gca/consult-prep', 'clipboard', ['/provider/gca/consult-prep']),
+            ('GCA Queue',      '/provider/gca/queue',        'inbox',     ['/provider/gca/queue']),
+            ('Consult Prep',   '/provider/gca/consult-prep', 'clipboard', ['/provider/gca/consult-prep', '/provider/gca/consult-prep/detail']),
             ('GC Admin',       '/provider/gc-admin',         'settings',  ['/provider/gc-admin']),
             ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
             ('Blurb Library',  '/provider/blurbs',           'document',  ['/provider/blurbs']),
