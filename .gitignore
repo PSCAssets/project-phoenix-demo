@@ -5,3 +5,6 @@ project_phoenix.db
 *.db-wal
 .fuse_hidden*
 __pycache__/
+
+# Allow DB backups in Databases/ folder
+!Databases/
