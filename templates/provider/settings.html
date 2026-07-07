@@ -108,9 +108,9 @@ input:checked + .tslider:before { transform: translateX(18px); }
     <!-- Tab nav -->
     <div class="settings-tabs">
       <button class="s-tab active" onclick="switchTab('profile')">Profile</button>
-      <button class="s-tab" onclick="switchTab('licenses')">Licenses</button>
+      {% if session.get('role') in ['provider_md', 'provider_np', 'provider_rn', 'provider_gc'] %}<button class="s-tab" onclick="switchTab('licenses')">Licenses</button>{% endif %}
       <button class="s-tab" onclick="switchTab('security')">Security</button>
-      <button class="s-tab" onclick="switchTab('notifications')">Notifications</button>
+      {% if session.get('role') in ['provider_md', 'provider_np', 'provider_gc'] %}<button class="s-tab" onclick="switchTab('notifications')">Notifications</button>{% endif %}
       <button class="s-tab" onclick="switchTab('preferences')">Preferences</button>
     </div>
     <!-- Tab content -->
@@ -165,6 +165,7 @@ input:checked + .tslider:before { transform: translateX(18px); }
         </div>
       </div>
 
+      {% if session.get('role') in ['provider_md', 'provider_np', 'provider_rn', 'provider_gc'] %}
       <!-- LICENSES -->
       <div class="s-panel" id="panel-licenses">
         <div class="s-card">
@@ -200,6 +201,7 @@ input:checked + .tslider:before { transform: translateX(18px); }
           </table>
         </div>
       </div>
+      {% endif %}
 
       <!-- SECURITY -->
       <div class="s-panel" id="panel-security">
@@ -257,6 +259,7 @@ input:checked + .tslider:before { transform: translateX(18px); }
         </div>
       </div>
 
+      {% if session.get('role') in ['provider_md', 'provider_np', 'provider_gc'] %}
       <!-- NOTIFICATIONS -->
       <div class="s-panel" id="panel-notifications">
         <div class="s-card">
@@ -353,6 +356,7 @@ input:checked + .tslider:before { transform: translateX(18px); }
           <div style="margin-top:16px;"><button class="btn-primary" onclick="alert('Notification preferences saved.')">Save Preferences</button></div>
         </div>
       </div>
+      {% endif %}
 
       <!-- PREFERENCES -->
       <div class="s-panel" id="panel-preferences">
@@ -415,9 +419,10 @@ input:checked + .tslider:before { transform: translateX(18px); }
 function switchTab(tab) {
   document.querySelectorAll('.s-tab').forEach(function(b) { b.classList.remove('active'); });
   document.querySelectorAll('.s-panel').forEach(function(p) { p.classList.remove('active'); });
-  var idx = ['profile','licenses','security','notifications','preferences'].indexOf(tab);
-  document.querySelectorAll('.s-tab')[idx].classList.add('active');
-  document.getElementById('panel-' + tab).classList.add('active');
+  var btn = document.querySelector('.s-tab[onclick="switchTab(\'' + tab + '\')"]');
+  if (btn) btn.classList.add('active');
+  var panel = document.getElementById('panel-' + tab);
+  if (panel) panel.classList.add('active');
 }
 
 function toggleOOO() {
