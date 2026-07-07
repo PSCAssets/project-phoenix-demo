@@ -327,7 +327,7 @@ def inject_sidebar_nav():
             ('My Dashboard',  '/care-team/',             'home',      ['/care-team/']),
             ('CT Queue',      '/care-team/queue',        'clipboard', ['/care-team/queue']),
             ('Patient Queue', '/provider/queue',          'users',     ['/provider/queue']),
-            ('Schedule',      '/provider/schedule',       'calendar',  ['/provider/schedule']),
+            ('Network Schedule', '/provider/schedule',   'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
@@ -346,10 +346,11 @@ def inject_sidebar_nav():
             ('Settings',       '/provider/settings',              'settings',  ['/provider/settings']),
         ],
         'scheduler': [
-            ('Dashboard',     '/scheduler/',             'home',      ['/scheduler/']),
-            ('Schedule',      '/scheduler/schedule',      'calendar',  ['/scheduler/schedule', '/provider/schedule']),
-            ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
+            ('Dashboard',     '/scheduler/',              'home',         ['/scheduler/']),
+            ('Patient Mgmt',  '/provider/patient-management?flow=search', 'person-search', ['/provider/patient-management']),
+            ('Schedule',      '/scheduler/schedule',      'calendar',     ['/scheduler/schedule', '/provider/schedule']),
+            ('Messages',      '/provider/messages',       'message',      ['/provider/messages']),
+            ('Settings',      '/provider/settings',       'settings',     ['/provider/settings']),
         ],
     }
 

@@ -694,7 +694,10 @@ const npCompleted = new Set();
 let npPath = 'existing'; // 'existing' or 'new'
 let npSteps = []; // ordered step IDs for current path
 
-window.addEventListener('load', function() { selectPatientType('new'); });
+window.addEventListener('load', function() {
+  var _p = new URLSearchParams(window.location.search);
+  selectPatientType(_p.get('flow') === 'search' ? 'existing' : 'new');
+});
 function selectPatientType(type) {
   npPath = type;
   document.getElementById('npTypeSelect').style.display = 'none';
@@ -775,7 +778,7 @@ function submitNP() {
     document.getElementById('np_btnContinue').textContent = 'Done →';
   } else if (ct) {
     var panel = document.getElementById('np_step5');
-    panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>' + ct.value + ' Appointment Scheduled</h2><p>Appointment confirmed. Patient will receive a confirmation notification.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+    panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>' + ct.value + ' Appointment Scheduled</h2><p>Appointment confirmed. Patient will receive a confirmation notification.</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><a href="/provider/schedule" class="btn btn-primary" style="">Schedule Consult →</a><a href="/provider/queue" class="btn btn-primary" style="background:#6B7280;">Return to Queue →</a></div></div>';
     document.getElementById('np_btnContinue').style.display = 'none';
     document.getElementById('np_btnBack').style.display = 'none';
   } else {
@@ -883,14 +886,14 @@ function submitSchedule() {
   const date = document.getElementById('rcDate').value || 'selected date';
   const time = document.getElementById('rcTime').value;
   const panel = document.getElementById('np_step5');
-  panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>Appointment Scheduled</h2><p>Appointment confirmed for ' + date + ' at ' + time + '. Patient will receive confirmation.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+  panel.innerHTML = '<div class="success-screen show"><div class="icon">📅</div><h2>Appointment Scheduled</h2><p>Appointment confirmed for ' + date + ' at ' + time + '. Patient will receive confirmation.</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><a href="/provider/schedule" class="btn btn-primary" style="">Schedule Consult →</a><a href="/provider/queue" class="btn btn-primary" style="background:#6B7280;">Return to Queue →</a></div></div>';
   document.getElementById('np_btnContinue').style.display = 'none';
   document.getElementById('np_btnBack').style.display = 'none';
 }
 
 function submitAsync() {
   const panel = document.getElementById('np_step5');
-  panel.innerHTML = '<div class="success-screen show"><div class="icon">✉</div><h2>Questionnaire Sent</h2><p>Intake questionnaire sent to patient email. Their submission will appear in your queue once completed.</p><a href="/provider/queue" class="btn btn-primary" style="margin:0 auto;">Return to Queue →</a></div>';
+  panel.innerHTML = '<div class="success-screen show"><div class="icon">✉</div><h2>Questionnaire Sent</h2><p>Intake questionnaire sent to patient email. Their submission will appear in your queue once completed.</p><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;"><a href="/provider/schedule" class="btn btn-primary" style="">Schedule Consult →</a><a href="/provider/queue" class="btn btn-primary" style="background:#6B7280;">Return to Queue →</a></div></div>';
   document.getElementById('np_btnContinue').style.display = 'none';
   document.getElementById('np_btnBack').style.display = 'none';
 }
