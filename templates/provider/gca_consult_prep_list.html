@@ -173,7 +173,7 @@ textarea.modal-input { width:100%; border:1px solid var(--border); border-radius
     </div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('viewModal')">Close</button>
-      <button class="btn-primary" id="vm-open-btn">Open Checklist →</button>
+      <button class="btn-primary" id="vm-open-btn" onclick="window.location.href='/provider/gca/consult-prep/detail'">Open Checklist →</button>
     </div>
   </div>
 </div>
@@ -222,6 +222,7 @@ function renderRows() {
       + '<td style="white-space:nowrap;">'
         + (r.status === 'Unassigned' ? '<button class="action-btn btn-purple" onclick="takeTask(\'' + r.id + '\')" style="margin-right:4px;">Take</button>' : '')
         + '<button class="action-btn btn-outline" onclick="openView(' + JSON.stringify(r) + ')">View</button>'
+        + '<button class="action-btn btn-purple" onclick="window.location.href=\'/provider/gca/consult-prep/detail\'" style="margin-left:3px;">Open →</button>'
       + '</td>'
       + '</tr>';
   }).join('');

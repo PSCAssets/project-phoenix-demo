@@ -266,6 +266,10 @@ def gca_consult_prep_detail():
 def gca_task_queue():
     return render_template("provider/gca_queue.html")
 
+@bp.route("/gca/task")
+def gca_task_detail():
+    return render_template("provider/gca_task_detail.html")
+
 @bp.route("/blurbs")
 def blurb_library():
     return render_template("provider/blurbs.html")

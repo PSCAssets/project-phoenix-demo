@@ -376,16 +376,23 @@ function openView(r) {
   document.getElementById('vm-due').textContent = r.due + (r.dueUrgent ? ' ⚠ URGENT' : '');
   document.getElementById('vm-routing-note').textContent = r.note || '—';
   var actionBtn = document.getElementById('vm-action-btn');
-  if (r.typeKey === 'consult') {
-    actionBtn.textContent = 'Open Consult Prep →';
-    actionBtn.onclick = function() { window.location.href = '/provider/gca/consult-prep'; };
-  } else if (r.typeKey === 'blurb') {
-    actionBtn.textContent = 'Open Blurb Library →';
-    actionBtn.onclick = function() { window.location.href = '/provider/blurbs'; };
-  } else {
-    actionBtn.textContent = 'View Patient →';
-    actionBtn.onclick = function() { window.location.href = '/provider/patient-management?flow=search'; };
-  }
+  var destMap = {
+    consult: '/provider/gca/consult-prep/detail',
+    poa:     '/provider/gca/task?type=poa',
+    report:  '/provider/gca/task?type=report',
+    stage:   '/provider/gca/task?type=stage',
+    blurb:   '/provider/blurbs',
+  };
+  var labelMap = {
+    consult: 'Open Consult Prep Checklist →',
+    poa:     'Open POA Verification Workflow →',
+    report:  'Open Report Review Workflow →',
+    stage:   'Open Stage Gate Workflow →',
+    blurb:   'Open Blurb Library →',
+  };
+  var dest = destMap[r.typeKey] || '/provider/gca/queue';
+  actionBtn.textContent = labelMap[r.typeKey] || 'Open Task →';
+  actionBtn.onclick = function() { window.location.href = dest; };
   document.getElementById('viewModal').classList.add('open');
 }
 
