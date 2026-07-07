@@ -221,7 +221,7 @@ function renderRows() {
       + '<td>' + statusBadge + '</td>'
       + '<td style="white-space:nowrap;">'
         + (r.status === 'Unassigned' ? '<button class="action-btn btn-purple" onclick="takeTask(\'' + r.id + '\')" style="margin-right:4px;">Take</button>' : '')
-        + '<button class="action-btn btn-outline" onclick="openView(' + JSON.stringify(r) + ')">View</button>'
+        + '<button class="action-btn btn-outline" onclick="openView(' + JSON.stringify(r).replace(/"/g, '&quot;') + ')">View</button>'
         + '<button class="action-btn btn-purple" onclick="window.location.href=\'/provider/gca/consult-prep/detail\'" style="margin-left:3px;">Open →</button>'
       + '</td>'
       + '</tr>';

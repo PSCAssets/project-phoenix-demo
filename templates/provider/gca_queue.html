@@ -315,7 +315,7 @@ function renderRows() {
       actions += '<button class="action-btn btn-purple" onclick="takeTask(\'' + r.id + '\')">Take</button>';
     }
     actions += '<button class="action-btn btn-blue" onclick="openRoute(\'' + r.id + '\')">Route</button>';
-    actions += '<button class="action-btn btn-gray" onclick="openView(' + JSON.stringify(r).replace(/'/g,"&#39;") + ')">View</button>';
+    actions += '<button class="action-btn btn-gray" onclick="openView(' + JSON.stringify(r).replace(/"/g, '&quot;') + ')">View</button>';
     return '<tr>'
       + '<td><div class="pt-id">' + r.id + '</div><div class="pt-name">' + r.name + '</div></td>'
       + '<td>' + typeBadge + '</td>'
