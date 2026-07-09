@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Stage Genetic Test Workflow — Admin Configuration & Live Tracker</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F8F7F4; margin: 0; padding: 24px; }
+
+/* ── Page header ── */
+.page-header { max-width: 1100px; margin: 0 auto 28px; }
+.page-title { font-size: 22px; font-weight: 800; color: #111827; }
+.page-sub { font-size: 13px; color: #6B7280; margin-top: 4px; }
+.req-tag { display:inline-block; background:#EDE9FE; color:#6B21A8; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; margin-left:8px; vertical-align:middle; }
+
+.shell { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 360px 1fr; gap: 22px; }
+
+/* ── Admin config panel ── */
+.config-panel { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+.panel-header { padding: 14px 18px; border-bottom: 1px solid #E5E0D8; background: #F9F5EE; display: flex; align-items: center; gap: 10px; }
+.panel-title { font-size: 14px; font-weight: 700; color: #111827; }
+.panel-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #DBEAFE; color: #1D4ED8; }
+.panel-body { padding: 18px; }
+
+.stage-config { border: 1.5px solid #E5E0D8; border-radius: 10px; margin-bottom: 12px; overflow: hidden; transition: border-color .2s; }
+.stage-config:hover { border-color: #6B21A8; }
+.stage-config-header { padding: 10px 14px; display: flex; align-items: center; gap: 10px; background: #F9FAFB; cursor: pointer; }
+.stage-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
+.s1 { background: #6B21A8; }
+.s2 { background: #1D4ED8; }
+.s3 { background: #059669; }
+.s4 { background: #D97706; }
+.stage-config-name { font-size: 13px; font-weight: 700; color: #111827; flex: 1; }
+.stage-toggle { font-size: 11px; color: #6B7280; }
+.stage-config-body { padding: 12px 14px; border-top: 1px solid #F3F4F6; }
+.cfg-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 12px; }
+.cfg-label { color: #6B7280; }
+.cfg-val { font-weight: 600; color: #111827; }
+.cfg-toggle { display: flex; align-items: center; gap: 6px; }
+.toggle-pill { width: 32px; height: 18px; border-radius: 9px; background: #059669; position: relative; cursor: pointer; }
+.toggle-pill::after { content: ''; position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; }
+.toggle-pill.off { background: #D1D5DB; }
+.toggle-pill.off::after { right: auto; left: 2px; }
+
+.add-stage-btn { width: 100%; padding: 9px; border: 1.5px dashed #D1D5DB; border-radius: 8px; background: none; font-size: 12px; color: #6B7280; cursor: pointer; font-weight: 600; margin-top: 4px; }
+.add-stage-btn:hover { border-color: #6B21A8; color: #6B21A8; background: #FDFAFF; }
+
+/* ── Live tracker ── */
+.tracker-panel { display: flex; flex-direction: column; gap: 18px; }
+.tracker-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+.tc-header { padding: 14px 18px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 12px; }
+.tc-patient { font-size: 15px; font-weight: 700; color: #111827; }
+.tc-meta { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.tc-badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+.tc-badge-active { background: #FFF8E1; color: #92400E; border: 1px solid #FDE68A; }
+.tc-badge-done { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+.tc-badge-pending { background: #F3F4F6; color: #6B7280; border: 1px solid #E5E7EB; }
+.tc-badge-waiting { background: #EDE9FE; color: #6B21A8; border: 1px solid #C4B5FD; }
+
+.stage-track { padding: 0 18px 18px; }
+.stage-row { display: flex; gap: 0; margin: 14px 0 0; }
+.stage-col { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
+.stage-col:not(:last-child)::after { content: ''; position: absolute; top: 16px; left: calc(50% + 16px); right: calc(-50% + 16px); height: 2px; background: #E5E0D8; z-index: 0; }
+.stage-col.done::after { background: #059669; }
+.stage-col.active::after { background: linear-gradient(to right, #6B21A8 40%, #E5E0D8 40%); }
+
+.stage-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; z-index: 1; flex-shrink: 0; }
+.dot-done { background: #059669; color: #fff; }
+.dot-active { background: #6B21A8; color: #fff; box-shadow: 0 0 0 4px rgba(107,33,168,.15); }
+.dot-pending { background: #F3F4F6; color: #9CA3AF; border: 2px solid #E5E0D8; }
+.stage-label { font-size: 11px; font-weight: 700; color: #374151; text-align: center; margin-top: 6px; line-height: 1.3; }
+.stage-sub { font-size: 10px; color: #9CA3AF; text-align: center; margin-top: 3px; }
+.stage-label.active-lbl { color: #6B21A8; }
+.stage-label.done-lbl { color: #059669; }
+
+.stage-detail { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 9px; padding: 12px 14px; margin-top: 14px; }
+.sd-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid #F3F4F6; font-size: 12px; }
+.sd-row:last-child { border-bottom: none; }
+.sd-label { color: #6B7280; }
+.sd-val { font-weight: 600; color: #111827; text-align: right; max-width: 60%; }
+.sd-val.highlight { color: #6B21A8; }
+.sd-val.success { color: #059669; }
+.sd-val.warn { color: #D97706; }
+
+.action-row { display: flex; gap: 8px; margin-top: 12px; }
+.btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; }
+.btn-primary { background: #6B21A8; color: #fff; }
+.btn-primary:hover { background: #5B1898; }
+.btn-outline { background: #fff; border: 1px solid #E5E0D8; color: #374151; }
+.btn-outline:hover { background: #F9FAFB; }
+.btn-approve { background: #059669; color: #fff; }
+.btn-approve:hover { background: #047857; }
+.btn-deny { background: #fff; border: 1px solid #DC2626; color: #DC2626; }
+
+/* ── Payment tracker ── */
+.pay-track { margin-top: 14px; border: 1px solid #E5E0D8; border-radius: 9px; overflow: hidden; }
+.pay-track-header { padding: 8px 14px; background: #F9FAFB; border-bottom: 1px solid #E5E0D8; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: .05em; display: flex; justify-content: space-between; }
+.pay-row { display: flex; align-items: center; padding: 9px 14px; border-bottom: 1px solid #F3F4F6; font-size: 12px; gap: 10px; }
+.pay-row:last-child { border-bottom: none; }
+.pay-stage { font-weight: 600; color: #374151; flex: 1; }
+.pay-provider { color: #6B7280; font-size: 11px; }
+.pay-amount { font-weight: 700; color: #111827; }
+.pay-status { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.pay-pending { background: #F3F4F6; color: #6B7280; }
+.pay-triggered { background: #FFF8E1; color: #92400E; }
+.pay-paid { background: #D1FAE5; color: #065F46; }
+
+/* ── Toast ── */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1F2937; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; display: none; z-index: 999; min-width: 280px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Multi-Stage Genetic Test Workflow <span class="req-tag">GC-STG-001</span></div>
+  <div class="page-sub">Admin configuration of stage gates and payment triggers · Live patient order tracker — Project Phoenix Demo</div>
+</div>
+
+<div class="shell">
+
+  <!-- ── LEFT: Admin Configuration ── -->
+  <div class="config-panel">
+    <div class="panel-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+      <div class="panel-title">Care Product: GC Genetics — ExomeDx</div>
+      <span class="panel-badge">Admin Config</span>
+    </div>
+    <div class="panel-body">
+      <div style="font-size:12px;color:#6B7280;margin-bottom:14px;">Configure the stages, gate requirements, and per-stage payment events for this care product's genetic test workflow.</div>
+
+      <!-- Stage 1 -->
+      <div class="stage-config">
+        <div class="stage-config-header" onclick="toggleStage(1)">
+          <div class="stage-num s1">1</div>
+          <div class="stage-config-name">GC Pre-Test Consult & Order Placement</div>
+          <span class="stage-toggle" id="st1">▾</span>
+        </div>
+        <div class="stage-config-body" id="sb1">
+          <div class="cfg-row"><span class="cfg-label">Queue</span><span class="cfg-val">GC Provider Queue</span></div>
+          <div class="cfg-row"><span class="cfg-label">SLA</span><span class="cfg-val">48 hours from referral receipt</span></div>
+          <div class="cfg-row"><span class="cfg-label">Required to advance</span><span class="cfg-val">GC signs chart + places order</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment trigger</span><span class="cfg-val">On stage completion</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment amount</span><span class="cfg-val">$75.00 (Pre-Test Consult)</span></div>
+          <div class="cfg-row"><span class="cfg-label">Hard gate</span>
+            <div class="cfg-toggle"><div class="toggle-pill"></div><span class="cfg-val" style="font-size:11px;">Required</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 2 -->
+      <div class="stage-config">
+        <div class="stage-config-header" onclick="toggleStage(2)">
+          <div class="stage-num s2">2</div>
+          <div class="stage-config-name">Physician Authorization</div>
+          <span class="stage-toggle" id="st2">▾</span>
+        </div>
+        <div class="stage-config-body" id="sb2">
+          <div class="cfg-row"><span class="cfg-label">Queue</span><span class="cfg-val">Provider (MD/DO) Queue — Auth Task</span></div>
+          <div class="cfg-row"><span class="cfg-label">SLA</span><span class="cfg-val">24 hours from GC order placement</span></div>
+          <div class="cfg-row"><span class="cfg-label">Required to advance</span><span class="cfg-val">Physician sign-off on order</span></div>
+          <div class="cfg-row"><span class="cfg-label">Denial routing</span><span class="cfg-val">Returns to GC queue with reason</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment trigger</span><span class="cfg-val">None — authorization only</span></div>
+          <div class="cfg-row"><span class="cfg-label">Hard gate</span>
+            <div class="cfg-toggle"><div class="toggle-pill"></div><span class="cfg-val" style="font-size:11px;">Required — lab cannot process without</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage 3 -->
+      <div class="stage-config">
+        <div class="stage-config-header" onclick="toggleStage(3)">
+          <div class="stage-num s3">3</div>
+          <div class="stage-config-name">Lab Processing & Result Delivery</div>
+          <span class="stage-toggle" id="st3">▾</span>
+        </div>
+        <div class="stage-config-body" id="sb3">
+          <div class="cfg-row"><span class="cfg-label">Integration</span><span class="cfg-val">Lab Module (auto-update)</span></div>
+          <div class="cfg-row"><span class="cfg-label">Expected TAT</span><span class="cfg-val">14–21 calendar days (ExomeDx)</span></div>
+          <div class="cfg-row"><span class="cfg-label">Result trigger</span><span class="cfg-val">Lab Module → Platform notification</span></div>
+          <div class="cfg-row"><span class="cfg-label">Day 17 outreach</span><span class="cfg-val">Auto email + SMS if not scheduled</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment trigger</span><span class="cfg-val">None at this stage</span></div>
+        </div>
+      </div>
+
+      <!-- Stage 4 -->
+      <div class="stage-config">
+        <div class="stage-config-header" onclick="toggleStage(4)">
+          <div class="stage-num s4">4</div>
+          <div class="stage-config-name">GC Results Disclosure Consult</div>
+          <span class="stage-toggle" id="st4">▾</span>
+        </div>
+        <div class="stage-config-body" id="sb4">
+          <div class="cfg-row"><span class="cfg-label">Queue</span><span class="cfg-val">GC Provider Queue</span></div>
+          <div class="cfg-row"><span class="cfg-label">SLA</span><span class="cfg-val">30 days from result delivery</span></div>
+          <div class="cfg-row"><span class="cfg-label">Required to advance</span><span class="cfg-val">GC results note signed (all fields complete)</span></div>
+          <div class="cfg-row"><span class="cfg-label">Chart enforcement</span><span class="cfg-val">System blocks signing if incomplete (CFE-001)</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment trigger</span><span class="cfg-val">On chart finalization</span></div>
+          <div class="cfg-row"><span class="cfg-label">Payment amount</span><span class="cfg-val">$75.00 (Results Disclosure)</span></div>
+          <div class="cfg-row"><span class="cfg-label">LM close</span><span class="cfg-val">GCA submits — LM closes without physician attestation</span></div>
+        </div>
+      </div>
+
+      <button class="add-stage-btn" onclick="toast('Stage builder: click + drag to add custom stage gate to this workflow')">+ Add Custom Stage Gate</button>
+
+      <div style="margin-top:18px;padding:10px 14px;background:#F0FDF4;border-radius:8px;border:1px solid #A7F3D0;font-size:11px;color:#065F46;line-height:1.6;">
+        <strong>Payment summary:</strong> Stage 1 — $75.00 · Stage 4 — $75.00<br>
+        <strong>Total per complete case:</strong> $150.00 · Paid per-stage on completion
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT: Live Patient Order Tracker ── -->
+  <div class="tracker-panel">
+
+    <!-- Patient 1: Active — at physician auth -->
+    <div class="tracker-card">
+      <div class="tc-header">
+        <div>
+          <div class="tc-patient">Priya Patel · MRN-3398441</div>
+          <div class="tc-meta">ExomeDx Proband · Referral received Jun 5, 2026 · GC: Taylor Brooks, MS CGC</div>
+        </div>
+        <span class="tc-badge tc-badge-active">Awaiting Physician Authorization</span>
+      </div>
+      <div class="stage-track">
+        <div class="stage-row">
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">GC Pre-Test<br>Consult</div>
+            <div class="stage-sub">Jun 5, 2026</div>
+          </div>
+          <div class="stage-col active">
+            <div class="stage-dot dot-active">2</div>
+            <div class="stage-label active-lbl">Physician<br>Authorization</div>
+            <div class="stage-sub">Pending · 6 hrs remaining</div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-dot dot-pending">3</div>
+            <div class="stage-label">Lab Processing<br>& Results</div>
+            <div class="stage-sub">Awaiting auth</div>
+          </div>
+          <div class="stage-col">
+            <div class="stage-dot dot-pending">4</div>
+            <div class="stage-label">Results<br>Disclosure</div>
+            <div class="stage-sub">Awaiting results</div>
+          </div>
+        </div>
+        <div class="stage-detail">
+          <div class="sd-row"><span class="sd-label">Current stage</span><span class="sd-val highlight">Stage 2 — Physician Authorization</span></div>
+          <div class="sd-row"><span class="sd-label">GC order placed</span><span class="sd-val">Jun 5, 2026, 2:14 PM · GeneDx ExomeDx Proband</span></div>
+          <div class="sd-row"><span class="sd-label">Authorization request sent</span><span class="sd-val">Jun 5, 2026, 2:15 PM → Dr. B. Patel</span></div>
+          <div class="sd-row"><span class="sd-label">Auth SLA deadline</span><span class="sd-val warn">Jun 6, 2026, 2:15 PM (6 hrs remaining)</span></div>
+          <div class="sd-row"><span class="sd-label">Stage 1 payment</span><span class="sd-val success">$75.00 — Triggered Jun 5, 2026</span></div>
+        </div>
+        <!-- Physician auth action (as physician role) -->
+        <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:#5B21B6;">
+          <strong>Physician Action Required:</strong> Review GC order for ExomeDx Proband below and authorize or deny to advance patient workflow.
+        </div>
+        <div class="action-row">
+          <button class="btn btn-approve" onclick="advanceToStage3()">✓ Authorize Order</button>
+          <button class="btn btn-deny" onclick="toast('Denial modal: enter reason → returns to GC queue')">✗ Deny — Return to GC</button>
+          <button class="btn btn-outline" onclick="toast('Opening order details for GeneDx ExomeDx Proband')">View Order Details</button>
+        </div>
+        <!-- Payment tracker -->
+        <div class="pay-track">
+          <div class="pay-track-header"><span>Per-Stage Payment Tracker</span><span>Total: $150.00</span></div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 1 — Pre-Test Consult</div><div class="pay-provider">Taylor Brooks, MS CGC</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-triggered">Triggered</span>
+          </div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 4 — Results Disclosure</div><div class="pay-provider">TBD — on results completion</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-pending">Pending</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient 2: Active — results out, day 17 triggered -->
+    <div class="tracker-card">
+      <div class="tc-header">
+        <div>
+          <div class="tc-patient">Michelle Harris · MRN-0854199</div>
+          <div class="tc-meta">ExomeDx Proband · Results delivered May 10, 2026 · GC: Jordan Lee, MS CGC</div>
+        </div>
+        <span class="tc-badge tc-badge-waiting">Day 17 Outreach Triggered — Awaiting Scheduling</span>
+      </div>
+      <div class="stage-track">
+        <div class="stage-row">
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">GC Pre-Test<br>Consult</div>
+            <div class="stage-sub">Apr 18, 2026</div>
+          </div>
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">Physician<br>Authorization</div>
+            <div class="stage-sub">Apr 18, 2026</div>
+          </div>
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">Lab Processing<br>& Results</div>
+            <div class="stage-sub">May 10, 2026</div>
+          </div>
+          <div class="stage-col active">
+            <div class="stage-dot dot-active">4</div>
+            <div class="stage-label active-lbl">Results<br>Disclosure</div>
+            <div class="stage-sub">Not yet scheduled</div>
+          </div>
+        </div>
+        <div class="stage-detail">
+          <div class="sd-row"><span class="sd-label">Results delivered</span><span class="sd-val">May 10, 2026 — VUS detected (BRCA2)</span></div>
+          <div class="sd-row"><span class="sd-label">Days since results</span><span class="sd-val warn">28 days — SLA alert</span></div>
+          <div class="sd-row"><span class="sd-label">Day 17 auto-outreach</span><span class="sd-val success">✓ Email + SMS sent May 27, 2026</span></div>
+          <div class="sd-row"><span class="sd-label">Patient response</span><span class="sd-val">No response — escalating to GCA queue</span></div>
+          <div class="sd-row"><span class="sd-label">Results disclosure SLA</span><span class="sd-val warn">Jun 9, 2026 — 12 days overdue</span></div>
+        </div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12px;color:#B91C1C;">
+          <strong>⚠ SLA Breach:</strong> Day 17 automated outreach sent and no scheduling response. GCA follow-up task created and routed to queue.
+        </div>
+        <div class="action-row">
+          <button class="btn btn-primary" onclick="toast('Opening GCA follow-up task for Michelle Harris')">View GCA Follow-Up Task</button>
+          <button class="btn btn-outline" onclick="toast('Opening scheduling modal for results disclosure consult')">Schedule Consult</button>
+        </div>
+        <div class="pay-track">
+          <div class="pay-track-header"><span>Per-Stage Payment Tracker</span><span>Total: $150.00</span></div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 1 — Pre-Test Consult</div><div class="pay-provider">Jordan Lee, MS CGC</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-paid">Paid Apr 18</span>
+          </div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 4 — Results Disclosure</div><div class="pay-provider">Jordan Lee, MS CGC</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-pending">Pending — not yet completed</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient 3: Complete -->
+    <div class="tracker-card">
+      <div class="tc-header">
+        <div>
+          <div class="tc-patient">Amanda Rivera · MRN-7723019</div>
+          <div class="tc-meta">BRCA1/2 Panel · Case completed Jun 18, 2026 · GC: Taylor Brooks, MS CGC</div>
+        </div>
+        <span class="tc-badge tc-badge-done">All Stages Completed</span>
+      </div>
+      <div class="stage-track">
+        <div class="stage-row">
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">GC Pre-Test<br>Consult</div>
+            <div class="stage-sub">May 28, 2026</div>
+          </div>
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">Physician<br>Authorization</div>
+            <div class="stage-sub">May 29, 2026</div>
+          </div>
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">Lab Processing<br>& Results</div>
+            <div class="stage-sub">Jun 12, 2026</div>
+          </div>
+          <div class="stage-col done">
+            <div class="stage-dot dot-done">✓</div>
+            <div class="stage-label done-lbl">Results<br>Disclosure</div>
+            <div class="stage-sub">Jun 18, 2026</div>
+          </div>
+        </div>
+        <div class="pay-track" style="margin-top:14px;">
+          <div class="pay-track-header"><span>Per-Stage Payment Tracker</span><span style="color:#059669;">Total: $150.00 — Fully Paid</span></div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 1 — Pre-Test Consult</div><div class="pay-provider">Taylor Brooks, MS CGC</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-paid">Paid May 29</span>
+          </div>
+          <div class="pay-row">
+            <div><div class="pay-stage">Stage 4 — Results Disclosure</div><div class="pay-provider">Taylor Brooks, MS CGC</div></div>
+            <div class="pay-amount">$75.00</div>
+            <span class="pay-status pay-paid">Paid Jun 19</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /tracker-panel -->
+</div><!-- /shell -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.display = 'none'; }, 3200);
+}
+
+function toggleStage(n) {
+  const body = document.getElementById('sb' + n);
+  const arrow = document.getElementById('st' + n);
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    arrow.textContent = '▾';
+  } else {
+    body.style.display = 'none';
+    arrow.textContent = '▸';
+  }
+}
+
+function advanceToStage3() {
+  toast('✓ Order authorized by Dr. B. Patel — Stage 2 complete. Order transmitted to GeneDx Lab Module. Stage 3: Lab Processing now active. Estimated TAT: 14–21 days.');
+  // Visual update
+  const badge = document.querySelector('.tc-badge-active');
+  if (badge) { badge.textContent = 'Lab Processing — Authorized'; badge.className = 'tc-badge tc-badge-waiting'; }
+}
+</script>
+
+</body>
+</html>

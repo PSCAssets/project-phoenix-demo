@@ -221,12 +221,24 @@ tbody td { padding: 10px 12px; color: #374151; vertical-align: middle; }
   </div>
   <div class="topbar-user" style="display:flex;align-items:center;gap:12px;">
     <a href="/provider/new-patient?flow=new" style="background:#fff;color:#6B21A8;border:1.5px solid rgba(255,255,255,0.5);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">+ New Patient</a>
+    <button onclick="openMaPageGuide()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:7px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📖 Page Guide</button>
     <span>Michael Torres, MA</span>
     <div class="avatar">MT</div>
   </div>
 </header>
 
 <main class="main">
+
+  <!-- Urgent Message Bar (URG-MSG-001) -->
+  <div id="urgMsgBar" style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:10px;padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+    <span style="font-size:16px;">⚠️</span>
+    <div style="flex:1;">
+      <span style="font-size:13px;font-weight:700;color:#991B1B;">URGENT — </span>
+      <span style="font-size:13px;font-weight:600;color:#374151;">Dr. Sarah Lee: Emma Johnson — HbA1c 14.2%. Provider requires immediate MA support for care escalation. <span style="font-family:monospace;font-size:12px;color:#6B7280;">CST-2026-11024</span></span>
+    </div>
+    <button onclick="openUrgentChart()" style="background:#DC2626;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">Open Chart</button>
+    <button onclick="dismissUrgBar()" style="background:none;border:none;color:#9CA3AF;font-size:18px;cursor:pointer;line-height:1;padding:0 4px;">&times;</button>
+  </div>
 
   <!-- Clock In/Out Widget -->
   <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
@@ -511,6 +523,26 @@ function clockIn() {
   document.getElementById('btnClockIn').style.display = 'none';
   document.getElementById('btnClockOut').style.display = '';
   updateDuration();
+}
+
+// Urgent message bar (URG-MSG-001)
+function dismissUrgBar() {
+  var b = document.getElementById('urgMsgBar');
+  if (b) b.style.display = 'none';
+}
+function openUrgentChart() {
+  window.location.href = '/provider/chart?id=11024&urgent=1';
+}
+
+// Page Guide (PG-ALL-001)
+function openMaPageGuide() {
+  var panel = document.getElementById('maDashGuidePanel');
+  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
+  panel = document.createElement('div');
+  panel.id = 'maDashGuidePanel';
+  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
+  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#6B21A8;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'maDashGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">MA Dashboard</h3><p style="margin-bottom:12px;"><strong>Purpose:</strong> Your daily work hub — active intakes, PA submissions, patient reminders, and internal messages.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Urgent Messages</h4><p style="margin-bottom:12px;">Red notification bars at the top of the page are Urgent Messages routed to you by a provider. Open the patient chart immediately and take the requested action.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Time Tracking</h4><p style="margin-bottom:12px;">Clock in and out using the top widget. Your timesheet is submitted weekly to your manager for approval.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Patient Activity Table</h4><p style="margin-bottom:12px;">Shows your personally assigned open items sorted by priority. P1 items require same-day resolution. P3 can be deferred 24h.</p><p style="font-size:11px;color:#9CA3AF;">Req: URG-MSG-001 · MGR-TS-001 · PG-ALL-001</p></div>';
+  document.body.appendChild(panel);
 }
 </script>
 {% endblock %}

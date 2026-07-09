@@ -85,6 +85,7 @@ tbody tr:hover { background: #FAF7F2; }
     <div class="topbar-subtitle">MA / RN Team Lead &mdash; Clinical Operations</div>
   </div>
   <div class="topbar-right">
+    <button onclick="openManagerPageGuide()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:7px;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">📖 Page Guide</button>
     <span>Riley Perrone, Team Manager</span>
     <div class="avatar">RP</div>
   </div>
@@ -240,6 +241,7 @@ tbody tr:hover { background: #FAF7F2; }
     <div class="widget-header">
       <div class="widget-title">Timesheet Approvals</div>
       <span class="badge badge-amber">4 pending</span>
+      <span style="font-size:10px;color:#9CA3AF;font-family:monospace;margin-left:4px;">MGR-TS-001</span>
       <a href="/provider/manager/timekeeping" class="section-link">View All &rarr;</a>
     </div>
     <table>
@@ -315,6 +317,17 @@ function returnTs(btn) {
   var badge = document.querySelector('.badge-amber');
   var n = parseInt(badge.textContent) - 1;
   badge.textContent = n + ' pending';
+}
+
+// Page Guide (PG-ALL-001)
+function openManagerPageGuide() {
+  var panel = document.getElementById('mgrGuidePanel');
+  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
+  panel = document.createElement('div');
+  panel.id = 'mgrGuidePanel';
+  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
+  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#6B21A8;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'mgrGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Manager Dashboard</h3><p style="margin-bottom:12px;"><strong>Purpose:</strong> Supervisor view of team workload, queue health, and timesheet approvals across all MA/RN/CT staff.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Timesheet Approvals</h4><p style="margin-bottom:12px;">Team members submit weekly timesheets for approval. Use Approve to finalize or Return (with a reason) to send back. All approved timesheets flow into payroll. (MGR-TS-001)</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Critical Alerts</h4><p style="margin-bottom:12px;">Red alert cards at the top surface uncontacted critical lab results and unassigned P1 tasks. These require immediate manager intervention if the queue owner is unavailable.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Team Workload</h4><p style="margin-bottom:12px;">Open items by category gives a real-time load view across the team. Use this to identify who has capacity to absorb escalated tasks.</p><p style="font-size:11px;color:#9CA3AF;">Req: MGR-TS-001 · PG-ALL-001</p></div>';
+  document.body.appendChild(panel);
 }
 </script>
 {% endblock %}

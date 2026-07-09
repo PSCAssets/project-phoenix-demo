@@ -26,6 +26,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .search-btn { padding: 10px 22px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
 .search-btn:hover { background: #047857; }
 
+/* ── Search Mode Selector (PLK-001) ── */
+.srch-mode-btn { padding: 7px 16px; background: #fff; border: none; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; transition: all .15s; }
+.srch-mode-btn:hover { background: #F3F4F6; color: #374151; }
+.srch-mode-btn.active { background: #059669; color: #fff; }
+.action-link { font-size: 12px; font-weight: 600; color: #059669; cursor: pointer; text-decoration: underline; }
+.action-link:hover { color: #047857; }
+
 /* ── Results Table ── */
 .results-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
 .results-header { padding: 12px 20px; background: #F0FDF4; border-bottom: 1px solid #E5E0D8; font-size: 12px; font-weight: 700; color: #065F46; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -469,18 +476,46 @@ tbody tr:last-child td { border-bottom: none; }
     </div>
   </div>
 
-  <!-- ── Patient Search Panel ── -->
+  <!-- ── Patient Search Panel (PLK-001 — all roles) ── -->
   <div class="panel" id="panelPatient">
-    <div class="search-row">
-      <input class="search-input" type="text" id="patientSearchInput" placeholder="Search by name, patient ID, or date of birth…" oninput="filterPatients(this.value)">
-      <button class="search-btn" onclick="filterPatients(document.getElementById('patientSearchInput').value)">Search</button>
+    <!-- Search mode selector -->
+    <div style="display:flex;gap:0;border:1.5px solid #D1D5DB;border-radius:9px;overflow:hidden;margin-bottom:14px;width:fit-content;">
+      <button class="srch-mode-btn active" id="sm-name" onclick="setSearchMode('name')">Name / DOB</button>
+      <button class="srch-mode-btn" id="sm-mrn" onclick="setSearchMode('mrn')">MRN</button>
+      <button class="srch-mode-btn" id="sm-acct" onclick="setSearchMode('acct')">Account #</button>
     </div>
+    <div class="search-row">
+      <input class="search-input" type="text" id="patientSearchInput" placeholder="Search by patient name or date of birth…" oninput="filterPatients(this.value)">
+      <button class="search-btn" onclick="filterPatients(document.getElementById('patientSearchInput').value)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search
+      </button>
+    </div>
+    <div style="font-size:11px;color:#9CA3AF;margin-top:-8px;margin-bottom:14px;" id="srch-hint">Showing consultation history lookup · Partial name match supported (min 2 chars) · Available to all roles (Req PLK-001)</div>
     <div class="results-card">
-      <div class="results-header">Patient Records</div>
+      <div class="results-header">Patient Consultation History Lookup</div>
       <table>
-        <thead><tr><th>Patient</th><th>DOB</th><th>Phone</th><th>Last Consult</th><th>Status</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Patient</th><th>MRN</th><th>Account #</th><th>DOB</th><th>Consultations</th><th>Last Consult</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody id="patientTbody">
+          <!-- Populated by JS -->
         </tbody>
+      </table>
+    </div>
+    <!-- Consultation history drawer -->
+    <div id="consult-history-drawer" style="display:none;margin-top:14px;background:#fff;border:1.5px solid #C4B5FD;border-radius:10px;overflow:hidden;">
+      <div style="padding:12px 18px;background:#EDE9FE;border-bottom:1px solid #C4B5FD;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;font-weight:700;color:#5B21B6;" id="drawer-patient-name">Patient Consultation History</div>
+        <button onclick="document.getElementById('consult-history-drawer').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#6B7280;">×</button>
+      </div>
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="background:#F9FAFB;">
+          <th style="padding:8px 16px;text-align:left;font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;">Consult Date</th>
+          <th style="padding:8px 16px;text-align:left;font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;">Care Product</th>
+          <th style="padding:8px 16px;text-align:left;font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;">Provider</th>
+          <th style="padding:8px 16px;text-align:left;font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;">Type</th>
+          <th style="padding:8px 16px;text-align:left;font-size:11px;color:#6B7280;font-weight:700;text-transform:uppercase;">Status</th>
+        </tr></thead>
+        <tbody id="drawer-consult-rows"></tbody>
       </table>
     </div>
   </div>
@@ -793,16 +828,55 @@ tbody tr:last-child td { border-bottom: none; }
 <script>
 // ─── DATA ───
 const PATIENTS = [
-  { id:'PT-2026-00201', first:'Marcus',   last:'Johnson',   dob:'1985-04-12', phone:'(512) 555-0102', email:'marcus.j@email.com',    lastConsult:'Jun 12, 2026', status:'Active' },
-  { id:'PT-2026-00188', first:'Amanda',   last:'Rivera',    dob:'1991-08-22', phone:'(310) 555-0188', email:'a.rivera@email.com',     lastConsult:'Jun 10, 2026', status:'Active' },
-  { id:'PT-2026-00174', first:'James',    last:'Park',      dob:'1978-11-05', phone:'(312) 555-0174', email:'j.park@email.com',       lastConsult:'May 28, 2026', status:'Active' },
-  { id:'PT-2026-00155', first:'Sandra',   last:'Nguyen',    dob:'2000-03-17', phone:'(206) 555-0155', email:'s.nguyen@email.com',     lastConsult:'May 14, 2026', status:'Active' },
-  { id:'PT-2026-00140', first:'Robert',   last:'Chen',      dob:'1965-07-30', phone:'(415) 555-0140', email:'r.chen@email.com',       lastConsult:'Apr 29, 2026', status:'Active' },
-  { id:'PT-2026-00132', first:'Priya',    last:'Patel',     dob:'1988-12-03', phone:'(972) 555-0132', email:'p.patel@email.com',      lastConsult:'Jun 5, 2026',  status:'Active' },
-  { id:'PT-2026-00119', first:'Derek',    last:'Williams',  dob:'1973-06-18', phone:'(404) 555-0119', email:'d.williams@email.com',   lastConsult:'Jun 1, 2026',  status:'Active' },
-  { id:'PT-2026-00108', first:'Lisa',     last:'Morales',   dob:'1995-09-27', phone:'(720) 555-0108', email:'l.morales@email.com',    lastConsult:'May 22, 2026', status:'Active' },
-  { id:'PT-2026-00094', first:'Kevin',    last:'Thompson',  dob:'1960-02-14', phone:'(617) 555-0094', email:'k.thompson@email.com',   lastConsult:'May 10, 2026', status:'Active' },
-  { id:'PT-2026-00081', first:'Michelle', last:'Harris',    dob:'1983-07-09', phone:'(202) 555-0081', email:'m.harris@email.com',     lastConsult:'Apr 18, 2026', status:'Active' },
+  { id:'PT-2026-00201', mrn:'MRN-8841022', acct:'EW-20260201-A', first:'Marcus',   last:'Johnson',   dob:'1985-04-12', phone:'(512) 555-0102', email:'marcus.j@email.com',    lastConsult:'Jun 12, 2026', status:'Active', consultCount:4,
+    history:[
+      { date:'Jun 12, 2026', product:'EverlyCare Thyroid', provider:'Dr. A. Chen', type:'Video', status:'Completed' },
+      { date:'Mar 8, 2026',  product:'EverlyCare Thyroid', provider:'Dr. A. Chen', type:'Async', status:'Completed' },
+      { date:'Jan 15, 2026', product:'EverlyCare Weight',  provider:'Dr. M. Patel', type:'Video', status:'Completed' },
+      { date:'Nov 3, 2025',  product:'EverlyCare Thyroid', provider:'Dr. A. Chen', type:'Phone', status:'Completed' },
+    ]},
+  { id:'PT-2026-00188', mrn:'MRN-7723019', acct:'EW-20260188-B', first:'Amanda',   last:'Rivera',    dob:'1991-08-22', phone:'(310) 555-0188', email:'a.rivera@email.com',     lastConsult:'Jun 10, 2026', status:'Active', consultCount:2,
+    history:[
+      { date:'Jun 10, 2026', product:'GC Genetics — BRCA', provider:'Taylor Brooks, MS CGC', type:'Async', status:'In Progress' },
+      { date:'May 28, 2026', product:'GC Genetics — BRCA', provider:'Taylor Brooks, MS CGC', type:'Video', status:'Completed' },
+    ]},
+  { id:'PT-2026-00174', mrn:'MRN-6614033', acct:'EW-20260174-A', first:'James',    last:'Park',      dob:'1978-11-05', phone:'(312) 555-0174', email:'j.park@email.com',       lastConsult:'May 28, 2026', status:'Active', consultCount:1,
+    history:[
+      { date:'May 28, 2026', product:'EverlyCare STI',     provider:'Dr. R. Nguyen', type:'Async', status:'Completed' },
+    ]},
+  { id:'PT-2026-00155', mrn:'MRN-5509877', acct:'EW-20260155-C', first:'Sandra',   last:'Nguyen',    dob:'2000-03-17', phone:'(206) 555-0155', email:'s.nguyen@email.com',     lastConsult:'May 14, 2026', status:'Active', consultCount:3,
+    history:[
+      { date:'May 14, 2026', product:'EverlyCare HgbA1c',  provider:'Dr. K. Williams', type:'Async', status:'Completed' },
+      { date:'Feb 20, 2026', product:'EverlyCare HgbA1c',  provider:'Dr. K. Williams', type:'Async', status:'Completed' },
+      { date:'Nov 10, 2025', product:'EverlyCare HgbA1c',  provider:'Dr. K. Williams', type:'Phone', status:'Completed' },
+    ]},
+  { id:'PT-2026-00140', mrn:'MRN-4401256', acct:'EW-20260140-A', first:'Robert',   last:'Chen',      dob:'1965-07-30', phone:'(415) 555-0140', email:'r.chen@email.com',       lastConsult:'Apr 29, 2026', status:'Active', consultCount:6,
+    history:[
+      { date:'Apr 29, 2026', product:'EverlyCare Men\'s Health', provider:'Dr. B. Patel', type:'Video', status:'Completed' },
+      { date:'Jan 6, 2026',  product:'EverlyCare Men\'s Health', provider:'Dr. B. Patel', type:'Async', status:'Completed' },
+      { date:'Oct 14, 2025', product:'EverlyCare Men\'s Health', provider:'Dr. B. Patel', type:'Video', status:'Completed' },
+    ]},
+  { id:'PT-2026-00132', mrn:'MRN-3398441', acct:'EW-20260132-D', first:'Priya',    last:'Patel',     dob:'1988-12-03', phone:'(972) 555-0132', email:'p.patel@email.com',      lastConsult:'Jun 5, 2026',  status:'Active', consultCount:2,
+    history:[
+      { date:'Jun 5, 2026',  product:'GC Genetics — Exome', provider:'Taylor Brooks, MS CGC', type:'Phone', status:'Completed' },
+      { date:'Apr 18, 2026', product:'GC Genetics — Exome', provider:'Jordan Lee, MS CGC',    type:'Video', status:'Completed' },
+    ]},
+  { id:'PT-2026-00119', mrn:'MRN-2287063', acct:'EW-20260119-A', first:'Derek',    last:'Williams',  dob:'1973-06-18', phone:'(404) 555-0119', email:'d.williams@email.com',   lastConsult:'Jun 1, 2026',  status:'Active', consultCount:1,
+    history:[
+      { date:'Jun 1, 2026',  product:'EverlyCare Thyroid', provider:'Dr. A. Chen', type:'Async', status:'Completed' },
+    ]},
+  { id:'PT-2026-00108', mrn:'MRN-1176844', acct:'EW-20260108-B', first:'Lisa',     last:'Morales',   dob:'1995-09-27', phone:'(720) 555-0108', email:'l.morales@email.com',    lastConsult:'May 22, 2026', status:'Active', consultCount:0,
+    history:[]},
+  { id:'PT-2026-00094', mrn:'MRN-0965320', acct:'EW-20260094-A', first:'Kevin',    last:'Thompson',  dob:'1960-02-14', phone:'(617) 555-0094', email:'k.thompson@email.com',   lastConsult:'May 10, 2026', status:'Active', consultCount:5,
+    history:[
+      { date:'May 10, 2026', product:'EverlyCare Weight',  provider:'Dr. M. Patel', type:'Async', status:'Completed' },
+      { date:'Feb 2, 2026',  product:'EverlyCare Weight',  provider:'Dr. M. Patel', type:'Video', status:'Completed' },
+    ]},
+  { id:'PT-2026-00081', mrn:'MRN-0854199', acct:'EW-20260081-C', first:'Michelle', last:'Harris',    dob:'1983-07-09', phone:'(202) 555-0081', email:'m.harris@email.com',     lastConsult:'Apr 18, 2026', status:'Active', consultCount:2,
+    history:[
+      { date:'Apr 18, 2026', product:'GC Genetics — BRCA', provider:'Jordan Lee, MS CGC', type:'Video', status:'Completed' },
+      { date:'Mar 1, 2026',  product:'GC Genetics — BRCA', provider:'Jordan Lee, MS CGC', type:'Async', status:'Completed' },
+    ]},
 ];
 
 const MEMBERS = [
@@ -830,28 +904,93 @@ let state = {
   consentText: null,
 };
 
-// ─── RENDER PATIENT TABLE ───
+// ─── RENDER PATIENT TABLE (PLK-001) ───
+let currentSearchMode = 'name';
+
+function setSearchMode(mode) {
+  currentSearchMode = mode;
+  document.querySelectorAll('.srch-mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sm-' + mode).classList.add('active');
+  const inp = document.getElementById('patientSearchInput');
+  const hint = document.getElementById('srch-hint');
+  if (mode === 'mrn') {
+    inp.placeholder = 'Enter MRN (e.g. MRN-8841022 or partial digits)…';
+    hint.textContent = 'MRN lookup · Partial match supported (min 4 chars) · Available to all roles (Req PLK-001)';
+  } else if (mode === 'acct') {
+    inp.placeholder = 'Enter account number (e.g. EW-20260201-A)…';
+    hint.textContent = 'Account number lookup · Exact or partial match · Available to all roles (Req PLK-001)';
+  } else {
+    inp.placeholder = 'Search by patient name or date of birth…';
+    hint.textContent = 'Name / DOB lookup · Partial match supported · Available to all roles (Req PLK-001)';
+  }
+  inp.value = '';
+  renderPatients(PATIENTS);
+}
+
 function renderPatients(data) {
   const tbody = document.getElementById('patientTbody');
-  tbody.innerHTML = data.map(p => `
+  if (!data.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px;">No matching patients found. Try a different search term or mode.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(p => {
+    const histLabel = p.consultCount === 0
+      ? '<span style="font-size:11px;color:#9CA3AF;">No prior consults</span>'
+      : `<a class="action-link" onclick="showConsultHistory('${p.id}')">${p.consultCount} consult${p.consultCount!==1?'s':''} — view history</a>`;
+    return `
     <tr>
       <td><div class="p-name">${p.first} ${p.last}</div><div class="p-id">${p.id}</div></td>
-      <td>${p.dob}</td>
-      <td>${p.phone}</td>
-      <td>${p.lastConsult}</td>
+      <td style="font-size:12px;font-weight:600;color:#374151;">${p.mrn}</td>
+      <td style="font-size:11px;color:#6B7280;">${p.acct}</td>
+      <td style="font-size:12px;">${p.dob}</td>
+      <td>${histLabel}</td>
+      <td style="font-size:12px;color:#6B7280;">${p.lastConsult || '—'}</td>
       <td><span class="status-pill status-active">${p.status}</span></td>
       <td>
         <button class="book-btn" onclick="openPatientBookModal('${p.id}')">Schedule Consult</button>
-        <a class="action-link" href="#">View Appts</a>
       </td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 function filterPatients(q) {
-  const lq = q.toLowerCase();
-  renderPatients(PATIENTS.filter(p =>
-    (p.first+' '+p.last+' '+p.id+' '+p.dob).toLowerCase().includes(lq)
-  ));
+  const lq = q.toLowerCase().trim();
+  if (!lq) { renderPatients(PATIENTS); return; }
+  let filtered;
+  if (currentSearchMode === 'mrn') {
+    filtered = PATIENTS.filter(p => p.mrn.toLowerCase().includes(lq));
+  } else if (currentSearchMode === 'acct') {
+    filtered = PATIENTS.filter(p => p.acct.toLowerCase().includes(lq));
+  } else {
+    filtered = PATIENTS.filter(p =>
+      (p.first+' '+p.last+' '+p.id+' '+p.dob).toLowerCase().includes(lq)
+    );
+  }
+  renderPatients(filtered);
+}
+
+function showConsultHistory(patientId) {
+  const p = PATIENTS.find(x => x.id === patientId);
+  if (!p) return;
+  const drawer = document.getElementById('consult-history-drawer');
+  document.getElementById('drawer-patient-name').textContent = p.first + ' ' + p.last + ' — ' + p.mrn + ' — Consultation History';
+  const rows = document.getElementById('drawer-consult-rows');
+  if (!p.history || !p.history.length) {
+    rows.innerHTML = '<tr><td colspan="5" style="padding:16px;text-align:center;color:#9CA3AF;font-size:13px;">No consultation history on record</td></tr>';
+  } else {
+    rows.innerHTML = p.history.map(h => `
+      <tr style="border-bottom:1px solid #F3F4F6;">
+        <td style="padding:10px 16px;font-size:12px;color:#6B7280;">${h.date}</td>
+        <td style="padding:10px 16px;font-size:12px;font-weight:600;color:#374151;">${h.product}</td>
+        <td style="padding:10px 16px;font-size:12px;color:#374151;">${h.provider}</td>
+        <td style="padding:10px 16px;font-size:12px;color:#6B7280;">${h.type}</td>
+        <td style="padding:10px 16px;">
+          <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;${h.status==='Completed'?'background:#D1FAE5;color:#065F46;':h.status==='In Progress'?'background:#FFF8E1;color:#92400E;':'background:#F3F4F6;color:#6B7280;'}">${h.status}</span>
+        </td>
+      </tr>`).join('');
+  }
+  drawer.style.display = 'block';
+  drawer.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
 function openPatientBookModal(patientId) {

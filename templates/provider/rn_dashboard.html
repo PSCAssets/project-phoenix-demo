@@ -105,13 +105,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <div class="rn-provider-role">Registered Nurse · Clinical Support</div>
         </div>
         <div class="rn-topbar-right" style="display:flex;align-items:center;gap:10px;">
+          <button onclick="openRnPageGuide()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Page Guide
+          </button>
           <a href="/provider/new-patient?flow=new" style="background:#fff;color:#6B21A8;border:1.5px solid rgba(255,255,255,0.5);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">+ New Patient</a>
           <span class="rn-date-time" id="rnDateTime">Fri Jun 13, 2026 · 9:15 AM</span>
         </div>
       </div>
 
+      <!-- Urgent message indicator (MSG-BAR-001 / URG-MSG-001) -->
+      <div style="margin:12px 20px 0;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="alert('Opening urgent message from Dr. Sarah Lee...')">
+        <span style="font-size:14px;">⚠</span>
+        <div style="flex:1;">
+          <span style="font-size:12px;font-weight:700;color:#DC2626;">URGENT — Dr. Sarah Lee:</span>
+          <span style="font-size:12px;color:#7F1D1D;margin-left:6px;">Emma Johnson HbA1c 14.2% — critical result requires immediate follow-up call</span>
+        </div>
+        <span style="font-size:11px;color:#9CA3AF;white-space:nowrap;">3 min ago</span>
+        <span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border-radius:4px;padding:2px 6px;">URGENT</span>
+      </div>
+
       <!-- Stat cards -->
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin:16px 20px 8px;">Today's snapshot</div>
       <div class="rn-stats">
         <div class="rn-stat-card">
           <div class="rn-stat-label">My Assigned Patients</div>
@@ -128,10 +142,59 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           <div class="rn-stat-value">2</div>
           <div class="rn-stat-sub">Unread</div>
         </div>
-        <div class="rn-stat-card">
-          <div class="rn-stat-label">Overdue</div>
-          <div class="rn-stat-value" style="color:#DC2626;">1</div>
-          <div class="rn-stat-sub">Needs escalation</div>
+        <div class="rn-stat-card" style="border:1.5px solid #DC2626;cursor:pointer;" onclick="document.getElementById('critLabWidget').scrollIntoView({behavior:'smooth'})">
+          <div class="rn-stat-label" style="color:#DC2626;">Critical Lab Results</div>
+          <div class="rn-stat-value" style="color:#DC2626;">2</div>
+          <div class="rn-stat-sub">24-hr SLA · tap to view</div>
+        </div>
+      </div>
+
+      <!-- Critical Lab Results Queue (CRIT-Q-001) -->
+      <div class="rn-widget" id="critLabWidget" style="margin-top:16px;border:1.5px solid #DC2626;">
+        <div class="rn-widget-header" style="background:#FEF2F2;">
+          <span style="font-size:14px;">🚨</span>
+          <span class="rn-widget-title" style="color:#DC2626;">Critical Lab Results — Isolated Queue</span>
+          <span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#991B1B;border-radius:4px;padding:2px 7px;margin-right:4px;">24-HR SLA</span>
+          <span style="font-size:10px;color:#9CA3AF;font-family:monospace;">CRIT-Q-001</span>
+        </div>
+        <div style="padding:10px 14px;background:#FFF5F5;border-bottom:1px solid #FEE2E2;font-size:12px;color:#7F1D1D;">
+          These items are isolated from the general queue. Each has a hard 24-hour SLA — no rollover. Items turning red have less than 2 hours remaining.
+        </div>
+        <div class="rn-widget-body">
+          <table class="rn-table">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Result</th>
+                <th>Value</th>
+                <th>SLA Timer</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="rn-patient-name">Emma Johnson</span><br><span class="rn-time">MRN-00421</span></td>
+                <td><span class="rn-cat-badge cat-lab">HbA1c</span></td>
+                <td><strong style="color:#DC2626;">14.2% ↑↑</strong></td>
+                <td><span style="font-size:13px;font-weight:800;color:#DC2626;" id="timer1">21:34:18</span></td>
+                <td><span style="font-size:11px;font-weight:700;background:#FEE2E2;color:#991B1B;padding:2px 7px;border-radius:4px;">Awaiting Call</span></td>
+                <td>
+                  <button class="rn-action-btn" onclick="takeItem('Emma Johnson','HbA1c')">Take</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="rn-patient-name">Marcus Rodriguez</span><br><span class="rn-time">MRN-00398</span></td>
+                <td><span class="rn-cat-badge cat-lab">Potassium</span></td>
+                <td><strong style="color:#DC2626;">6.8 mEq/L ↑↑</strong></td>
+                <td><span style="font-size:13px;font-weight:800;color:#F59E0B;" id="timer2">06:12:44</span></td>
+                <td><span style="font-size:11px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;">1st Attempt</span></td>
+                <td>
+                  <button class="rn-action-btn" onclick="takeItem('Marcus Rodriguez','Potassium')">Take</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -222,4 +285,39 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 </div><!-- /rn-shell -->
 
 {% endblock %}
-{% block scripts %}{% raw %}<script>/* RN dashboard loaded */</script>{% endraw %}{% endblock %}
+{% block scripts %}{% raw %}<script>
+// Take button (RN-TAKE-001)
+function takeItem(patient, resultType) {
+  var msg = '✓ ' + resultType + ' critical result for ' + patient + ' claimed — item removed from shared queue and assigned to you (RN-TAKE-001)';
+  var t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',background:'#1F2937',color:'#fff',padding:'10px 18px',borderRadius:'8px',fontSize:'12px',fontWeight:'600',zIndex:'9999',boxShadow:'0 4px 16px rgba(0,0,0,0.2)',maxWidth:'480px',textAlign:'center'});
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 3500);
+}
+
+// Countdown timers for critical lab queue
+function tickTimers() {
+  ['timer1','timer2'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var parts = el.textContent.split(':').map(Number);
+    var h = parts[0], m = parts[1], s = parts[2];
+    if (s > 0) s--; else if (m > 0) { m--; s = 59; } else if (h > 0) { h--; m = 59; s = 59; }
+    el.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    if (h < 2) el.style.color = '#DC2626';
+  });
+}
+setInterval(tickTimers, 1000);
+
+// Page Guide (PG-ALL-001)
+function openRnPageGuide() {
+  var panel = document.getElementById('rnGuidePanel');
+  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
+  panel = document.createElement('div');
+  panel.id = 'rnGuidePanel';
+  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
+  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#6B21A8;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'rnGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">RN Dashboard</h3><p style="margin-bottom:12px;"><strong>Purpose:</strong> Your central clinical workspace. Shows assigned patients, urgent messages, and the isolated Critical Lab Results queue with 24-hour SLA timers.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Critical Lab Results</h4><p style="margin-bottom:12px;">Items in the red Critical Lab Results queue have a hard 24-hour SLA. No rollover. Click <strong>Take</strong> to claim an item and remove it from the shared queue. Timer counts down from 24h — items below 2h turn red.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Urgent Messages</h4><p style="margin-bottom:12px;">Urgent-flagged messages from providers appear as a banner at the top of your dashboard. Tap to open the message linked to the patient chart.</p><p style="font-size:11px;color:#9CA3AF;">Req: CRIT-Q-001 · RN-TAKE-001 · URG-MSG-001 · PG-ALL-001</p></div>';
+  document.body.appendChild(panel);
+}
+</script>{% endraw %}{% endblock %}

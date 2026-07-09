@@ -162,6 +162,33 @@
 .lm-log-entry:last-child { border-bottom: none; }
 .lm-log-ts { color: #9CA3AF; width: 120px; flex-shrink: 0; }
 .lm-log-action { color: #374151; font-weight: 600; flex: 1; }
+
+/* ── Smart Template Components (TPL-001 / CFE-001) ── */
+.tpl-field { display: flex; flex-direction: column; gap: 4px; }
+.tpl-label { font-size: 11px; font-weight: 700; color: #374151; }
+.req-star { color: #DC2626; }
+.tpl-select { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #111827; background: #fff; cursor: pointer; appearance: auto; }
+.tpl-select:focus { outline: none; border-color: #6B21A8; box-shadow: 0 0 0 3px rgba(107,33,168,.1); }
+.tpl-input { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #111827; background: #fff; box-sizing: border-box; }
+.tpl-input:focus { outline: none; border-color: #6B21A8; }
+.tpl-textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #374151; line-height: 1.5; min-height: 72px; resize: vertical; box-sizing: border-box; font-family: inherit; }
+.tpl-textarea:focus { outline: none; border-color: #6B21A8; }
+.tpl-picklist { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.pick-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #374151; cursor: pointer; }
+.pick-item input[type=checkbox] { accent-color: #6B21A8; width: 14px; height: 14px; cursor: pointer; }
+.tpl-radio-group { display: flex; flex-direction: column; gap: 5px; padding: 6px 0; }
+.radio-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #374151; cursor: pointer; }
+.radio-item input[type=radio] { accent-color: #6B21A8; cursor: pointer; }
+
+/* Phenotype rows */
+.phenotype-row { display: grid; grid-template-columns: 2fr 1fr; align-items: center; padding: 8px 12px; border-bottom: 1px solid #F3F4F6; font-size: 12px; color: #374151; }
+.phenotype-row:last-child { border-bottom: none; }
+.pn-toggle { display: flex; gap: 4px; justify-content: center; }
+.pn-btn { padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid #D1D5DB; background: #fff; color: #6B7280; transition: all .15s; }
+.pn-btn.pn-pos.active { background: #DC2626; border-color: #DC2626; color: #fff; }
+.pn-btn.pn-neg.active { background: #059669; border-color: #059669; color: #fff; }
+.pn-btn.pn-na.active { background: #9CA3AF; border-color: #9CA3AF; color: #fff; }
+.pn-btn:hover { border-color: #6B21A8; }
 </style>
 {% endblock %}
 {% block content %}
@@ -648,32 +675,279 @@ PLAN: GeneDx BRCA1/2 full sequencing + large rearrangement analysis ordered. Res
           </div>
         </div>
 
-        <!-- Results disclosure note (in progress) -->
-        <div class="gc-card">
+        <!-- Results disclosure note — Smart Template (In Progress) -->
+        <div class="gc-card" id="results-note-card">
           <div class="gc-card-header">
             <div class="gc-card-title">Results Disclosure Note</div>
-            <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;">In Progress — Not Signed</span>
-            <span class="gc-card-action" onclick="gcToast('Opening note for editing')">Edit &amp; Sign</span>
+            <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;" id="note-status-badge">In Progress — Not Signed</span>
+            <span style="margin-left:auto;font-size:11px;color:#9CA3AF;">Taylor Brooks, MS CGC · Jun 18, 2026 · Async</span>
           </div>
           <div class="gc-card-body">
-            <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Taylor Brooks, MS CGC · Jun 18, 2026 · Async · In progress</div>
-            <div class="note-block" style="border:1.5px dashed #C4B5FD;background:#FDFCFF;">Patient contacted via secure async message to discuss results. PATHOGENIC variant BRCA1 c.5266dupC (p.Gln1756fs) identified.
 
-DISCUSSION:
-• Result communicated clearly with plain-language explanation
-• Patient asked about surgical prevention options — reviewed prophylactic mastectomy and salpingo-oophorectomy as options per NCCN
-• Discussed enhanced surveillance (annual MRI + mammogram starting at age 25)
-• Chemoprevention options reviewed (tamoxifen, raloxifene)
-• Patient expressed significant distress — referred to psychosocial support resources
+            <!-- Required field enforcement banner -->
+            <div id="validation-banner" style="display:none;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;padding:10px 14px;margin-bottom:14px;">
+              <div style="font-size:12px;font-weight:700;color:#DC2626;margin-bottom:6px;">⚠ Chart cannot be finalized — required fields incomplete:</div>
+              <ul id="validation-list" style="margin:0;padding-left:16px;font-size:12px;color:#7F1D1D;"></ul>
+            </div>
 
-NEXT STEPS:
-[ ] Referral to high-risk breast/gyn oncology — MD Anderson Cancer Center (preferred by patient)
-[ ] Cascade testing letters to brother and sister
-[ ] Follow-up call scheduled in 2 weeks to answer additional questions
+            <!-- ── S: SUBJECTIVE ── -->
+            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">S — Subjective</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+              <div class="tpl-field">
+                <label class="tpl-label">Consult Type <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-consult-type" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="results-disclosure" selected>Results Disclosure</option>
+                  <option value="pre-test">Pre-Test Counseling</option>
+                  <option value="variant-reinterp">Variant Reinterpretation</option>
+                  <option value="followup">Follow-Up</option>
+                  <option value="incident">Incident / Urgent</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Consult Modality <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-modality" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="async" selected>Async Secure Message</option>
+                  <option value="video">Video</option>
+                  <option value="phone">Telephonic</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Reason for Contact <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-contact-reason" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="results-avail" selected>Genetic test results available</option>
+                  <option value="patient-inquiry">Patient inquiry — results question</option>
+                  <option value="variant-update">Variant classification updated</option>
+                  <option value="cascade">Cascade testing recommendation</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Patient Understanding (Prior Session)</label>
+                <select class="tpl-select" id="f-prior-understand" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="demonstrated">Demonstrated understanding</option>
+                  <option value="partial">Partial — reinforcement needed</option>
+                  <option value="no-prior">No prior session on record</option>
+                </select>
+              </div>
+            </div>
 
-— NOTE IN PROGRESS — sign before closing chart</div>
-            <div class="note-meta" style="color:#D97706;">⚠ Unsigned · Last autosaved: Jun 18, 2026, 10:41 AM</div>
-            <!-- Submission pipeline — current state -->
+            <!-- Patient concerns (multi-select pick-list) -->
+            <div class="tpl-field" style="margin-bottom:14px;">
+              <label class="tpl-label">Patient-Reported Concerns / Topics (select all that apply)</label>
+              <div class="tpl-picklist">
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Surgical prevention options (mastectomy / oophorectomy)</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Enhanced surveillance schedule</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Chemoprevention options</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Impact on family members / cascade testing</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Insurance / GINA protections</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Emotional / psychosocial support</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Reproductive options</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Second opinion / additional testing</label>
+              </div>
+            </div>
+
+            <!-- ── O: OBJECTIVE ── -->
+            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">O — Objective</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+              <div class="tpl-field">
+                <label class="tpl-label">Test Type Reviewed <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-test-type" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="brca12-panel" selected>BRCA1/2 Comprehensive Panel</option>
+                  <option value="hboc-panel">HBOC Multi-Gene Panel</option>
+                  <option value="exomedx-proband">ExomeDx Proband</option>
+                  <option value="exomedx-duo">ExomeDx Duo</option>
+                  <option value="exomedx-trio">ExomeDx Trio</option>
+                  <option value="colorectal-panel">Colorectal Cancer Panel</option>
+                  <option value="cardio-panel">Cardiovascular Panel</option>
+                  <option value="custom">Other (see narrative)</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Result Classification <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-result-class" onchange="updateResultBadge()" >
+                  <option value="">— select —</option>
+                  <option value="pathogenic" selected>Pathogenic</option>
+                  <option value="likely-pathogenic">Likely Pathogenic</option>
+                  <option value="vus">Variant of Uncertain Significance (VUS)</option>
+                  <option value="likely-benign">Likely Benign</option>
+                  <option value="benign">Benign / Negative</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Gene / Variant (auto-filled from orders)</label>
+                <input class="tpl-input" type="text" value="BRCA1 c.5266dupC (p.Gln1756fs)" readonly style="background:#F9FAFB;cursor:default;">
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Inheritance Pattern <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-inheritance" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="ad" selected>Autosomal Dominant</option>
+                  <option value="ar">Autosomal Recessive</option>
+                  <option value="xl">X-Linked</option>
+                  <option value="de-novo">De Novo</option>
+                  <option value="unknown">Unknown / Unclear</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Phenotypic findings (positive/negative toggles) -->
+            <div class="tpl-field" style="margin-bottom:14px;">
+              <label class="tpl-label">Phenotypic Findings <span class="req-star">*</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(required — select P/N/NA for each applicable finding)</span></label>
+              <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+                <div style="display:grid;grid-template-columns:2fr 1fr;background:#F9FAFB;padding:6px 12px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">
+                  <span>Finding</span><span style="text-align:center;">Result</span>
+                </div>
+                <div class="phenotype-row" id="phen-breast">
+                  <span>Personal history of breast cancer</span>
+                  <div class="pn-toggle" id="phen-breast-val">
+                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-breast','P')">P</button>
+                    <button class="pn-btn pn-neg" onclick="setPhen('phen-breast','N')">N</button>
+                    <button class="pn-btn pn-na" onclick="setPhen('phen-breast','NA')">N/A</button>
+                  </div>
+                </div>
+                <div class="phenotype-row" id="phen-ovarian">
+                  <span>Personal history of ovarian cancer</span>
+                  <div class="pn-toggle">
+                    <button class="pn-btn pn-pos" onclick="setPhen('phen-ovarian','P')">P</button>
+                    <button class="pn-btn pn-neg active" onclick="setPhen('phen-ovarian','N')">N</button>
+                    <button class="pn-btn pn-na" onclick="setPhen('phen-ovarian','NA')">N/A</button>
+                  </div>
+                </div>
+                <div class="phenotype-row" id="phen-fam-breast">
+                  <span>Family history — breast cancer (1st/2nd degree)</span>
+                  <div class="pn-toggle">
+                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-fam-breast','P')">P</button>
+                    <button class="pn-btn pn-neg" onclick="setPhen('phen-fam-breast','N')">N</button>
+                    <button class="pn-btn pn-na" onclick="setPhen('phen-fam-breast','NA')">N/A</button>
+                  </div>
+                </div>
+                <div class="phenotype-row" id="phen-fam-ovarian">
+                  <span>Family history — ovarian cancer</span>
+                  <div class="pn-toggle">
+                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-fam-ovarian','P')">P</button>
+                    <button class="pn-btn pn-neg" onclick="setPhen('phen-fam-ovarian','N')">N</button>
+                    <button class="pn-btn pn-na" onclick="setPhen('phen-fam-ovarian','NA')">N/A</button>
+                  </div>
+                </div>
+                <div class="phenotype-row" id="phen-prostate">
+                  <span>Family history — prostate cancer (early onset)</span>
+                  <div class="pn-toggle">
+                    <button class="pn-btn pn-pos" onclick="setPhen('phen-prostate','P')">P</button>
+                    <button class="pn-btn pn-neg" onclick="setPhen('phen-prostate','N')">N</button>
+                    <button class="pn-btn pn-na active" onclick="setPhen('phen-prostate','NA')">N/A</button>
+                  </div>
+                </div>
+                <div class="phenotype-row" id="phen-pancreatic">
+                  <span>Family history — pancreatic cancer</span>
+                  <div class="pn-toggle">
+                    <button class="pn-btn pn-pos" onclick="setPhen('phen-pancreatic','P')">P</button>
+                    <button class="pn-btn pn-neg" onclick="setPhen('phen-pancreatic','N')">N</button>
+                    <button class="pn-btn pn-na active" onclick="setPhen('phen-pancreatic','NA')">N/A</button>
+                  </div>
+                </div>
+              </div>
+              <div style="font-size:10px;color:#9CA3AF;margin-top:4px;">P = Positive finding present · N = Negative / not present · N/A = Not applicable to this consult type</div>
+            </div>
+
+            <!-- ── A: ASSESSMENT ── -->
+            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">A — Assessment</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+              <div class="tpl-field">
+                <label class="tpl-label">GC Clinical Impression <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-impression" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="high-risk" selected>High risk — confirmed pathogenic variant</option>
+                  <option value="mod-risk">Moderate risk — likely pathogenic / VUS</option>
+                  <option value="avg-risk">Average / population risk — negative result</option>
+                  <option value="inconclusive">Inconclusive — further testing recommended</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Risk Disclosure Completed <span class="req-star">*</span></label>
+                <div class="tpl-radio-group required-field" id="f-risk-disclosure">
+                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="yes" checked onchange="autosave()"> Yes — patient verbalized understanding</label>
+                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="partial" onchange="autosave()"> Partial — follow-up required</label>
+                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="deferred" onchange="autosave()"> Deferred — patient not ready</label>
+                </div>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Psychological / Emotional Status <span class="req-star">*</span></label>
+                <select class="tpl-select required-field" id="f-psych-status" onchange="autosave()">
+                  <option value="">— select —</option>
+                  <option value="appropriate">Appropriate response to results</option>
+                  <option value="distressed-referred" selected>Distressed — psychosocial referral made</option>
+                  <option value="distressed-monitoring">Distressed — monitoring, no referral</option>
+                  <option value="requires-fu">Requires follow-up assessment</option>
+                  <option value="stable">Stable / no concerns</option>
+                </select>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">NCCN Guidelines Reviewed <span class="req-star">*</span></label>
+                <div class="tpl-radio-group required-field" id="f-nccn">
+                  <label class="radio-item"><input type="radio" name="nccn" value="yes" checked onchange="autosave()"> Yes</label>
+                  <label class="radio-item"><input type="radio" name="nccn" value="no" onchange="autosave()"> No</label>
+                  <label class="radio-item"><input type="radio" name="nccn" value="na" onchange="autosave()"> N/A</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- ── P: PLAN ── -->
+            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">P — Plan</div>
+            <div class="tpl-field" style="margin-bottom:14px;">
+              <label class="tpl-label">Actions Taken / Recommended <span class="req-star">*</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(select all that apply — at least one required)</span></label>
+              <div class="tpl-picklist" id="f-plan-actions">
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Enhanced surveillance recommended (annual MRI + mammogram)</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Prophylactic surgery options discussed (mastectomy / salpingo-oophorectomy)</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Chemoprevention options reviewed (tamoxifen / raloxifene)</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Psychosocial support referral made</label>
+                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Cascade testing letters initiated — brother, sister</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Referral to high-risk breast/gyn oncology ordered</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Patient education materials attached from library</label>
+                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Ordering physician notified of results</label>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+              <div class="tpl-field">
+                <label class="tpl-label">Follow-Up Scheduled <span class="req-star">*</span></label>
+                <div class="tpl-radio-group required-field" id="f-fu-scheduled">
+                  <label class="radio-item"><input type="radio" name="fu-sched" value="yes" checked onchange="autosave()"> Yes</label>
+                  <label class="radio-item"><input type="radio" name="fu-sched" value="no" onchange="autosave()"> No — patient declined</label>
+                  <label class="radio-item"><input type="radio" name="fu-sched" value="pending" onchange="autosave()"> Pending — patient to schedule</label>
+                </div>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Follow-Up Date</label>
+                <input class="tpl-input" type="date" value="2026-07-02" onchange="autosave()">
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Physician Notification Required <span class="req-star">*</span></label>
+                <div class="tpl-radio-group required-field" id="f-phys-notify">
+                  <label class="radio-item"><input type="radio" name="phys-notify" value="yes" onchange="autosave()"> Yes — routing to physician queue</label>
+                  <label class="radio-item"><input type="radio" name="phys-notify" value="no" checked onchange="autosave()"> No — results delivery only, LM closes without attestation</label>
+                </div>
+              </div>
+              <div class="tpl-field">
+                <label class="tpl-label">Data Correction Needed</label>
+                <div class="tpl-radio-group">
+                  <label class="radio-item"><input type="radio" name="data-err" value="yes" onchange="showDataCorrectionTask()"> Yes — flag to GCA</label>
+                  <label class="radio-item"><input type="radio" name="data-err" value="no" checked> No</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Optional narrative -->
+            <div class="tpl-field" style="margin-bottom:14px;">
+              <label class="tpl-label">Additional Narrative <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(optional — for context not captured above)</span></label>
+              <textarea class="tpl-textarea" onchange="autosave()" placeholder="Free text for nuanced clinical context, unusual circumstances, or additional patient-reported information…">Patient expressed significant distress upon receiving positive result. Partner was present for the async message review. Patient has a strong support system and has been in contact with her mother, who tested positive previously, for emotional guidance. All options reviewed in detail.</textarea>
+            </div>
+
+            <div class="note-meta" style="color:#D97706;">⚠ Unsigned · Last autosaved: Jun 18, 2026, 10:41 AM · Template: GC Results Disclosure v2.1</div>
+
+            <!-- Submission pipeline -->
             <div class="submit-pipeline">
               <div class="submit-step done">
                 <div class="submit-step-dot done">✓</div>
@@ -685,7 +959,7 @@ NEXT STEPS:
               </div>
               <div class="submit-step pending">
                 <div class="submit-step-dot pending">3</div>
-                <div class="submit-step-label">GCA Reviews<br>Template</div>
+                <div class="submit-step-label">System Validates<br>Required Fields</div>
               </div>
               <div class="submit-step pending">
                 <div class="submit-step-dot pending">4</div>
@@ -696,18 +970,18 @@ NEXT STEPS:
                 <div class="submit-step-label">LM Closed<br>Completed</div>
               </div>
             </div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">LM Referral #24213 · Session: Ended Jun 18, 2026 · Awaiting GC sign-off to proceed to GCA submission</div>
+            <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">LM Referral #24213 · Session: Ended Jun 18, 2026 · Awaiting GC sign-off to proceed</div>
             <div style="display:flex;gap:8px;margin-top:10px;">
-              <button class="btn btn-outline" onclick="gcToast('Note saved as draft')">Save Draft</button>
+              <button class="btn btn-outline" onclick="gcToast('Template auto-saved')">Save Draft</button>
               <button class="btn btn-outline" style="border-color:#DC2626;color:#DC2626;" onclick="showRejectModal()">Reject &amp; Sign ✗</button>
-              <button class="btn btn-primary" onclick="gcToast('Note approved and signed — GCA Priya Sharma notified for review')">Approve &amp; Sign ✓</button>
+              <button class="btn btn-primary" onclick="validateAndSign()">Approve &amp; Sign ✓</button>
             </div>
           </div>
         </div>
 
-        <!-- Note info box -->
+        <!-- Note info box — updated: in-system messaging, no Slack -->
         <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:12px 16px;font-size:12px;color:#5B21B6;line-height:1.6;">
-          <strong>Submission workflow:</strong> After you sign, GCA Priya Sharma will review the note template for completeness. If edits are needed, she will contact you via Slack. Once approved, GCA submits to LifeMap. For results delivery consults, LM closes the referral without physician attestation.
+          <strong>Submission workflow:</strong> When you sign, the system validates all required template fields. If any are incomplete, signing is blocked and a list of missing fields is shown. Once signed, GCA Priya Sharma receives an in-platform task to submit to LifeMap — no Slack required. For results delivery consults, LM closes the referral without physician attestation. Chart finalization is enforced by the system (Req CFE-001).
         </div>
       </div>
     </div>
@@ -1145,6 +1419,81 @@ function showRejectModal() {
   var reason = prompt('Rejection reason (required — this will be recorded in LM and the test order will be rejected with this reason):');
   if (reason && reason.trim()) {
     gcToast('Note rejected and signed — Rejection reason logged · GCA notified · LM will record test order rejection');
+  }
+}
+
+/* ── Smart Template helpers ── */
+function setPhen(rowId, val) {
+  var row = document.getElementById(rowId);
+  if (!row) return;
+  row.querySelectorAll('.pn-btn').forEach(function(b) { b.classList.remove('active'); });
+  var target = row.querySelector('.pn-btn.pn-' + val.toLowerCase());
+  if (target) target.classList.add('active');
+  autosave();
+}
+
+function autosave() {
+  var meta = document.querySelector('#results-note-card .note-meta');
+  if (meta) {
+    var now = new Date();
+    meta.textContent = '⚠ Unsigned · Last autosaved: ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' · Template: GC Results Disclosure v2.1';
+    meta.style.color = '#D97706';
+  }
+}
+
+function updateResultBadge() {
+  var sel = document.getElementById('f-result-class');
+  autosave();
+}
+
+function showDataCorrectionTask() {
+  gcToast('Data correction task will be routed to GCA queue on sign — GCA will correct in Lab Module and notify you.');
+}
+
+/* ── Chart Finalization Enforcement (Req CFE-001) ── */
+function validateAndSign() {
+  var missing = [];
+
+  // Check all required <select> fields
+  document.querySelectorAll('.required-field').forEach(function(el) {
+    if (el.tagName === 'SELECT' && !el.value) {
+      var lbl = el.closest('.tpl-field') ? el.closest('.tpl-field').querySelector('.tpl-label') : null;
+      missing.push(lbl ? lbl.textContent.replace('*','').trim() : el.id);
+    }
+  });
+
+  // Check plan actions — at least one checkbox required
+  var planChecked = Array.from(document.querySelectorAll('#f-plan-actions input[type=checkbox]')).some(function(c){ return c.checked; });
+  if (!planChecked) missing.push('Actions Taken / Recommended (at least one required)');
+
+  // Check phenotypic required rows — all must have an active P/N/NA selection
+  var phenRows = ['phen-breast','phen-ovarian','phen-fam-breast','phen-fam-ovarian','phen-prostate','phen-pancreatic'];
+  phenRows.forEach(function(id) {
+    var row = document.getElementById(id);
+    if (row && !row.querySelector('.pn-btn.active')) {
+      missing.push('Phenotypic finding: ' + row.querySelector('span').textContent);
+    }
+  });
+
+  if (missing.length > 0) {
+    // Show inline validation banner
+    var banner = document.getElementById('validation-banner');
+    var list = document.getElementById('validation-list');
+    list.innerHTML = '';
+    missing.forEach(function(m) {
+      var li = document.createElement('li');
+      li.textContent = m;
+      list.appendChild(li);
+    });
+    banner.style.display = 'block';
+    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    gcToast('⚠ ' + missing.length + ' required field(s) incomplete — chart cannot be finalized');
+  } else {
+    document.getElementById('validation-banner').style.display = 'none';
+    // Proceed with sign
+    var badge = document.getElementById('note-status-badge');
+    if (badge) { badge.textContent = 'Signed ✓'; badge.style.background = '#D1FAE5'; badge.style.color = '#065F46'; }
+    gcToast('✓ Note signed — all required fields validated · GCA Priya Sharma notified for LM submission · System enforced (CFE-001)');
   }
 }
 </script>

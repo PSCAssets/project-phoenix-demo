@@ -300,7 +300,15 @@
 /* Async section labels */
 .async-section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #9CA3AF; margin-bottom: 10px; }
 /* Route modal */
-.route-modal { background:#fff; border-radius:12px; width:480px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+.route-modal { background:#fff; border-radius:12px; width:500px; max-width:95vw; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); }
+.route-target-tabs { display:flex; gap:0; border:1.5px solid #E5E0D8; border-radius:8px; overflow:hidden; margin-bottom:14px; }
+.route-target-tab { flex:1; padding:9px 14px; font-size:13px; font-weight:600; text-align:center; cursor:pointer; background:#F9FAFB; color:#6B7280; border:none; transition:all 0.15s; font-family:inherit; }
+.route-target-tab.active { background:#6B21A8; color:#fff; }
+.urgent-checkbox-row { display:flex; align-items:center; gap:10px; background:#FEF2F2; border:1.5px solid #FECACA; border-radius:8px; padding:10px 14px; margin-top:14px; cursor:pointer; }
+.urgent-checkbox-row input[type=checkbox] { width:16px; height:16px; accent-color:#DC2626; cursor:pointer; }
+.urgent-label { font-size:13px; font-weight:700; color:#DC2626; }
+.urgent-sublabel { font-size:11px; color:#991B1B; margin-top:1px; }
+.urgent-flag-active { background:#FEE2E2; border:2px solid #DC2626; }
 /* 4-tab right panel — tighten font */
 .right-tab-btn { flex: 1; padding: 10px 4px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: none; color: #6B7280; border-bottom: 2px solid transparent; }
 /* Async event log */
@@ -565,6 +573,9 @@
 
 Patient has been notified and added to the Real-Time Queue.
 Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">&#9889; Conduct Consult Now</button>
+      <button onclick="openChartPageGuide()" style="border:1px solid #E5E0D8;color:#6B7280;background:#fff;border-radius:8px;padding:8px 12px;font-weight:600;font-size:11px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Page Guide
+      </button>
       <button onclick="openPreviewModal()" style="border:1.5px solid #6B21A8;color:#6B21A8;background:#fff;border-radius:8px;padding:8px 16px;font-weight:600;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">&#128065; Preview</button>
       <button class="btn btn-outline" onclick="openSignModal()">Sign &amp; Close Chart</button>
       <button class="btn btn-outline" onclick="toggleCallPopover(event)">📞 Call</button>
@@ -2415,26 +2426,35 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <button class="modal-close" onclick="closeRouteModal()">×</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">Route Marcus Johnson — CST-2026-10849</div>
-      <div style="font-size:12px;color:#6B7280;margin-bottom:18px;">Select a problem type to route this consultation to the appropriate queue.</div>
-      <div class="form-group">
-        <label class="form-label">Problem Type</label>
-        <select class="form-select problem-type" id="problemType" onchange="onProblemTypeChange(this.value)">
-          <option value="">— Select problem type —</option>
-          <option value="billing">Billing Question</option>
-          <option value="clinical">Clinical Question</option>
-          <option value="careteam">Care Team Follow-up</option>
-          <option value="escalation">Escalation — Urgent</option>
-          <option value="lab">Lab Question</option>
-          <option value="rx">Prescription/Refill</option>
-          <option value="scheduling">Scheduling</option>
-          <option value="individual">Message Individual</option>
-        </select>
+      <div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:2px;">Route Marcus Johnson — CST-2026-10849</div>
+      <div style="font-size:12px;color:#6B7280;margin-bottom:16px;">Select a routing target and optionally flag as urgent. Message stays linked to this patient chart. <span style="font-size:11px;color:#9CA3AF;">(Req URG-MSG-001)</span></div>
+
+      <!-- Routing Target Type -->
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">Send To</label>
+        <div class="route-target-tabs">
+          <button class="route-target-tab active" id="tabDept" onclick="setRouteTarget('dept')">Department</button>
+          <button class="route-target-tab" id="tabUser" onclick="setRouteTarget('user')">Specific User</button>
+        </div>
       </div>
-      <div class="form-group route-to" id="routeToGroup" style="max-height:0;overflow:hidden;transition:max-height 0.3s ease;">
-        <label class="form-label">Route To</label>
-        <select class="form-select" id="routeToSelect" onchange="updateRouteBtn()">
-          <option value="">&#8212; Select team member &#8212;</option>
+
+      <!-- Department routing -->
+      <div class="form-group" id="deptRouteGroup">
+        <label class="form-label">Department</label>
+        <select class="form-select" id="deptSelect">
+          <option value="">— Select department —</option>
+          <option value="Medical Assistants">Medical Assistants</option>
+          <option value="Nurses">Nurses</option>
+          <option value="Caretakers">Caretakers</option>
+        </select>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Message routes into the selected department's queue. First available team member handles it.</div>
+      </div>
+
+      <!-- Specific user routing -->
+      <div class="form-group" id="userRouteGroup" style="display:none;">
+        <label class="form-label">Specific User</label>
+        <select class="form-select" id="routeToSelect">
+          <option value="">— Select team member —</option>
           <option value="Dr. Sarah Lee (Physician)">Dr. Sarah Lee (Physician)</option>
           <option value="Dr. Marcus Webb (Physician)">Dr. Marcus Webb (Physician)</option>
           <option value="Jamie Rodriguez (MA)">Jamie Rodriguez (MA)</option>
@@ -2442,16 +2462,28 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
           <option value="Dana Cho (Care Coordinator)">Dana Cho (Care Coordinator)</option>
           <option value="Alex Kim (Billing Specialist)">Alex Kim (Billing Specialist)</option>
           <option value="Rachel Torres (Clinical Pharmacist)">Rachel Torres (Clinical Pharmacist)</option>
+          <option value="Jennifer Martinez (RN)">Jennifer Martinez (RN)</option>
         </select>
+        <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Message appears directly on that person's dashboard.</div>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Routing Note (optional)</label>
-        <textarea class="form-textarea" rows="3" placeholder="Add context for the receiving team..."></textarea>
+        <label class="form-label">Message / Routing Note</label>
+        <textarea class="form-textarea" rows="3" placeholder="Add context for the recipient..."></textarea>
       </div>
+
+      <!-- Urgent checkbox -->
+      <label class="urgent-checkbox-row" id="urgentRow" onclick="toggleUrgentStyle()">
+        <input type="checkbox" id="urgentChk">
+        <div>
+          <div class="urgent-label">⚠ Mark as Urgent</div>
+          <div class="urgent-sublabel">Recipient sees elevated priority indicator on dashboard and in queue. Use for critical clinical situations only.</div>
+        </div>
+      </label>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeRouteModal()">Cancel</button>
-      <button class="btn btn-primary" id="routeConfirmBtn" onclick="confirmRoute()">Route</button>
+      <button class="btn btn-primary" id="routeConfirmBtn" onclick="confirmRouteEnhanced()">Send Message</button>
     </div>
   </div>
 </div>
@@ -2977,6 +3009,53 @@ function addNoteToZendesk() {
 function showRouteToast(msg) {
   var t = document.getElementById('routeToast'); t.textContent = msg; t.style.display = 'block';
   setTimeout(function(){ t.style.display = 'none'; }, 2000);
+}
+
+// Enhanced Route Modal (URG-MSG-001)
+function setRouteTarget(mode) {
+  var tabDept = document.getElementById('tabDept');
+  var tabUser = document.getElementById('tabUser');
+  var deptGrp = document.getElementById('deptRouteGroup');
+  var userGrp = document.getElementById('userRouteGroup');
+  if (mode === 'dept') {
+    tabDept.classList.add('active'); tabUser.classList.remove('active');
+    deptGrp.style.display = 'block'; userGrp.style.display = 'none';
+  } else {
+    tabUser.classList.add('active'); tabDept.classList.remove('active');
+    userGrp.style.display = 'block'; deptGrp.style.display = 'none';
+  }
+}
+function toggleUrgentStyle() {
+  var row = document.getElementById('urgentRow');
+  var chk = document.getElementById('urgentChk');
+  setTimeout(function() {
+    if (chk.checked) { row.classList.add('urgent-flag-active'); }
+    else { row.classList.remove('urgent-flag-active'); }
+  }, 0);
+}
+function confirmRouteEnhanced() {
+  var isDept = document.getElementById('tabDept').classList.contains('active');
+  var dest = isDept
+    ? (document.getElementById('deptSelect').value || '')
+    : (document.getElementById('routeToSelect').value || '');
+  var isUrgent = document.getElementById('urgentChk').checked;
+  if (!dest) { alert('Please select a ' + (isDept ? 'department' : 'team member') + '.'); return; }
+  var msg = isUrgent
+    ? '⚠ URGENT message routed to ' + dest + ' — elevated in their queue (URG-MSG-001)'
+    : '✓ Message routed to ' + dest;
+  closeRouteModal();
+  showRouteToast(msg);
+}
+
+// Chart Page Guide (PG-ALL-001)
+function openChartPageGuide() {
+  var panel = document.getElementById('chartGuidePanel');
+  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
+  panel = document.createElement('div');
+  panel.id = 'chartGuidePanel';
+  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
+  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#6B21A8;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'chartGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Patient Chart</h3><p style="margin-bottom:12px;"><strong>Purpose:</strong> The central workspace for reviewing and documenting a patient consultation. All notes, orders, and communications are linked to this chart.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Key Actions</h4><ul style="padding-left:16px;margin-bottom:14px;"><li style="margin-bottom:6px;"><strong>Route ↗</strong> — Send this chart to a Department (Medical Assistants, Nurses, Caretakers) or a Specific User. Check Urgent to elevate visibility at destination.</li><li style="margin-bottom:6px;"><strong>Sign & Close Chart</strong> — Finalizes the encounter. Required fields must be complete.</li><li style="margin-bottom:6px;"><strong>Preview</strong> — Review chart before signing.</li></ul><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Routing</h4><p style="margin-bottom:12px;">Messages routed from this chart stay linked to the patient record. Use Route for clinical handoffs and urgent escalations — not general staff comms.</p><p style="font-size:11px;color:#9CA3AF;">Req: URG-MSG-001 · CFE-001</p></div>';
+  document.body.appendChild(panel);
 }
 
 // Schedule modal (Fix 7)
