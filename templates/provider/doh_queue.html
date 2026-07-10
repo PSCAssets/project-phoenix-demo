@@ -32,6 +32,10 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
 table { width:100%; border-collapse:collapse; font-size:13px; }
 thead th { background:#FAF7F2; padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+thead th.sortable { cursor:pointer; user-select:none; }
+thead th.sortable:hover { color:var(--teal); background:#EDFAF8; }
+thead th.sort-asc::after { content:' ↑'; color:var(--teal); }
+thead th.sort-desc::after { content:' ↓'; color:var(--teal); }
 thead th:first-child { width:36px; }
 tbody td { padding:11px 12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
 tbody tr:last-child td { border-bottom:none; }
@@ -108,6 +112,12 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
       <option value="in-progress">In Progress</option>
       <option value="overdue">Overdue</option>
     </select>
+    <select id="filterDays" onchange="filterQueue()">
+      <option value="">All SLA Ages</option>
+      <option value="current">Current (&lt; 1 day)</option>
+      <option value="warning">Warning (1 day)</option>
+      <option value="overdue">Overdue (2+ days)</option>
+    </select>
     <button class="btn-bulk" id="bulkBtn" disabled onclick="bulkSubmit()">Bulk Fax Selected (0)</button>
     <span class="row-count" id="rowCount">Showing 12 of 12</span>
   </div>
@@ -125,14 +135,14 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <th>Destination</th>
           <th>Minor</th>
           <th>Created</th>
-          <th>Days Open</th>
-          <th>Status</th>
+          <th class="sortable" onclick="sortByCol('days')" id="thDays" title="Sort by Days Open">Days Open</th>
+          <th class="sortable" onclick="sortByCol('status')" id="thStatus" title="Sort by SLA Status">SLA Status <span style="font-size:9px;font-family:monospace;color:#9CA3AF;font-weight:400;">DOH-SORT-001</span></th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody id="queueBody">
 
-        <tr class="overdue-row" data-status="overdue" data-state="FL" data-condition="STI">
+        <tr class="overdue-row" data-status="overdue" data-state="FL" data-condition="STI" data-days="3">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0431</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0142</td>
@@ -147,7 +157,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0431" class="btn-open">Open</a></td>
         </tr>
 
-        <tr class="overdue-row" data-status="overdue" data-state="TX" data-condition="STI">
+        <tr class="overdue-row" data-status="overdue" data-state="TX" data-condition="STI" data-days="2">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0433</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0198</td>
@@ -162,7 +172,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0433" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="FL" data-condition="STI">
+        <tr data-status="new" data-state="FL" data-condition="STI" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0442</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0071</td>
@@ -177,7 +187,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0442" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="CA" data-condition="HIV">
+        <tr data-status="new" data-state="CA" data-condition="HIV" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0443</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0211</td>
@@ -192,7 +202,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0443" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="in-progress" data-state="NY" data-condition="TB">
+        <tr data-status="in-progress" data-state="NY" data-condition="TB" data-days="1">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0438</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0089</td>
@@ -207,7 +217,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0438" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="CA" data-condition="STI">
+        <tr data-status="new" data-state="CA" data-condition="STI" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0444</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0033</td>
@@ -222,7 +232,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0444" class="btn-open">Open</a></td>
         </tr>
 
-        <tr class="overdue-row" data-status="overdue" data-state="MI" data-condition="Lead">
+        <tr class="overdue-row" data-status="overdue" data-state="MI" data-condition="Lead" data-days="3">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0429</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0114</td>
@@ -237,7 +247,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0429" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="GA" data-condition="STI">
+        <tr data-status="new" data-state="GA" data-condition="STI" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0445</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0156</td>
@@ -252,7 +262,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0445" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="VA" data-condition="Lyme">
+        <tr data-status="new" data-state="VA" data-condition="Lyme" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0446</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0177</td>
@@ -267,7 +277,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0446" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="WA" data-condition="STI">
+        <tr data-status="new" data-state="WA" data-condition="STI" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0447</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0199</td>
@@ -282,7 +292,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0447" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="in-progress" data-state="TX" data-condition="STI">
+        <tr data-status="in-progress" data-state="TX" data-condition="STI" data-days="1">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0435</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0204</td>
@@ -297,7 +307,7 @@ input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var
           <td><a href="/provider/doh/report/DOH-2026-0435" class="btn-open">Open</a></td>
         </tr>
 
-        <tr data-status="new" data-state="NM" data-condition="STI">
+        <tr data-status="new" data-state="NM" data-condition="STI" data-days="0">
           <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
           <td><span class="rec-id">DOH-2026-0448</span></td>
           <td style="font-size:12px;color:#6B7280;">PT-••••-0221</td>
@@ -328,6 +338,7 @@ function filterQueue() {
   var state     = document.getElementById('filterState').value;
   var condition = document.getElementById('filterCondition').value;
   var status    = document.getElementById('filterStatus').value;
+  var daysFilter = document.getElementById('filterDays').value;
   var rows = document.querySelectorAll('#queueBody tr');
   var visible = 0;
   rows.forEach(function(row) {
@@ -335,14 +346,48 @@ function filterQueue() {
     var rState  = row.dataset.state || '';
     var rCond   = row.dataset.condition || '';
     var rStatus = row.dataset.status || '';
+    var rDays   = parseInt(row.dataset.days || '0');
+    var daysOk  = true;
+    if (daysFilter === 'current')  daysOk = rDays < 1;
+    if (daysFilter === 'warning')  daysOk = rDays === 1;
+    if (daysFilter === 'overdue')  daysOk = rDays >= 2;
     var ok = (!search    || text.includes(search))
           && (!state     || rState === state)
           && (!condition || rCond === condition)
-          && (!status    || rStatus === status);
+          && (!status    || rStatus === status)
+          && daysOk;
     row.style.display = ok ? '' : 'none';
     if (ok) visible++;
   });
   document.getElementById('rowCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
+}
+
+var sortState = { col: null, dir: 1 };
+function sortByCol(col) {
+  var tbody = document.getElementById('queueBody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var thDays   = document.getElementById('thDays');
+  var thStatus = document.getElementById('thStatus');
+  // Toggle direction if same col
+  if (sortState.col === col) { sortState.dir *= -1; } else { sortState.dir = 1; sortState.col = col; }
+  // Update header classes
+  [thDays, thStatus].forEach(function(th) { th.classList.remove('sort-asc','sort-desc'); });
+  var activeTh = col === 'days' ? thDays : thStatus;
+  activeTh.classList.add(sortState.dir === 1 ? 'sort-asc' : 'sort-desc');
+  // Status rank: overdue=3, in-progress=2, new=1, submitted=0
+  var statusRank = { overdue:3, 'in-progress':2, new:1, submitted:0 };
+  rows.sort(function(a, b) {
+    var aVal, bVal;
+    if (col === 'days') {
+      aVal = parseInt(a.dataset.days || '0');
+      bVal = parseInt(b.dataset.days || '0');
+    } else {
+      aVal = statusRank[a.dataset.status] || 0;
+      bVal = statusRank[b.dataset.status] || 0;
+    }
+    return (aVal - bVal) * sortState.dir;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
 }
 
 function toggleAll(master) {

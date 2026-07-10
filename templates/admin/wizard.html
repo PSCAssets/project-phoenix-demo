@@ -220,16 +220,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <div class="step-nav-item active" onclick="goToStep(1)" id="sni1"><div class="step-num">1</div><div class="step-name">Select Client</div></div>
       <div class="step-group-label">Foundation</div>
       <div class="step-nav-item" onclick="goToStep(2)" id="sni2"><div class="step-num">2</div><div class="step-name">Basic Info</div></div>
-      <div class="step-nav-item" onclick="goToStep('team_assign')" id="sni_team_assign"><div class="step-num">3</div><div class="step-name">Team Assignment</div></div>
+      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">3</div><div class="step-name">Ecosystem</div></div>
       <div class="step-nav-item" onclick="goToStep('branding')" id="sni_branding"><div class="step-num">4</div><div class="step-name">Portal Branding</div></div>
-      <div class="step-nav-item" onclick="goToStep('ecosystem')" id="sni_ecosystem"><div class="step-num">5</div><div class="step-name">Ecosystem</div></div>
-      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">6</div><div class="step-name">Provider Type</div></div>
-      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">7</div><div class="step-name">Provider Eligibility</div></div>
-      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">8</div><div class="step-name">State Configuration</div></div>
-      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">9</div><div class="step-name">Age &amp; Guardian Rules</div></div>
+      <div class="step-nav-item" onclick="goToStep(3)" id="sni3"><div class="step-num">5</div><div class="step-name">Provider Type</div></div>
+      <div class="step-nav-item" onclick="goToStep('eligibility')" id="sni_eligibility"><div class="step-num">6</div><div class="step-name">Provider Eligibility</div></div>
+      <div class="step-nav-item" onclick="goToStep(4)" id="sni4"><div class="step-num">7</div><div class="step-name">State Configuration</div></div>
+      <div class="step-nav-item" onclick="goToStep(5)" id="sni5"><div class="step-num">8</div><div class="step-name">Age &amp; Guardian Rules</div></div>
       <div class="step-group-label">Clinical Setup</div>
-      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">10</div><div class="step-name">Appointment Duration</div></div>
-      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">11</div><div class="step-name">Consult Payment Tiers</div></div>
+      <div class="step-nav-item" onclick="goToStep(6)" id="sni6"><div class="step-num">9</div><div class="step-name">Appointment Duration</div></div>
+      <div class="step-nav-item" onclick="goToStep(7)" id="sni7"><div class="step-num">10</div><div class="step-name">Consult Classification &amp; Billing Tiers</div></div>
+      <div class="step-nav-item" onclick="goToStep('team_assign')" id="sni_team_assign"><div class="step-num">11</div><div class="step-name">Outreach Rule</div></div>
       <div class="step-nav-item" onclick="goToStep(8)" id="sni8"><div class="step-num">12</div><div class="step-name">Health Profile Requirements</div></div>
       <div class="step-nav-item" onclick="goToStep(9)" id="sni9"><div class="step-num">13</div><div class="step-name">Intake Questionnaire</div></div>
       <div class="step-nav-item" onclick="goToStep(10)" id="sni10"><div class="step-num">14</div><div class="step-name">Documentation Template</div></div>
@@ -286,40 +286,45 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
       </div>
 
-      <!-- STEP: Team Assignment -->
+      <!-- STEP: Outreach Rule (formerly Team Assignment) -->
       <div class="step-panel" id="step_team_assign">
-        <div class="step-heading">Step 3 — Team Assignment</div>
-        <div class="step-sub">Assign which care team(s) will handle this product. This determines which queues and dashboards are activated.</div>
+        <div class="step-heading">Step 11 — Outreach Rule</div>
+        <div class="step-sub">Configure how this care product handles outbound patient outreach — proactive consult offers, result hold rules, and the 28-day outreach protocol.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
           <div class="step-help-content">
             <div class="step-help-title">Why this step exists</div>
             <div class="step-help-body">
-              Everlywell has two distinct care team groups — PSR (Melanie Marmo's team, EverlyCare + DXS) and PCC (Missy Lemieux's team, Gaps in Care). This assignment controls which team's queue receives tasks for this care product. Workflow stages within this product can be routed to different teams, enabling cross-team handoffs. Getting this right is the foundation of all routing logic.
+              Outreach rules control how aggressively the platform pursues patient engagement after a result is received. This includes whether care team members can proactively offer scheduling links during calls, when lab results are released to the patient portal, and whether the 28-day outreach tracking protocol is activated.
               <ul>
-                <li><strong>PSR team</strong> — outbound alert calls, scheduling link generation, consult offers (EverlyCare + DXS products)</li>
-                <li><strong>PCC team</strong> — Gaps in Care outbound follow-up calls, patient chart creation</li>
-                <li>Users with access to both teams see a toggle button in the portal top-right to switch views</li>
-                <li>Activity and statistics always roll up to the correct manager's dashboard based on team assignment</li>
+                <li><strong>Proactive consult offer</strong> — controls whether care team members can offer scheduling links during alert calls</li>
+                <li><strong>Result hold &amp; release</strong> — governs when lab results become visible to the patient (immediate, day N, post-GC, or physician approval)</li>
+                <li><strong>28-day protocol</strong> — automated outreach tracking with alerts at days 5, 10, 14, and 21; certified letter and auto-closure at day 28</li>
               </ul>
             </div>
           </div>
         </div>
         <div class="form-card">
-          <div class="form-card-title">Primary Care Team</div>
-          <div class="form-group">
-            <label class="form-label">Which team(s) own this care product? <span class="req">*</span></label>
-            <div class="check-group">
-              <label class="check-opt"><input type="checkbox" name="team_psr" value="psr"> PSR Team — EverlyCare &amp; DXS (Melanie Marmo)</label>
-              <label class="check-opt"><input type="checkbox" name="team_pcc" value="pcc"> PCC Team — Gaps in Care (Missy Lemieux)</label>
-            </div>
-          </div>
           <div class="form-group">
             <label class="form-label">Proactive Consult Offer</label>
             <p style="font-size:12px;color:#6B7280;margin-bottom:8px;">When enabled, care team members may proactively offer a scheduling link during alert calls. When disabled, the link is only sent if the patient asks.</p>
             <div class="toggle-row">
               <label class="toggle"><input type="checkbox" id="s_proactive_offer"><span class="toggle-slider"></span></label>
               <span class="toggle-label">Enable proactive consult offer for eligible patients</span>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:16px;margin-bottom:0;">
+            <label class="form-label">Account-Level Consult Blocking</label>
+            <div style="display:flex;align-items:flex-start;gap:14px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:14px 16px;">
+              <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:1px;">
+                <input type="checkbox" id="ct_block" style="opacity:0;width:0;height:0;" onchange="document.getElementById('ct_block_track').style.background=this.checked?'#D97706':'#D1D5DB'">
+                <span id="ct_block_track" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#D1D5DB;border-radius:24px;transition:.2s;"></span>
+                <span style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;" id="ct_block_knob"></span>
+              </label>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:3px;">Block consults for specific account numbers</div>
+                <div style="font-size:12px;color:#B45309;">When enabled, certain client account numbers under this care product will be restricted from creating new consults. Account-level block list is configured in Client Account settings after this wizard is saved.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -355,7 +360,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP: Portal Branding -->
       <div class="step-panel" id="step_branding">
-        <div class="step-heading">Portal Branding Configuration</div>
+        <div class="step-heading">Step 4 — Portal Branding Configuration</div>
         <div class="step-sub">Configure how patients experience this care product's portal. Controls branding at login and throughout their session.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -463,7 +468,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP: Ecosystem Classification -->
       <div class="step-panel" id="step_ecosystem">
-        <div class="step-heading">Ecosystem Classification</div>
+        <div class="step-heading">Step 3 — Ecosystem Classification</div>
         <div class="step-sub">Configure how this care product's patient portal is managed. This setting cannot be changed once patients are enrolled.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -539,20 +544,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Account-Level Consult Blocking</label>
-          <div style="display:flex;align-items:flex-start;gap:14px;background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:14px 16px;">
-            <label style="position:relative;display:inline-block;width:44px;height:24px;flex-shrink:0;margin-top:1px;">
-              <input type="checkbox" id="ct_block" style="opacity:0;width:0;height:0;" onchange="document.getElementById('ct_block_track').style.background=this.checked?'#D97706':'#D1D5DB'">
-              <span id="ct_block_track" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#D1D5DB;border-radius:24px;transition:.2s;"></span>
-              <span style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;pointer-events:none;" id="ct_block_knob"></span>
-            </label>
-            <div>
-              <div style="font-size:13px;font-weight:600;color:#92400E;margin-bottom:3px;">Block consults for specific account numbers</div>
-              <div style="font-size:12px;color:#B45309;">When enabled, certain client account numbers under this care product will be restricted from creating new consults. Account-level block list is configured in the Client Account settings after this wizard is saved.</div>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
           <label class="form-label">Short Description <span style="font-weight:400;color:#9CA3AF">(160 char max)</span></label>
           <textarea class="form-textarea" id="s1_desc" maxlength="160" oninput="document.getElementById('s1_desc_count').textContent=this.value.length+'/160'" placeholder="Patient-facing summary of this care product"></textarea>
           <div class="char-count" id="s1_desc_count">0/160</div>
@@ -565,7 +556,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 2: Provider Type -->
       <div class="step-panel" id="step3">
-        <div class="step-heading">Step 6 — Provider Type</div>
+        <div class="step-heading">Step 5 — Provider Type</div>
         <div class="step-sub">Define which provider credential types are eligible to deliver this care product.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -595,7 +586,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP: Provider Eligibility -->
       <div class="step-panel" id="step_eligibility">
-        <div class="step-heading">Step 7 — Provider Eligibility Configuration</div>
+        <div class="step-heading">Step 6 — Provider Eligibility Configuration</div>
         <div class="step-sub">Define which providers are eligible to deliver this care product and configure program-type-specific assignment rules.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -672,7 +663,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 3: State Configuration -->
       <div class="step-panel" id="step4">
-        <div class="step-heading">Step 8 — State Configuration</div>
+        <div class="step-heading">Step 7 — State Configuration</div>
         <div class="step-sub">Configure which consult modalities are allowed per state. Check each modality your care product supports in that state.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -1073,7 +1064,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 4: Age & Guardian Rules -->
       <div class="step-panel" id="step5">
-        <div class="step-heading">Step 9 — Age &amp; Guardian Rules</div>
+        <div class="step-heading">Step 8 — Age &amp; Guardian Rules</div>
         <div class="step-sub">Set patient age eligibility requirements for this care product.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -1111,7 +1102,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 5: Appointment Duration -->
       <div class="step-panel" id="step6">
-        <div class="step-heading">Step 10 — Appointment Duration</div>
+        <div class="step-heading">Step 9 — Appointment Duration</div>
         <div class="step-sub">Set appointment slot durations for each scheduled consult type. Initial and follow-up visits can have different lengths.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -1187,7 +1178,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
       <!-- STEP 6: Consult Classification & Billing Tiers -->
       <div class="step-panel" id="step7">
-        <div class="step-heading">Step 11 — Consult Classification &amp; Billing Tiers</div>
+        <div class="step-heading">Step 10 — Consult Classification &amp; Billing Tiers</div>
         <div class="step-sub">Consultation rates are managed in provider agreements and tracked externally. Configure consult tier categories here for reporting.</div>
         <div class="step-help-box">
           <div class="step-help-icon">🔥</div>
@@ -1336,6 +1327,70 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <div class="iq-card" style="margin-bottom:0;"><span class="iq-drag">⠿</span><span class="iq-num">25.</span><div class="iq-body"><div class="iq-q">Is there anything else you would like the provider to know?</div><span class="iq-badge iq-txt">Text</span></div></div>
 
           </div><!-- /scrollable list -->
+
+          <!-- Conditional Formatting Rules (INTAKE-COND-001) -->
+          <div style="margin-top:20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;">Conditional Formatting Rules</div>
+              <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;background:#FEE2E2;color:#991B1B;">Clinical Escalation</span>
+              <span style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;">INTAKE-COND-001</span>
+            </div>
+            <div style="font-size:12px;color:#6B7280;margin-bottom:12px;line-height:1.5;">Define rules that trigger actions when a patient answers a specific question in a specific way. Flagged answers surface in the physician chart and can escalate to an RN or link directly to a physician template field.</div>
+
+            <!-- Rule 1 — pre-configured demo -->
+            <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <span style="font-size:12px;font-weight:700;color:#111827;">Rule 1</span>
+                <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;background:#FEE2E2;color:#991B1B;">⚑ Active</span>
+                <button onclick="removeCondRule(this)" style="margin-left:auto;background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;font-size:12px;">
+                <select class="form-input" style="font-size:12px;">
+                  <option selected>Q23 — Hospitalized for diabetes...</option>
+                  <option>Q16 — Hypoglycemia episodes...</option>
+                  <option>Q5 — Taking diabetes medications...</option>
+                </select>
+                <span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">answer is</span>
+                <select class="form-input" style="font-size:12px;"><option selected>Yes</option><option>No</option><option>&gt; threshold</option></select>
+                <span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">→ then</span>
+                <select class="form-input" style="font-size:12px;">
+                  <option selected>Flag in physician chart + Escalate to RN</option>
+                  <option>Flag in physician chart only</option>
+                  <option>Link to physician template field</option>
+                  <option>Block consult progression</option>
+                </select>
+              </div>
+              <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#6B7280;">Link to template field:</span>
+                <select class="form-input" style="font-size:11px;max-width:220px;"><option selected>HPI — Recent Hospitalizations</option><option>Assessment — Complication Risk</option><option>Plan — Escalation Notes</option></select>
+              </div>
+            </div>
+
+            <!-- Rule 2 — Social Needs Screener (SOCIAL-SCR-001) -->
+            <div style="background:#fff;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                <span style="font-size:12px;font-weight:700;color:#111827;">Rule 2</span>
+                <span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;background:#FEF3C7;color:#92400E;">⚑ Social Needs</span>
+                <span style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;">SOCIAL-SCR-001</span>
+                <button onclick="removeCondRule(this)" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;font-size:12px;">
+                <select class="form-input" style="font-size:12px;"><option selected>Social Needs — Food security</option><option>Social Needs — Housing stability</option><option>Social Needs — Transportation</option></select>
+                <span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">answer is</span>
+                <select class="form-input" style="font-size:12px;"><option selected>At risk / Yes</option><option>No</option></select>
+                <span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">→ then</span>
+                <select class="form-input" style="font-size:12px;"><option>Flag in physician chart + Escalate to RN</option><option selected>Link to physician template field</option><option>Flag in physician chart only</option></select>
+              </div>
+              <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#6B7280;">Link to template field:</span>
+                <select class="form-input" style="font-size:11px;max-width:260px;"><option selected>Social Determinants of Health — Action Required</option><option>Plan — Community Resource Referral</option></select>
+                <span style="font-size:11px;color:#DC2626;font-weight:600;margin-left:8px;">⚑ Flags unaddressed in QA module</span>
+              </div>
+            </div>
+
+            <button onclick="addCondRule()" style="background:#F5F3FF;border:1.5px dashed #A78BFA;color:#6D28D9;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;width:100%;">+ Add Conditional Rule</button>
+          </div>
+
         </div><!-- /iq_build -->
       </div>
 
@@ -1554,6 +1609,43 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             </div>
           </div>
         </div>
+
+        <!-- State DOH Template Overrides (STATE-TPL-001) -->
+        <div style="margin-top:24px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;">State DOH Template Overrides</div>
+            <span style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;">STATE-TPL-001</span>
+          </div>
+          <div style="font-size:12px;color:#6B7280;margin-bottom:12px;line-height:1.5;">When a patient's state matches a configured override, the system automatically selects the state-specific DOH documentation template instead of the default. No separate queue is created.</div>
+          <div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;margin-bottom:10px;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead>
+                <tr style="background:#F2EDE4;">
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">State</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">Override Template</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;">Auto-Selects When</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;"></th>
+                </tr>
+              </thead>
+              <tbody id="stateTemplateRows">
+                <tr style="border-top:1px solid #F3F4F6;">
+                  <td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:120px;"><option selected>Florida</option><option>Texas</option><option>California</option><option>New York</option></select></td>
+                  <td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:200px;"><option selected>Florida DOH Merlin Report Form</option><option>Standard DOH Template</option><option>CDC Case Report</option></select></td>
+                  <td style="padding:10px 14px;font-size:11px;color:#6B7280;">Patient state = FL</td>
+                  <td style="padding:10px 14px;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button></td>
+                </tr>
+                <tr style="border-top:1px solid #F3F4F6;">
+                  <td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:120px;"><option>Florida</option><option selected>Texas</option><option>California</option><option>New York</option></select></td>
+                  <td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:200px;"><option>Florida DOH Merlin Report Form</option><option>Standard DOH Template</option><option selected>Texas DSHS Report Form</option><option>CDC Case Report</option></select></td>
+                  <td style="padding:10px 14px;font-size:11px;color:#6B7280;">Patient state = TX</td>
+                  <td style="padding:10px 14px;"><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button onclick="addStateTplRow()" style="background:#F5F3FF;border:1.5px dashed #A78BFA;color:#6D28D9;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">+ Add State Override</button>
+        </div>
+
       </div>
 
       <!-- STEP 9: Workflow Configuration -->
@@ -1858,6 +1950,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <div style="font-size:11px;color:#9CA3AF;margin-top:4px;">Press Enter to add a test</div>
           </div>
         </div>
+
+
       </div>
 
       <!-- STEP 12: Cancellation Policy -->
@@ -2198,13 +2292,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 const TOTAL = 19;
 const DISPLAY_TOTAL = 25;
 // Maps internal step key → visual 1-25 position shown to user
-var DISPLAY_STEP_MAP = { team_assign:3, branding:4, ecosystem:5, eligibility:7, preconsult_chk:16, qa_stage:17 };
+// Order: 1=Select Client, 2=Basic Info, 3=Ecosystem, 4=Provider Type, 5=Portal Branding,
+//        6=Provider Eligibility, 7=State Config, 8=Age/Guardian, 9=Appt Duration,
+//        10=Consult Classification, 11=Outreach Rule, 12=Health Profile, 13=Intake Q,
+//        14=Doc Template, 15=Workflow Config, 16=Pre-Consult, 17=QA Stage, 18=SLA,
+//        19=Lab Config, 20=Cancellation, 21=Docs/Consent, 22=Notifications, 23=Onboarding,
+//        24=Linked Consults, 25=Review
+var DISPLAY_STEP_MAP = { ecosystem:3, branding:4, eligibility:6, team_assign:11, preconsult_chk:16, qa_stage:17 };
 function getDisplayStep(n) {
   if (typeof n === 'string') return DISPLAY_STEP_MAP[n] || n;
-  // Named steps: team_assign+branding+ecosystem insert before step 3; eligibility inserts before step 4; preconsult_chk+qa_stage before step 12
+  // Named steps: ecosystem(3), branding(4) insert before numbered 3; eligibility(6) inserts before numbered 4;
+  //              team_assign(11) inserts before numbered 8; preconsult_chk(16)+qa_stage(17) before numbered 12
   var offset = 0;
-  if (n >= 3)  offset += 3; // team_assign + branding + ecosystem
+  if (n >= 3)  offset += 2; // ecosystem + branding
   if (n >= 4)  offset += 1; // eligibility
+  if (n >= 8)  offset += 1; // team_assign (outreach rule)
   if (n >= 12) offset += 2; // preconsult_chk + qa_stage
   return n + offset;
 }
@@ -2236,7 +2338,7 @@ function goToStep(n) {
     if (curSniEl)  curSniEl.classList.remove('active');
   }
   // ── Shared nav update: mark all completed steps green (numbered + named) ──
-  var NAMED_STEP_DISPLAY = { team_assign:3, branding:4, ecosystem:5, eligibility:7, preconsult_chk:16, qa_stage:17 };
+  var NAMED_STEP_DISPLAY = { ecosystem:3, branding:4, eligibility:6, team_assign:11, preconsult_chk:16, qa_stage:17 };
   function refreshNavDone() {
     // Numbered steps sni1–sni20
     for (var i = 1; i <= TOTAL; i++) {
@@ -2321,14 +2423,18 @@ function selectBrandCard(idx) {
 }
 
 // Named step → next/prev step mapping
-var NAMED_NEXT = { team_assign:'branding', branding:'ecosystem', ecosystem:3, eligibility:4, preconsult_chk:'qa_stage', qa_stage:12 };
-var NAMED_PREV = { team_assign:2, branding:'team_assign', ecosystem:'branding', eligibility:3, preconsult_chk:11, qa_stage:'preconsult_chk' };
+// Flow: Basic Info(2) → ecosystem → Provider Type(3) → branding → eligibility → State Config(4) → ...
+//       → Consult Payment(7) → team_assign(Outreach Rule) → Health Profile(8) → ...
+//       → Workflow Config(11) → preconsult_chk → qa_stage → SLA Config(12) → ...
+// Flow: Basic Info(2) → ecosystem → branding → Provider Type(3) → eligibility → State Config(4) → ...
+//       → Consult Classification(7) → team_assign(Outreach Rule) → Health Profile(8) → ...
+//       → Workflow Config(11) → preconsult_chk → qa_stage → SLA Config(12) → ...
+var NAMED_NEXT = { ecosystem:'branding', branding:3, eligibility:4, team_assign:8, preconsult_chk:'qa_stage', qa_stage:12 };
+var NAMED_PREV = { ecosystem:2, branding:'ecosystem', eligibility:3, team_assign:7, preconsult_chk:11, qa_stage:'preconsult_chk' };
 // Numbered step → named step override (insert named step before continuing to n+1)
-// Step 1 → 2 (Basic Info) numerically; Step 2 (Basic Info) → team_assign; Step 3 (Provider Type) → eligibility
-var STEP_NAMED_NEXT = { 2:'team_assign', 3:'eligibility', 11:'preconsult_chk' };
+var STEP_NAMED_NEXT = { 2:'ecosystem', 3:'eligibility', 7:'team_assign', 11:'preconsult_chk' };
 // Numbered step → named step override for Back
-// Step 3 back → ecosystem; Step 4 back → eligibility; Step 12 back → qa_stage
-var STEP_NAMED_PREV = { 3:'ecosystem', 4:'eligibility', 12:'qa_stage' };
+var STEP_NAMED_PREV = { 3:'branding', 4:'eligibility', 8:'team_assign', 12:'qa_stage' };
 
 function nextStep() {
   completed.add(currentStep);
@@ -2373,6 +2479,29 @@ function setAllStates(v) {
 }
 
 // IQ library toggle
+function addStateTplRow() {
+  var states = ['Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut','Florida','Georgia','Illinois','Michigan','New York','North Carolina','Ohio','Pennsylvania','Texas','Virginia','Washington'];
+  var tbody = document.getElementById('stateTemplateRows');
+  if (!tbody) return;
+  var tr = document.createElement('tr');
+  tr.style.borderTop = '1px solid #F3F4F6';
+  var stateOpts = states.map(s=>'<option>'+s+'</option>').join('');
+  tr.innerHTML = '<td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:120px;"><option>Select state...</option>'+stateOpts+'</select></td><td style="padding:10px 14px;"><select class="form-input" style="font-size:11px;max-width:200px;"><option>Standard DOH Template</option><option>Florida DOH Merlin Report Form</option><option>Texas DSHS Report Form</option><option>CDC Case Report</option></select></td><td style="padding:10px 14px;font-size:11px;color:#6B7280;">Patient state matches</td><td style="padding:10px 14px;"><button onclick="this.closest(\'tr\').remove()" style="background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button></td>';
+  tbody.appendChild(tr);
+}
+
+var condRuleCount = 2;
+function addCondRule() {
+  condRuleCount++;
+  var container = document.querySelector('#iq_build > div[style*="margin-top:20px"]');
+  var btn = container.querySelector('button[onclick="addCondRule()"]');
+  var div = document.createElement('div');
+  div.style.cssText = 'background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:14px 16px;margin-bottom:10px;';
+  div.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><span style="font-size:12px;font-weight:700;color:#111827;">Rule ' + condRuleCount + '</span><span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px;background:#FEE2E2;color:#991B1B;">⚑ Active</span><button onclick="removeCondRule(this)" style="margin-left:auto;background:none;border:none;color:#9CA3AF;cursor:pointer;font-size:13px;">✕</button></div><div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:center;font-size:12px;"><select class="form-input" style="font-size:12px;"><option>Select question...</option><option>Q5 — Taking diabetes medications...</option><option>Q16 — Hypoglycemia episodes...</option><option>Q23 — Hospitalized for diabetes...</option><option>Social Needs — Food security</option><option>Social Needs — Housing stability</option></select><span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">answer is</span><select class="form-input" style="font-size:12px;"><option>Yes</option><option>No</option><option>&gt; threshold</option><option>At risk</option></select><span style="color:#6B7280;font-weight:600;white-space:nowrap;padding:0 4px;">→ then</span><select class="form-input" style="font-size:12px;"><option>Flag in physician chart + Escalate to RN</option><option>Flag in physician chart only</option><option>Link to physician template field</option><option>Block consult progression</option></select></div>';
+  container.insertBefore(div, btn);
+}
+function removeCondRule(btn) { btn.closest('div[style*="border-radius:10px"]').remove(); }
+
 function toggleIQLibrary() {
   const v = document.querySelector('input[name="iqMode"]:checked').value;
   document.getElementById('iq_library').style.display = v === 'library' ? '' : 'none';

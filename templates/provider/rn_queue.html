@@ -132,9 +132,7 @@ tbody tr.flagged-row { background:#FFF5F5; border-left:3px solid var(--amber); }
     <div class="topbar-sub">All open RN work items &nbsp;·&nbsp; M–F 8:00 AM – 8:00 PM ET</div>
   </div>
   <div class="topbar-right">
-    <button onclick="openRnQueueGuide()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Page Guide
-    </button>
+
     <span>Jennifer Martinez, Lead RN</span>
     <div class="avatar">JM</div>
   </div>
@@ -628,15 +626,6 @@ function takeQueueItem(id, resultType) {
   setTimeout(function(){ t.remove(); }, 3000);
 }
 
-// Page Guide (PG-ALL-001)
-function openRnQueueGuide() {
-  var panel = document.getElementById('rnQueueGuidePanel');
-  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
-  panel = document.createElement('div');
-  panel.id = 'rnQueueGuidePanel';
-  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
-  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#445D7A;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'rnQueueGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">RN Queue</h3><p style="margin-bottom:12px;"><strong>Purpose:</strong> All open RN work items including critical lab results, titer interpretations, and DXS audit tasks.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Take Button</h4><p style="margin-bottom:12px;">Click <strong>Take</strong> (green) to explicitly claim a queue item. It is removed from all other RNs\' views and assigned to you. You can release it back if needed with a reason code.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Critical Results SLA</h4><p style="margin-bottom:12px;">Critical results have a 24-hour hard SLA. No rollover. Log your attempt and outcome with every patient contact.</p><p style="font-size:11px;color:#9CA3AF;">Req: RN-TAKE-001 · CRIT-Q-001</p></div>';
-  document.body.appendChild(panel);
-}
+
 </script>
 {% endblock %}

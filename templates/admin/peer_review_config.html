@@ -1,0 +1,267 @@
+{% extends "admin/base.html" %}
+{% block title %}Peer Review Program — Admin{% endblock %}
+{% block content %}
+<style>
+  .pr-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .pr-title { font-size:22px; font-weight:800; color:#111827; }
+  .pr-sub { font-size:13px; color:#6B7280; margin-top:2px; }
+  .pr-ref { font-size:10px; font-family:monospace; color:#9CA3AF; margin-left:8px; }
+
+  .pr-tabs { display:flex; gap:0; border-bottom:2px solid #E5E7EB; margin-bottom:24px; }
+  .pr-tab { padding:10px 20px; font-size:13px; font-weight:600; color:#6B7280; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-2px; }
+  .pr-tab.active { color:#6B21A8; border-bottom-color:#6B21A8; }
+
+  /* Stat cards */
+  .pr-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+  .pr-stat { background:#fff; border:1px solid #E5E0D8; border-radius:10px; padding:18px 20px; }
+  .pr-stat-label { font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+  .pr-stat-value { font-size:28px; font-weight:800; color:#111827; line-height:1; }
+  .pr-stat-sub { font-size:11px; color:#9CA3AF; margin-top:4px; }
+
+  /* Reviewer table */
+  .pr-section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#9CA3AF; margin-bottom:10px; }
+  .pr-table-wrap { background:#fff; border:1px solid #E5E0D8; border-radius:12px; overflow:hidden; margin-bottom:28px; }
+  .pr-table { width:100%; border-collapse:collapse; }
+  .pr-table th { font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:.05em; padding:10px 16px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; text-align:left; }
+  .pr-table td { padding:12px 16px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#111827; vertical-align:middle; }
+  .pr-table tr:last-child td { border-bottom:none; }
+  .pr-table tr.reviewer-row { cursor:pointer; }
+  .pr-table tr.reviewer-row:hover td { background:#FAFAF8; }
+  .pr-table tr.expand-row td { background:#F8F4FF; padding:0; }
+
+  .badge-role { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; background:#EDE9FE; color:#5B21B6; }
+  .badge-active { background:#D1FAE5; color:#065F46; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+  .badge-inactive { background:#F3F4F6; color:#6B7280; font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; }
+
+  .pct-input { width:56px; border:1px solid #D1D5DB; border-radius:6px; padding:4px 8px; font-size:13px; text-align:center; }
+  .pct-input:focus { outline:none; border-color:#6B21A8; box-shadow:0 0 0 2px rgba(107,33,168,0.12); }
+
+  .btn-sm { font-size:12px; font-weight:600; padding:5px 12px; border-radius:6px; cursor:pointer; border:none; font-family:inherit; }
+  .btn-primary { background:#6B21A8; color:#fff; }
+  .btn-primary:hover { background:#581C87; }
+  .btn-outline { background:#fff; color:#6B21A8; border:1.5px solid #6B21A8; }
+  .btn-outline:hover { background:#F5F3FF; }
+  .btn-danger { background:#FEE2E2; color:#DC2626; border:none; }
+  .btn-danger:hover { background:#FECACA; }
+  .btn-add { background:#6B21A8; color:#fff; font-size:13px; font-weight:700; padding:8px 18px; border-radius:8px; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; }
+
+  /* Expand panel */
+  .expand-inner { padding:16px 20px; }
+  .assign-table { width:100%; border-collapse:collapse; }
+  .assign-table th { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; letter-spacing:.05em; padding:6px 10px; text-align:left; }
+  .assign-table td { padding:8px 10px; font-size:13px; border-bottom:1px solid #E5E7EB; }
+  .assign-table tr:last-child td { border-bottom:none; }
+  .assign-add { font-size:12px; color:#6B21A8; font-weight:600; cursor:pointer; margin-top:10px; display:inline-block; }
+  .assign-add:hover { text-decoration:underline; }
+
+  /* Config note */
+  .config-note { background:#F5F3FF; border:1px solid #DDD6FE; border-radius:10px; padding:14px 18px; margin-bottom:24px; display:flex; gap:12px; align-items:flex-start; font-size:13px; color:#4C1D95; }
+</style>
+
+<div class="pr-header">
+  <div>
+    <div class="pr-title">Peer Review Program <span class="pr-ref">M17 · PHX-PEER</span></div>
+    <div class="pr-sub">Configure peer reviewers, provider assignments, and audit sampling rates</div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn-sm btn-outline" onclick="window.location='/admin/peer-review/reports'">📊 View Reports</button>
+    <button class="btn-add" onclick="openAddReviewer()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add Reviewer
+    </button>
+  </div>
+</div>
+
+<!-- Program Stats -->
+<div class="pr-stats">
+  <div class="pr-stat">
+    <div class="pr-stat-label">Active Peer Reviewers</div>
+    <div class="pr-stat-value">3</div>
+    <div class="pr-stat-sub">MD/DO designated</div>
+  </div>
+  <div class="pr-stat">
+    <div class="pr-stat-label">Providers Under Review</div>
+    <div class="pr-stat-value">7</div>
+    <div class="pr-stat-sub">Across all reviewers</div>
+  </div>
+  <div class="pr-stat">
+    <div class="pr-stat-label">Reviews Pending</div>
+    <div class="pr-stat-value" style="color:#D97706;">12</div>
+    <div class="pr-stat-sub">In reviewer queues</div>
+  </div>
+  <div class="pr-stat">
+    <div class="pr-stat-label">Completed This Month</div>
+    <div class="pr-stat-value" style="color:#059669;">34</div>
+    <div class="pr-stat-sub">87% pass rate avg</div>
+  </div>
+</div>
+
+<div class="config-note">
+  <span style="font-size:16px;flex-shrink:0;">ℹ️</span>
+  <div><strong>Peer Review Privilege:</strong> This program operates under clinical peer review committee protections. Reviewer identities are not disclosed to reviewed providers. Documentation generated by this program is designated as privileged and protected from discovery in accordance with applicable state statutes.</div>
+</div>
+
+<!-- Reviewer Table -->
+<div class="pr-section-label">Peer Reviewers</div>
+<div class="pr-table-wrap">
+  <table class="pr-table" id="reviewerTable">
+    <thead>
+      <tr>
+        <th style="width:28px;"></th>
+        <th>Reviewer</th>
+        <th>Credentials</th>
+        <th>Assigned Providers</th>
+        <th>Avg Audit %</th>
+        <th>Pending Reviews</th>
+        <th>Completed (30d)</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="reviewerTbody">
+      <!-- rows injected by JS -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Add Reviewer Modal -->
+<div id="addReviewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:400;display:none;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:480px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+    <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:6px;">Add Peer Reviewer</div>
+    <div style="font-size:13px;color:#6B7280;margin-bottom:20px;">Only MD/DO credentialed providers can be designated as peer reviewers.</div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">Select Provider</label>
+      <select style="width:100%;padding:9px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px;font-family:inherit;">
+        <option value="">— Select MD/DO —</option>
+        <option>Dr. Sarah Lee, MD</option>
+        <option>Dr. James Thompson, DO</option>
+        <option>Dr. Rachel Kim, MD</option>
+      </select>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:5px;">Default Audit % for Assigned Providers</label>
+      <input type="number" min="1" max="100" value="10" style="width:100px;padding:8px 12px;border:1px solid #D1D5DB;border-radius:8px;font-size:13px;">
+      <span style="font-size:12px;color:#6B7280;margin-left:8px;">% of closed charts sampled</span>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px;">
+      <button class="btn-sm btn-outline" onclick="closeAddReviewer()">Cancel</button>
+      <button class="btn-sm btn-primary" onclick="closeAddReviewer()">Add Reviewer</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}{% raw %}<script>
+var REVIEWERS = [
+  {
+    id: 'rev-001',
+    name: 'Dr. Sarah Lee, MD',
+    creds: 'MD',
+    status: 'Active',
+    pending: 4,
+    completed: 14,
+    providers: [
+      { name: 'Dr. James Thompson, DO', creds: 'DO', pct: 15, open: 2 },
+      { name: 'Dr. Maria Vasquez, MD', creds: 'MD', pct: 10, open: 2 },
+      { name: 'Dr. Alan Park, MD', creds: 'MD', pct: 10, open: 0 },
+    ]
+  },
+  {
+    id: 'rev-002',
+    name: 'Dr. Kevin Okafor, MD',
+    creds: 'MD',
+    status: 'Active',
+    pending: 5,
+    completed: 12,
+    providers: [
+      { name: 'Dr. Sarah Lee, MD', creds: 'MD', pct: 10, open: 3 },
+      { name: 'Dr. Lisa Nguyen, DO', creds: 'DO', pct: 20, open: 2 },
+    ]
+  },
+  {
+    id: 'rev-003',
+    name: 'Dr. Rachel Kim, MD',
+    creds: 'MD',
+    status: 'Active',
+    pending: 3,
+    completed: 8,
+    providers: [
+      { name: 'Dr. Kevin Okafor, MD', creds: 'MD', pct: 10, open: 1 },
+      { name: 'Dr. James Thompson, DO', creds: 'DO', pct: 15, open: 2 },
+    ]
+  }
+];
+
+var expanded = {};
+
+function renderTable() {
+  var tbody = document.getElementById('reviewerTbody');
+  var html = '';
+  REVIEWERS.forEach(function(r) {
+    var avgPct = Math.round(r.providers.reduce(function(s,p){return s+p.pct;},0) / r.providers.length);
+    html += '<tr class="reviewer-row" onclick="toggleExpand(\'' + r.id + '\')">' +
+      '<td><span style="font-size:12px;color:#9CA3AF;transition:transform 0.2s;" id="chevron-'+r.id+'">' + (expanded[r.id] ? '▼' : '▶') + '</span></td>' +
+      '<td><div style="font-weight:700;color:#111827;">' + r.name + '</div></td>' +
+      '<td><span class="badge-role">' + r.creds + '</span></td>' +
+      '<td><span style="font-weight:600;">' + r.providers.length + ' providers</span></td>' +
+      '<td><span style="font-weight:700;color:#6B21A8;">' + avgPct + '%</span></td>' +
+      '<td><span style="font-weight:700;color:#D97706;">' + r.pending + '</span></td>' +
+      '<td><span style="font-weight:700;color:#059669;">' + r.completed + '</span></td>' +
+      '<td><span class="' + (r.status==='Active' ? 'badge-active' : 'badge-inactive') + '">' + r.status + '</span></td>' +
+      '<td onclick="event.stopPropagation()"><div style="display:flex;gap:6px;">' +
+        '<button class="btn-sm btn-outline" onclick="openAssign(\'' + r.id + '\')">+ Assign Provider</button>' +
+        '<button class="btn-sm btn-danger">Remove</button>' +
+      '</div></td>' +
+    '</tr>';
+    if (expanded[r.id]) {
+      html += '<tr class="expand-row"><td colspan="9"><div class="expand-inner">' +
+        '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6B21A8;margin-bottom:10px;">Assigned Providers — ' + r.name + '</div>' +
+        '<table class="assign-table"><thead><tr>' +
+          '<th>Provider</th><th>Credentials</th><th>Audit %</th><th>Open Reviews</th><th>Action</th>' +
+        '</tr></thead><tbody>';
+      r.providers.forEach(function(p, pi) {
+        html += '<tr>' +
+          '<td style="font-weight:600;">' + p.name + '</td>' +
+          '<td><span class="badge-role">' + p.creds + '</span></td>' +
+          '<td><input class="pct-input" type="number" min="1" max="100" value="' + p.pct + '" onchange="updatePct(\'' + r.id + '\',' + pi + ',this.value)"> %</td>' +
+          '<td>' + (p.open > 0 ? '<span style="color:#D97706;font-weight:700;">' + p.open + ' pending</span>' : '<span style="color:#059669;">0</span>') + '</td>' +
+          '<td><button class="btn-sm btn-danger" onclick="removeAssignment(\'' + r.id + '\',' + pi + ')">Remove</button></td>' +
+        '</tr>';
+      });
+      html += '</tbody></table>' +
+        '<span class="assign-add" onclick="openAssign(\'' + r.id + '\')">+ Assign another provider</span>' +
+        '</div></td></tr>';
+    }
+  });
+  tbody.innerHTML = html;
+}
+
+function toggleExpand(id) {
+  expanded[id] = !expanded[id];
+  renderTable();
+}
+
+function updatePct(revId, provIdx, val) {
+  var rev = REVIEWERS.find(function(r){return r.id===revId;});
+  if (rev) rev.providers[provIdx].pct = parseInt(val)||10;
+}
+
+function removeAssignment(revId, provIdx) {
+  var rev = REVIEWERS.find(function(r){return r.id===revId;});
+  if (rev) { rev.providers.splice(provIdx, 1); renderTable(); }
+}
+
+function openAssign(revId) {
+  alert('Assign Provider modal for ' + revId + ' — coming in full build');
+}
+
+function openAddReviewer() {
+  document.getElementById('addReviewerModal').style.display = 'flex';
+}
+function closeAddReviewer() {
+  document.getElementById('addReviewerModal').style.display = 'none';
+}
+
+renderTable();
+</script>{% endraw %}
+{% endblock %}

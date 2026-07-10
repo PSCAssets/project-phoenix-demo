@@ -147,3 +147,13 @@ def members_db():
 @bp.route("/doh-config")
 def doh_config():
     return render_template("admin/doh_config.html")
+
+# ── Peer Review (M17) ────────────────────────────────────────────────────────
+
+@bp.route("/peer-review")
+def peer_review_config():
+    return render_template("admin/peer_review_config.html")
+
+@bp.route("/peer-review/reports")
+def peer_review_reports():
+    return render_template("admin/peer_review_reports.html")

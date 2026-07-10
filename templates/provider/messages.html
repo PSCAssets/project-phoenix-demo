@@ -180,9 +180,19 @@
       </div>
 
     </div>
-    <div class="convo-input">
-      <textarea placeholder="Type a reply…" id="replyBox"></textarea>
-      <button class="send-btn">Send</button>
+    <div class="convo-input" style="flex-direction:column;gap:0;">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 10px 6px 12px;border-bottom:1px solid #F2EDE4;">
+        <label id="urgentToggleLabel" style="display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding:4px 10px;border-radius:6px;border:1.5px solid #E5E0D8;background:#fff;transition:all 0.15s;" onclick="toggleMsgUrgent()">
+          <input type="checkbox" id="urgentMsgChk" style="width:14px;height:14px;accent-color:#DC2626;cursor:pointer;" onclick="event.stopPropagation();toggleMsgUrgent()">
+          <span id="urgentToggleText" style="font-size:12px;font-weight:600;color:#6B7280;">⚠ Mark as Urgent</span>
+        </label>
+        <span id="urgentBadge" style="display:none;font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:10px;padding:2px 8px;">URGENT — will appear on recipient's dashboard</span>
+        <span style="font-size:10px;font-family:monospace;color:#D1D5DB;margin-left:auto;">URG-MSG-002</span>
+      </div>
+      <div style="display:flex;gap:0;">
+        <textarea placeholder="Type a reply…" id="replyBox" style="border-top-left-radius:0;border-top-right-radius:0;border-top:none;flex:1;border:none;padding:10px 12px;font-size:13px;font-family:inherit;resize:none;outline:none;line-height:1.5;height:44px;max-height:120px;"></textarea>
+        <button class="send-btn" style="border-radius:0 0 8px 0;">Send</button>
+      </div>
     </div>
   </div>
 </div>
@@ -201,6 +211,17 @@ function selectMsgTab(tab) {
   document.getElementById('tabTeam').style.color = tab==='team' ? '#1D4ED8' : '#9CA3AF';
   document.getElementById('tabTeam').style.borderBottomColor = tab==='team' ? '#1D4ED8' : 'transparent';
   // Team channels tab would show different content — for demo, just toggle visual
+}
+function toggleMsgUrgent() {
+  const chk = document.getElementById('urgentMsgChk');
+  const label = document.getElementById('urgentToggleLabel');
+  const badge = document.getElementById('urgentBadge');
+  const txt = document.getElementById('urgentToggleText');
+  const isUrgent = chk.checked;
+  label.style.background = isUrgent ? '#FEE2E2' : '#fff';
+  label.style.borderColor = isUrgent ? '#DC2626' : '#E5E0D8';
+  txt.style.color = isUrgent ? '#DC2626' : '#6B7280';
+  badge.style.display = isUrgent ? 'inline-block' : 'none';
 }
 document.querySelector('.send-btn').addEventListener('click', function() {
   const box = document.getElementById('replyBox');

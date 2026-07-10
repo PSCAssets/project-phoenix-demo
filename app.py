@@ -239,8 +239,9 @@ def inject_sidebar_nav():
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Oversight',     '/provider/oversight',      'check',     ['/provider/oversight']),
             ('Lab Auth',      '/provider/lab-auth',       'flask',     ['/provider/lab-auth']),
+            ('Peer Review',   '/provider/peer-review',    'clipboard', ['/provider/peer-review']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Notification Console', '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_np': [
@@ -249,7 +250,7 @@ def inject_sidebar_nav():
             ('My Schedule',   '/provider/schedule',       'calendar',  ['/provider/schedule']),
             ('Prescriptions', '/provider/prescriptions',  'pill',      ['/provider/prescriptions']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Notification Console', '/provider/notifications',  'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'provider_rn': [
@@ -263,7 +264,7 @@ def inject_sidebar_nav():
             ('On-Call Schedule','/provider/rn/oncall',        'calendar',  ['/provider/rn/oncall']),
             ('Timesheet',       '/provider/timesheet',        'clock',     ['/provider/timesheet']),
             ('Messages',        '/provider/messages',         'message',   ['/provider/messages']),
-            ('Alerts',          '/provider/notifications',    'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Notification Console', '/provider/notifications',    'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',        '/provider/settings',         'settings',  ['/provider/settings']),
         ],
         'provider_ma': [
@@ -280,7 +281,7 @@ def inject_sidebar_nav():
             ('My Schedule',   '/provider/staff-schedule',  'calendar',  ['/provider/staff-schedule']),
             ('Timesheet',     '/provider/timesheet',        'clock',     ['/provider/timesheet']),
             ('Messages',      '/provider/messages',         'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/notifications',    'bell',      ['/provider/notifications', '/provider/alerts']),
+            ('Notification Console', '/provider/notifications',    'bell',      ['/provider/notifications', '/provider/alerts']),
             ('Settings',      '/provider/settings',         'settings',  ['/provider/settings']),
         ],
         'provider_gca': [
@@ -324,7 +325,7 @@ def inject_sidebar_nav():
             ('Timekeeping',    '/provider/manager/timekeeping',  'clock',       ['/provider/manager/timekeeping']),
             ('Team Schedule',  '/provider/staff-schedule',       'calendar',    ['/provider/staff-schedule']),
             ('Messages',       '/provider/messages',             'message',     ['/provider/messages']),
-            ('Alerts',         '/provider/notifications',        'bell',        ['/provider/notifications']),
+            ('Notification Console', '/provider/notifications',        'bell',        ['/provider/notifications']),
             ('Settings',       '/provider/settings',             'settings',    ['/provider/settings']),
         ],
         'provider_gc': [
@@ -333,7 +334,7 @@ def inject_sidebar_nav():
             ('Patient Mgmt', '/provider/patient-management', 'person-search', ['/provider/patient-management', '/scheduler/search-patient']),
             ('My Schedule',   '/provider/schedule',      'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',       'message',   ['/provider/messages']),
-            ('Alerts',        '/provider/gc/notifications',  'bell',      ['/provider/gc/notifications']),
+            ('Notification Console', '/provider/gc/notifications',  'bell',      ['/provider/gc/notifications']),
             ('Settings',      '/provider/settings',       'settings',  ['/provider/settings']),
         ],
         'care_team': [
@@ -631,4 +632,4 @@ app.register_blueprint(care_team.bp, url_prefix="/care-team")
 app.register_blueprint(scheduler.bp, url_prefix="/scheduler")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=True, port=int(os.environ.get('PORT', 5001)))

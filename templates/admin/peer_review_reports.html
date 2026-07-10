@@ -1,0 +1,351 @@
+{% extends "admin/base.html" %}
+{% block title %}Peer Review Reports{% endblock %}
+{% block content %}
+<style>
+  .rpt-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+  .rpt-title { font-size:22px; font-weight:800; color:#111827; }
+  .rpt-sub { font-size:13px; color:#6B7280; margin-top:2px; }
+  .rpt-ref { font-size:10px; font-family:monospace; color:#9CA3AF; margin-left:8px; }
+
+  /* Filter bar */
+  .rpt-filters { display:flex; gap:10px; align-items:center; margin-bottom:22px; flex-wrap:wrap; }
+  .rpt-filters select, .rpt-filters input { padding:7px 12px; border:1px solid #D1D5DB; border-radius:8px; font-size:13px; font-family:inherit; }
+  .btn-export { background:#F3F4F6; color:#374151; border:1px solid #D1D5DB; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .btn-export:hover { background:#E5E7EB; }
+
+  /* Summary stats */
+  .rpt-stats { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:26px; }
+  .rpt-stat { background:#fff; border:1px solid #E5E0D8; border-radius:10px; padding:16px 18px; }
+  .rpt-stat-label { font-size:11px; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px; }
+  .rpt-stat-value { font-size:26px; font-weight:800; color:#111827; line-height:1; }
+  .rpt-stat-sub { font-size:11px; color:#9CA3AF; margin-top:3px; }
+
+  /* Provider quality table */
+  .section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color:#9CA3AF; margin-bottom:10px; }
+  .rpt-table-wrap { background:#fff; border:1px solid #E5E0D8; border-radius:12px; overflow:hidden; margin-bottom:26px; }
+  .rpt-table { width:100%; border-collapse:collapse; }
+  .rpt-table th { font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:.05em; padding:10px 16px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; text-align:left; cursor:pointer; white-space:nowrap; }
+  .rpt-table th:hover { color:#6B21A8; }
+  .rpt-table td { padding:13px 16px; border-bottom:1px solid #F3F4F6; font-size:13px; color:#111827; vertical-align:middle; }
+  .rpt-table tr:last-child td { border-bottom:none; }
+  .rpt-table tr:hover td { background:#FAFAF8; }
+
+  .pass-rate { display:flex; align-items:center; gap:8px; }
+  .rate-bar { height:6px; border-radius:3px; background:#E5E7EB; flex:1; max-width:80px; overflow:hidden; }
+  .rate-fill { height:100%; border-radius:3px; }
+  .rate-high  { background:#10B981; }
+  .rate-mid   { background:#D97706; }
+  .rate-low   { background:#DC2626; }
+
+  .trend-chip { font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px; }
+  .trend-up   { background:#D1FAE5; color:#065F46; }
+  .trend-flat { background:#F3F4F6; color:#6B7280; }
+  .trend-down { background:#FEE2E2; color:#DC2626; }
+
+  .badge-risk { display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; }
+  .risk-low  { background:#D1FAE5; color:#065F46; }
+  .risk-mid  { background:#FEF3C7; color:#92400E; }
+  .risk-high { background:#FEE2E2; color:#DC2626; }
+
+  /* Checklist item breakdown */
+  .checklist-breakdown { background:#fff; border:1px solid #E5E0D8; border-radius:12px; overflow:hidden; margin-bottom:26px; }
+  .breakdown-header { padding:16px 20px; background:#F9FAFB; border-bottom:1px solid #E5E7EB; display:flex; align-items:center; justify-content:space-between; }
+  .breakdown-title { font-size:15px; font-weight:800; color:#111827; }
+  .breakdown-sub { font-size:12px; color:#6B7280; }
+  .breakdown-body { padding:20px; }
+
+  .cl-item-row { display:flex; align-items:center; gap:14px; padding:8px 0; border-bottom:1px solid #F3F4F6; }
+  .cl-item-row:last-child { border-bottom:none; }
+  .cl-num { font-size:11px; font-weight:700; color:#9CA3AF; width:18px; flex-shrink:0; }
+  .cl-label { flex:1; font-size:13px; color:#374151; }
+  .cl-pass-bar { height:8px; border-radius:4px; background:#E5E7EB; width:200px; overflow:hidden; flex-shrink:0; }
+  .cl-pass-fill { height:100%; border-radius:4px; background:#10B981; }
+  .cl-pct { font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
+  .cl-fail-count { font-size:11px; color:#DC2626; font-weight:600; width:60px; text-align:right; flex-shrink:0; }
+
+  /* Trend chart (CSS-only sparkline-style) */
+  .trend-section { background:#fff; border:1px solid #E5E0D8; border-radius:12px; padding:20px; margin-bottom:26px; }
+  .trend-title { font-size:15px; font-weight:800; color:#111827; margin-bottom:4px; }
+  .trend-sub { font-size:12px; color:#6B7280; margin-bottom:16px; }
+  .trend-grid { display:flex; gap:6px; align-items:flex-end; height:100px; }
+  .trend-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .trend-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; }
+  .trend-bar.pass { background:#10B981; }
+  .trend-bar.needs { background:#D97706; }
+  .trend-bar.below { background:#DC2626; }
+  .trend-bar-label { font-size:9px; color:#9CA3AF; }
+  .trend-bar-val { font-size:9px; color:#6B7280; font-weight:600; }
+  .trend-legend { display:flex; gap:16px; margin-top:10px; }
+  .trend-legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:#6B7280; }
+  .trend-legend-dot { width:10px; height:10px; border-radius:2px; flex-shrink:0; }
+
+  /* Reviewer workload */
+  .workload-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:26px; }
+  .workload-card { background:#fff; border:1px solid #E5E0D8; border-radius:10px; padding:16px; }
+  .wl-name { font-size:14px; font-weight:700; color:#111827; margin-bottom:2px; }
+  .wl-creds { font-size:11px; color:#6B7280; margin-bottom:12px; }
+  .wl-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .wl-row-label { font-size:12px; color:#6B7280; }
+  .wl-row-val { font-size:13px; font-weight:700; color:#111827; }
+  .wl-progress-bar { height:4px; background:#E5E7EB; border-radius:2px; margin-top:8px; overflow:hidden; }
+  .wl-progress-fill { height:100%; border-radius:2px; background:#6B21A8; }
+
+  .privilege-note { background:#F5F3FF; border:1px solid #DDD6FE; border-radius:9px; padding:11px 16px; margin-bottom:20px; font-size:12px; color:#4C1D95; display:flex; gap:10px; }
+</style>
+
+<div class="rpt-header">
+  <div>
+    <div class="rpt-title">Peer Review Reports <span class="rpt-ref">M17 · PHX-RPT-001</span></div>
+    <div class="rpt-sub">Clinical quality analytics by provider — 90-day rolling window</div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <a href="/admin/peer-review" style="font-size:13px;font-weight:600;color:#6B21A8;text-decoration:none;padding:8px 14px;border:1.5px solid #6B21A8;border-radius:8px;">← Program Config</a>
+    <button class="btn-export" onclick="alert('Export to CSV — coming in full build')">⬇ Export CSV</button>
+  </div>
+</div>
+
+<div class="privilege-note">
+  <span style="font-size:15px;flex-shrink:0;">🔒</span>
+  <div><strong>Protected Data.</strong> Peer review quality data is confidential committee work product. Reviewer identity is not included in any report. Do not distribute outside this system.</div>
+</div>
+
+<!-- Filters -->
+<div class="rpt-filters">
+  <select id="periodFilter" onchange="renderAll()">
+    <option value="90">Last 90 days</option>
+    <option value="30">Last 30 days</option>
+    <option value="180">Last 180 days</option>
+  </select>
+  <select id="providerFilter" onchange="renderAll()">
+    <option value="">All Providers</option>
+    <option>Dr. James Thompson, DO</option>
+    <option>Dr. Maria Vasquez, MD</option>
+    <option>Dr. Alan Park, MD</option>
+    <option>Dr. Sarah Lee, MD</option>
+    <option>Dr. Lisa Nguyen, DO</option>
+  </select>
+  <select id="productFilter" onchange="renderAll()">
+    <option value="">All Care Products</option>
+    <option>Weight Management</option>
+    <option>Testosterone</option>
+    <option>Annual Wellness Visit</option>
+    <option>Thyroid</option>
+    <option>Skincare</option>
+  </select>
+</div>
+
+<!-- Summary Stats -->
+<div class="rpt-stats" id="summaryStats"></div>
+
+<!-- Provider Quality Table -->
+<div class="section-label">Provider Quality Summary</div>
+<div class="rpt-table-wrap">
+  <table class="rpt-table" id="providerTable">
+    <thead>
+      <tr>
+        <th>Provider</th>
+        <th>Charts Reviewed</th>
+        <th>Pass Rate</th>
+        <th>Needs Improvement</th>
+        <th>Below Standards</th>
+        <th>90-Day Trend</th>
+        <th>Risk Level</th>
+      </tr>
+    </thead>
+    <tbody id="providerTbody"></tbody>
+  </table>
+</div>
+
+<!-- Checklist Item Breakdown -->
+<div class="checklist-breakdown">
+  <div class="breakdown-header">
+    <div>
+      <div class="breakdown-title">Checklist Item Pass Rates</div>
+      <div class="breakdown-sub">Across all reviewed charts in selected period</div>
+    </div>
+    <div style="font-size:12px;color:#6B7280;" id="breakdownPeriodLabel">Last 90 days · All providers</div>
+  </div>
+  <div class="breakdown-body" id="checklistBreakdown"></div>
+</div>
+
+<!-- 90-Day Trend -->
+<div class="trend-section">
+  <div class="trend-title">Monthly Rating Distribution</div>
+  <div class="trend-sub">Count of reviews per rating category by month</div>
+  <div class="trend-grid" id="trendGrid"></div>
+  <div class="trend-legend">
+    <div class="trend-legend-item"><div class="trend-legend-dot" style="background:#10B981;"></div> Meets Standards</div>
+    <div class="trend-legend-item"><div class="trend-legend-dot" style="background:#D97706;"></div> Needs Improvement</div>
+    <div class="trend-legend-item"><div class="trend-legend-dot" style="background:#DC2626;"></div> Below Standards</div>
+  </div>
+</div>
+
+<!-- Reviewer Workload -->
+<div class="section-label">Reviewer Workload</div>
+<div class="workload-grid" id="workloadGrid"></div>
+
+{% endblock %}
+{% block scripts %}{% raw %}<script>
+
+var PROVIDERS = [
+  { name:'Dr. James Thompson, DO', reviewed:28, pass:22, needs:5, below:1, trend:'↑', risk:'low',  products:['Weight Management','Testosterone','Skincare'] },
+  { name:'Dr. Maria Vasquez, MD',  reviewed:19, pass:16, needs:3, below:0, trend:'→', risk:'low',  products:['Annual Wellness Visit','Thyroid','Testosterone'] },
+  { name:'Dr. Alan Park, MD',      reviewed:14, pass:10, needs:3, below:1, trend:'↓', risk:'mid',  products:['Weight Management','Testosterone'] },
+  { name:'Dr. Sarah Lee, MD',      reviewed:22, pass:20, needs:2, below:0, trend:'↑', risk:'low',  products:['Weight Management','Skincare','Thyroid'] },
+  { name:'Dr. Lisa Nguyen, DO',    reviewed:11, pass:7,  needs:3, below:1, trend:'↓', risk:'high', products:['Annual Wellness Visit','Weight Management'] },
+];
+
+var CHECKLIST_ITEMS = [
+  { label:'History and presenting complaint documented', pass:91, fail:9 },
+  { label:'Clinical assessment / diagnosis documented',  pass:94, fail:6 },
+  { label:'Diagnosis supported by documented clinical findings', pass:88, fail:12 },
+  { label:'Treatment plan is appropriate to diagnosis',  pass:85, fail:15 },
+  { label:'Medications prescribed appropriately with documented rationale', pass:82, fail:18 },
+  { label:'Lab / diagnostic orders appropriate and documented', pass:90, fail:10 },
+  { label:'Patient communication and education documented', pass:79, fail:21 },
+  { label:'Follow-up plan or care continuity documented', pass:76, fail:24 },
+  { label:'Informed consent documented where applicable', pass:93, fail:7 },
+  { label:'Chart closed within SLA timeframe', pass:96, fail:4 },
+];
+
+var TREND_DATA = [
+  { month:'Feb', pass:24, needs:5, below:2 },
+  { month:'Mar', pass:31, needs:6, below:2 },
+  { month:'Apr', pass:29, needs:4, below:1 },
+  { month:'May', pass:34, needs:7, below:3 },
+  { month:'Jun', pass:38, needs:8, below:2 },
+  { month:'Jul', pass:27, needs:6, below:1 },
+];
+
+var REVIEWERS = [
+  { name:'Dr. Sarah Lee, MD', creds:'MD', completed:34, pending:4, avgTime:'7m', providers:3 },
+  { name:'Dr. Kevin Okafor, MD', creds:'MD', completed:28, pending:5, avgTime:'9m', providers:2 },
+  { name:'Dr. Rachel Kim, MD', creds:'MD', completed:21, pending:3, avgTime:'8m', providers:2 },
+];
+
+function rateClass(pct) {
+  if (pct >= 90) return 'rate-high';
+  if (pct >= 75) return 'rate-mid';
+  return 'rate-low';
+}
+function riskClass(r) {
+  return r === 'low' ? 'risk-low' : r === 'mid' ? 'risk-mid' : 'risk-high';
+}
+function riskLabel(r) {
+  return r === 'low' ? 'Low Risk' : r === 'mid' ? 'Monitor' : 'High Risk';
+}
+function trendClass(t) {
+  return t === '↑' ? 'trend-up' : t === '→' ? 'trend-flat' : 'trend-down';
+}
+function trendLabel(t) {
+  return t === '↑' ? '↑ Improving' : t === '→' ? '→ Stable' : '↓ Declining';
+}
+
+function renderSummary() {
+  var provFilter = document.getElementById('providerFilter').value;
+  var data = provFilter ? PROVIDERS.filter(function(p){ return p.name === provFilter; }) : PROVIDERS;
+  var totalReviewed = data.reduce(function(s,p){ return s+p.reviewed; }, 0);
+  var totalPass = data.reduce(function(s,p){ return s+p.pass; }, 0);
+  var totalNeeds = data.reduce(function(s,p){ return s+p.needs; }, 0);
+  var totalBelow = data.reduce(function(s,p){ return s+p.below; }, 0);
+  var passRate = totalReviewed ? Math.round(totalPass/totalReviewed*100) : 0;
+  document.getElementById('summaryStats').innerHTML =
+    stat('Charts Reviewed', totalReviewed, 'In selected period') +
+    stat('Pass Rate', passRate + '%', 'Meets Standards', passRate >= 90 ? '#059669' : passRate >= 75 ? '#D97706' : '#DC2626') +
+    stat('Needs Improvement', totalNeeds, 'Reviews flagged') +
+    stat('Below Standards', totalBelow, 'Require follow-up', totalBelow > 0 ? '#DC2626' : '#111827') +
+    stat('Providers Reviewed', data.length, 'Active in period');
+}
+
+function stat(label, val, sub, color) {
+  color = color || '#111827';
+  return '<div class="rpt-stat"><div class="rpt-stat-label">'+label+'</div>' +
+    '<div class="rpt-stat-value" style="color:'+color+';">'+val+'</div>' +
+    '<div class="rpt-stat-sub">'+sub+'</div></div>';
+}
+
+function renderProviderTable() {
+  var provFilter = document.getElementById('providerFilter').value;
+  var data = provFilter ? PROVIDERS.filter(function(p){ return p.name === provFilter; }) : PROVIDERS;
+  var tbody = document.getElementById('providerTbody');
+  tbody.innerHTML = data.map(function(p) {
+    var passRate = Math.round(p.pass/p.reviewed*100);
+    var needsRate = Math.round(p.needs/p.reviewed*100);
+    var belowRate = Math.round(p.below/p.reviewed*100);
+    var rc = rateClass(passRate);
+    return '<tr>' +
+      '<td><div style="font-weight:700;">'+p.name+'</div><div style="font-size:11px;color:#9CA3AF;">'+p.products.join(' · ')+'</div></td>' +
+      '<td style="font-weight:700;">'+p.reviewed+'</td>' +
+      '<td><div class="pass-rate"><div class="rate-bar"><div class="rate-fill '+rc+'" style="width:'+passRate+'%"></div></div><span style="font-weight:700;color:'+(rc==='rate-high'?'#059669':rc==='rate-mid'?'#D97706':'#DC2626')+';">'+passRate+'%</span></div></td>' +
+      '<td style="color:#D97706;font-weight:600;">'+needsRate+'%</td>' +
+      '<td style="color:'+(p.below>0?'#DC2626':'#059669')+';font-weight:700;">'+belowRate+'%</td>' +
+      '<td><span class="trend-chip '+trendClass(p.trend)+'">'+trendLabel(p.trend)+'</span></td>' +
+      '<td><span class="badge-risk '+riskClass(p.risk)+'">'+riskLabel(p.risk)+'</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderChecklistBreakdown() {
+  var provFilter = document.getElementById('providerFilter').value;
+  var periodLabel = document.getElementById('periodFilter').options[document.getElementById('periodFilter').selectedIndex].text;
+  var provLabel = provFilter || 'All providers';
+  document.getElementById('breakdownPeriodLabel').textContent = periodLabel + ' · ' + provLabel;
+  document.getElementById('checklistBreakdown').innerHTML = CHECKLIST_ITEMS.map(function(item, i) {
+    var failCount = Math.round(item.fail * 0.94); // approx # of fails
+    return '<div class="cl-item-row">' +
+      '<div class="cl-num">'+(i+1)+'</div>' +
+      '<div class="cl-label">'+item.label+'</div>' +
+      '<div class="cl-pass-bar"><div class="cl-pass-fill" style="width:'+item.pass+'%"></div></div>' +
+      '<div class="cl-pct" style="color:'+(item.pass>=90?'#059669':item.pass>=80?'#D97706':'#DC2626')+';">'+item.pass+'%</div>' +
+      '<div class="cl-fail-count">'+failCount+' fails</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderTrend() {
+  var maxVal = Math.max.apply(null, TREND_DATA.map(function(d){ return d.pass+d.needs+d.below; }));
+  var grid = document.getElementById('trendGrid');
+  grid.innerHTML = TREND_DATA.map(function(d) {
+    var total = d.pass + d.needs + d.below;
+    var passH = Math.round((d.pass / maxVal) * 90);
+    var needsH = Math.round((d.needs / maxVal) * 90);
+    var belowH = Math.round((d.below / maxVal) * 90);
+    return '<div class="trend-bar-wrap">' +
+      '<div class="trend-bar-val">'+total+'</div>' +
+      '<div style="display:flex;flex-direction:column;justify-content:flex-end;height:90px;width:100%;gap:1px;">' +
+        '<div class="trend-bar below" style="height:'+belowH+'px;"></div>' +
+        '<div class="trend-bar needs" style="height:'+needsH+'px;"></div>' +
+        '<div class="trend-bar pass" style="height:'+passH+'px;"></div>' +
+      '</div>' +
+      '<div class="trend-bar-label">'+d.month+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderWorkload() {
+  var maxCompleted = Math.max.apply(null, REVIEWERS.map(function(r){ return r.completed; }));
+  document.getElementById('workloadGrid').innerHTML = REVIEWERS.map(function(r) {
+    var pct = Math.round(r.completed / maxCompleted * 100);
+    return '<div class="workload-card">' +
+      '<div class="wl-name">'+r.name+'</div>' +
+      '<div class="wl-creds">'+r.creds+' · Peer Reviewer</div>' +
+      '<div class="wl-row"><span class="wl-row-label">Completed (90d)</span><span class="wl-row-val" style="color:#059669;">'+r.completed+'</span></div>' +
+      '<div class="wl-row"><span class="wl-row-label">Pending</span><span class="wl-row-val" style="color:#D97706;">'+r.pending+'</span></div>' +
+      '<div class="wl-row"><span class="wl-row-label">Avg Time / Review</span><span class="wl-row-val">'+r.avgTime+'</span></div>' +
+      '<div class="wl-row"><span class="wl-row-label">Providers Assigned</span><span class="wl-row-val">'+r.providers+'</span></div>' +
+      '<div class="wl-progress-bar"><div class="wl-progress-fill" style="width:'+pct+'%"></div></div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderAll() {
+  renderSummary();
+  renderProviderTable();
+  renderChecklistBreakdown();
+  renderTrend();
+  renderWorkload();
+}
+
+renderAll();
+</script>{% endraw %}
+{% endblock %}

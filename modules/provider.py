@@ -290,6 +290,20 @@ def doh_report(record_id):
 def doh_history():
     return render_template("provider/doh_history.html")
 
+@bp.route("/doh/state-portals")
+def doh_state_portals():
+    return render_template("provider/doh_state_portals.html")
+
 @bp.route("/patient-management")
 def patient_management():
     return render_template("scheduler/search_patient.html")
+
+# ── Peer Review (M17) ────────────────────────────────────────────────────────
+
+@bp.route("/peer-review")
+def peer_review_queue():
+    return render_template("provider/peer_review_queue.html")
+
+@bp.route("/peer-review/chart/<review_id>")
+def peer_review_chart(review_id):
+    return render_template("provider/peer_review_chart.html", review_id=review_id)

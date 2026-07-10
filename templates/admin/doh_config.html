@@ -515,6 +515,76 @@ input:checked + .slider:before { transform:translateX(16px); }
     </div>
   </div>
 </div>
+<!-- State Portal Links Configuration (STATE-PORTAL-001) -->
+<div class="section" style="margin-top:20px;">
+  <div class="sec-header">
+    <div>
+      <div class="sec-title">State Portal Links</div>
+      <div style="font-size:12px;color:#6B7280;margin-top:2px;">URL links to external state reporting portals. These appear in the DOH Coordinator's State Portal Access module for one-click access.</div>
+    </div>
+    <span style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;margin-right:12px;">STATE-PORTAL-001</span>
+    <button onclick="openAddPortalModal()" style="background:#0F766E;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Add Portal</button>
+  </div>
+  <div class="sec-body" style="padding:0;">
+    <table>
+      <thead>
+        <tr>
+          <th>State</th>
+          <th>Agency / Portal Name</th>
+          <th>URL</th>
+          <th>Submission Type</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="portalLinksBody">
+        <tr>
+          <td><span style="font-weight:600;">Florida</span></td>
+          <td>FL Merlin — STI/HIV Reporting</td>
+          <td><a href="#" style="color:#0F766E;font-size:11px;font-family:monospace;">https://merlin.fl.gov/login</a></td>
+          <td><span class="condition-chip cond-sti">Web Portal</span></td>
+          <td><button onclick="editPortal(this)" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:12px;font-weight:600;">Edit</button> <button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:12px;">Remove</button></td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:600;">Texas</span></td>
+          <td>TX DSHS — Electronic Lab Reporting</td>
+          <td><a href="#" style="color:#0F766E;font-size:11px;font-family:monospace;">https://elr.dshs.state.tx.us</a></td>
+          <td><span class="condition-chip cond-lyme">ELR</span></td>
+          <td><button onclick="editPortal(this)" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:12px;font-weight:600;">Edit</button> <button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:12px;">Remove</button></td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:600;">California</span></td>
+          <td>CA CDPH — CalREDIE</td>
+          <td><a href="#" style="color:#0F766E;font-size:11px;font-family:monospace;">https://cdph.ca.gov/calredie</a></td>
+          <td><span class="condition-chip cond-hiv">Web Portal</span></td>
+          <td><button onclick="editPortal(this)" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:12px;font-weight:600;">Edit</button> <button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:12px;">Remove</button></td>
+        </tr>
+        <tr>
+          <td><span style="font-weight:600;">New York</span></td>
+          <td>NY DOH — NYSIIS</td>
+          <td><a href="#" style="color:#0F766E;font-size:11px;font-family:monospace;">https://nysiis.health.ny.gov</a></td>
+          <td><span class="condition-chip cond-tb">Web Portal</span></td>
+          <td><button onclick="editPortal(this)" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:12px;font-weight:600;">Edit</button> <button onclick="this.closest('tr').remove()" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:12px;">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Portal Modal -->
+<div class="modal-overlay" id="portalModal">
+  <div class="modal-box">
+    <div class="modal-header"><span id="portalModalTitle">Add State Portal Link</span><button class="modal-close" onclick="closeModals()">✕</button></div>
+    <div class="modal-body">
+      <div class="mfield"><label>State</label><select id="portalState" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;"><option>Florida</option><option>Texas</option><option>California</option><option>New York</option><option>Georgia</option><option>Virginia</option><option>Washington</option><option>Michigan</option><option>North Carolina</option><option>Ohio</option><option>Illinois</option></select></div>
+      <div class="mfield"><label>Agency / Portal Name</label><input type="text" id="portalAgency" placeholder="e.g. FL Merlin — STI/HIV Reporting"></div>
+      <div class="mfield"><label>Portal URL</label><input type="url" id="portalUrl" placeholder="https://..."></div>
+      <div class="mfield"><label>Submission Type</label><select id="portalType"><option>Web Portal</option><option>ELR</option><option>Fax Only</option><option>Phone Only</option></select></div>
+      <div class="mfield"><label>Notes (optional)</label><textarea id="portalNotes" style="width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;min-height:48px;" placeholder="Login credentials in 1Password · Requires VPN · etc."></textarea></div>
+    </div>
+    <div class="modal-footer"><button class="btn-cancel" onclick="closeModals()">Cancel</button><button class="btn-save" onclick="savePortal()">Save Portal</button></div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -565,6 +635,32 @@ function showSaveBanner() {
   var b = document.getElementById('saveBanner');
   b.classList.add('show');
   setTimeout(function() { b.classList.remove('show'); }, 4000);
+}
+
+function openAddPortalModal() {
+  document.getElementById('portalModalTitle').textContent = 'Add State Portal Link';
+  document.getElementById('portalAgency').value = '';
+  document.getElementById('portalUrl').value = '';
+  document.getElementById('portalModal').classList.add('open');
+}
+function editPortal(btn) {
+  document.getElementById('portalModalTitle').textContent = 'Edit Portal Link';
+  var row = btn.closest('tr');
+  document.getElementById('portalAgency').value = row.cells[1].textContent.trim();
+  document.getElementById('portalModal').classList.add('open');
+}
+function savePortal() {
+  var state = document.getElementById('portalState').value;
+  var agency = document.getElementById('portalAgency').value || 'State Portal';
+  var url = document.getElementById('portalUrl').value || '#';
+  var type = document.getElementById('portalType').value;
+  var chipClass = type === 'ELR' ? 'cond-lyme' : type === 'Fax Only' ? 'cond-tb' : 'cond-sti';
+  var tbody = document.getElementById('portalLinksBody');
+  var tr = document.createElement('tr');
+  tr.innerHTML = '<td><span style="font-weight:600;">'+state+'</span></td><td>'+agency+'</td><td><a href="'+url+'" style="color:#0F766E;font-size:11px;font-family:monospace;">'+url+'</a></td><td><span class="condition-chip '+chipClass+'">'+type+'</span></td><td><button onclick="editPortal(this)" style="background:none;border:none;color:#6B7280;cursor:pointer;font-size:12px;font-weight:600;">Edit</button> <button onclick="this.closest(\'tr\').remove()" style="background:none;border:none;color:#DC2626;cursor:pointer;font-size:12px;">Remove</button></td>';
+  tbody.appendChild(tr);
+  closeModals();
+  showSaveBanner();
 }
 </script>
 {% endblock %}

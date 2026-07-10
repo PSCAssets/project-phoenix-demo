@@ -10,8 +10,6 @@ body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; backg
 .topbar-title { color:#fff; font-weight:700; font-size:16px; }
 .topbar-sub { color:rgba(255,255,255,0.6); font-size:12px; margin-top:1px; }
 .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
-.pg-btn { display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer; }
-.pg-btn:hover { background:rgba(255,255,255,0.2); }
 .avatar { width:32px; height:32px; border-radius:50%; background:#4C1D95; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
 
 .page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
@@ -77,10 +75,7 @@ tbody tr.approved td { opacity:0.45; }
     <div class="topbar-sub">Dr. Sarah Lee · Assigned to you based on tier &amp; state allocation</div>
   </div>
   <div class="topbar-right">
-    <button class="pg-btn" onclick="openPageGuide()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-      Page Guide
-    </button>
+
     <div class="avatar">SL</div>
   </div>
 </div>
@@ -153,26 +148,6 @@ tbody tr.approved td { opacity:0.45; }
 
 </div>
 
-<!-- Page Guide Panel -->
-<div id="pageGuidePanel" style="display:none;position:fixed;top:0;right:0;width:340px;height:100vh;background:#fff;border-left:1px solid #E5E0D8;z-index:9998;flex-direction:column;box-shadow:-4px 0 20px rgba(0,0,0,0.1);">
-  <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#6B21A8;">
-    <span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span>
-    <button onclick="document.getElementById('pageGuidePanel').style.display='none'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button>
-  </div>
-  <div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;">
-    <h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Lab Requisitions</h3>
-    <p style="margin-bottom:12px;"><strong>Purpose:</strong> Review and bulk-approve all lab orders assigned to you based on your state, client, and tier allocation. Requisitions are never reviewed individually — this module is designed for batch processing.</p>
-    <h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">How It Works</h4>
-    <ul style="padding-left:16px;margin-bottom:14px;">
-      <li style="margin-bottom:6px;">The admin portal assigns a percentage of all lab orders to you based on state and client (e.g., 40% of TX orders)</li>
-      <li style="margin-bottom:6px;">Click <strong>Select All</strong>, then <strong>Approve Selected</strong> to clear your queue in one action</li>
-      <li style="margin-bottom:6px;">You can also review individual orders and approve selectively</li>
-    </ul>
-    <h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Getting Here</h4>
-    <p style="margin-bottom:12px;">From your dashboard, click the <strong>Lab Requisitions</strong> count badge. The number on your dashboard is your pending count.</p>
-    <p style="font-size:11px;color:#9CA3AF;">Req: LAB-MOD-001 · LAB-DASH-001</p>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -258,10 +233,7 @@ function showToast(msg) {
   setTimeout(function(){ t.style.display = 'none'; }, 3000);
 }
 
-function openPageGuide() {
-  var p = document.getElementById('pageGuidePanel');
-  p.style.display = p.style.display === 'none' ? 'flex' : 'none';
-}
+
 
 renderTable();
 </script>

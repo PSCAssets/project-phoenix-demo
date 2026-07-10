@@ -95,9 +95,7 @@ tbody tr:hover { background:#F5F7FA; }
     <div class="topbar-sub">After-hours coverage · 8 internal 1099 RN pool · $100/shift</div>
   </div>
   <div class="topbar-right" style="color:rgba(255,255,255,0.85);font-size:13px;display:flex;align-items:center;gap:10px;">
-    <button onclick="openOncallPageGuide()" style="display:flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:600;cursor:pointer;">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> Page Guide
-    </button>
+
     <span>Jennifer Martinez, Lead RN</span>
     <div class="avatar">JP</div>
   </div>
@@ -430,15 +428,6 @@ function showToast(msg) {
   setTimeout(function(){ banner.remove(); }, 4000);
 }
 
-// Page Guide (PG-ALL-001)
-function openOncallPageGuide() {
-  var panel = document.getElementById('oncallGuidePanel');
-  if (panel) { panel.style.display = panel.style.display === 'none' ? 'flex' : 'none'; return; }
-  panel = document.createElement('div');
-  panel.id = 'oncallGuidePanel';
-  Object.assign(panel.style, {position:'fixed',top:'0',right:'0',width:'340px',height:'100vh',background:'#fff',borderLeft:'1px solid #E5E0D8',zIndex:'9998',display:'flex',flexDirection:'column',boxShadow:'-4px 0 20px rgba(0,0,0,0.1)'});
-  panel.innerHTML = '<div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:10px;background:#445D7A;"><span style="font-size:14px;font-weight:700;color:#fff;flex:1;">📖 Page Guide</span><button onclick="document.getElementById(\'oncallGuidePanel\').style.display=\'none\'" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:4px;padding:2px 8px;">✕</button></div><div style="padding:20px;overflow-y:auto;flex:1;font-size:13px;color:#374151;line-height:1.6;"><h3 style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">My On-Call Schedule</h3><p style="margin-bottom:12px;"><strong>Privacy Notice:</strong> You only see your own on-call shifts. Other RNs\' schedules are not visible to prevent scheduling confusion.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Schedule Changes</h4><p style="margin-bottom:12px;">Contact your supervisor or use the Scheduling module to request swap or coverage. Changes made by management will appear here automatically.</p><h4 style="font-size:12px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">On-Call Responsibilities</h4><p style="margin-bottom:12px;">During your on-call window, ensure you are logged in with Online status toggled ON so you receive critical lab alerts and urgent patient notifications.</p><p style="font-size:11px;color:#9CA3AF;">Req: RN-SCHED-001 · PG-ALL-001</p></div>';
-  document.body.appendChild(panel);
-}
+
 </script>
 {% endblock %}
