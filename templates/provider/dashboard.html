@@ -369,17 +369,17 @@
         <div class="stat-value red">3</div>
         <div class="stat-sub">Require immediate action</div>
       </div>
-      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="alert('Navigating to Scheduled Consults...')">
+      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="window.location.href='/provider/schedule'">
         <div class="stat-label">Scheduled Consults</div>
         <div class="stat-value">7</div>
         <div class="stat-sub">Today's calendar</div>
       </div>
-      <div class="stat-card accent-blue" style="cursor:pointer;" onclick="alert('Navigating to Async Consult queue...')">
+      <div class="stat-card accent-blue" style="cursor:pointer;" onclick="scrollAndFilter('async')">
         <div class="stat-label">Async Consults</div>
         <div class="stat-value">6</div>
         <div class="stat-sub">Awaiting review</div>
       </div>
-      <div class="stat-card accent-amber" style="cursor:pointer;" onclick="alert('Navigating to Open Encounters...')">
+      <div class="stat-card accent-amber" style="cursor:pointer;" onclick="scrollAndFilter('open')">
         <div class="stat-label">Open Encounters</div>
         <div class="stat-value amber">2</div>
         <div class="stat-sub">Requires chart close</div>
@@ -432,6 +432,7 @@
             <button class="ct-filter-btn" data-filter="phone" onclick="filterConsultsByType('phone',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Phone</button>
             <button class="ct-filter-btn" data-filter="video" onclick="filterConsultsByType('video',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Video</button>
             <button class="ct-filter-btn" data-filter="async" onclick="filterConsultsByType('async',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Async</button>
+            <button class="ct-filter-btn" data-filter="open" onclick="filterConsultsByType('open',this)" style="padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;">Open Encounters</button>
           </div>
           <table class="sortable-table" id="consultTable" style="table-layout: fixed; width: 100%;">
             <thead>
@@ -449,7 +450,7 @@
             </thead>
             <tbody id="consultTbody">
               <!-- QA Flagged consult — sorted to top -->
-              <tr data-program="Weight Management" data-type="Async" data-ct-type="async" data-wait-sec="0" data-status="QA Flag" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer;border-left:3px solid #DC2626;background:#FFF5F5;">
+              <tr data-program="Weight Management" data-type="Async" data-ct-type="async" data-open-encounter="true" data-wait-sec="0" data-status="QA Flag" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer;border-left:3px solid #DC2626;background:#FFF5F5;">
                 <td><div class="cr-patient">R.T.</div><div class="cr-id">CST-2026-10801</div></td>
                 <td><span class="cr-program">Weight Management</span></td>
                 <td><span style="font-size:11px;color:#6B7280;font-weight:600">TX</span></td>
@@ -470,7 +471,7 @@
                 <td><span style="color:#DC2626;font-weight:600;">47 min overdue</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=phone'">Open</button></td>
               </tr>
-              <tr data-program="Testosterone" data-type="Async" data-ct-type="async" data-wait-sec="11760" data-status="In Progress" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+              <tr data-program="Testosterone" data-type="Async" data-ct-type="async" data-open-encounter="true" data-wait-sec="11760" data-status="In Progress" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
                 <td><div class="cr-patient">G.O.</div><div class="cr-id">CST-2026-10832</div></td>
                 <td><span class="cr-program">Testosterone</span></td>
                 <td><span style="font-size:11px;color:#6B7280;font-weight:600">CA</span></td>
@@ -947,9 +948,23 @@ function filterConsultsByType(type, btn) {
   btn.style.background = '#6B21A8';
   btn.style.color = '#fff';
   btn.style.borderColor = '#6B21A8';
-  document.querySelectorAll('#consultTbody tr[data-ct-type]').forEach(row => {
-    row.style.display = (type === 'all' || row.dataset.ctType === type) ? '' : 'none';
+  document.querySelectorAll('#consultTbody tr').forEach(row => {
+    if (type === 'all') {
+      row.style.display = '';
+    } else if (type === 'open') {
+      row.style.display = row.dataset.openEncounter === 'true' ? '' : 'none';
+    } else {
+      row.style.display = row.dataset.ctType === type ? '' : 'none';
+    }
   });
+}
+
+function scrollAndFilter(type) {
+  var btn = document.querySelector('.ct-filter-btn[data-filter="' + type + '"]');
+  if (btn) {
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(function() { filterConsultsByType(type, btn); }, 300);
+  }
 }
 
 const sortState = {};

@@ -60,10 +60,10 @@ tbody tr:last-child td { border-bottom: none; }
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
     <div class="stat-row">
       <div class="stat-card" style="cursor:pointer;border-left:3px solid #DC2626;" onclick="openUrgentPanel()"><div class="stat-label">Urgent Messages</div><div class="stat-value red">3</div></div>
-      <div class="stat-card"><div class="stat-label">Pending Review</div><div class="stat-value amber">4</div></div>
+      <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('pendingQueueBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">Pending Review</div><div class="stat-value amber">4</div></div>
       <div class="stat-card"><div class="stat-label">Approved Today</div><div class="stat-value green">7</div></div>
       <div class="stat-card"><div class="stat-label">Rejected Today</div><div class="stat-value red">1</div></div>
-      <div class="stat-card"><div class="stat-label">SLA Breach Risk</div><div class="stat-value amber">1</div></div>
+      <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('closureFlagsBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">SLA Breach Risk</div><div class="stat-value amber">1</div></div>
     </div>
 
     <!-- Pending Queue -->

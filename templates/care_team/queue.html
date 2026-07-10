@@ -36,15 +36,14 @@
   }
 
   .main { margin-left: 56px; margin-top: 116px; padding: 24px; flex: 1; }
+  .topbar { top: 60px !important; }
+  .main { margin-top: 116px !important; }
 
-  .page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .page-header h1 { font-size: 20px; font-weight: 700; color: #111827; }
-  .unassigned-badge { background: #FEF2F2; color: #DC2626; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 12px; border: 1px solid #FCA5A5; }
   .page-desc { font-size: 13px; color: #6B7280; margin-bottom: 20px; line-height: 1.5; }
 
   /* Toolbar */
   .queue-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 300px; }
   .search-wrap input { width: 100%; padding: 7px 10px 7px 32px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 13px; background: #fff; outline: none; }
   .search-wrap input:focus { border-color: var(--navy); }
   .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
@@ -53,7 +52,7 @@
 
   /* Widget */
   .widget { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-  .widget-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .widget-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .widget-title { font-size: 14px; font-weight: 600; color: #111827; }
   .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
   .chip-red { background: var(--red-light); color: var(--red); }
@@ -83,20 +82,112 @@
   .action-btn.green-btn { border-color: var(--ct-green); color: var(--ct-green); }
   .action-btn.green-btn:hover { background: var(--ct-green); color: #fff; }
   .cat-tag { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
-  .cat-edu { background: var(--blue-light); color: var(--blue); }
-  .cat-ae { background: var(--red-light); color: var(--red); }
-  .cat-async { background: var(--ct-green-light); color: var(--ct-green); }
   .cat-followup { background: var(--amber-light); color: #92400E; }
-  .cat-coord { background: #F3E8FF; color: #6D28D9; }
+  .cat-coord   { background: #F3E8FF; color: #6D28D9; }
+  .cat-edu     { background: var(--blue-light); color: var(--blue); }
+  .cat-async   { background: var(--ct-green-light); color: var(--ct-green); }
+  .cat-auto    { background: #EDE9FE; color: #6D28D9; }
   .patient-name { font-weight: 500; }
   .consult-id { font-size: 11px; color: #6B7280; }
-
   .empty-state { padding: 48px 24px; text-align: center; color: #6B7280; font-size: 14px; }
   .empty-state svg { margin: 0 auto 12px; display: block; opacity: 0.3; }
 
-  /* demo-nav-offset */
-  .topbar { top: 60px !important; }
-  .main { margin-top: 116px !important; }
+  /* ── Platform Workflow Intelligence Panel ── */
+  .impact-panel {
+    background: #F5F3FF;
+    border: 1.5px solid #C4B5FD;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    overflow: hidden;
+  }
+  .impact-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 13px 18px; cursor: pointer; user-select: none;
+  }
+  .impact-header:hover { background: #EDE9FE; }
+  .impact-title { font-size: 13px; font-weight: 700; color: #5B21B6; }
+  .impact-sub   { font-size: 12px; color: #7C3AED; }
+  .impact-toggle { margin-left: auto; font-size: 11px; color: #7C3AED; font-weight: 600; background: #EDE9FE; padding: 3px 10px; border-radius: 6px; white-space: nowrap; }
+
+  .impact-body { border-top: 1.5px solid #C4B5FD; }
+
+  .impact-table-head {
+    display: grid;
+    grid-template-columns: 165px 1fr 1fr 100px;
+    background: #EDE9FE;
+    border-bottom: 1px solid #C4B5FD;
+  }
+  .impact-table-head div {
+    padding: 7px 14px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; color: #6D28D9;
+  }
+
+  .impact-row {
+    display: grid;
+    grid-template-columns: 165px 1fr 1fr 100px;
+    border-bottom: 1px solid #EDE9FE;
+  }
+  .impact-row:last-child { border-bottom: none; }
+  .impact-row.elim-row { opacity: 0.68; }
+
+  .impact-cell { padding: 11px 14px; font-size: 12px; color: #374151; line-height: 1.5; }
+  .impact-type     { font-weight: 700; color: #111827; font-size: 12px; }
+  .impact-type-sub { font-size: 10px; color: #7C3AED; font-weight: 600; margin-top: 2px; }
+  .impact-channel  {
+    display: inline-block;
+    font-family: monospace; font-size: 10px;
+    background: #FEF3C7; color: #92400E;
+    padding: 1px 6px; border-radius: 3px; margin-top: 4px;
+  }
+  .status-auto {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #D1FAE5; color: #065F46;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+  }
+  .status-elim {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #F3F4F6; color: #6B7280;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 6px;
+  }
+
+  /* Auto-generated queue rows */
+  .auto-row td:first-child { border-left: 3px solid #7C3AED; }
+  .auto-badge {
+    font-size: 10px; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px;
+    background: #EDE9FE; color: #6D28D9;
+    display: inline-block; margin-left: 4px; vertical-align: middle;
+  }
+  .info-btn {
+    background: none; border: none; cursor: pointer;
+    color: #C4B5FD; font-size: 13px; padding: 0 3px;
+    vertical-align: middle;
+  }
+  .info-btn:hover { color: #7C3AED; }
+
+  /* Workflow Info Popover */
+  .wf-popover {
+    position: fixed; z-index: 600;
+    background: #fff; border: 1.5px solid #C4B5FD;
+    border-radius: 12px; padding: 16px; width: 360px;
+    box-shadow: 0 8px 32px rgba(109,40,217,0.14);
+  }
+  .wf-pop-title { font-size: 13px; font-weight: 700; color: #5B21B6; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+  .wf-pop-close { font-size: 18px; cursor: pointer; color: #9CA3AF; line-height: 1; }
+  .wf-pop-close:hover { color: #374151; }
+  .wf-pop-channel-row { margin-bottom: 10px; font-size: 11px; color: #6B7280; }
+  .wf-pop-ch { font-family: monospace; font-size: 10px; background: #FEF3C7; color: #92400E; padding: 1px 6px; border-radius: 3px; }
+  .wf-pop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .wf-pop-block { border-radius: 8px; padding: 10px; }
+  .wf-pop-block.old { background: #FEF3C7; }
+  .wf-pop-block.new { background: #D1FAE5; }
+  .wf-pop-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+  .wf-pop-block.old .wf-pop-label { color: #92400E; }
+  .wf-pop-block.new .wf-pop-label { color: #065F46; }
+  .wf-pop-text { font-size: 11px; color: #374151; line-height: 1.5; }
 </style>
 {% endblock %}
 
@@ -119,6 +210,81 @@
 
   <p class="page-desc">All unassigned tasks across the care team. Pull any task directly or route it to a specific team member. Tasks assigned to you also appear on <a href="/care-team/" style="color:#6B21A8;font-weight:600;">My Dashboard</a>.</p>
 
+  <!-- ══════════════ PLATFORM WORKFLOW INTELLIGENCE ══════════════ -->
+  <div class="impact-panel" id="impactPanel">
+    <div class="impact-header" onclick="toggleImpact()">
+      <span style="font-size:15px;">⚡</span>
+      <span class="impact-title">Platform Workflow Intelligence</span>
+      <span class="impact-sub">How this queue replaces 5 manual Slack-based processes · Click a row's ⓘ for details</span>
+      <span class="impact-toggle" id="impactToggle">▲ Hide</span>
+    </div>
+    <div id="impactBody" class="impact-body">
+      <div class="impact-table-head">
+        <div>Workflow</div>
+        <div>Old Process (Current Platform)</div>
+        <div>New Platform Solution</div>
+        <div>Status</div>
+      </div>
+
+      <div class="impact-row">
+        <div class="impact-cell">
+          <div class="impact-type">Unable to Reach</div>
+          <div class="impact-type-sub">⚡ Auto-generates CT task</div>
+          <div class="impact-channel">#new_referral_notes</div>
+        </div>
+        <div class="impact-cell">Care team monitored #new_referral_notes every ~30 min. Provider posted note; team member called patient back manually — no system record, no SLA clock.</div>
+        <div class="impact-cell">Pre-call SMS/push fires automatically when provider accepts patient from queue. If still unreachable, CT task auto-creates with notification delivery status, consult link, and contact history.</div>
+        <div class="impact-cell" style="padding-top:14px;"><span class="status-auto">⚡ Automated</span></div>
+      </div>
+
+      <div class="impact-row">
+        <div class="impact-cell">
+          <div class="impact-type">Untreated Rx Consult</div>
+          <div class="impact-type-sub">⚡ Auto-generates CT task</div>
+          <div class="impact-channel">#physician_monitoring</div>
+        </div>
+        <div class="impact-cell">Monitoring bot posted to #physician_monitoring when an Rx consult closed without a prescription. Team manually investigated and contacted provider.</div>
+        <div class="impact-cell">System auto-creates CT task the moment an Rx-type consult completes without a prescription record. Task includes consult ID, physician name, note, and care product.</div>
+        <div class="impact-cell" style="padding-top:14px;"><span class="status-auto">⚡ Automated</span></div>
+      </div>
+
+      <div class="impact-row">
+        <div class="impact-cell">
+          <div class="impact-type">Reassignment Needed</div>
+          <div class="impact-type-sub">⚡ Auto-generates CT task</div>
+          <div class="impact-channel">#physician_issues</div>
+        </div>
+        <div class="impact-cell">Team typed freeform messages in #physician_issues to request provider swaps. No system record, no audit trail, no SLA. Manual back-and-forth to confirm.</div>
+        <div class="impact-cell">Reassignment trigger detected automatically or provider-initiated. CT task created with one-click Reassign action. All changes logged with timestamp, reason, and new provider.</div>
+        <div class="impact-cell" style="padding-top:14px;"><span class="status-auto">⚡ Automated</span></div>
+      </div>
+
+      <div class="impact-row elim-row">
+        <div class="impact-cell">
+          <div class="impact-type" style="color:#6B7280;">Broken Portal Link</div>
+          <div class="impact-type-sub" style="color:#9CA3AF;">No CT task needed</div>
+          <div class="impact-channel">#th-user-support-tickets</div>
+        </div>
+        <div class="impact-cell" style="color:#6B7280;">Patients received wrong or expired portal links. They contacted support; issues routed manually to #th-user-support-tickets. High volume of preventable tickets.</div>
+        <div class="impact-cell" style="color:#6B7280;">No outbound scheduled links in the new platform. Patients access the portal directly and initiate their consult from there. Eliminated by architecture — no task needed.</div>
+        <div class="impact-cell" style="padding-top:14px;"><span class="status-elim">✓ Eliminated</span></div>
+      </div>
+
+      <div class="impact-row elim-row">
+        <div class="impact-cell">
+          <div class="impact-type" style="color:#6B7280;">Prescription Not Found</div>
+          <div class="impact-type-sub" style="color:#9CA3AF;">No CT task needed</div>
+          <div class="impact-channel">#physician_monitoring</div>
+        </div>
+        <div class="impact-cell" style="color:#6B7280;">Monitoring bot checked hourly for prescription records, posting alerts to #physician_monitoring when a committed Rx was missing from the system.</div>
+        <div class="impact-cell" style="color:#6B7280;">Prescription is an atomic, integrated platform action — provider clicks Prescribe and the record is created in the same step. A committed-but-missing Rx is structurally impossible in the new platform.</div>
+        <div class="impact-cell" style="padding-top:14px;"><span class="status-elim">✓ Eliminated</span></div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ══════════════ END WORKFLOW INTELLIGENCE ══════════════ -->
+
   <!-- Toolbar -->
   <div class="queue-toolbar">
     <div class="search-wrap">
@@ -137,14 +303,20 @@
       <option value="Care Coord">Care Coordination</option>
       <option value="Education Q">Education Q</option>
       <option value="Async Consult">Async Consult</option>
+      <option value="Auto-Generated">Auto-Generated</option>
+    </select>
+    <select class="filter-select" id="sourceFilter" onchange="filterQueue()">
+      <option value="">All Sources</option>
+      <option value="auto">⚡ Auto-Generated</option>
+      <option value="manual">Manual</option>
     </select>
   </div>
 
   <div class="widget">
     <div class="widget-header">
       <h2 class="widget-title">Unassigned Tasks</h2>
-      <span class="chip chip-red" id="queueCount">2 items</span>
-      <span class="sort-hint">Click column headers to sort</span>
+      <span class="chip chip-red" id="queueCount">6 items</span>
+      <span class="sort-hint">Click headers to sort · <span style="color:#7C3AED;font-weight:700;">⚡</span> = auto-generated by platform · <span style="color:#9CA3AF;">ⓘ</span> = workflow guide</span>
     </div>
     <div class="queue-table-wrap">
       <table id="ctUnassignedTable">
@@ -154,7 +326,7 @@
             <th onclick="sortTable('ctUnassignedTable',1)">Patient <span class="sort-arrow">↕</span></th>
             <th onclick="sortTable('ctUnassignedTable',2)">Consult ID <span class="sort-arrow">↕</span></th>
             <th onclick="sortTable('ctUnassignedTable',3)">Category <span class="sort-arrow">↕</span></th>
-            <th onclick="sortTable('ctUnassignedTable',4)">Type <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('ctUnassignedTable',4)">Task Type <span class="sort-arrow">↕</span></th>
             <th onclick="sortTable('ctUnassignedTable',5)">Care Product <span class="sort-arrow">↕</span></th>
             <th onclick="sortTable('ctUnassignedTable',6)">Urgency <span class="sort-arrow">↕</span></th>
             <th onclick="sortTable('ctUnassignedTable',7)">Wait <span class="sort-arrow">↕</span></th>
@@ -162,7 +334,9 @@
           </tr>
         </thead>
         <tbody id="queueBody">
-          <tr data-urgency="CRITICAL" data-category="Follow-up">
+
+          <!-- Manual tasks -->
+          <tr data-urgency="CRITICAL" data-category="Follow-up" data-source="manual">
             <td><span class="pri-dot pri-critical"></span></td>
             <td><span class="patient-name">J.P.</span></td>
             <td><span class="consult-id">CST-2026-10848</span></td>
@@ -177,7 +351,8 @@
               <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
             </td>
           </tr>
-          <tr data-urgency="HIGH" data-category="Care Coord">
+
+          <tr data-urgency="HIGH" data-category="Care Coord" data-source="manual">
             <td><span class="pri-dot pri-high"></span></td>
             <td><span class="patient-name">D.K.</span></td>
             <td><span class="consult-id">CST-2026-10850</span></td>
@@ -192,6 +367,75 @@
               <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
             </td>
           </tr>
+
+          <!-- Auto-generated: Unable to Reach -->
+          <tr class="auto-row" data-urgency="CRITICAL" data-category="Auto-Generated" data-source="auto">
+            <td><span class="pri-dot pri-critical"></span></td>
+            <td><span class="patient-name">R.M.</span></td>
+            <td><span class="consult-id">CST-2026-10862</span></td>
+            <td><span class="cat-tag cat-auto">Auto-Generated</span></td>
+            <td>Unable to Reach <span class="auto-badge">⚡</span> <button class="info-btn" onclick="showInfo(event,'Unable to Reach')">ⓘ</button></td>
+            <td>Testosterone</td>
+            <td><span class="urgency-tag urg-critical">CRITICAL</span></td>
+            <td>18m</td>
+            <td>
+              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+            </td>
+          </tr>
+
+          <!-- Auto-generated: Untreated Rx -->
+          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto">
+            <td><span class="pri-dot pri-high"></span></td>
+            <td><span class="patient-name">K.S.</span></td>
+            <td><span class="consult-id">CST-2026-10857</span></td>
+            <td><span class="cat-tag cat-auto">Auto-Generated</span></td>
+            <td>Untreated Rx Consult <span class="auto-badge">⚡</span> <button class="info-btn" onclick="showInfo(event,'Untreated Rx Consult')">ⓘ</button></td>
+            <td>Weight Management</td>
+            <td><span class="urgency-tag urg-high">HIGH</span></td>
+            <td>2h 14m</td>
+            <td>
+              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+            </td>
+          </tr>
+
+          <!-- Auto-generated: Reassignment Needed -->
+          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto">
+            <td><span class="pri-dot pri-high"></span></td>
+            <td><span class="patient-name">B.T.</span></td>
+            <td><span class="consult-id">CST-2026-10851</span></td>
+            <td><span class="cat-tag cat-auto">Auto-Generated</span></td>
+            <td>Reassignment Needed <span class="auto-badge">⚡</span> <button class="info-btn" onclick="showInfo(event,'Reassignment Needed')">ⓘ</button></td>
+            <td>Thyroid</td>
+            <td><span class="urgency-tag urg-high">HIGH</span></td>
+            <td>47m</td>
+            <td>
+              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+            </td>
+          </tr>
+
+          <!-- Auto-generated: Post-Consult Follow-up -->
+          <tr class="auto-row" data-urgency="NORMAL" data-category="Auto-Generated" data-source="auto">
+            <td><span class="pri-dot pri-normal"></span></td>
+            <td><span class="patient-name">L.H.</span></td>
+            <td><span class="consult-id">CST-2026-10849</span></td>
+            <td><span class="cat-tag cat-auto">Auto-Generated</span></td>
+            <td>Post-Consult Follow-up <span class="auto-badge">⚡</span> <button class="info-btn" onclick="showInfo(event,'Post-Consult Follow-up')">ⓘ</button></td>
+            <td>Annual Wellness</td>
+            <td><span class="urgency-tag urg-normal">NORMAL</span></td>
+            <td>1h 30m</td>
+            <td>
+              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+            </td>
+          </tr>
+
         </tbody>
       </table>
       <div id="emptyState" style="display:none;" class="empty-state">
@@ -224,12 +468,95 @@
   </div>
 </div>
 
+<!-- Workflow Info Popover -->
+<div id="wfPopover" class="wf-popover" style="display:none;">
+  <div class="wf-pop-title">
+    <span id="wfPopTitle"></span>
+    <span class="wf-pop-close" onclick="hidePopover()">×</span>
+  </div>
+  <div class="wf-pop-channel-row">Previously managed in: <span id="wfPopChannel" class="wf-pop-ch"></span></div>
+  <div class="wf-pop-grid">
+    <div class="wf-pop-block old">
+      <div class="wf-pop-label">⚠ Old Process</div>
+      <div class="wf-pop-text" id="wfPopOld"></div>
+    </div>
+    <div class="wf-pop-block new">
+      <div class="wf-pop-label">⚡ New Platform</div>
+      <div class="wf-pop-text" id="wfPopNew"></div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
 <script>
 var sortState = {};
 var _routeRow = null;
+
+var WORKFLOW_INFO = {
+  'Unable to Reach': {
+    channel: '#new_referral_notes',
+    old: 'Team monitored Slack every ~30 min. Provider noted patient unreachable; team member called back manually — no system record, no SLA clock.',
+    'new': 'Pre-call notification fires when provider accepts patient from queue. If still unreachable, this task auto-creates with notification delivery status and contact history.'
+  },
+  'Untreated Rx Consult': {
+    channel: '#physician_monitoring',
+    old: 'Monitoring bot alerted #physician_monitoring when Rx consult closed without a prescription. Team manually investigated and contacted provider to determine cause.',
+    'new': 'System auto-creates this task when any Rx-type consult completes without a prescription record. Includes consult link and physician note for immediate follow-up.'
+  },
+  'Reassignment Needed': {
+    channel: '#physician_issues',
+    old: 'Team typed freeform Slack messages in #physician_issues to request provider swaps. No system record, no audit trail, no SLA — manual back-and-forth to confirm.',
+    'new': 'Reassignment trigger auto-detected or provider-initiated. Task created with one-click Reassign action. All changes logged with timestamp, reason, and new provider.'
+  },
+  'Post-Consult Follow-up': {
+    channel: '#new_referral_notes',
+    old: 'After consult, provider posted follow-up note to Slack. Team monitored channel and decided next action manually — no structured handoff, no SLA.',
+    'new': 'Provider selects follow-up reason in chart (pending results, reschedule, lab access, etc.). CT task auto-creates with note attached and consult link for structured handoff.'
+  }
+};
+
+function toggleImpact() {
+  var body = document.getElementById('impactBody');
+  var toggle = document.getElementById('impactToggle');
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    toggle.textContent = '▲ Hide';
+  } else {
+    body.style.display = 'none';
+    toggle.textContent = '▼ Show';
+  }
+}
+
+function showInfo(event, type) {
+  event.stopPropagation();
+  var info = WORKFLOW_INFO[type];
+  if (!info) return;
+  document.getElementById('wfPopTitle').textContent = type;
+  document.getElementById('wfPopChannel').textContent = info.channel;
+  document.getElementById('wfPopOld').textContent = info.old;
+  document.getElementById('wfPopNew').textContent = info['new'];
+  var pop = document.getElementById('wfPopover');
+  pop.style.display = 'block';
+  var rect = event.target.getBoundingClientRect();
+  var left = rect.left - 310;
+  if (left < 8) left = rect.right + 8;
+  if (left + 360 > window.innerWidth) left = window.innerWidth - 368;
+  var top = rect.bottom + 8;
+  if (top + 240 > window.innerHeight) top = rect.top - 248;
+  pop.style.top = top + 'px';
+  pop.style.left = left + 'px';
+}
+
+function hidePopover() {
+  document.getElementById('wfPopover').style.display = 'none';
+}
+
+document.addEventListener('click', function(e) {
+  var pop = document.getElementById('wfPopover');
+  if (pop && pop.style.display !== 'none' && !pop.contains(e.target)) hidePopover();
+});
 
 function sortTable(tableId, colIndex) {
   var table = document.getElementById(tableId);
@@ -239,39 +566,36 @@ function sortTable(tableId, colIndex) {
   var key = tableId + '_' + colIndex;
   var asc = sortState[key] !== true;
   sortState[key] = asc;
-  ths.forEach(function(th, i) {
+  ths.forEach(function(th) {
     th.classList.remove('sorted');
     var arrow = th.querySelector('.sort-arrow');
     if (arrow) arrow.textContent = '↕';
   });
   ths[colIndex].classList.add('sorted');
-  var sortedArrow = ths[colIndex].querySelector('.sort-arrow');
-  if (sortedArrow) sortedArrow.textContent = asc ? '↑' : '↓';
+  var sa = ths[colIndex].querySelector('.sort-arrow');
+  if (sa) sa.textContent = asc ? '↑' : '↓';
   rows.sort(function(a, b) {
     var cellA = a.querySelectorAll('td')[colIndex];
     var cellB = b.querySelectorAll('td')[colIndex];
     var valA = cellA ? cellA.innerText.trim().toLowerCase() : '';
     var valB = cellB ? cellB.innerText.trim().toLowerCase() : '';
-    if (valA < valB) return asc ? -1 : 1;
-    if (valA > valB) return asc ? 1 : -1;
-    return 0;
+    return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
   });
   rows.forEach(function(row) { tbody.appendChild(row); });
 }
 
 function filterQueue() {
-  var search = document.getElementById('queueSearch').value.toLowerCase();
-  var urgency = document.getElementById('urgencyFilter').value;
+  var search   = document.getElementById('queueSearch').value.toLowerCase();
+  var urgency  = document.getElementById('urgencyFilter').value;
   var category = document.getElementById('categoryFilter').value;
+  var source   = document.getElementById('sourceFilter').value;
   var rows = document.querySelectorAll('#queueBody tr');
   var visible = 0;
   rows.forEach(function(row) {
-    var text = row.innerText.toLowerCase();
-    var rowUrgency = row.getAttribute('data-urgency') || '';
-    var rowCategory = row.getAttribute('data-category') || '';
-    var match = (!search || text.includes(search)) &&
-                (!urgency || rowUrgency === urgency) &&
-                (!category || rowCategory === category);
+    var match = (!search   || row.innerText.toLowerCase().includes(search)) &&
+                (!urgency  || row.getAttribute('data-urgency')  === urgency) &&
+                (!category || row.getAttribute('data-category') === category) &&
+                (!source   || row.getAttribute('data-source')   === source);
     row.style.display = match ? '' : 'none';
     if (match) visible++;
   });

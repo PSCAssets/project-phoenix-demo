@@ -175,17 +175,17 @@
 
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
   <div class="stat-grid">
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-queue-heading').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:var(--ct-green)"></div>
       <div class="stat-label">Active Cases</div>
       <div class="stat-value" style="color:var(--ct-green)">18</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-msg-heading').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:var(--blue)"></div>
       <div class="stat-label">Messages (unread)</div>
       <div class="stat-value" style="color:var(--blue)">4</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-queue-heading').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:var(--amber)"></div>
       <div class="stat-label">Pending Follow-ups</div>
       <div class="stat-value" style="color:var(--amber)">7</div>

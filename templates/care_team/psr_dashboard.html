@@ -134,7 +134,7 @@ main.main-content { margin-left: 56px; display: flex; flex-direction: column; ov
     <!-- Stats -->
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
     <div class="stats-strip">
-      <div class="stat-card pss">
+      <div class="stat-card pss" style="cursor:pointer;" onclick="window.location.href='/care-team/psr/queue'">
         <div class="stat-num">14</div>
         <div class="stat-label">Pending Calls Today</div>
       </div>
@@ -142,11 +142,11 @@ main.main-content { margin-left: 56px; display: flex; flex-direction: column; ov
         <div class="stat-num">31</div>
         <div class="stat-label">Completed Calls Today</div>
       </div>
-      <div class="stat-card warn">
+      <div class="stat-card warn" style="cursor:pointer;" onclick="window.location.href='/care-team/psr/queue'">
         <div class="stat-num">6</div>
         <div class="stat-label">2nd Attempt Needed</div>
       </div>
-      <div class="stat-card red">
+      <div class="stat-card red" style="cursor:pointer;" onclick="window.location.href='/care-team/psr/queue'">
         <div class="stat-num">3</div>
         <div class="stat-label">Exhausted (3 Attempts)</div>
       </div>

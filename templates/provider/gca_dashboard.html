@@ -87,13 +87,13 @@ tbody tr:hover { background:#FAF7F2; }
       <div class="stat-val">11</div>
       <div class="stat-sub">across all GCs</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('gca-prep-queue').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:#D97706;"></div>
       <div class="stat-label">Prep Needed</div>
       <div class="stat-val" style="color:#D97706;">4</div>
       <div class="stat-sub">action required</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('gca-prep-queue').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:#1D4ED8;"></div>
       <div class="stat-label">In Progress</div>
       <div class="stat-val" style="color:#1D4ED8;">3</div>
@@ -134,7 +134,7 @@ tbody tr:hover { background:#FAF7F2; }
 
   <!-- Consult Prep Queue -->
   <div class="widget">
-    <div class="widget-header">
+    <div class="widget-header" id="gca-prep-queue">
       <div class="widget-title">Consult Prep Queue</div>
       <span class="badge badge-amber">7 open</span>
       <a href="/provider/gca/consult-prep" class="section-link">View All &rarr;</a>

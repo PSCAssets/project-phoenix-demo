@@ -350,17 +350,17 @@
         <div class="stat-value green">5</div>
         <div class="stat-sub">+2 vs. yesterday</div>
       </div>
-      <div class="stat-card accent-navy">
+      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="document.getElementById('consultsTable').scrollIntoView({behavior:'smooth'})">
         <div class="stat-label">Active Consults</div>
         <div class="stat-value">8</div>
         <div class="stat-sub">Assigned to you</div>
       </div>
-      <div class="stat-card accent-amber">
+      <div class="stat-card accent-amber" style="cursor:pointer;" onclick="document.getElementById('pendingTable').scrollIntoView({behavior:'smooth'})">
         <div class="stat-label">Pending Chart Close</div>
         <div class="stat-value amber">2</div>
         <div class="stat-sub">Requires signature</div>
       </div>
-      <div class="stat-card accent-red">
+      <div class="stat-card accent-red" style="cursor:pointer;" onclick="document.getElementById('slaTable').scrollIntoView({behavior:'smooth'})">
         <div class="stat-label">SLA Alerts</div>
         <div class="stat-value red">2</div>
         <div class="stat-sub">1 over SLA · 1 warning</div>
