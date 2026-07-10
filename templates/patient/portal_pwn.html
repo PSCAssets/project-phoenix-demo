@@ -385,6 +385,86 @@
       <!-- ── DASHBOARD ── -->
       <div class="section-panel active" id="panel-dashboard">
 
+        <!-- DXS Urgent Consult Card (DXS-PT-001 / DXS-PT-002) -->
+        <div id="dxsConsultCard" style="background:#fff;border:2px solid #7C3AED;border-radius:12px;padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 16px rgba(124,58,237,0.08);">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+            <span style="font-size:18px;">🔬</span>
+            <div style="flex:1;">
+              <div style="font-size:15px;font-weight:800;color:#111827;">Your Results Are Ready — Consultation Available Now</div>
+              <div style="font-size:12px;color:#6B7280;margin-top:2px;">Testosterone Program · Results received Jul 9, 2026</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;">Est. Wait Time</div>
+              <div id="waitTimeDisplay" style="font-size:22px;font-weight:900;color:#7C3AED;line-height:1.1;">22 min</div>
+              <div style="font-size:10px;color:#9CA3AF;margin-top:1px;">to see a provider</div>
+            </div>
+          </div>
+          <!-- Abnormal results summary -->
+          <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px;">Results to Discuss with Provider</div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;">ABNORMAL ↑</span>
+                <span style="font-size:13px;font-weight:700;color:#111827;flex:1;">LDL Cholesterol</span>
+                <span style="font-size:13px;font-weight:800;color:#D97706;">240 mg/dL</span>
+                <span style="font-size:11px;color:#9CA3AF;">(ref: &lt;200)</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <span style="background:#FEF3C7;color:#92400E;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;">ABNORMAL ↓</span>
+                <span style="font-size:13px;font-weight:700;color:#111827;flex:1;">Vitamin D, 25-OH</span>
+                <span style="font-size:13px;font-weight:800;color:#2563EB;">18 ng/mL</span>
+                <span style="font-size:11px;color:#9CA3AF;">(ref: 30–100)</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button onclick="openStateCheck()" style="background:#7C3AED;color:#fff;border:none;border-radius:9px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:8px;">
+              🚀 Initiate Consult
+            </button>
+            <button onclick="alert('You can return to this page at any time using the link from your text message.')" style="background:#fff;border:1.5px solid #E5E7EB;color:#374151;border-radius:9px;padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Come Back Later</button>
+            <span style="font-size:10px;color:#9CA3AF;margin-left:4px;font-family:monospace;">DXS-PT-001</span>
+          </div>
+        </div>
+
+        <!-- State-of-Service Modal (DXS-PT-002) -->
+        <div id="stateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;">
+          <div style="background:#fff;border-radius:14px;width:460px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,0.2);overflow:hidden;">
+            <div style="padding:20px 24px 14px;border-bottom:1px solid #E5E7EB;">
+              <div style="font-size:16px;font-weight:800;color:#111827;margin-bottom:4px;">Confirm Your Current Location</div>
+              <div style="font-size:12px;color:#6B7280;line-height:1.5;">To connect you with a licensed provider, we need to confirm the state you are physically in right now — this may be different from your home address if you are traveling.</div>
+            </div>
+            <div style="padding:20px 24px;">
+              <div style="background:#F3F4F6;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#374151;">
+                📍 Your home address is in <strong>Texas</strong>. Are you currently in Texas?
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button onclick="confirmState('Texas')" style="background:#0A2F5C;color:#fff;border:none;border-radius:8px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left;display:flex;align-items:center;gap:10px;">
+                  <span style="font-size:16px;">✓</span> Yes, I am currently in Texas
+                </button>
+                <div style="font-size:11px;font-weight:700;color:#6B7280;text-align:center;margin:4px 0;">— OR —</div>
+                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;">I am currently in a different state:</div>
+                <select id="stateSelect" style="width:100%;border:1.5px solid #D1D5DB;border-radius:8px;padding:10px 12px;font-size:13px;font-family:inherit;color:#374151;">
+                  <option value="">Select your current state...</option>
+                  <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option>
+                  <option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option>
+                  <option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option>
+                  <option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option>
+                  <option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
+                  <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option>
+                  <option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option>
+                  <option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option>
+                  <option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option>
+                  <option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
+                  <option>South Dakota</option><option>Tennessee</option><option>Vermont</option><option>Virginia</option>
+                  <option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+                </select>
+                <button onclick="confirmStateFromSelect()" style="background:#374151;color:#fff;border:none;border-radius:8px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px;">Continue with Selected State</button>
+              </div>
+              <div style="font-size:10px;color:#9CA3AF;margin-top:12px;text-align:center;font-family:monospace;">DXS-PT-002 · State-of-Service Routing</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Abnormal result alert -->
         <div class="abnormal-alert" id="abnormalAlert">
           <div class="abnormal-alert-icon">⚠️</div>
@@ -1279,6 +1359,50 @@ function buildConfirmation() {
     topicList.innerHTML += '<div class="confirm-topic-row" style="color:#9CA3AF;">No specific topics selected</div>';
   }
 }
+
+// DXS state-of-service modal (DXS-PT-002)
+function openStateCheck() {
+  document.getElementById('stateModal').style.display = 'flex';
+}
+function confirmState(state) {
+  document.getElementById('stateModal').style.display = 'none';
+  enterConsultQueue(state);
+}
+function confirmStateFromSelect() {
+  var sel = document.getElementById('stateSelect').value;
+  if (!sel) { alert('Please select your current state.'); return; }
+  document.getElementById('stateModal').style.display = 'none';
+  enterConsultQueue(sel);
+}
+function enterConsultQueue(state) {
+  var card = document.getElementById('dxsConsultCard');
+  card.style.borderColor = '#059669';
+  card.innerHTML = '<div style="display:flex;align-items:center;gap:14px;padding:4px 0;">' +
+    '<span style="font-size:28px;">✅</span>' +
+    '<div>' +
+      '<div style="font-size:15px;font-weight:800;color:#059669;">You\'re in the queue!</div>' +
+      '<div style="font-size:13px;color:#374151;margin-top:4px;">State of service confirmed: <strong>' + state + '</strong>. A provider licensed in ' + state + ' will see you shortly.</div>' +
+      '<div style="font-size:12px;color:#6B7280;margin-top:6px;">Estimated wait: <strong id="liveWait">22 min</strong> · You will be notified when your provider is ready.</div>' +
+      '<div style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-top:6px;">DXS-PT-002 · State of Service = ' + state + '</div>' +
+    '</div>' +
+  '</div>';
+  // Count down wait time
+  var mins = 22;
+  var waitInterval = setInterval(function() {
+    mins = Math.max(0, mins - 1);
+    var el = document.getElementById('liveWait');
+    if (el) el.textContent = mins > 0 ? mins + ' min' : 'Provider ready — please stand by';
+    if (mins === 0) clearInterval(waitInterval);
+  }, 30000);
+}
+
+// DXS wait time countdown (DXS-PT-001)
+var waitMins = 22;
+setInterval(function() {
+  var el = document.getElementById('waitTimeDisplay');
+  if (!el) return;
+  if (waitMins > 1) { waitMins--; el.textContent = waitMins + ' min'; }
+}, 60000);
 
 function filterConsults() {
   var status  = document.getElementById('csFilter').value;

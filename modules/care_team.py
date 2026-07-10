@@ -22,6 +22,14 @@ def psr_link_generator():
 def psr_thyroid_queue():
     return render_template("care_team/thyroid_queue.html")
 
+@bp.route("/psr/dxs-queue")
+def psr_dxs_queue():
+    return render_template("care_team/dxs_queue.html")
+
+@bp.route("/psr/dxs-call/<consult_id>")
+def psr_dxs_call(consult_id):
+    return render_template("care_team/dxs_call.html")
+
 @bp.route("/queue")
 def queue():
     return render_template("care_team/queue.html")

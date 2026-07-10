@@ -352,6 +352,7 @@ def inject_sidebar_nav():
         'provider_psr': [
             ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
             ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
+            ('DXS Queue',      '/care-team/psr/dxs-queue',        'clipboard', ['/care-team/psr/dxs-queue', '/care-team/psr/dxs-call']),
             ('Thyroid Program','/care-team/psr/thyroid-queue',    'clipboard', ['/care-team/psr/thyroid-queue']),
             ('GC Queue',       '/provider/gc/queue',              'users',     ['/provider/gc/queue']),
             ('Patient Queue',  '/provider/queue',                 'users',     ['/provider/queue']),
