@@ -316,13 +316,14 @@
   <!-- Footer: End-of-call actions -->
   <div class="call-footer">
     <span class="footer-label">End-of-Call Action:</span>
-    <button class="btn-initiate" id="initiateBtn" onclick="initiateConsult()" disabled style="opacity:0.5;">
-      🚀 Initiate Patient Consult
-      <span style="font-size:10px;font-family:monospace;color:#C4B5FD;">DXS-CALL-004</span>
+    <button class="btn-initiate" id="initiateBtn" onclick="initiateConsult()" disabled style="background:#D1D5DB;color:#9CA3AF;cursor:not-allowed;">
+      🔒 Initiate Patient Consult
+      <span style="font-size:10px;font-family:monospace;color:#9CA3AF;">DXS-CALL-004</span>
     </button>
-    <button class="btn-pcp" id="pcpBtn" onclick="pcpReferral()" disabled style="opacity:0.5;">
+    <button class="btn-pcp" id="pcpBtn" onclick="pcpReferral()" disabled style="opacity:0.4;cursor:not-allowed;">
       → Refer to PCP
     </button>
+    <span style="font-size:11px;color:#F59E0B;font-weight:600;">⚠ Complete HIPAA verification to enable actions</span>
     <button class="btn-log-outcome" onclick="alert('Log call outcome / no answer / callback request')">Log Outcome</button>
   </div>
 </div>
@@ -359,10 +360,20 @@ function markHipaaVerified() {
   document.getElementById('hipaaLock').style.display = 'none';
 
   // Enable footer actions
-  document.getElementById('initiateBtn').disabled = false;
-  document.getElementById('initiateBtn').style.opacity = '1';
-  document.getElementById('pcpBtn').disabled = false;
-  document.getElementById('pcpBtn').style.opacity = '1';
+  var initiateBtn = document.getElementById('initiateBtn');
+  initiateBtn.disabled = false;
+  initiateBtn.style.background = '#7C3AED';
+  initiateBtn.style.color = '#fff';
+  initiateBtn.style.cursor = 'pointer';
+  initiateBtn.textContent = '';
+  initiateBtn.innerHTML = '🚀 Initiate Patient Consult <span style="font-size:10px;font-family:monospace;color:#C4B5FD;">DXS-CALL-004</span>';
+  var pcpBtn = document.getElementById('pcpBtn');
+  pcpBtn.disabled = false;
+  pcpBtn.style.opacity = '1';
+  pcpBtn.style.cursor = 'pointer';
+  // Hide the warning
+  var warn = initiateBtn.parentElement.querySelector('span[style*="F59E0B"]');
+  if (warn) warn.style.display = 'none';
 
   showToast('✓ HIPAA verified — results unlocked');
 }
