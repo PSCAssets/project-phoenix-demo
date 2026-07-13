@@ -384,9 +384,8 @@ tbody tr:hover { background:#F0FDFA; }
   <!-- Tooltip element -->
   <div id="slaTooltip" style="display:none;position:fixed;background:#111827;color:#fff;border-radius:8px;padding:10px 14px;font-size:12px;z-index:9999;pointer-events:none;min-width:160px;box-shadow:0 4px 16px rgba(0,0,0,0.2);"></div>
 
-</main>
   <!-- Urgent Messages Panel (URG-MSG-001) -->
-  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:1100;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
     <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
       <span style="font-size:16px;">🚨</span>
       <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
@@ -399,7 +398,9 @@ tbody tr:hover { background:#F0FDFA; }
     </div>
     <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
   </div>
-  <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+  <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:1099;"></div>
+
+</main>
 
 {% endblock %}
 {% block scripts %}
