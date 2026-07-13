@@ -1,1637 +1,1150 @@
 {% extends "base.html" %}
-{% block title %}GC Chart | Telehealth{% endblock %}
+{% block title %}GC Chart — Jennifer Walsh{% endblock %}
 {% block head %}
 <style>
-/* ── Layout ── */
-.chart-shell { position: fixed; top: 60px; left: 0; right: 0; bottom: 0; display: flex; overflow: hidden; background: #F8F7F4; }
-
-/* ── Left sidebar ── */
-.gc-sidebar { width: 56px; background: #F2EDE4; border-right: 1px solid #E5E0D8; display: flex; flex-direction: column; align-items: center; padding: 10px 0; flex-shrink: 0; z-index: 10; }
-.gc-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; padding: 9px 4px; cursor: pointer; color: #9CA3AF; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; text-decoration: none; transition: background .15s, color .15s; }
-.gc-nav-item:hover { background: #E5E0D8; color: #374151; }
-.gc-nav-item.active { background: #EDE9FE; color: #6B21A8; }
-.gc-nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
-
-/* ── Main area ── */
-.gc-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-
-/* ── Patient header ── */
-.gc-header { background: #fff; border-bottom: 2px solid #E5E0D8; padding: 12px 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-.gc-avatar { width: 48px; height: 48px; border-radius: 50%; background: #EDE9FE; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: #6B21A8; flex-shrink: 0; }
-.gc-patient-name { font-size: 17px; font-weight: 700; color: #111827; }
-.gc-patient-meta { font-size: 12px; color: #6B7280; margin-top: 2px; }
-.gc-badges { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-.gc-badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; border: 1px solid; }
-.gc-badge-pathogenic { background: #FEF2F2; color: #DC2626; border-color: #FECACA; }
-.gc-badge-program { background: #EDE9FE; color: #6B21A8; border-color: #C4B5FD; }
-.gc-badge-status { background: #FFF8E1; color: #92400E; border-color: #FDE68A; }
-.gc-badge-vus { background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
-.gc-badge-scheduled { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
-.gc-badge-pretest { background: #F0FDF4; color: #15803D; border-color: #BBF7D0; }
-.gc-badge-pending { background: #FFF8E1; color: #92400E; border-color: #FDE68A; }
-.gc-alert-info { background: #FFF7ED; border-bottom: 2px solid #FED7AA; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #C2410C; font-weight: 600; flex-shrink: 0; }
-.gc-alert-pretest { background: #F0FDF4; border-bottom: 2px solid #BBF7D0; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #15803D; font-weight: 600; flex-shrink: 0; }
-.gc-header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
-.btn { padding: 7px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 5px; }
-.btn-primary { background: #6B21A8; color: #fff; }
-.btn-primary:hover { background: #5B1898; }
-.btn-outline { background: #fff; border: 1px solid #E5E0D8; color: #374151; }
-.btn-outline:hover { background: #F9FAFB; }
-.btn-danger { background: #DC2626; color: #fff; }
-
-/* ── Tab bar ── */
-.gc-tabs { background: #fff; border-bottom: 1px solid #E5E0D8; display: flex; padding: 0 20px; flex-shrink: 0; }
-.gc-tab { padding: 10px 16px; font-size: 12px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .15s; }
-.gc-tab:hover { color: #374151; }
-.gc-tab.active { color: #6B21A8; border-bottom-color: #6B21A8; }
-
-/* ── Alerts banner ── */
-.gc-alert { background: #FEF2F2; border-bottom: 2px solid #FECACA; padding: 8px 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #DC2626; font-weight: 600; flex-shrink: 0; }
-
-/* ── Body ── */
-.gc-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; gap: 18px; }
-.gc-col-main { flex: 1; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.gc-col-side { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
-
-/* ── Cards ── */
-.gc-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
-.gc-card-header { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; gap: 8px; }
-.gc-card-title { font-size: 13px; font-weight: 700; color: #111827; }
-.gc-card-badge { background: #F3F4F6; border-radius: 10px; padding: 2px 8px; font-size: 10px; font-weight: 700; color: #6B7280; }
-.gc-card-body { padding: 14px 16px; }
-.gc-card-action { margin-left: auto; font-size: 11px; color: #6B21A8; cursor: pointer; font-weight: 600; }
-
-/* ── Field rows ── */
-.field-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #F9FAFB; font-size: 13px; }
-.field-row:last-child { border-bottom: none; }
-.field-label { color: #6B7280; font-weight: 500; }
-.field-val { color: #111827; font-weight: 600; text-align: right; max-width: 55%; }
-
-/* ── Variant block ── */
-.variant-block { background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
-.variant-class { font-size: 11px; font-weight: 800; color: #DC2626; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
-.variant-name { font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 2px; }
-.variant-hgvs { font-size: 12px; color: #6B7280; font-family: monospace; margin-bottom: 10px; }
-.variant-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.variant-cell { background: #fff; border: 1px solid #FECACA; border-radius: 7px; padding: 8px 10px; }
-.variant-cell-label { font-size: 10px; color: #6B7280; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
-.variant-cell-val { font-size: 13px; font-weight: 700; color: #111827; margin-top: 2px; }
-
-/* ── Risk meter ── */
-.risk-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.risk-label { font-size: 12px; font-weight: 600; color: #374151; width: 140px; flex-shrink: 0; }
-.risk-bar-wrap { flex: 1; background: #F3F4F6; border-radius: 6px; height: 10px; overflow: hidden; }
-.risk-bar { height: 10px; border-radius: 6px; }
-.risk-pct { font-size: 12px; font-weight: 800; color: #111827; width: 40px; text-align: right; }
-.risk-bar.high { background: #DC2626; }
-.risk-bar.medium { background: #D97706; }
-.risk-bar.low { background: #059669; }
-
-/* ── Pedigree ── */
-.pedigree-node { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 600; color: #374151; }
-.pedigree-symbol { width: 24px; height: 24px; border: 2px solid #374151; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
-.pedigree-symbol.circle { border-radius: 50%; }
-.pedigree-symbol.affected { background: #374151; color: #fff; }
-.pedigree-symbol.carrier { background: linear-gradient(135deg, #374151 50%, #fff 50%); }
-
-/* ── Note area ── */
-.note-block { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #374151; line-height: 1.6; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; }
-.note-meta { font-size: 11px; color: #9CA3AF; margin-top: 6px; }
-
-/* ── Timeline ── */
-.tl-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px solid #F3F4F6; }
-.tl-item:last-child { border-bottom: none; }
-.tl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
-.tl-dot.green { background: #059669; }
-.tl-dot.purple { background: #6B21A8; }
-.tl-dot.amber { background: #D97706; }
-.tl-dot.red { background: #DC2626; }
-.tl-content { flex: 1; min-width: 0; }
-.tl-label { font-size: 12px; font-weight: 700; color: #111827; }
-.tl-sub { font-size: 11px; color: #6B7280; margin-top: 1px; }
-
-/* ── Consent ── */
-.consent-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; }
-.consent-row:last-child { border-bottom: none; }
-.consent-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
-.consent-icon.signed { background: #D1FAE5; }
-.consent-icon.declined { background: #FEF2F2; }
-.consent-icon.pending { background: #FFF8E1; }
-.consent-name { font-size: 13px; font-weight: 600; color: #111827; }
-.consent-date { font-size: 11px; color: #6B7280; margin-top: 1px; }
-.consent-status { margin-left: auto; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
-.consent-status.signed { background: #D1FAE5; color: #065F46; }
-.consent-status.declined { background: #FEF2F2; color: #DC2626; }
-.consent-status.pending { background: #FFF8E1; color: #92400E; }
-
-/* ── Tab content panels ── */
-.tab-panel { display: none; }
-.tab-panel.active { display: flex; gap: 18px; width: 100%; }
-.tab-panel-full { display: none; flex-direction: column; gap: 14px; width: 100%; }
-.tab-panel-full.active { display: flex; }
-
-/* ── Toast ── */
-.gc-toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
-.gc-toast.show { opacity: 1; transform: translateY(0); }
-
-/* ── LM Contact Log status badges ── */
-.lm-status { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px; }
-.lm-status-open { background: #F3F4F6; color: #6B7280; }
-.lm-status-scheduled { background: #EFF6FF; color: #1D4ED8; }
-.lm-status-ended { background: #FFF8E1; color: #92400E; }
-.lm-status-completed { background: #D1FAE5; color: #065F46; }
-.lm-status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-
-/* ── Submission workflow pipeline ── */
-.submit-pipeline { display: flex; align-items: flex-start; gap: 0; margin-top: 12px; padding: 12px 14px; background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; overflow-x: auto; }
-.submit-step { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 100px; position: relative; }
-.submit-step:not(:last-child)::after { content: ''; position: absolute; top: 11px; left: 50%; right: -50%; height: 2px; background: #E5E0D8; z-index: 0; }
-.submit-step:not(:last-child).done::after { background: #6B21A8; }
-.submit-step-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; z-index: 1; flex-shrink: 0; }
-.submit-step-dot.done { background: #6B21A8; color: #fff; }
-.submit-step-dot.current { background: #FFF8E1; border: 2px solid #D97706; color: #92400E; }
-.submit-step-dot.pending { background: #F3F4F6; border: 2px solid #D1D5DB; color: #9CA3AF; }
-.submit-step-label { font-size: 10px; font-weight: 600; color: #6B7280; text-align: center; margin-top: 5px; line-height: 1.3; }
-.submit-step-label.done { color: #6B21A8; }
-.submit-step-label.current { color: #92400E; }
-
-/* ── LM log expand row ── */
-.lm-expand-row { background: #F9FAFB; }
-.lm-expand-inner { padding: 12px 16px 14px 40px; }
-.lm-log-entry { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #F3F4F6; font-size: 12px; }
-.lm-log-entry:last-child { border-bottom: none; }
-.lm-log-ts { color: #9CA3AF; width: 120px; flex-shrink: 0; }
-.lm-log-action { color: #374151; font-weight: 600; flex: 1; }
-
-/* ── Smart Template Components (TPL-001 / CFE-001) ── */
-.tpl-field { display: flex; flex-direction: column; gap: 4px; }
-.tpl-label { font-size: 11px; font-weight: 700; color: #374151; }
-.req-star { color: #DC2626; }
-.tpl-select { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #111827; background: #fff; cursor: pointer; appearance: auto; }
-.tpl-select:focus { outline: none; border-color: #6B21A8; box-shadow: 0 0 0 3px rgba(107,33,168,.1); }
-.tpl-input { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #111827; background: #fff; box-sizing: border-box; }
-.tpl-input:focus { outline: none; border-color: #6B21A8; }
-.tpl-textarea { width: 100%; padding: 10px 12px; border: 1.5px solid #D1D5DB; border-radius: 7px; font-size: 13px; color: #374151; line-height: 1.5; min-height: 72px; resize: vertical; box-sizing: border-box; font-family: inherit; }
-.tpl-textarea:focus { outline: none; border-color: #6B21A8; }
-.tpl-picklist { background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 8px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
-.pick-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #374151; cursor: pointer; }
-.pick-item input[type=checkbox] { accent-color: #6B21A8; width: 14px; height: 14px; cursor: pointer; }
-.tpl-radio-group { display: flex; flex-direction: column; gap: 5px; padding: 6px 0; }
-.radio-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #374151; cursor: pointer; }
-.radio-item input[type=radio] { accent-color: #6B21A8; cursor: pointer; }
-
-/* Phenotype rows */
-.phenotype-row { display: grid; grid-template-columns: 2fr 1fr; align-items: center; padding: 8px 12px; border-bottom: 1px solid #F3F4F6; font-size: 12px; color: #374151; }
-.phenotype-row:last-child { border-bottom: none; }
-.pn-toggle { display: flex; gap: 4px; justify-content: center; }
-.pn-btn { padding: 3px 10px; border-radius: 5px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1.5px solid #D1D5DB; background: #fff; color: #6B7280; transition: all .15s; }
-.pn-btn.pn-pos.active { background: #DC2626; border-color: #DC2626; color: #fff; }
-.pn-btn.pn-neg.active { background: #059669; border-color: #059669; color: #fff; }
-.pn-btn.pn-na.active { background: #9CA3AF; border-color: #9CA3AF; color: #fff; }
-.pn-btn:hover { border-color: #6B21A8; }
+/* ── Sidebar ── */
+.sidebar { position:fixed; top:60px; left:0; width:56px; height:calc(100vh - 60px); background:#F2EDE4; display:flex; flex-direction:column; align-items:center; padding:12px 0; z-index:200; border-right:1px solid #E5E0D8; overflow:hidden; }
+.sidebar-nav { flex:1; display:flex; flex-direction:column; gap:4px; width:100%; padding:0 6px; }
+.sib-item { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:9px 4px; border-radius:8px; cursor:pointer; color:#6B7280; font-size:9px; font-weight:500; text-align:center; transition:background .15s,color .15s; text-decoration:none; }
+.sib-item:hover { background:rgba(107,33,168,0.08); }
+.sib-item.active { background:rgba(107,33,168,0.12); color:#6B21A8; border-right:3px solid #6B21A8; }
+.sib-item svg { width:18px; height:18px; }
+.sib-label { font-size:9px; font-weight:500; line-height:1; color:inherit; }
+.sidebar-footer { padding:10px 6px; border-top:1px solid #E5E0D8; width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; }
+/* ── Resets & shared ── */
+*,*::before,*::after{box-sizing:border-box;}
+.btn{padding:7px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;}
+.btn-primary{background:#6B21A8;color:#fff;}.btn-primary:hover{background:#5B1898;}
+.btn-outline{background:#fff;border:1px solid #E5E0D8;color:#374151;}.btn-outline:hover{background:#FAF7F2;}
+.btn-danger{background:#DC2626;color:#fff;}.btn-danger:hover{background:#B91C1C;}
+/* ── Main shell ── */
+.chart-shell{position:fixed;top:60px;left:56px;right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden;background:#F1F5F9;}
+/* ── Breadcrumb ── */
+.chart-crumb{height:42px;background:#fff;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;padding:0 18px;gap:8px;flex-shrink:0;}
+.chart-crumb a{font-size:12px;color:#6B21A8;text-decoration:none;font-weight:600;}
+.chart-crumb a:hover{text-decoration:underline;}
+.chart-crumb-sep{color:#D1D5DB;font-size:12px;}
+.chart-crumb-cur{font-size:12px;color:#374151;font-weight:600;}
+.chart-crumb-right{margin-left:auto;}
+/* ── Critical alert banner ── */
+.crit-banner{background:#DC2626;color:#fff;padding:7px 18px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.crit-banner svg{width:16px;height:16px;flex-shrink:0;}
+/* ── Demographics header ── */
+.chart-demoheader{background:#fff;border-bottom:2px solid #E5E0D8;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-shrink:0;min-height:76px;}
+.demo-avatar{width:48px;height:48px;border-radius:50%;background:#EDE9FE;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:700;color:#6B21A8;}
+.demo-info{flex:1;min-width:0;}
+.demo-name{font-size:17px;font-weight:700;color:#111827;margin-bottom:2px;}
+.demo-record{font-size:11px;color:#6B7280;margin-bottom:4px;}
+.demo-badges{display:flex;flex-wrap:wrap;gap:6px;}
+.gc-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid;}
+.gc-badge-pathogenic{background:#FEE2E2;color:#DC2626;border-color:#FECACA;}
+.gc-badge-product{background:#EDE9FE;color:#6B21A8;border-color:#DDD6FE;}
+.gc-badge-pending{background:#FEF3C7;color:#D97706;border-color:#FDE68A;}
+.demo-actions{display:flex;gap:8px;flex-shrink:0;}
+/* ── Workflow progress strip ── */
+.wf-strip{background:#fff;border-bottom:1px solid #E5E0D8;padding:6px 18px;display:flex;align-items:center;gap:14px;flex-shrink:0;height:48px;}
+.wf-stages{display:flex;align-items:center;gap:0;}
+.wf-circle{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;}
+.wf-done{background:#1A1D23;color:#fff;}
+.wf-active{background:#6B21A8;color:#fff;box-shadow:0 0 0 3px rgba(107,33,168,0.25);}
+.wf-pending{background:transparent;border:2px solid #D1D5DB;color:#9CA3AF;}
+.wf-line{width:18px;height:2px;background:#E5E7EB;flex-shrink:0;}
+.wf-line-done{background:#1A1D23;}
+.wf-label{font-size:11px;color:#374151;white-space:nowrap;}
+.wf-sla{margin-left:10px;font-size:11px;font-weight:600;background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:8px;}
+/* ── Consult type banner ── */
+.ct-banner-row{display:none;padding:7px 18px;border-bottom:1px solid #E5E0D8;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap;background:#fff;}
+.ct-banner-row.active{display:flex;}
+.ct-bl{font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.04em;}
+.ct-bv{font-size:13px;font-weight:600;color:#111827;margin-left:4px;}
+.ct-bsep{color:#D1D5DB;}
+.ct-bactions{margin-left:auto;display:flex;gap:8px;}
+/* ── 3-column area ── */
+.chart-cols{flex:1;display:flex;overflow:hidden;min-height:0;}
+/* ── Left panel: Patient Intake ── */
+.chart-left{width:230px;min-width:230px;background:#fff;border-right:1px solid #E5E7EB;display:flex;flex-direction:column;overflow:hidden;transition:width 0.2s ease,min-width 0.2s ease;flex-shrink:0;}
+.chart-left.collapsed{width:36px;min-width:36px;}
+.left-header{height:38px;display:flex;align-items:center;padding:0 10px;border-bottom:1px solid #E5E7EB;gap:6px;flex-shrink:0;cursor:pointer;user-select:none;}
+.left-header-label{font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:0.06em;flex:1;white-space:nowrap;overflow:hidden;}
+.chart-left.collapsed .left-header-label{display:none;}
+.left-collapse-btn{width:20px;height:20px;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;color:#9CA3AF;flex-shrink:0;padding:0;}
+.left-collapse-btn svg{width:14px;height:14px;}
+.left-scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.left-scroll::-webkit-scrollbar{width:3px;}
+.left-scroll::-webkit-scrollbar-thumb{background:#E5E0D8;border-radius:3px;}
+/* Accordion */
+.acc-section{border-bottom:1px solid #E5E7EB;}
+.acc-section:last-child{border-bottom:none;}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer;user-select:none;}
+.chart-left.collapsed .acc-header{justify-content:center;padding:8px 0;}
+.acc-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#6B7280;white-space:nowrap;overflow:hidden;}
+.chart-left.collapsed .acc-title{display:none;}
+.acc-chevron{font-size:10px;color:#9CA3AF;flex-shrink:0;transition:transform 0.15s;}
+.chart-left.collapsed .acc-chevron{display:none;}
+.acc-body{padding:4px 12px 10px;display:flex;flex-direction:column;gap:7px;}
+.acc-body.closed{display:none;}
+.chart-left.collapsed .acc-body{display:none !important;}
+.field-row{display:flex;justify-content:space-between;gap:6px;padding:3px 0;border-bottom:1px solid #F3F4F6;font-size:11px;}
+.field-row:last-child{border-bottom:none;}
+.field-key{color:#6B7280;flex-shrink:0;}
+.field-val{font-weight:600;color:#374151;text-align:right;}
+.intake-q{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:2px;}
+.intake-a{font-size:11px;color:#374151;line-height:1.4;margin-bottom:8px;}
+.allergy-item{font-size:11px;color:#DC2626;font-weight:500;}
+.med-row{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;}
+.med-name{flex:1;font-size:11px;color:#374151;font-weight:500;line-height:1.4;}
+.med-badge{font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#CCFBF1;color:#0F766E;flex-shrink:0;margin-top:1px;}
+/* ── Center panel ── */
+.chart-center{flex:1;background:#F8FAFC;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+/* Async workspace */
+.async-workspace{display:none;flex-direction:column;height:100%;}
+.async-workspace.active{display:flex;}
+.event-log-body{flex:1;overflow-y:auto;}
+.event-log-body::-webkit-scrollbar{width:4px;}
+.event-log-body::-webkit-scrollbar-thumb{background:#E5E0D8;border-radius:4px;}
+.event-day-sep{padding:7px 16px;background:#F8FAFC;border-bottom:1px solid #E5E7EB;font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;}
+.event-entry{display:flex;border-bottom:1px solid #F3F4F6;cursor:pointer;transition:background 0.1s;}
+.event-entry:hover{background:#F9FAFB;}
+.event-border{width:4px;flex-shrink:0;}
+.event-body{padding:11px 14px;flex:1;min-width:0;}
+.event-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+.event-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700;}
+.event-name{font-size:11px;font-weight:600;color:#374151;}
+.event-ts{font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;white-space:nowrap;}
+.event-title{font-size:12px;font-weight:600;color:#111827;margin-bottom:3px;}
+.event-text{font-size:12px;color:#6B7280;line-height:1.5;}
+.event-extra{display:none;margin-top:6px;padding:8px 10px;border-radius:0 6px 6px 0;font-size:11px;color:#374151;line-height:1.6;}
+.event-expand{font-size:11px;color:#6B21A8;font-weight:600;text-decoration:none;display:inline-block;margin-top:5px;}
+/* Async compose bar */
+.async-compose{border-top:2px solid #E5E7EB;background:#fff;padding:10px 14px;flex-shrink:0;}
+.compose-tabs{display:flex;border-bottom:1px solid #E5E0D8;margin-bottom:10px;}
+.ctab{padding:7px 10px;font-size:11px;font-weight:600;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:#6B7280;white-space:nowrap;}
+.ctab.active{color:#6B21A8;border-bottom-color:#6B21A8;}
+.compose-area{display:flex;gap:8px;}
+.compose-input{flex:1;border:1px solid #E5E0D8;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;min-height:60px;}
+.compose-input:focus{border-color:#6B21A8;}
+/* Video workspace */
+.video-workspace{display:none;flex-direction:column;height:100%;}
+.video-workspace.active{display:flex;}
+.video-stage{flex:1;background:#111827;position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.video-av-circle{width:80px;height:80px;border-radius:50%;background:#374151;display:flex;align-items:center;justify-content:center;}
+.video-av-circle svg{width:44px;height:44px;color:#6B7280;}
+.video-patient-name{font-size:13px;color:#9CA3AF;font-weight:500;margin-top:8px;}
+.video-self-view{position:absolute;bottom:12px;right:12px;width:140px;height:90px;background:#1E3A5F;border-radius:8px;border:2px solid #374151;display:flex;align-items:center;justify-content:center;}
+.video-controls{height:52px;background:#1F2937;display:flex;align-items:center;justify-content:center;gap:10px;flex-shrink:0;}
+.vcb{background:#374151;border:none;color:#E5E7EB;padding:7px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;}
+.vcb:hover{background:#4B5563;}
+.vcb.end{background:#DC2626;color:#fff;}
+/* ── Right panel ── */
+.chart-right{width:440px;min-width:440px;background:#fff;border-left:1px solid #E5E7EB;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;}
+.right-panel{display:none;flex:1;overflow-y:auto;padding:14px 16px 14px 56px;}
+.right-panel.active{display:block;}
+.right-panel::-webkit-scrollbar{width:3px;}
+.right-panel::-webkit-scrollbar-thumb{background:#E5E0D8;border-radius:3px;}
+/* Vertical icon nav */
+.rp-vnav{position:absolute;top:0;left:0;bottom:0;width:44px;background:#F8F6F2;border-right:1px solid #E5E0D8;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:2px;z-index:10;}
+.rp-vnav-btn{width:36px;height:36px;border:none;background:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#9CA3AF;position:relative;transition:background .15s,color .15s;}
+.rp-vnav-btn:hover{background:rgba(107,33,168,0.08);color:#6B21A8;}
+.rp-vnav-btn.active{background:rgba(107,33,168,0.12);color:#6B21A8;border-left:3px solid #6B21A8;}
+.rp-vnav-btn .vnav-tip{display:none;position:absolute;left:46px;top:50%;transform:translateY(-50%);background:#1F2937;color:#fff;font-size:11px;font-weight:500;padding:4px 8px;border-radius:5px;white-space:nowrap;pointer-events:none;z-index:200;}
+.rp-vnav-btn:hover .vnav-tip{display:block;}
+.rp-vnav-divider{width:28px;height:1px;background:#E5E0D8;margin:4px 0;}
+/* ── GC Smart Template ── */
+.note-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #E5E0D8;}
+.note-title{font-size:13px;font-weight:700;color:#111827;}
+.note-status{font-size:11px;color:#9CA3AF;}
+.st-section{border:1px solid #E5E0D8;border-radius:8px;margin-bottom:10px;overflow:hidden;}
+.st-sec-hd{display:flex;align-items:center;gap:10px;padding:9px 13px;cursor:pointer;background:#F9FAFB;user-select:none;}
+.st-sec-hd:hover{background:#F3F4F6;}
+.st-sec-num{width:20px;height:20px;border-radius:50%;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.st-sec-title{font-size:12px;font-weight:700;color:#111827;flex:1;}
+.st-sec-chev{font-size:11px;color:#9CA3AF;transition:transform 0.15s;}
+.st-section.open .st-sec-chev{transform:rotate(90deg);}
+.st-sec-body{display:none;padding:12px 14px;border-top:1px solid #E5E0D8;}
+.st-section.open .st-sec-body{display:block;}
+.st-field{margin-bottom:10px;}
+.st-field label{display:block;font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em;}
+.st-input{width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;outline:none;}
+.st-input:focus{border-color:#6B21A8;}
+.st-select{width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;background:#fff;outline:none;}
+.st-textarea{width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;line-height:1.5;}
+.st-textarea:focus{border-color:#6B21A8;}
+.st-row{display:flex;gap:10px;margin-bottom:10px;}
+.st-row .st-field{flex:1;margin-bottom:0;}
+.phen-grid{display:grid;gap:4px;margin-top:4px;}
+.phen-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid #E5E0D8;border-radius:6px;background:#fff;font-size:12px;}
+.phen-label{flex:1;color:#374151;}
+.phen-btns{display:flex;gap:4px;}
+.phen-btn{padding:2px 8px;border-radius:4px;border:1px solid #E5E0D8;font-size:10px;font-weight:700;cursor:pointer;background:#fff;color:#9CA3AF;transition:all 0.1s;}
+.phen-btn.active-P{background:#D1FAE5;border-color:#6EE7B7;color:#065F46;}
+.phen-btn.active-N{background:#FEE2E2;border-color:#FCA5A5;color:#DC2626;}
+.phen-btn.active-NA{background:#F3F4F6;border-color:#D1D5DB;color:#374151;}
+.picklist-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+.pick-opt{font-size:11px;padding:4px 10px;border-radius:20px;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;transition:all 0.1s;}
+.pick-opt.selected{background:#EDE9FE;border-color:#A78BFA;color:#5B21B6;font-weight:600;}
+/* Submission pipeline */
+.sub-pipeline{display:flex;align-items:center;gap:4px;margin-top:14px;padding:12px 14px;background:#F9FAFB;border-radius:8px;border:1px solid #E5E0D8;overflow-x:auto;}
+.sub-step{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:70px;text-align:center;}
+.sub-dot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.sub-done{background:#22C55E;color:#fff;}
+.sub-active{background:#6B21A8;color:#fff;box-shadow:0 0 0 3px rgba(107,33,168,0.2);}
+.sub-pending{background:#E5E7EB;color:#9CA3AF;}
+.sub-label{font-size:9px;color:#6B7280;font-weight:600;line-height:1.2;}
+.sub-arrow{color:#D1D5DB;font-size:12px;flex-shrink:0;}
+/* Doc footer */
+.doc-footer{border-top:1px solid #E5E0D8;padding:10px 16px 10px 56px;background:#fff;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.doc-save-status{font-size:11px;color:#9CA3AF;flex:1;}
+/* ── Genetic Results ── */
+.variant-block{background:#FEF2F2;border:1.5px solid #FECACA;border-radius:10px;padding:14px;margin-bottom:14px;}
+.variant-class-badge{font-size:11px;font-weight:800;background:#DC2626;color:#fff;padding:3px 10px;border-radius:6px;display:inline-block;margin-bottom:8px;}
+.variant-gene{font-size:18px;font-weight:800;color:#111827;margin-bottom:2px;}
+.variant-hgvs{font-size:12px;color:#6B7280;font-family:monospace;margin-bottom:10px;}
+.variant-meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;}
+.v-cell{background:#fff;border-radius:6px;padding:7px 10px;}
+.v-cell-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:2px;}
+.v-cell-val{font-size:12px;font-weight:700;color:#111827;}
+.interp-box{background:#fff;border-radius:6px;padding:10px;font-size:11px;color:#374151;line-height:1.6;}
+.risk-row{margin-bottom:10px;}
+.risk-label{display:flex;justify-content:space-between;font-size:11px;font-weight:600;color:#374151;margin-bottom:4px;}
+.risk-pct{font-weight:800;}
+.risk-pct.high{color:#DC2626;}
+.risk-bar-bg{height:10px;border-radius:10px;background:#E5E7EB;position:relative;overflow:hidden;}
+.risk-bar-fill{height:100%;border-radius:10px;}
+.risk-note{font-size:10px;color:#9CA3AF;margin-top:3px;}
+/* ── Family History ── */
+.cancer-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;}
+.cancer-tbl th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#6B7280;padding:6px 10px;background:#F9FAFB;border-bottom:1px solid #E5E0D8;text-align:left;}
+.cancer-tbl td{padding:8px 10px;border-bottom:1px solid #F0EBE4;color:#374151;}
+.cancer-tbl tr:last-child td{border-bottom:none;}
+.cascade-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #F0EBE4;font-size:12px;}
+.cascade-row:last-child{border-bottom:none;}
+.cascade-name{flex:1;color:#374151;font-weight:500;}
+.cascade-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;}
+.badge-pending{background:#FEF3C7;color:#92400E;}
+.badge-confirmed{background:#D1FAE5;color:#065F46;}
+/* ── Communication tabs ── */
+.comm-tab-bar{display:flex;border-bottom:1px solid #E5E0D8;margin-bottom:12px;}
+.comm-tab{padding:8px 10px;font-size:11px;font-weight:600;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:#6B7280;white-space:nowrap;flex:1;text-align:center;}
+.comm-tab.active{color:#6B21A8;border-bottom-color:#6B21A8;background:#FAF5FF;}
+.comm-panel{display:none;}
+.comm-panel.active{display:block;}
+.tl-card{border-bottom:1px solid #F0EBE4;}
+.tl-card-row{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;}
+.tl-card-row:hover{background:#FAF7F2;}
+.tl-type-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.tl-card-main{flex:1;min-width:0;}
+.tl-card-title{font-size:12px;font-weight:600;color:#111827;}
+.tl-card-sub{font-size:11px;color:#6B7280;}
+.tl-section-hdr{padding:6px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;background:#F9FAFB;border-bottom:1px solid #F0EBE4;}
+/* ── Zendesk ── */
+.zd-case{border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;margin-bottom:12px;}
+.zd-id{font-size:10px;font-weight:700;color:#9CA3AF;margin-bottom:4px;}
+.zd-title{font-size:13px;font-weight:700;color:#111827;margin-bottom:6px;}
+.zd-meta{display:flex;gap:12px;font-size:11px;color:#6B7280;margin-bottom:10px;flex-wrap:wrap;}
+.zd-status{font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:10px;}
+.zd-note-entry{display:flex;gap:8px;margin-bottom:8px;}
+.zd-av{width:26px;height:26px;border-radius:50%;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6B21A8;flex-shrink:0;}
+.zd-msg{background:#F9FAFB;border-radius:0 8px 8px 8px;padding:7px 10px;font-size:12px;color:#374151;line-height:1.5;flex:1;}
+.zd-ts{font-size:10px;color:#9CA3AF;margin-top:3px;}
+/* ── Test Workflow ── */
+.tw-stage{border:1px solid #E5E0D8;border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.tw-stage-hd{display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;}
+.tw-stage-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.tw-stage-done{background:#22C55E;color:#fff;}
+.tw-stage-active{background:#6B21A8;color:#fff;}
+.tw-stage-pending{background:#F3F4F6;color:#9CA3AF;border:2px solid #E5E7EB;}
+.tw-stage-title{flex:1;font-size:13px;font-weight:700;}
+.tw-stage-badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;}
+.tw-done-badge{background:#D1FAE5;color:#065F46;}
+.tw-active-badge{background:#EDE9FE;color:#6B21A8;}
+.tw-pending-badge{background:#F3F4F6;color:#9CA3AF;}
+.tw-stage-body{padding:12px 14px;border-top:1px solid #E5E0D8;background:#FAFAF9;}
+.tw-checklist{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.tw-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;}
+.tw-check input[type=checkbox]{width:14px;height:14px;accent-color:#6B21A8;}
+.tw-gate{background:#FEF3C7;border:1px solid #FDE68A;border-radius:6px;padding:8px 10px;font-size:11px;color:#92400E;margin-bottom:8px;}
+/* ── Drag handle ── */
+.chart-drag-handle{width:4px;cursor:col-resize;background:#E5E0D8;flex-shrink:0;transition:background 0.15s;}
+.chart-drag-handle:hover{background:#6B21A8;}
+/* ── Sign modal ── */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;justify-content:center;align-items:center;}
+.modal-backdrop.open{display:flex;}
+.modal{background:#fff;border-radius:12px;width:560px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);}
+.modal-header{padding:18px 24px 14px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:16px;font-weight:700;color:#111827;}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:#6B7280;padding:0;line-height:1;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:14px 24px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:10px;}
+/* ── Toast & banners ── */
+.sign-success-banner{display:none;position:fixed;top:60px;left:56px;right:0;background:#D1FAE5;border-bottom:2px solid #6EE7B7;padding:10px 24px;text-align:center;font-size:13px;font-weight:700;color:#065F46;z-index:300;}
+.sign-success-banner.show{display:block;}
+.gc-toast{display:none;position:fixed;bottom:28px;right:28px;background:#1F2937;color:#fff;padding:11px 18px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);}
 </style>
 {% endblock %}
 {% block content %}
 
+<div class="sign-success-banner" id="signBanner">✓ GC Note Approved &amp; Signed — Routed to Physician for Attestation</div>
+<div class="gc-toast" id="gcToastEl"></div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <nav class="sidebar-nav">
+    <a href="/provider/gc" class="sib-item" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="sib-label">Dashboard</span>
+    </a>
+    <a href="/provider/gc/queue" class="sib-item" title="GC Queue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      <span class="sib-label">GC Queue</span>
+    </a>
+    <a href="#" class="sib-item active" title="Chart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="sib-label">Chart</span>
+    </a>
+    <a href="#" class="sib-item" title="Messages">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <span class="sib-label">Messages</span>
+    </a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="sib-item" onclick="gcToast('Settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="sib-label">Settings</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main chart shell -->
 <div class="chart-shell">
 
-  <!-- Left sidebar nav -->
-  <div class="gc-sidebar">
-    <a href="/provider/gc" class="gc-nav-item" title="Dashboard">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      Dash
-    </a>
-    <a href="/provider/gc/queue" class="gc-nav-item" title="GC Queue">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Queue
-    </a>
-    <a href="/provider/gc/chart/1" class="gc-nav-item active" title="Patient Chart">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Chart
-    </a>
-    <a href="/provider/messages" class="gc-nav-item" title="Messages">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      Msgs
-    </a>
-    <a href="/provider/settings" class="gc-nav-item" title="Settings">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      Settings
-    </a>
+  <!-- Critical alert banner -->
+  <div class="crit-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    PATHOGENIC Variant Identified — BRCA1 c.5266dupC &nbsp;·&nbsp; Results disclosure required &nbsp;·&nbsp; Post-disclosure care plan pending
   </div>
 
-  <!-- Main chart area -->
-  <div class="gc-main">
-
-    <!-- Critical finding alert -->
-    <div class="gc-alert">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      PATHOGENIC Variant Identified — BRCA1 c.5266dupC · Results disclosure required · Post-disclosure care plan pending
+  <!-- Breadcrumb -->
+  <div class="chart-crumb">
+    <a href="/provider/gc">Dashboard</a>
+    <span class="chart-crumb-sep">›</span>
+    <a href="/provider/gc/queue">GC Queue</a>
+    <span class="chart-crumb-sep">›</span>
+    <span class="chart-crumb-cur">Jennifer Walsh — CST-2026-10901</span>
+    <div class="chart-crumb-right" style="display:flex;gap:8px;">
+      <button class="btn btn-outline" style="font-size:11px;padding:5px 12px;" onclick="gcToast('Chart preview opened')">Preview Chart</button>
+      <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;" onclick="openSignModal()">Approve &amp; Sign ✓</button>
     </div>
+  </div>
 
-    <!-- Patient header -->
-    <div class="gc-header">
-      <div class="gc-avatar">JW</div>
-      <div>
-        <div class="gc-patient-name">Jennifer Walsh</div>
-        <div class="gc-patient-meta">42F · DOB: 03/15/1982 · MRN: EW-004821 · CST-2026-10901 · TX — Licensed ✓</div>
-      </div>
-      <div class="gc-badges">
+  <!-- Demographics header -->
+  <div class="chart-demoheader">
+    <div class="demo-avatar">JW</div>
+    <div class="demo-info">
+      <div class="demo-name" id="hdr-name">Jennifer Walsh</div>
+      <div class="demo-record" id="hdr-record">42F &nbsp;·&nbsp; DOB: 03/15/1982 &nbsp;·&nbsp; MRN: EW-004821 &nbsp;·&nbsp; CST-2026-10901 &nbsp;·&nbsp; TX &nbsp;— Licensed ✓</div>
+      <div class="demo-badges">
         <span class="gc-badge gc-badge-pathogenic">⚠ BRCA1 Pathogenic</span>
-        <span class="gc-badge gc-badge-program">BRCA Counseling</span>
-        <span class="gc-badge gc-badge-status">Disclosure Pending</span>
+        <span class="gc-badge gc-badge-product">BRCA Counseling</span>
+        <span class="gc-badge gc-badge-pending">Disclosure Pending</span>
       </div>
-      <div class="gc-header-actions">
-        <button class="btn btn-outline" onclick="gcToast('Message sent to Jennifer Walsh')">Message Patient</button>
-        <button class="btn btn-outline" onclick="gcToast('Referral form opened')">+ Referral</button>
-        <button class="btn btn-primary" onclick="gcToast('Starting disclosure session — timer started')">Start Disclosure Session</button>
+    </div>
+    <div class="demo-actions">
+      <button class="btn btn-outline" onclick="gcToast('Message sent to Jennifer Walsh')">Message Patient</button>
+      <button class="btn btn-outline" onclick="gcToast('Referral workflow opened')">+ Referral</button>
+      <button class="btn btn-danger" onclick="gcToast('Disclosure session starting...')">Start Disclosure Session</button>
+    </div>
+  </div>
+
+  <!-- Workflow progress strip -->
+  <div class="wf-strip">
+    <div class="wf-stages">
+      <div class="wf-circle wf-done" title="Pre-Test Counseling">✓</div>
+      <div class="wf-line wf-line-done"></div>
+      <div class="wf-circle wf-done" title="Genetic Testing">✓</div>
+      <div class="wf-line wf-line-done"></div>
+      <div class="wf-circle wf-active" title="Results Disclosure">3</div>
+      <div class="wf-line"></div>
+      <div class="wf-circle wf-pending" title="Care Plan">4</div>
+      <div class="wf-line"></div>
+      <div class="wf-circle wf-pending" title="Chart Close">5</div>
+    </div>
+    <span class="wf-label">Results Disclosure &amp; Counseling</span>
+    <span class="wf-sla">SLA: 2h 14m remaining</span>
+  </div>
+
+  <!-- Consult type banner -->
+  <div class="ct-banner-row active" id="ctBanner">
+    <span class="ct-bl">Type:</span><span class="ct-bv">Async Consultation</span>
+    <span class="ct-bsep">|</span>
+    <span class="ct-bl">Care Product:</span><span class="ct-bv">BRCA Counseling — Results Delivery 45</span>
+    <span class="ct-bsep">|</span>
+    <span class="ct-bl">GCA:</span><span class="ct-bv">Priya Sharma</span>
+    <div class="ct-bactions">
+      <button class="btn btn-outline" style="font-size:11px;padding:5px 12px;" onclick="switchToVideo()">Switch to Video</button>
+    </div>
+  </div>
+
+  <!-- 3-column area -->
+  <div class="chart-cols">
+
+    <!-- ══ LEFT: Patient Intake ══ -->
+    <div class="chart-left" id="chartLeft">
+      <div class="left-header" onclick="toggleLeft()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/></svg>
+        <span class="left-header-label">Patient Intake</span>
+        <button class="left-collapse-btn" id="leftCollapseBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+      </div>
+      <div class="left-scroll">
+
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title">Demographics</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="field-row"><span class="field-key">Full Name</span><span class="field-val">Jennifer Walsh</span></div>
+            <div class="field-row"><span class="field-key">DOB</span><span class="field-val">03/15/1982 (42F)</span></div>
+            <div class="field-row"><span class="field-key">MRN</span><span class="field-val">EW-004821</span></div>
+            <div class="field-row"><span class="field-key">State</span><span class="field-val">Texas (TX)</span></div>
+            <div class="field-row"><span class="field-key">Partner / Client</span><span class="field-val">Invitae / Eli Lilly</span></div>
+            <div class="field-row"><span class="field-key">Referring Provider</span><span class="field-val">Dr. Sarah Chen, MD</span></div>
+            <div class="field-row"><span class="field-key">Ethnicity</span><span class="field-val">Ashkenazi Jewish</span></div>
+          </div>
+        </div>
+
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title">Insurance &amp; Referral</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="field-row"><span class="field-key">Insurer</span><span class="field-val">BCBS Texas</span></div>
+            <div class="field-row"><span class="field-key">Member ID</span><span class="field-val">XYZ-889-443021</span></div>
+            <div class="field-row"><span class="field-key">Auth #</span><span class="field-val">AUTH-2026-84421</span></div>
+            <div class="field-row"><span class="field-key">Referral Source</span><span class="field-val">Oncology / Eli Lilly</span></div>
+            <div class="field-row"><span class="field-key">Consult Type</span><span class="field-val">Results Delivery 45</span></div>
+          </div>
+        </div>
+
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title">Genetic History</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="intake-q">Prior Genetic Testing</div>
+            <div class="intake-a">GeneDx BRCA1/2 Full Seq + Del/Dup — Jun 3, 2026 · <strong style="color:#DC2626;">PATHOGENIC</strong></div>
+            <div class="intake-q">Known Family Variants</div>
+            <div class="intake-a">Mother: BRCA1 c.5266dupC (confirmed)</div>
+            <div class="intake-q">Previous GC Counseling</div>
+            <div class="intake-a">Pre-Test session May 28, 2026 — Taylor Brooks, MS CGC</div>
+            <div class="intake-q">Ancestry</div>
+            <div class="intake-a">Ashkenazi Jewish (maternal line)</div>
+          </div>
+        </div>
+
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title">Intake Responses</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="intake-q">Reason for Referral</div>
+            <div class="intake-a">Positive BRCA1 result — results disclosure and care planning</div>
+            <div class="intake-q">Patient Concerns</div>
+            <div class="intake-a">Worried about breast cancer risk, questions about surgery options, impact on children</div>
+            <div class="intake-q">Emotional State at Intake</div>
+            <div class="intake-a">Anxious, wants information, supportive spouse attending session</div>
+            <div class="intake-q">Preferred Contact</div>
+            <div class="intake-a">Async (patient portal), any time</div>
+            <div class="intake-q">Decision Aids Completed</div>
+            <div class="intake-a">BRCA Decision Aid v2 — submitted May 26, 2026</div>
+          </div>
+        </div>
+
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title">Medications &amp; Allergies</span>
+            <span class="acc-chevron">▼</span>
+          </div>
+          <div class="acc-body">
+            <div class="med-row"><span class="med-name">Levothyroxine 50mcg QD</span><span class="med-badge">Active</span></div>
+            <div class="med-row"><span class="med-name">Vitamin D3 2000 IU QD</span><span class="med-badge">Active</span></div>
+            <div style="margin-top:8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:4px;">Allergies</div>
+            <div class="allergy-item">Penicillin — Rash</div>
+            <div class="allergy-item">Sulfa — GI</div>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Tab bar -->
-    <div class="gc-tabs">
-      <div class="gc-tab active" onclick="switchTab('summary',this)">Summary</div>
-      <div class="gc-tab" onclick="switchTab('results',this)">Genetic Results</div>
-      <div class="gc-tab" onclick="switchTab('family',this)">Family History</div>
-      <div class="gc-tab" onclick="switchTab('notes',this)">GC Notes</div>
-      <div class="gc-tab" onclick="switchTab('orders',this)">Test Orders</div>
-      <div class="gc-tab" onclick="switchTab('consents',this)">Consents</div>
-      <div class="gc-tab" onclick="switchTab('referrals',this)">Referrals</div>
-      <div class="gc-tab" onclick="switchTab('lmlog',this)">LM Contact Log</div>
-      <div class="gc-tab" onclick="switchTab('workflow',this)">Test Workflow</div>
+    <div class="chart-drag-handle"></div>
+
+    <!-- ══ CENTER: Consultation Workspace ══ -->
+    <div class="chart-center">
+
+      <!-- Async workspace -->
+      <div class="async-workspace active" id="asyncWorkspace">
+        <div class="event-log-body">
+
+          <div class="event-day-sep">May 28, 2026</div>
+          <div class="event-entry">
+            <div class="event-border" style="background:#22C55E;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#D1FAE5;color:#065F46;">System</span><span class="event-name">Consult Initiated</span><span class="event-ts">09:14</span></div>
+              <div class="event-title">CST-2026-10901 created — BRCA Counseling, Results Delivery 45</div>
+              <div class="event-text">Pre-Test Counseling note finalized. Awaiting GeneDx result return.</div>
+            </div>
+          </div>
+
+          <div class="event-day-sep">Jun 3, 2026</div>
+          <div class="event-entry">
+            <div class="event-border" style="background:#DC2626;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#FEE2E2;color:#DC2626;">Lab Result</span><span class="event-name">GeneDx</span><span class="event-ts">11:02</span></div>
+              <div class="event-title">PATHOGENIC result returned — BRCA1 c.5266dupC</div>
+              <div class="event-text">Class 5 Pathogenic · p.Gln1756fs · Chr17:43,091,434 · ClinVar ★★★★</div>
+              <a class="event-expand" onclick="this.nextElementSibling.style.display='block';this.style.display='none';">Show full report ▾</a>
+              <div class="event-extra" style="display:none;background:#FEF2F2;border-left:3px solid #DC2626;">Panel: BRCA1/2 Full Seq + Del/Dup · Lab director: Dr. R. Nussbaum, MD<br>Interpretation: Frameshift variant creates premature stop codon at p.Gln1756fs. One of the most common Ashkenazi Jewish founder mutations. Associated with substantially elevated lifetime risk for HBOC syndrome.</div>
+            </div>
+          </div>
+
+          <div class="event-entry">
+            <div class="event-border" style="background:#6B21A8;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#EDE9FE;color:#6B21A8;">GCA</span><span class="event-name">Priya Sharma</span><span class="event-ts">11:45</span></div>
+              <div class="event-title">Chart prep completed — routed to GC queue</div>
+              <div class="event-text">Gene blurbs attached (BRCA1 HBOC). Prior result reviewed. Pedigree updated with confirmed maternal BRCA1. Patient decision aid on file.</div>
+            </div>
+          </div>
+
+          <div class="event-day-sep">Jun 10, 2026</div>
+          <div class="event-entry">
+            <div class="event-border" style="background:#3B82F6;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#DBEAFE;color:#1D4ED8;">Patient</span><span class="event-name">Jennifer Walsh</span><span class="event-ts">08:31</span></div>
+              <div class="event-title">Patient message received</div>
+              <div class="event-text">"Will I need surgery? I'm scared and want to understand my options before our call."</div>
+            </div>
+          </div>
+
+          <div class="event-entry">
+            <div class="event-border" style="background:#6B21A8;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#EDE9FE;color:#6B21A8;">GC</span><span class="event-name">Taylor Brooks, MS CGC</span><span class="event-ts">10:15</span></div>
+              <div class="event-title">GC response sent</div>
+              <div class="event-text">"Hi Jennifer — I understand this feels overwhelming. We'll go through all of your options together in detail during our session. You won't need to make any decisions today."</div>
+            </div>
+          </div>
+
+          <div class="event-day-sep">Today — Jul 13, 2026</div>
+          <div class="event-entry" style="background:#FFFBEB;border-left:3px solid #F59E0B;">
+            <div class="event-border" style="background:#F59E0B;"></div>
+            <div class="event-body">
+              <div class="event-meta"><span class="event-badge" style="background:#FEF3C7;color:#D97706;">In Progress</span><span class="event-name">Results Disclosure Session</span><span class="event-ts">Now</span></div>
+              <div class="event-title">Results Disclosure — Active</div>
+              <div class="event-text">GC Note in progress. Complete documentation and approve to advance to Care Plan stage.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Compose bar -->
+        <div class="async-compose">
+          <div class="compose-tabs">
+            <button class="ctab active" onclick="switchCtab(this,'ctab-msg')">Message Patient</button>
+            <button class="ctab" onclick="switchCtab(this,'ctab-note')">Add Internal Note</button>
+            <button class="ctab" onclick="switchCtab(this,'ctab-task')">Create Task</button>
+          </div>
+          <div id="ctab-msg">
+            <textarea class="compose-input" placeholder="Type a secure message to Jennifer Walsh..." rows="3" style="display:block;width:100%;"></textarea>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+              <button class="btn btn-outline" style="font-size:11px;padding:5px 12px;">Save Draft</button>
+              <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;" onclick="gcToast('Message sent to patient portal')">Send Message</button>
+            </div>
+          </div>
+          <div id="ctab-note" style="display:none;">
+            <textarea class="compose-input" placeholder="Internal note — not visible to patient..." rows="3" style="display:block;width:100%;"></textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+              <button class="btn btn-outline" style="font-size:11px;padding:5px 12px;" onclick="gcToast('Note saved to activity timeline')">Save Note</button>
+            </div>
+          </div>
+          <div id="ctab-task" style="display:none;">
+            <input style="display:block;width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;outline:none;margin-bottom:8px;" placeholder="Task description...">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <select style="flex:1;border:1px solid #E5E0D8;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;background:#fff;outline:none;">
+                <option>Assign to me</option><option>Priya Sharma, GCA</option><option>Physician attestation queue</option>
+              </select>
+              <button class="btn btn-primary" style="font-size:11px;padding:5px 12px;" onclick="gcToast('Task created')">Create Task</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Video workspace -->
+      <div class="video-workspace" id="videoWorkspace">
+        <div class="video-stage">
+          <div class="video-av-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div class="video-patient-name">Jennifer Walsh</div>
+          <div class="video-self-view"><span style="font-size:10px;color:#60A5FA;">You</span></div>
+        </div>
+        <div class="video-controls">
+          <button class="vcb" onclick="gcToast('Microphone toggled')">🎙 Mute</button>
+          <button class="vcb" onclick="gcToast('Camera toggled')">📹 Camera</button>
+          <button class="vcb" onclick="gcToast('Screen share started')">🖥 Share</button>
+          <button class="vcb end" onclick="switchToAsync()">End Session</button>
+        </div>
+      </div>
+
     </div>
 
-    <!-- ══ SUMMARY TAB ══ -->
-    <div class="gc-body" id="tab-summary">
-      <div class="tab-panel active">
-        <!-- Main col -->
-        <div class="gc-col-main">
+    <div class="chart-drag-handle"></div>
 
-          <!-- Variant summary -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              <div class="gc-card-title" style="color:#DC2626;">Pathogenic Variant — Action Required</div>
-            </div>
-            <div class="gc-card-body">
-              <div style="display:flex;gap:16px;align-items:flex-start;">
-                <div style="flex:1;">
-                  <div style="font-size:15px;font-weight:800;color:#111827;margin-bottom:2px;">BRCA1 — Class 5 Pathogenic</div>
-                  <div style="font-size:12px;color:#6B7280;font-family:monospace;margin-bottom:10px;">c.5266dupC · p.Gln1756fs · Chr17:43,091,434</div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
-                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Classification</div>
-                      <div style="font-size:13px;font-weight:800;color:#DC2626;margin-top:2px;">Pathogenic</div>
-                    </div>
-                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
-                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Inheritance</div>
-                      <div style="font-size:13px;font-weight:700;color:#111827;margin-top:2px;">Autosomal Dominant</div>
-                    </div>
-                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:8px 10px;">
-                      <div style="font-size:10px;color:#6B7280;font-weight:700;text-transform:uppercase;">Lab / Reported</div>
-                      <div style="font-size:13px;font-weight:700;color:#111827;margin-top:2px;">GeneDx · Jun 3, 2026</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+    <!-- ══ RIGHT: Tools ══ -->
+    <div class="chart-right" id="chartRight">
+
+      <!-- Vertical icon nav -->
+      <div class="rp-vnav">
+        <button class="rp-vnav-btn active" onclick="switchRP(0,this)">📋<span class="vnav-tip">GC Notes</span></button>
+        <button class="rp-vnav-btn" onclick="switchRP(1,this)">🧬<span class="vnav-tip">Genetic Results</span></button>
+        <button class="rp-vnav-btn" onclick="switchRP(2,this)">👨‍👩‍👧<span class="vnav-tip">Family History</span></button>
+        <div class="rp-vnav-divider"></div>
+        <button class="rp-vnav-btn" onclick="switchRP(3,this)">💬<span class="vnav-tip">Communication</span></button>
+        <button class="rp-vnav-btn" onclick="switchRP(4,this)">🎫<span class="vnav-tip">Zendesk</span></button>
+        <div class="rp-vnav-divider"></div>
+        <button class="rp-vnav-btn" onclick="switchRP(5,this)">🔄<span class="vnav-tip">Test Workflow</span></button>
+      </div>
+
+      <!-- Panel 0: GC Notes -->
+      <div class="right-panel active" id="rp-0">
+        <div class="note-header">
+          <div>
+            <div class="note-title">Results Disclosure Note</div>
+            <div class="note-status">In Progress · Last autosaved <span id="autosaveTs">2 min ago</span></div>
           </div>
-
-          <!-- Lifetime risk -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              <div class="gc-card-title">Estimated Lifetime Risk — BRCA1 Carrier</div>
-              <span class="gc-card-badge">Population baseline shown for comparison</span>
-            </div>
-            <div class="gc-card-body">
-              <div class="risk-row">
-                <div class="risk-label">Breast Cancer (lifetime)</div>
-                <div class="risk-bar-wrap"><div class="risk-bar high" style="width:87%;"></div></div>
-                <div class="risk-pct" style="color:#DC2626;">87%</div>
-              </div>
-              <div class="risk-row">
-                <div class="risk-label">Ovarian Cancer (lifetime)</div>
-                <div class="risk-bar-wrap"><div class="risk-bar high" style="width:44%;"></div></div>
-                <div class="risk-pct" style="color:#DC2626;">44%</div>
-              </div>
-              <div class="risk-row">
-                <div class="risk-label">Breast Cancer — General Pop.</div>
-                <div class="risk-bar-wrap"><div class="risk-bar low" style="width:13%;"></div></div>
-                <div class="risk-pct" style="color:#059669;">13%</div>
-              </div>
-              <div class="risk-row">
-                <div class="risk-label">Ovarian Cancer — General Pop.</div>
-                <div class="risk-bar-wrap"><div class="risk-bar low" style="width:2%;"></div></div>
-                <div class="risk-pct" style="color:#059669;">2%</div>
-              </div>
-              <div style="margin-top:10px;font-size:11px;color:#9CA3AF;">Risk estimates per NCCN Guidelines v3.2026 — Hereditary Breast and Ovarian Cancer. Individual risk may vary based on additional factors.</div>
-            </div>
-          </div>
-
-          <!-- Care plan checklist -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-              <div class="gc-card-title">Post-Disclosure Care Plan</div>
-              <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;">3 of 5 complete</span>
-            </div>
-            <div class="gc-card-body" style="padding:0;">
-              <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                <tbody>
-                  <tr style="border-bottom:1px solid #F3F4F6;">
-                    <td style="padding:10px 16px;width:28px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
-                    <td style="padding:10px 16px;color:#111827;font-weight:500;">Results disclosure counseling completed</td>
-                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #F3F4F6;">
-                    <td style="padding:10px 16px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
-                    <td style="padding:10px 16px;color:#111827;font-weight:500;">NCCN risk management guidelines reviewed with patient</td>
-                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #F3F4F6;">
-                    <td style="padding:10px 16px;"><input type="checkbox" checked style="accent-color:#6B21A8;"></td>
-                    <td style="padding:10px 16px;color:#111827;font-weight:500;">Psychosocial support resources provided</td>
-                    <td style="padding:10px 16px;color:#6B7280;font-size:11px;">Jun 18, 2026</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid #F3F4F6;">
-                    <td style="padding:10px 16px;"><input type="checkbox" onclick="gcToast('Care plan updated')" style="accent-color:#6B21A8;"></td>
-                    <td style="padding:10px 16px;color:#374151;">High-risk breast/gynecologic oncology referral placed</td>
-                    <td style="padding:10px 16px;"><span style="font-size:11px;color:#D97706;font-weight:600;">Pending</span></td>
-                  </tr>
-                  <tr>
-                    <td style="padding:10px 16px;"><input type="checkbox" onclick="gcToast('Care plan updated')" style="accent-color:#6B21A8;"></td>
-                    <td style="padding:10px 16px;color:#374151;">Cascade testing letter sent to first-degree relatives</td>
-                    <td style="padding:10px 16px;"><span style="font-size:11px;color:#D97706;font-weight:600;">Pending</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
+          <span style="font-size:10px;font-weight:700;background:#EDE9FE;color:#6B21A8;padding:2px 8px;border-radius:8px;">CFE-001</span>
         </div>
 
-        <!-- Side col -->
-        <div class="gc-col-side">
-
-          <!-- Patient demographics -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <div class="gc-card-title">Patient Information</div>
-            </div>
-            <div class="gc-card-body">
-              <div class="field-row"><span class="field-label">Full Name</span><span class="field-val">Jennifer Walsh</span></div>
-              <div class="field-row"><span class="field-label">Date of Birth</span><span class="field-val">03/15/1982 (42F)</span></div>
-              <div class="field-row"><span class="field-label">State</span><span class="field-val">Texas (TX)</span></div>
-              <div class="field-row"><span class="field-label">Partner / Client</span><span class="field-val">Invitae / Eli Lilly</span></div>
-              <div class="field-row"><span class="field-label">Care Product</span><span class="field-val">BRCA Counseling</span></div>
-              <div class="field-row"><span class="field-label">Consult ID</span><span class="field-val">CST-2026-10901</span></div>
-              <div class="field-row"><span class="field-label">Assigned GC</span><span class="field-val">Taylor Brooks, MS CGC</span></div>
-              <div class="field-row"><span class="field-label">GCA Coordinator</span><span class="field-val">Priya Sharma, GCA</span></div>
-            </div>
+        <!-- S: Subjective -->
+        <div class="st-section open">
+          <div class="st-sec-hd" onclick="toggleStSection(this)">
+            <div class="st-sec-num">S</div>
+            <div class="st-sec-title">Subjective</div>
+            <span class="st-sec-chev">›</span>
           </div>
-
-          <!-- Timeline -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <div class="gc-card-title">Consult Timeline</div>
+          <div class="st-sec-body">
+            <div class="st-row">
+              <div class="st-field">
+                <label>Consult Type</label>
+                <select class="st-select" id="consultType"><option value="">— Select —</option><option selected>Results Disclosure</option><option>Pre-Test Counseling</option><option>Post-Disclosure Follow-Up</option></select>
+              </div>
+              <div class="st-field">
+                <label>Modality</label>
+                <select class="st-select" id="modality"><option value="">— Select —</option><option selected>Async</option><option>Video</option><option>Phone</option></select>
+              </div>
             </div>
-            <div class="gc-card-body" style="padding:10px 16px;">
-              <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content"><div class="tl-label">Pre-Test Counseling</div><div class="tl-sub">May 28, 2026 · Taylor Brooks, MS CGC</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content"><div class="tl-label">Pre-Test Consent Signed</div><div class="tl-sub">May 28, 2026 · Patient portal</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content"><div class="tl-label">GeneDx Order Placed</div><div class="tl-sub">May 28, 2026 · BRCA1/2 Full Sequencing</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content"><div class="tl-label">Results Received — PATHOGENIC</div><div class="tl-sub">Jun 3, 2026 · GeneDx Lab</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot purple"></div>
-                <div class="tl-content"><div class="tl-label">Results Disclosure Session</div><div class="tl-sub">Jun 18, 2026 · In progress</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot amber"></div>
-                <div class="tl-content"><div class="tl-label">Post-Disclosure Referral</div><div class="tl-sub">Pending — Breast/Gyn Oncology</div></div>
+            <div class="st-field">
+              <label>Reason for Contact</label>
+              <select class="st-select" id="reasonContact"><option value="">— Select —</option><option selected>Positive genetic test result — disclosure counseling</option><option>Pre-test counseling and consent</option><option>Post-disclosure care planning</option></select>
+            </div>
+            <div class="st-field">
+              <label>Patient's Prior Understanding of Genetics</label>
+              <select class="st-select"><option value="">— Select —</option><option selected>Limited — new to genetic testing concepts</option><option>Moderate — had family testing discussions</option><option>Strong — healthcare background</option></select>
+            </div>
+            <div class="st-field">
+              <label>Patient Concerns (select all that apply)</label>
+              <div class="picklist-wrap">
+                <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Cancer risk / prognosis</span>
+                <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Surgical options</span>
+                <span class="pick-opt" onclick="this.classList.toggle('selected')">Impact on children / family</span>
+                <span class="pick-opt" onclick="this.classList.toggle('selected')">Insurance implications</span>
+                <span class="pick-opt" onclick="this.classList.toggle('selected')">Emotional / psychological</span>
+                <span class="pick-opt" onclick="this.classList.toggle('selected')">Partner / relationship impact</span>
               </div>
             </div>
           </div>
-
-          <!-- Messages snapshot -->
-          <div class="gc-card">
-            <div class="gc-card-header">
-              <div class="gc-card-title">Recent Messages</div>
-              <span class="gc-card-action" onclick="gcToast('Opening messages')">View all →</span>
-            </div>
-            <div class="gc-card-body" style="padding:10px 16px;">
-              <div class="tl-item">
-                <div class="tl-dot purple"></div>
-                <div class="tl-content"><div class="tl-label">Patient: "Will I need surgery?"</div><div class="tl-sub">Jun 10, 2026 · Unread</div></div>
-              </div>
-              <div class="tl-item">
-                <div class="tl-dot green"></div>
-                <div class="tl-content"><div class="tl-label">GC: Pre-session prep materials sent</div><div class="tl-sub">Jun 15, 2026 · Delivered</div></div>
-              </div>
-            </div>
-          </div>
-
         </div>
-      </div><!-- end tab-panel -->
-    </div><!-- end gc-body -->
 
-    <!-- ══ GENETIC RESULTS TAB ══ -->
-    <div class="gc-body" id="tab-results" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="display:flex;gap:18px;">
-          <div style="flex:1;">
-            <div class="gc-card" style="margin-bottom:14px;">
-              <div class="gc-card-header" style="background:#FEF2F2;">
-                <div class="gc-card-title" style="color:#DC2626;">Primary Finding — Pathogenic</div>
+        <!-- O: Objective -->
+        <div class="st-section open">
+          <div class="st-sec-hd" onclick="toggleStSection(this)">
+            <div class="st-sec-num">O</div>
+            <div class="st-sec-title">Objective</div>
+            <span class="st-sec-chev">›</span>
+          </div>
+          <div class="st-sec-body">
+            <div class="st-row">
+              <div class="st-field">
+                <label>Test Type</label>
+                <select class="st-select"><option selected>BRCA1/2 Full Seq + Del/Dup</option></select>
               </div>
-              <div class="gc-card-body">
-                <div class="variant-block">
-                  <div class="variant-class">Class 5 — Pathogenic</div>
-                  <div class="variant-name">BRCA1 — Frameshift Variant</div>
-                  <div class="variant-hgvs">NM_007294.4:c.5266dupC · NP_009225.1:p.Gln1756fs</div>
-                  <div class="variant-grid">
-                    <div class="variant-cell"><div class="variant-cell-label">Gene</div><div class="variant-cell-val">BRCA1</div></div>
-                    <div class="variant-cell"><div class="variant-cell-label">Chromosome</div><div class="variant-cell-val">17q21.31</div></div>
-                    <div class="variant-cell"><div class="variant-cell-label">Variant Type</div><div class="variant-cell-val">Frameshift (duplication)</div></div>
-                    <div class="variant-cell"><div class="variant-cell-label">Zygosity</div><div class="variant-cell-val">Heterozygous</div></div>
-                    <div class="variant-cell"><div class="variant-cell-label">ClinVar</div><div class="variant-cell-val" style="color:#DC2626;">Pathogenic (★★★★)</div></div>
-                    <div class="variant-cell"><div class="variant-cell-label">gnomAD AF</div><div class="variant-cell-val">&lt; 0.001%</div></div>
-                  </div>
-                </div>
-                <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;font-size:13px;color:#374151;line-height:1.6;">
-                  <strong>Clinical Interpretation:</strong> This frameshift variant (c.5266dupC) in BRCA1 creates a premature stop codon at position p.Gln1756fs, resulting in a truncated, non-functional protein. This is one of the most common Ashkenazi Jewish founder mutations. The variant has been classified as Pathogenic by multiple independent labs and is associated with a substantially elevated lifetime risk of breast and ovarian cancer (HBOC syndrome). Per NCCN guidelines, enhanced surveillance and risk-reduction discussions are indicated.
-                </div>
+              <div class="st-field">
+                <label>Result Classification</label>
+                <select class="st-select" id="resultClass">
+                  <option value="">— Select —</option>
+                  <option value="pathogenic" selected>Pathogenic (Class 5)</option>
+                  <option value="likely_path">Likely Pathogenic (Class 4)</option>
+                  <option value="vus">VUS (Class 3)</option>
+                  <option value="likely_benign">Likely Benign (Class 2)</option>
+                  <option value="benign">Benign (Class 1)</option>
+                  <option value="negative">Negative</option>
+                </select>
               </div>
             </div>
-
-            <div class="gc-card">
-              <div class="gc-card-header">
-                <div class="gc-card-title">Secondary / Incidental Findings</div>
-                <span class="gc-card-badge" style="background:#D1FAE5;color:#065F46;">None reportable</span>
+            <div class="st-row">
+              <div class="st-field">
+                <label>Gene</label>
+                <input class="st-input" value="BRCA1" id="geneField">
               </div>
-              <div class="gc-card-body">
-                <div style="text-align:center;padding:16px;color:#9CA3AF;font-size:13px;">
-                  No secondary or incidental findings to report at this time. Panel includes 47 additional genes — all variants of uncertain significance (VUS) or benign.
-                </div>
+              <div class="st-field">
+                <label>Variant (HGVS)</label>
+                <input class="st-input" value="c.5266dupC" id="variantField">
+              </div>
+            </div>
+            <div class="st-field">
+              <label>Inheritance Pattern</label>
+              <select class="st-select"><option selected>Autosomal Dominant</option><option>Autosomal Recessive</option><option>X-Linked</option><option>Mitochondrial</option></select>
+            </div>
+            <div class="st-field">
+              <label>Phenotypic Findings</label>
+              <div class="phen-grid" id="phenGrid">
+                <div class="phen-row"><span class="phen-label">Family history of breast cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                <div class="phen-row"><span class="phen-label">Family history of ovarian cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                <div class="phen-row"><span class="phen-label">Personal cancer diagnosis</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                <div class="phen-row"><span class="phen-label">Ashkenazi Jewish ancestry</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                <div class="phen-row"><span class="phen-label">Prior risk-reduction surgery</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                <div class="phen-row"><span class="phen-label">Chemoprevention discussed</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn active-NA" onclick="setPhen(this,'NA')">NA</button></div></div>
               </div>
             </div>
           </div>
+        </div>
 
-          <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
-            <div class="gc-card">
-              <div class="gc-card-header"><div class="gc-card-title">Lab Report Details</div></div>
-              <div class="gc-card-body">
-                <div class="field-row"><span class="field-label">Laboratory</span><span class="field-val">GeneDx (Stamford, CT)</span></div>
-                <div class="field-row"><span class="field-label">Order Date</span><span class="field-val">May 28, 2026</span></div>
-                <div class="field-row"><span class="field-label">Report Date</span><span class="field-val">Jun 3, 2026</span></div>
-                <div class="field-row"><span class="field-label">Panel</span><span class="field-val">BRCA1/2 Full Seq + Del/Dup</span></div>
-                <div class="field-row"><span class="field-label">Report ID</span><span class="field-val">GDX-2026-4721</span></div>
-                <div class="field-row"><span class="field-label">Ordering GC</span><span class="field-val">Taylor Brooks, MS CGC</span></div>
-                <div style="margin-top:10px;">
-                  <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="gcToast('Opening lab report PDF')">View Full Lab Report PDF</button>
+        <!-- A: Assessment -->
+        <div class="st-section open">
+          <div class="st-sec-hd" onclick="toggleStSection(this)">
+            <div class="st-sec-num">A</div>
+            <div class="st-sec-title">Assessment</div>
+            <span class="st-sec-chev">›</span>
+          </div>
+          <div class="st-sec-body">
+            <div class="st-field">
+              <label>GC Clinical Impression</label>
+              <textarea class="st-textarea" rows="3">Patient presents with confirmed BRCA1 c.5266dupC pathogenic variant (Class 5). Counseling addressed significantly elevated lifetime risks for breast (87%) and ovarian (44%) cancers consistent with HBOC syndrome. Ashkenazi Jewish founder mutation confirmed. Patient is emotionally processing; expressed desire for surgical risk reduction options.</textarea>
+            </div>
+            <div class="st-row">
+              <div class="st-field">
+                <label>Risk Disclosure Completed</label>
+                <div style="display:flex;gap:12px;margin-top:6px;">
+                  <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc" checked> Yes</label>
+                  <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc"> No</label>
+                </div>
+              </div>
+              <div class="st-field">
+                <label>NCCN Guidelines Reviewed</label>
+                <div style="display:flex;gap:12px;margin-top:6px;">
+                  <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn" checked> Yes</label>
+                  <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn"> No</label>
                 </div>
               </div>
             </div>
-            <div class="gc-card">
-              <div class="gc-card-header"><div class="gc-card-title">Population Context</div></div>
-              <div class="gc-card-body">
-                <div style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:8px;">c.5266dupC is one of three Ashkenazi Jewish BRCA1/2 founder mutations. Prevalence ~1:40 in AJ population vs ~1:400 in general population.</div>
-                <div class="field-row"><span class="field-label">AJ Population Freq.</span><span class="field-val" style="color:#DC2626;">~2.5%</span></div>
-                <div class="field-row"><span class="field-label">General Population</span><span class="field-val">~0.1%</span></div>
-                <div class="field-row"><span class="field-label">Reported in ClinVar</span><span class="field-val">2,847 times</span></div>
+            <div class="st-field">
+              <label>Psychological Status</label>
+              <select class="st-select"><option value="">— Select —</option><option selected>Distressed — emotional support provided</option><option>Neutral — informational focus</option><option>Positive — patient feels prepared</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- P: Plan -->
+        <div class="st-section open">
+          <div class="st-sec-hd" onclick="toggleStSection(this)">
+            <div class="st-sec-num">P</div>
+            <div class="st-sec-title">Plan</div>
+            <span class="st-sec-chev">›</span>
+          </div>
+          <div class="st-sec-body">
+            <div class="st-field">
+              <label>Actions Taken (select all that apply)</label>
+              <div id="planActions" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Risk-reduction surgery discussed (bilateral mastectomy, BSO)</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Enhanced surveillance plan reviewed (annual MRI + mammogram)</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Referral placed to high-risk breast oncology</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox"> Cascade testing recommended for siblings</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox"> Chemoprevention options discussed</label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox"> Psychosocial referral placed</label>
               </div>
             </div>
+            <div class="st-row" style="margin-top:10px;">
+              <div class="st-field">
+                <label>Follow-Up Scheduled</label>
+                <select class="st-select"><option>Yes — Care Plan session</option><option>No</option><option>Patient will schedule</option></select>
+              </div>
+              <div class="st-field">
+                <label>Follow-Up Date</label>
+                <input type="date" class="st-input" value="2026-07-27">
+              </div>
+            </div>
+            <div class="st-field">
+              <label>Physician Notification Required</label>
+              <select class="st-select"><option selected>Yes — route for attestation</option><option>No</option></select>
+            </div>
+            <div class="st-field">
+              <label>Additional Notes (optional)</label>
+              <textarea class="st-textarea" rows="2" placeholder="Any additional context for the attending physician..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submission pipeline -->
+        <div class="sub-pipeline">
+          <div class="sub-step"><div class="sub-dot sub-done">✓</div><div class="sub-label">GC Draft</div></div>
+          <span class="sub-arrow">›</span>
+          <div class="sub-step"><div class="sub-dot sub-active">2</div><div class="sub-label">GC Approve</div></div>
+          <span class="sub-arrow">›</span>
+          <div class="sub-step"><div class="sub-dot sub-pending">3</div><div class="sub-label">Physician Review</div></div>
+          <span class="sub-arrow">›</span>
+          <div class="sub-step"><div class="sub-dot sub-pending">4</div><div class="sub-label">Attestation</div></div>
+          <span class="sub-arrow">›</span>
+          <div class="sub-step"><div class="sub-dot sub-pending">5</div><div class="sub-label">Released</div></div>
+        </div>
+
+        <div id="valBanner" style="display:none;background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#DC2626;"></div>
+      </div>
+
+      <!-- Panel 1: Genetic Results -->
+      <div class="right-panel" id="rp-1">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;">Genetic Results</div>
+        <div class="variant-block">
+          <div class="variant-class-badge">Class 5 — Pathogenic</div>
+          <div class="variant-gene">BRCA1</div>
+          <div class="variant-hgvs">c.5266dupC &nbsp;·&nbsp; p.Gln1756fs &nbsp;·&nbsp; Chr17:43,091,434</div>
+          <div class="variant-meta-grid">
+            <div class="v-cell"><div class="v-cell-label">Lab</div><div class="v-cell-val">GeneDx</div></div>
+            <div class="v-cell"><div class="v-cell-label">Order ID</div><div class="v-cell-val">GDX-2026-4721</div></div>
+            <div class="v-cell"><div class="v-cell-label">Result Date</div><div class="v-cell-val">Jun 3, 2026</div></div>
+            <div class="v-cell"><div class="v-cell-label">ClinVar</div><div class="v-cell-val" style="color:#DC2626;">Pathogenic ★★★★</div></div>
+          </div>
+          <div class="interp-box">This frameshift variant (c.5266dupC) creates a premature stop codon at p.Gln1756fs, resulting in a truncated, non-functional protein. This is one of the most common Ashkenazi Jewish founder mutations. Classified Pathogenic by multiple independent labs.</div>
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;">Estimated Lifetime Risk — BRCA1 Carrier</div>
+        <div class="risk-row">
+          <div class="risk-label">Breast Cancer (lifetime) <span class="risk-pct high">87%</span></div>
+          <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:87%;background:#DC2626;"></div></div>
+          <div class="risk-note">Population baseline: 13%</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-label">Ovarian Cancer (lifetime) <span class="risk-pct high">44%</span></div>
+          <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:44%;background:#DC2626;"></div></div>
+          <div class="risk-note">Population baseline: 1.5%</div>
+        </div>
+        <div style="margin-top:14px;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Secondary Findings</div>
+        <div style="font-size:12px;color:#9CA3AF;font-style:italic;padding:10px;background:#F9FAFB;border-radius:6px;border:1px solid #E5E0D8;">No secondary findings reportable per ACMG guidelines.</div>
+      </div>
+
+      <!-- Panel 2: Family History -->
+      <div class="right-panel" id="rp-2">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;">Family History</div>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">3-Generation Cancer History</div>
+        <table class="cancer-tbl">
+          <thead><tr><th>Relative</th><th>Cancer Type</th><th>Age at Dx</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>Mother</td><td>Breast</td><td>51</td><td style="color:#22C55E;font-weight:600;">Survivor</td></tr>
+            <tr><td>Maternal Aunt</td><td>Ovarian</td><td>58</td><td style="color:#6B7280;">Deceased</td></tr>
+            <tr><td>Maternal Grandmother</td><td>Breast</td><td>44</td><td style="color:#6B7280;">Deceased</td></tr>
+            <tr><td>Maternal Grandfather</td><td>Prostate</td><td>67</td><td style="color:#6B7280;">Deceased</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Pedigree Summary</div>
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px;font-size:11px;color:#374151;line-height:1.8;margin-bottom:14px;">
+          <strong>Generation I:</strong> MGM — Breast Dx age 44 (deceased) · MGF — Prostate Dx age 67 (deceased)<br>
+          <strong>Generation II:</strong> Mother — Breast Dx age 51 (BRCA1+, survivor) · Maternal Aunt — Ovarian Dx age 58 (deceased)<br>
+          <strong>Generation III:</strong> Jennifer Walsh (42F) — BRCA1 c.5266dupC Pathogenic<br>
+          Siblings: 1 brother (38M, not tested), 1 sister (35F, not tested)
+        </div>
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Cascade Testing</div>
+        <div class="cascade-row"><span class="cascade-name">Mother — BRCA1+ (index case)</span><span class="cascade-badge badge-confirmed">Confirmed</span></div>
+        <div class="cascade-row"><span class="cascade-name">Brother (38M)</span><span class="cascade-badge badge-pending">Pending referral</span></div>
+        <div class="cascade-row"><span class="cascade-name">Sister (35F)</span><span class="cascade-badge badge-pending">Pending referral</span></div>
+      </div>
+
+      <!-- Panel 3: Communication -->
+      <div class="right-panel" id="rp-3">
+        <div class="comm-tab-bar">
+          <button class="comm-tab active" onclick="switchCommTab(this,'comm-timeline')">Timeline</button>
+          <button class="comm-tab" onclick="switchCommTab(this,'comm-compose')">Log Activity</button>
+          <button class="comm-tab" onclick="switchCommTab(this,'comm-msgs')">Messages</button>
+        </div>
+        <div id="comm-timeline" class="comm-panel active">
+          <div class="tl-section-hdr">Jul 2026</div>
+          <div class="tl-card"><div class="tl-card-row"><div class="tl-type-icon" style="background:#FEE2E2;">⚠️</div><div class="tl-card-main"><div class="tl-card-title">SLA Alert — Results disclosure nearing deadline</div><div class="tl-card-sub">Automated · Jul 13, 2026</div></div></div></div>
+          <div class="tl-card"><div class="tl-card-row"><div class="tl-type-icon" style="background:#EDE9FE;">💬</div><div class="tl-card-main"><div class="tl-card-title">Patient message — surgical options question</div><div class="tl-card-sub">Jennifer Walsh · Jun 10, 2026</div></div></div></div>
+          <div class="tl-section-hdr">Jun 2026</div>
+          <div class="tl-card"><div class="tl-card-row"><div class="tl-type-icon" style="background:#D1FAE5;">🧬</div><div class="tl-card-main"><div class="tl-card-title">Lab result returned — BRCA1 PATHOGENIC</div><div class="tl-card-sub">GeneDx · Jun 3, 2026</div></div></div></div>
+          <div class="tl-card"><div class="tl-card-row"><div class="tl-type-icon" style="background:#EDE9FE;">📋</div><div class="tl-card-main"><div class="tl-card-title">Chart prep completed by GCA</div><div class="tl-card-sub">Priya Sharma · Jun 3, 2026</div></div></div></div>
+          <div class="tl-section-hdr">May 2026</div>
+          <div class="tl-card"><div class="tl-card-row"><div class="tl-type-icon" style="background:#EDE9FE;">✍️</div><div class="tl-card-main"><div class="tl-card-title">Pre-Test Counseling note signed</div><div class="tl-card-sub">Taylor Brooks, MS CGC · May 28, 2026</div></div></div></div>
+        </div>
+        <div id="comm-compose" class="comm-panel" style="display:none;">
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:700;color:#374151;display:block;margin-bottom:4px;">Activity Type</label>
+            <select style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:6px 10px;font-size:12px;font-family:inherit;outline:none;background:#fff;"><option>Log Phone Call</option><option>Send Secure Message</option><option>Add Internal Note</option><option>Create Task</option></select>
+          </div>
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px;font-weight:700;color:#374151;display:block;margin-bottom:4px;">Notes</label>
+            <textarea style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;" rows="4" placeholder="Describe the activity..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="gcToast('Activity logged to timeline')">Log Activity</button>
+        </div>
+        <div id="comm-msgs" class="comm-panel" style="display:none;">
+          <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px;">
+            <div style="display:flex;gap:8px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#DBEAFE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1D4ED8;flex-shrink:0;">JW</div>
+              <div><div style="font-size:10px;color:#9CA3AF;margin-bottom:3px;">Jennifer Walsh · Jun 10</div><div style="font-size:12px;color:#374151;background:#F3F4F6;padding:8px 11px;border-radius:0 10px 10px 10px;">"Will I need surgery? I'm scared and want to understand my options."</div></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-direction:row-reverse;">
+              <div style="width:28px;height:28px;border-radius:50%;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#6B21A8;flex-shrink:0;">TB</div>
+              <div><div style="font-size:10px;color:#9CA3AF;margin-bottom:3px;text-align:right;">Taylor Brooks · Jun 10</div><div style="font-size:12px;color:#374151;background:#EDE9FE;padding:8px 11px;border-radius:10px 0 10px 10px;">"Hi Jennifer — I understand this feels overwhelming. We'll go through all your options together. You won't need to make any decisions today."</div></div>
+            </div>
+          </div>
+          <div style="border-top:1px solid #E5E0D8;padding-top:12px;display:flex;gap:8px;">
+            <textarea style="flex:1;border:1px solid #E5E0D8;border-radius:8px;padding:7px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;min-height:56px;" placeholder="Reply to patient..."></textarea>
+            <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;align-self:flex-end;" onclick="gcToast('Message sent')">Send</button>
           </div>
         </div>
       </div>
+
+      <!-- Panel 4: Zendesk -->
+      <div class="right-panel" id="rp-4">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;">Zendesk — Support Case</div>
+        <div class="zd-case">
+          <div class="zd-id">ZD-294102</div>
+          <div class="zd-title">BRCA1 result — patient questions about surgical timing</div>
+          <div class="zd-meta"><span>Opened: Jun 10, 2026</span><span>Requester: Jennifer Walsh</span><span class="zd-status">Open</span></div>
+          <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Notes</div>
+          <div class="zd-note-entry">
+            <div class="zd-av">JW</div>
+            <div><div class="zd-msg">Patient called to ask if she needs to decide on surgery before the disclosure session. Reassured that no decision is required at this stage.</div><div class="zd-ts">Jun 10 · 8:31 AM · Patient</div></div>
+          </div>
+          <div class="zd-note-entry">
+            <div class="zd-av">PS</div>
+            <div><div class="zd-msg">Ticket escalated to GC for results disclosure scheduling. GC session booked for async follow-up.</div><div class="zd-ts">Jun 10 · 9:02 AM · Priya Sharma, GCA</div></div>
+          </div>
+        </div>
+        <label style="font-size:11px;font-weight:700;color:#374151;display:block;margin-bottom:6px;">Add Note to Case</label>
+        <textarea style="width:100%;border:1px solid #E5E0D8;border-radius:8px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;margin-bottom:8px;" rows="3" placeholder="Add a note to ZD-294102..."></textarea>
+        <button class="btn btn-outline" style="font-size:11px;padding:5px 12px;" onclick="gcToast('Note added to Zendesk case ZD-294102')">Save Note</button>
+      </div>
+
+      <!-- Panel 5: Test Workflow -->
+      <div class="right-panel" id="rp-5">
+        <div style="font-size:13px;font-weight:700;color:#374151;margin-bottom:14px;">Test Workflow — BRCA Counseling</div>
+        <div class="tw-stage">
+          <div class="tw-stage-hd"><div class="tw-stage-num tw-stage-done">✓</div><div class="tw-stage-title">Stage 1 — Pre-Test Counseling</div><span class="tw-stage-badge tw-done-badge">Complete</span></div>
+        </div>
+        <div class="tw-stage" style="border-color:#6B21A8;">
+          <div class="tw-stage-hd"><div class="tw-stage-num tw-stage-active">2</div><div class="tw-stage-title">Stage 2 — Results Disclosure</div><span class="tw-stage-badge tw-active-badge">In Progress</span></div>
+          <div class="tw-stage-body">
+            <div class="tw-checklist">
+              <label class="tw-check"><input type="checkbox" checked> Lab result received and reviewed</label>
+              <label class="tw-check"><input type="checkbox" checked> Patient notified of result availability</label>
+              <label class="tw-check"><input type="checkbox" checked> Disclosure session conducted</label>
+              <label class="tw-check"><input type="checkbox"> GC note approved and signed</label>
+              <label class="tw-check"><input type="checkbox"> Physician attestation received</label>
+            </div>
+            <div class="tw-gate">⚠ Gate: GC note must be signed before advancing to Stage 3</div>
+            <div style="font-size:11px;color:#6B21A8;font-weight:600;margin-bottom:10px;">Payment trigger: $250 on stage completion</div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-primary" style="font-size:11px;padding:6px 14px;" onclick="gcToast('Sign the note first — use Approve & Sign')">Advance to Stage 3 →</button>
+              <button class="btn btn-outline" style="font-size:11px;padding:6px 14px;" onclick="gcToast('Stage flagged for review')">Flag Issue</button>
+            </div>
+          </div>
+        </div>
+        <div class="tw-stage"><div class="tw-stage-hd"><div class="tw-stage-num tw-stage-pending">3</div><div class="tw-stage-title">Stage 3 — Post-Disclosure Care Plan</div><span class="tw-stage-badge tw-pending-badge">Pending</span></div></div>
+        <div class="tw-stage"><div class="tw-stage-hd"><div class="tw-stage-num tw-stage-pending">4</div><div class="tw-stage-title">Stage 4 — Chart Close &amp; Billing</div><span class="tw-stage-badge tw-pending-badge">Pending</span></div></div>
+        <div style="margin-top:14px;font-size:12px;font-weight:700;color:#374151;margin-bottom:8px;">Billing Summary</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr style="background:#F9FAFB;"><th style="padding:6px 8px;text-align:left;border-bottom:1px solid #E5E0D8;color:#6B7280;">Stage</th><th style="padding:6px 8px;text-align:right;border-bottom:1px solid #E5E0D8;color:#6B7280;">Payment</th><th style="padding:6px 8px;text-align:center;border-bottom:1px solid #E5E0D8;color:#6B7280;">Status</th></tr></thead>
+          <tbody>
+            <tr><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;">Pre-Test Counseling</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:right;font-weight:600;">$150</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:center;"><span style="background:#D1FAE5;color:#065F46;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">Done</span></td></tr>
+            <tr><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;">Results Disclosure</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:right;font-weight:600;">$250</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:center;"><span style="background:#EDE9FE;color:#6B21A8;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">Active</span></td></tr>
+            <tr><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;">Care Plan</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:right;font-weight:600;">$100</td><td style="padding:7px 8px;border-bottom:1px solid #F0EBE4;text-align:center;"><span style="background:#F3F4F6;color:#9CA3AF;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">Pending</span></td></tr>
+            <tr><td style="padding:7px 8px;">Chart Close</td><td style="padding:7px 8px;text-align:right;font-weight:600;">$75</td><td style="padding:7px 8px;text-align:center;"><span style="background:#F3F4F6;color:#9CA3AF;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;">Pending</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Doc footer -->
+      <div class="doc-footer" id="docFooter">
+        <span class="doc-save-status">Autosaved · <span id="footerTs">2 min ago</span></span>
+        <button style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;" onclick="gcToast('Draft saved')">Save Draft</button>
+        <button style="background:#EDE9FE;color:#5B21B6;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;" onclick="gcToast('Preview generated')">Preview</button>
+        <button style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;" onclick="openSignModal()">Approve &amp; Sign ✓</button>
+      </div>
+
     </div>
+  </div>
+</div>
 
-    <!-- ══ FAMILY HISTORY TAB ══ -->
-    <div class="gc-body" id="tab-family" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="display:flex;gap:18px;">
-          <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
-            <div class="gc-card">
-              <div class="gc-card-header">
-                <div class="gc-card-title">3-Generation Pedigree Summary</div>
-                <span class="gc-card-badge">Maternal line predominant</span>
-              </div>
-              <div class="gc-card-body">
-                <!-- Visual pedigree approximation -->
-                <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:16px;margin-bottom:14px;overflow-x:auto;">
-                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation III — Grandparents (maternal)</div>
-                  <div style="display:flex;align-items:flex-end;gap:24px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px dashed #E5E0D8;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
-                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;background:#374151;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♂</div>
-                      Grandfather
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
-                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
-                      Grandmother
-                      <div style="font-size:9px;color:#DC2626;">Breast Ca · 52</div>
-                    </div>
-                  </div>
-                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation II — Mother's siblings</div>
-                  <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:20px;padding-bottom:14px;border-bottom:1px dashed #E5E0D8;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
-                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
-                      Mother
-                      <div style="font-size:9px;color:#DC2626;">Breast Ca · 46</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#DC2626;">
-                      <div style="width:24px;height:24px;border:2px solid #DC2626;background:#DC2626;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;">♀</div>
-                      Aunt
-                      <div style="font-size:9px;color:#DC2626;">Ovarian Ca · 51</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
-                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;">♂</div>
-                      Uncle
-                      <div style="font-size:9px;color:#6B7280;">Unaffected</div>
-                    </div>
-                  </div>
-                  <div style="font-size:11px;color:#6B7280;font-weight:600;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em;">Generation I — Proband & siblings</div>
-                  <div style="display:flex;align-items:flex-end;gap:16px;">
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#6B21A8;">
-                      <div style="width:28px;height:28px;border:2.5px solid #6B21A8;background:#EDE9FE;display:flex;align-items:center;justify-content:center;font-size:10px;">♀</div>
-                      <strong>Proband</strong>
-                      <div style="font-size:9px;color:#6B21A8;">Jennifer W. · BRCA1+</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
-                      <div style="width:24px;height:24px;border:2px solid #374151;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;">♂</div>
-                      Brother
-                      <div style="font-size:9px;color:#D97706;">Testing pending</div>
-                    </div>
-                    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#374151;">
-                      <div style="width:24px;height:24px;border:2px solid #374151;display:flex;align-items:center;justify-content:center;font-size:9px;">♀</div>
-                      Sister
-                      <div style="font-size:9px;color:#D97706;">Testing pending</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div style="font-size:11px;color:#9CA3AF;">Legend: Filled = affected · ⬧ = proband · Dashed border = cascade testing recommended</div>
-              </div>
-            </div>
-
-            <div class="gc-card">
-              <div class="gc-card-header"><div class="gc-card-title">Cancer History — First Degree Relatives</div></div>
-              <div class="gc-card-body" style="padding:0;">
-                <table style="width:100%;border-collapse:collapse;font-size:13px;">
-                  <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
-                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Relative</th>
-                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Cancer Type</th>
-                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Age at Dx</th>
-                    <th style="padding:8px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
-                  </tr></thead>
-                  <tbody>
-                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Mother (maternal)</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Breast Cancer</td><td style="padding:10px 16px;">46</td><td style="padding:10px 16px;"><span style="background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Survivor</span></td></tr>
-                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Maternal Aunt</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Ovarian Cancer</td><td style="padding:10px 16px;">51</td><td style="padding:10px 16px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Deceased</span></td></tr>
-                    <tr style="border-bottom:1px solid #F3F4F6;"><td style="padding:10px 16px;">Maternal Grandmother</td><td style="padding:10px 16px;color:#DC2626;font-weight:600;">Breast Cancer</td><td style="padding:10px 16px;">52</td><td style="padding:10px 16px;"><span style="background:#FEE2E2;color:#DC2626;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Deceased</span></td></tr>
-                    <tr><td style="padding:10px 16px;">Paternal side</td><td style="padding:10px 16px;color:#6B7280;">No significant history</td><td style="padding:10px 16px;">—</td><td style="padding:10px 16px;"><span style="background:#F3F4F6;color:#6B7280;padding:2px 7px;border-radius:8px;font-size:11px;font-weight:700;">Unaffected</span></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div style="width:280px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
-            <div class="gc-card">
-              <div class="gc-card-header"><div class="gc-card-title">Cascade Testing</div></div>
-              <div class="gc-card-body">
-                <div style="font-size:12px;color:#374151;margin-bottom:10px;line-height:1.5;">First-degree relatives recommended for targeted BRCA1 c.5266dupC testing.</div>
-                <div class="tl-item"><div class="tl-dot amber"></div><div class="tl-content"><div class="tl-label">Brother (39M)</div><div class="tl-sub">Letter sent Jun 18 · Testing pending</div></div></div>
-                <div class="tl-item"><div class="tl-dot amber"></div><div class="tl-content"><div class="tl-label">Sister (37F)</div><div class="tl-sub">Letter sent Jun 18 · Testing pending</div></div></div>
-                <div class="tl-item"><div class="tl-dot green"></div><div class="tl-content"><div class="tl-label">Mother (64F)</div><div class="tl-sub">BRCA1+ confirmed · Under surveillance</div></div></div>
-                <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:10px;" onclick="gcToast('Cascade testing letters ready for download')">Generate Cascade Letter</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- Sign modal -->
+<div class="modal-backdrop" id="signModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Approve &amp; Sign GC Note</h3>
+      <button class="modal-close" onclick="closeSignModal()">×</button>
     </div>
-
-    <!-- ══ GC NOTES TAB ══ -->
-    <div class="gc-body" id="tab-notes" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
-          <button class="btn btn-primary" onclick="gcToast('New GC note opened for editing')">+ Add Note</button>
-        </div>
-
-        <!-- Pre-test note -->
-        <div class="gc-card">
-          <div class="gc-card-header">
-            <div class="gc-card-title">Pre-Test Counseling Note</div>
-            <span class="gc-card-badge" style="background:#D1FAE5;color:#065F46;">Signed &amp; Finalized</span>
-            <span class="gc-card-action">Edit</span>
-          </div>
-          <div class="gc-card-body">
-            <div style="font-size:11px;color:#9CA3AF;margin-bottom:8px;">Taylor Brooks, MS CGC · May 28, 2026 · Video · 45 min</div>
-            <div class="note-block">Patient is a 42-year-old female referred for BRCA1/2 genetic counseling due to significant personal and family history of HBOC-associated cancers (see family history tab).
-
-DISCUSSION POINTS:
-• Reviewed purpose and scope of BRCA1/2 comprehensive panel testing
-• Discussed autosomal dominant inheritance pattern and 50% transmission risk to first-degree relatives
-• Addressed potential results: positive (pathogenic), VUS, negative, and their respective implications
-• Reviewed insurance and employment discrimination protections under GINA
-• Patient expressed understanding and signed consent for testing
-
-CLINICAL IMPRESSION: High pre-test probability given strong 3-generation maternal history. Patient emotionally prepared for positive result; has support system in place (partner present, mother already confirmed positive).
-
-PLAN: GeneDx BRCA1/2 full sequencing + large rearrangement analysis ordered. Results expected in 5–7 business days. Follow-up results disclosure scheduled upon return.</div>
-            <div class="note-meta">Authored: Taylor Brooks, MS CGC · May 28, 2026, 2:45 PM · Signed: May 28, 2026, 3:02 PM</div>
-            <!-- Submission pipeline -->
-            <div class="submit-pipeline">
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">GC Drafted<br>&amp; Signed</div>
-              </div>
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">GCA Reviewed<br>Template</div>
-              </div>
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">Submitted<br>to LM</div>
-              </div>
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">Physician<br>Attested</div>
-              </div>
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">LM Closed<br>Completed</div>
-              </div>
-            </div>
-            <div style="font-size:11px;color:#059669;margin-top:6px;">✓ Pre-test consult approved · GeneDx BRCA1/2 order placed · Physician attested by Dr. A. Chen — May 29, 2026 · LM Referral #24198</div>
-          </div>
-        </div>
-
-        <!-- Results disclosure note — Smart Template (In Progress) -->
-        <div class="gc-card" id="results-note-card">
-          <div class="gc-card-header">
-            <div class="gc-card-title">Results Disclosure Note</div>
-            <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;" id="note-status-badge">In Progress — Not Signed</span>
-            <span style="margin-left:auto;font-size:11px;color:#9CA3AF;">Taylor Brooks, MS CGC · Jun 18, 2026 · Async</span>
-          </div>
-          <div class="gc-card-body">
-
-            <!-- Required field enforcement banner -->
-            <div id="validation-banner" style="display:none;background:#FEF2F2;border:1.5px solid #FECACA;border-radius:8px;padding:10px 14px;margin-bottom:14px;">
-              <div style="font-size:12px;font-weight:700;color:#DC2626;margin-bottom:6px;">⚠ Chart cannot be finalized — required fields incomplete:</div>
-              <ul id="validation-list" style="margin:0;padding-left:16px;font-size:12px;color:#7F1D1D;"></ul>
-            </div>
-
-            <!-- ── S: SUBJECTIVE ── -->
-            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">S — Subjective</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-              <div class="tpl-field">
-                <label class="tpl-label">Consult Type <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-consult-type" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="results-disclosure" selected>Results Disclosure</option>
-                  <option value="pre-test">Pre-Test Counseling</option>
-                  <option value="variant-reinterp">Variant Reinterpretation</option>
-                  <option value="followup">Follow-Up</option>
-                  <option value="incident">Incident / Urgent</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Consult Modality <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-modality" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="async" selected>Async Secure Message</option>
-                  <option value="video">Video</option>
-                  <option value="phone">Telephonic</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Reason for Contact <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-contact-reason" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="results-avail" selected>Genetic test results available</option>
-                  <option value="patient-inquiry">Patient inquiry — results question</option>
-                  <option value="variant-update">Variant classification updated</option>
-                  <option value="cascade">Cascade testing recommendation</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Patient Understanding (Prior Session)</label>
-                <select class="tpl-select" id="f-prior-understand" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="demonstrated">Demonstrated understanding</option>
-                  <option value="partial">Partial — reinforcement needed</option>
-                  <option value="no-prior">No prior session on record</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Patient concerns (multi-select pick-list) -->
-            <div class="tpl-field" style="margin-bottom:14px;">
-              <label class="tpl-label">Patient-Reported Concerns / Topics (select all that apply)</label>
-              <div class="tpl-picklist">
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Surgical prevention options (mastectomy / oophorectomy)</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Enhanced surveillance schedule</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Chemoprevention options</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Impact on family members / cascade testing</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Insurance / GINA protections</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Emotional / psychosocial support</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Reproductive options</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Second opinion / additional testing</label>
-              </div>
-            </div>
-
-            <!-- ── O: OBJECTIVE ── -->
-            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">O — Objective</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-              <div class="tpl-field">
-                <label class="tpl-label">Test Type Reviewed <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-test-type" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="brca12-panel" selected>BRCA1/2 Comprehensive Panel</option>
-                  <option value="hboc-panel">HBOC Multi-Gene Panel</option>
-                  <option value="exomedx-proband">ExomeDx Proband</option>
-                  <option value="exomedx-duo">ExomeDx Duo</option>
-                  <option value="exomedx-trio">ExomeDx Trio</option>
-                  <option value="colorectal-panel">Colorectal Cancer Panel</option>
-                  <option value="cardio-panel">Cardiovascular Panel</option>
-                  <option value="custom">Other (see narrative)</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Result Classification <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-result-class" onchange="updateResultBadge()" >
-                  <option value="">— select —</option>
-                  <option value="pathogenic" selected>Pathogenic</option>
-                  <option value="likely-pathogenic">Likely Pathogenic</option>
-                  <option value="vus">Variant of Uncertain Significance (VUS)</option>
-                  <option value="likely-benign">Likely Benign</option>
-                  <option value="benign">Benign / Negative</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Gene / Variant (auto-filled from orders)</label>
-                <input class="tpl-input" type="text" value="BRCA1 c.5266dupC (p.Gln1756fs)" readonly style="background:#F9FAFB;cursor:default;">
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Inheritance Pattern <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-inheritance" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="ad" selected>Autosomal Dominant</option>
-                  <option value="ar">Autosomal Recessive</option>
-                  <option value="xl">X-Linked</option>
-                  <option value="de-novo">De Novo</option>
-                  <option value="unknown">Unknown / Unclear</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Phenotypic findings (positive/negative toggles) -->
-            <div class="tpl-field" style="margin-bottom:14px;">
-              <label class="tpl-label">Phenotypic Findings <span class="req-star">*</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(required — select P/N/NA for each applicable finding)</span></label>
-              <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
-                <div style="display:grid;grid-template-columns:2fr 1fr;background:#F9FAFB;padding:6px 12px;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">
-                  <span>Finding</span><span style="text-align:center;">Result</span>
-                </div>
-                <div class="phenotype-row" id="phen-breast">
-                  <span>Personal history of breast cancer</span>
-                  <div class="pn-toggle" id="phen-breast-val">
-                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-breast','P')">P</button>
-                    <button class="pn-btn pn-neg" onclick="setPhen('phen-breast','N')">N</button>
-                    <button class="pn-btn pn-na" onclick="setPhen('phen-breast','NA')">N/A</button>
-                  </div>
-                </div>
-                <div class="phenotype-row" id="phen-ovarian">
-                  <span>Personal history of ovarian cancer</span>
-                  <div class="pn-toggle">
-                    <button class="pn-btn pn-pos" onclick="setPhen('phen-ovarian','P')">P</button>
-                    <button class="pn-btn pn-neg active" onclick="setPhen('phen-ovarian','N')">N</button>
-                    <button class="pn-btn pn-na" onclick="setPhen('phen-ovarian','NA')">N/A</button>
-                  </div>
-                </div>
-                <div class="phenotype-row" id="phen-fam-breast">
-                  <span>Family history — breast cancer (1st/2nd degree)</span>
-                  <div class="pn-toggle">
-                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-fam-breast','P')">P</button>
-                    <button class="pn-btn pn-neg" onclick="setPhen('phen-fam-breast','N')">N</button>
-                    <button class="pn-btn pn-na" onclick="setPhen('phen-fam-breast','NA')">N/A</button>
-                  </div>
-                </div>
-                <div class="phenotype-row" id="phen-fam-ovarian">
-                  <span>Family history — ovarian cancer</span>
-                  <div class="pn-toggle">
-                    <button class="pn-btn pn-pos active" onclick="setPhen('phen-fam-ovarian','P')">P</button>
-                    <button class="pn-btn pn-neg" onclick="setPhen('phen-fam-ovarian','N')">N</button>
-                    <button class="pn-btn pn-na" onclick="setPhen('phen-fam-ovarian','NA')">N/A</button>
-                  </div>
-                </div>
-                <div class="phenotype-row" id="phen-prostate">
-                  <span>Family history — prostate cancer (early onset)</span>
-                  <div class="pn-toggle">
-                    <button class="pn-btn pn-pos" onclick="setPhen('phen-prostate','P')">P</button>
-                    <button class="pn-btn pn-neg" onclick="setPhen('phen-prostate','N')">N</button>
-                    <button class="pn-btn pn-na active" onclick="setPhen('phen-prostate','NA')">N/A</button>
-                  </div>
-                </div>
-                <div class="phenotype-row" id="phen-pancreatic">
-                  <span>Family history — pancreatic cancer</span>
-                  <div class="pn-toggle">
-                    <button class="pn-btn pn-pos" onclick="setPhen('phen-pancreatic','P')">P</button>
-                    <button class="pn-btn pn-neg" onclick="setPhen('phen-pancreatic','N')">N</button>
-                    <button class="pn-btn pn-na active" onclick="setPhen('phen-pancreatic','NA')">N/A</button>
-                  </div>
-                </div>
-              </div>
-              <div style="font-size:10px;color:#9CA3AF;margin-top:4px;">P = Positive finding present · N = Negative / not present · N/A = Not applicable to this consult type</div>
-            </div>
-
-            <!-- ── A: ASSESSMENT ── -->
-            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">A — Assessment</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-              <div class="tpl-field">
-                <label class="tpl-label">GC Clinical Impression <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-impression" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="high-risk" selected>High risk — confirmed pathogenic variant</option>
-                  <option value="mod-risk">Moderate risk — likely pathogenic / VUS</option>
-                  <option value="avg-risk">Average / population risk — negative result</option>
-                  <option value="inconclusive">Inconclusive — further testing recommended</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Risk Disclosure Completed <span class="req-star">*</span></label>
-                <div class="tpl-radio-group required-field" id="f-risk-disclosure">
-                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="yes" checked onchange="autosave()"> Yes — patient verbalized understanding</label>
-                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="partial" onchange="autosave()"> Partial — follow-up required</label>
-                  <label class="radio-item"><input type="radio" name="risk-disclosure" value="deferred" onchange="autosave()"> Deferred — patient not ready</label>
-                </div>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Psychological / Emotional Status <span class="req-star">*</span></label>
-                <select class="tpl-select required-field" id="f-psych-status" onchange="autosave()">
-                  <option value="">— select —</option>
-                  <option value="appropriate">Appropriate response to results</option>
-                  <option value="distressed-referred" selected>Distressed — psychosocial referral made</option>
-                  <option value="distressed-monitoring">Distressed — monitoring, no referral</option>
-                  <option value="requires-fu">Requires follow-up assessment</option>
-                  <option value="stable">Stable / no concerns</option>
-                </select>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">NCCN Guidelines Reviewed <span class="req-star">*</span></label>
-                <div class="tpl-radio-group required-field" id="f-nccn">
-                  <label class="radio-item"><input type="radio" name="nccn" value="yes" checked onchange="autosave()"> Yes</label>
-                  <label class="radio-item"><input type="radio" name="nccn" value="no" onchange="autosave()"> No</label>
-                  <label class="radio-item"><input type="radio" name="nccn" value="na" onchange="autosave()"> N/A</label>
-                </div>
-              </div>
-            </div>
-
-            <!-- ── P: PLAN ── -->
-            <div style="font-size:11px;font-weight:800;color:#6B21A8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #EDE9FE;">P — Plan</div>
-            <div class="tpl-field" style="margin-bottom:14px;">
-              <label class="tpl-label">Actions Taken / Recommended <span class="req-star">*</span> <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(select all that apply — at least one required)</span></label>
-              <div class="tpl-picklist" id="f-plan-actions">
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Enhanced surveillance recommended (annual MRI + mammogram)</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Prophylactic surgery options discussed (mastectomy / salpingo-oophorectomy)</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Chemoprevention options reviewed (tamoxifen / raloxifene)</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Psychosocial support referral made</label>
-                <label class="pick-item"><input type="checkbox" checked onchange="autosave()"> Cascade testing letters initiated — brother, sister</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Referral to high-risk breast/gyn oncology ordered</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Patient education materials attached from library</label>
-                <label class="pick-item"><input type="checkbox" onchange="autosave()"> Ordering physician notified of results</label>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
-              <div class="tpl-field">
-                <label class="tpl-label">Follow-Up Scheduled <span class="req-star">*</span></label>
-                <div class="tpl-radio-group required-field" id="f-fu-scheduled">
-                  <label class="radio-item"><input type="radio" name="fu-sched" value="yes" checked onchange="autosave()"> Yes</label>
-                  <label class="radio-item"><input type="radio" name="fu-sched" value="no" onchange="autosave()"> No — patient declined</label>
-                  <label class="radio-item"><input type="radio" name="fu-sched" value="pending" onchange="autosave()"> Pending — patient to schedule</label>
-                </div>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Follow-Up Date</label>
-                <input class="tpl-input" type="date" value="2026-07-02" onchange="autosave()">
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Physician Notification Required <span class="req-star">*</span></label>
-                <div class="tpl-radio-group required-field" id="f-phys-notify">
-                  <label class="radio-item"><input type="radio" name="phys-notify" value="yes" onchange="autosave()"> Yes — routing to physician queue</label>
-                  <label class="radio-item"><input type="radio" name="phys-notify" value="no" checked onchange="autosave()"> No — results delivery only, LM closes without attestation</label>
-                </div>
-              </div>
-              <div class="tpl-field">
-                <label class="tpl-label">Data Correction Needed</label>
-                <div class="tpl-radio-group">
-                  <label class="radio-item"><input type="radio" name="data-err" value="yes" onchange="showDataCorrectionTask()"> Yes — flag to GCA</label>
-                  <label class="radio-item"><input type="radio" name="data-err" value="no" checked> No</label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Optional narrative -->
-            <div class="tpl-field" style="margin-bottom:14px;">
-              <label class="tpl-label">Additional Narrative <span style="font-size:10px;color:#9CA3AF;font-weight:400;">(optional — for context not captured above)</span></label>
-              <textarea class="tpl-textarea" onchange="autosave()" placeholder="Free text for nuanced clinical context, unusual circumstances, or additional patient-reported information…">Patient expressed significant distress upon receiving positive result. Partner was present for the async message review. Patient has a strong support system and has been in contact with her mother, who tested positive previously, for emotional guidance. All options reviewed in detail.</textarea>
-            </div>
-
-            <div class="note-meta" style="color:#D97706;">⚠ Unsigned · Last autosaved: Jun 18, 2026, 10:41 AM · Template: GC Results Disclosure v2.1</div>
-
-            <!-- Submission pipeline -->
-            <div class="submit-pipeline">
-              <div class="submit-step done">
-                <div class="submit-step-dot done">✓</div>
-                <div class="submit-step-label done">GC Drafted<br>Note</div>
-              </div>
-              <div class="submit-step current">
-                <div class="submit-step-dot current">2</div>
-                <div class="submit-step-label current">GC Signs<br>(Approve / Reject)</div>
-              </div>
-              <div class="submit-step pending">
-                <div class="submit-step-dot pending">3</div>
-                <div class="submit-step-label">System Validates<br>Required Fields</div>
-              </div>
-              <div class="submit-step pending">
-                <div class="submit-step-dot pending">4</div>
-                <div class="submit-step-label">GCA Submits<br>to LM</div>
-              </div>
-              <div class="submit-step pending">
-                <div class="submit-step-dot pending">5</div>
-                <div class="submit-step-label">LM Closed<br>Completed</div>
-              </div>
-            </div>
-            <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">LM Referral #24213 · Session: Ended Jun 18, 2026 · Awaiting GC sign-off to proceed</div>
-            <div style="display:flex;gap:8px;margin-top:10px;">
-              <button class="btn btn-outline" onclick="gcToast('Template auto-saved')">Save Draft</button>
-              <button class="btn btn-outline" style="border-color:#DC2626;color:#DC2626;" onclick="showRejectModal()">Reject &amp; Sign ✗</button>
-              <button class="btn btn-primary" onclick="validateAndSign()">Approve &amp; Sign ✓</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Note info box — updated: in-system messaging, no Slack -->
-        <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:12px 16px;font-size:12px;color:#5B21B6;line-height:1.6;">
-          <strong>Submission workflow:</strong> When you sign, the system validates all required template fields. If any are incomplete, signing is blocked and a list of missing fields is shown. Once signed, GCA Priya Sharma receives an in-platform task to submit to LifeMap — no Slack required. For results delivery consults, LM closes the referral without physician attestation. Chart finalization is enforced by the system (Req CFE-001).
-        </div>
+    <div class="modal-body">
+      <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:#92400E;">
+        <strong>CFE-001 Enforcement:</strong> All required fields must be completed before this note can be signed. Signing will route the note for physician attestation.
       </div>
+      <div id="validationErrors" style="display:none;background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#DC2626;"></div>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer;font-weight:normal;"><input type="checkbox" id="confirmAccuracy" style="margin-top:2px;accent-color:#6B21A8;"> I certify this note accurately reflects the counseling session and my clinical assessment.</label>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;font-size:13px;cursor:pointer;font-weight:normal;"><input type="checkbox" id="confirmNccn" style="margin-top:2px;accent-color:#6B21A8;"> NCCN guidelines have been reviewed and documented.</label>
+      <label style="display:flex;align-items:flex-start;gap:10px;font-size:13px;cursor:pointer;font-weight:normal;"><input type="checkbox" id="confirmRoute" style="margin-top:2px;accent-color:#6B21A8;"> I understand this note will be routed to the attending physician for attestation before release.</label>
     </div>
-
-    <!-- ══ TEST ORDERS TAB ══ -->
-    <div class="gc-body" id="tab-orders" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
-          <button class="btn btn-primary" onclick="gcToast('GeneDx order panel opened')">+ New Order</button>
-        </div>
-        <div class="gc-card">
-          <div class="gc-card-header"><div class="gc-card-title">Genetic Test Orders</div></div>
-          <div class="gc-card-body" style="padding:0;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Order ID</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Panel</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Lab</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Ordered</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Resulted</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
-                <th style="padding:10px 16px;"></th>
-              </tr></thead>
-              <tbody>
-                <tr style="border-bottom:1px solid #F3F4F6;">
-                  <td style="padding:10px 16px;font-family:monospace;font-size:12px;">GDX-2026-4721</td>
-                  <td style="padding:10px 16px;font-weight:600;">BRCA1/2 Full Seq + Del/Dup</td>
-                  <td style="padding:10px 16px;">GeneDx</td>
-                  <td style="padding:10px 16px;">May 28, 2026</td>
-                  <td style="padding:10px 16px;">Jun 3, 2026</td>
-                  <td style="padding:10px 16px;"><span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">PATHOGENIC</span></td>
-                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Opening lab report PDF')">View Report</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeSignModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="validateAndSign()">Sign &amp; Submit →</button>
     </div>
+  </div>
+</div>
 
-    <!-- ══ CONSENTS TAB ══ -->
-    <div class="gc-body" id="tab-consents" style="display:none;">
-      <div class="tab-panel-full active">
-        <div class="gc-card">
-          <div class="gc-card-header"><div class="gc-card-title">Consent Forms</div></div>
-          <div class="gc-card-body">
-            <div class="consent-row">
-              <div class="consent-icon signed">✅</div>
-              <div><div class="consent-name">Pre-Test Genetic Counseling Consent</div><div class="consent-date">Signed May 28, 2026 · Patient portal e-signature</div></div>
-              <span class="consent-status signed">Signed</span>
-              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Opening consent PDF')">View</button>
-            </div>
-            <div class="consent-row">
-              <div class="consent-icon signed">✅</div>
-              <div><div class="consent-name">Genetic Testing Authorization (GeneDx)</div><div class="consent-date">Signed May 28, 2026 · Patient portal e-signature</div></div>
-              <span class="consent-status signed">Signed</span>
-              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Opening consent PDF')">View</button>
-            </div>
-            <div class="consent-row">
-              <div class="consent-icon declined">❌</div>
-              <div><div class="consent-name">Research Biobank Consent (optional)</div><div class="consent-date">Declined May 28, 2026</div></div>
-              <span class="consent-status declined">Declined</span>
-            </div>
-            <div class="consent-row">
-              <div class="consent-icon pending">⏳</div>
-              <div><div class="consent-name">Results Disclosure Acknowledgment</div><div class="consent-date">Sent Jun 3, 2026 · Patient has not yet signed</div></div>
-              <span class="consent-status pending">Pending</span>
-              <button class="btn btn-outline" style="margin-left:8px;padding:4px 10px;font-size:11px;" onclick="gcToast('Reminder sent to patient')">Send Reminder</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ REFERRALS TAB ══ -->
-    <div class="gc-body" id="tab-referrals" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="display:flex;justify-content:flex-end;margin-bottom:4px;">
-          <button class="btn btn-primary" onclick="gcToast('Referral form opened')">+ New Referral</button>
-        </div>
-        <div class="gc-card">
-          <div class="gc-card-header"><div class="gc-card-title">Post-Disclosure Referrals</div></div>
-          <div class="gc-card-body" style="padding:0;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-              <thead><tr style="background:#F9FAFB;border-bottom:1px solid #E5E0D8;">
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Referral Type</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Specialist / Center</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Initiated</th>
-                <th style="padding:10px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;">Status</th>
-                <th style="padding:10px 16px;"></th>
-              </tr></thead>
-              <tbody>
-                <tr style="border-bottom:1px solid #F3F4F6;">
-                  <td style="padding:10px 16px;font-weight:600;">High-Risk Breast Oncology</td>
-                  <td style="padding:10px 16px;">MD Anderson Cancer Center (Houston, TX)</td>
-                  <td style="padding:10px 16px;">Jun 18, 2026</td>
-                  <td style="padding:10px 16px;"><span style="background:#FFF8E1;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Pending</span></td>
-                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Referral status updated')">Update</button></td>
-                </tr>
-                <tr style="border-bottom:1px solid #F3F4F6;">
-                  <td style="padding:10px 16px;font-weight:600;">Gynecologic Oncology</td>
-                  <td style="padding:10px 16px;">MD Anderson Cancer Center (Houston, TX)</td>
-                  <td style="padding:10px 16px;">Jun 18, 2026</td>
-                  <td style="padding:10px 16px;"><span style="background:#FFF8E1;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Pending</span></td>
-                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Referral status updated')">Update</button></td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 16px;font-weight:600;">Psychosocial / Social Work</td>
-                  <td style="padding:10px 16px;">Everlywell Behavioral Health Partner</td>
-                  <td style="padding:10px 16px;">Jun 18, 2026</td>
-                  <td style="padding:10px 16px;"><span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700;">Accepted</span></td>
-                  <td style="padding:10px 16px;"><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="gcToast('Opening referral details')">View</button></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ══ LM CONTACT LOG TAB ══ -->
-    <div class="gc-body" id="tab-lmlog" style="display:none;">
-      <div class="tab-panel-full active">
-
-        <!-- Header info strip -->
-        <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:14px;margin-bottom:4px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          <div style="font-size:12px;color:#5B21B6;line-height:1.5;flex:1;">
-            <strong>LifeMap (LM) Contact Log</strong> — Read-only view synced from LifeMap. Statuses reflect LM's consult referral lifecycle: <strong>Open → Scheduled → Ended → Completed</strong>. GCA submits consult notes to LM after GC sign-off to advance status to Completed.
-          </div>
-          <button class="btn btn-outline" style="font-size:11px;" onclick="gcToast('Refreshing LM sync — last synced 2 min ago')">↻ Sync LM</button>
-        </div>
-
-        <!-- Contact Log Table -->
-        <div class="gc-card">
-          <div class="gc-card-header">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <div class="gc-card-title">Consult Referral History — Jennifer Walsh</div>
-            <span class="gc-card-badge">2 referrals</span>
-            <span class="gc-card-badge" style="background:#D1FAE5;color:#065F46;">1 Completed</span>
-            <span class="gc-card-badge" style="background:#FFF8E1;color:#92400E;">1 Pending GC Sign-Off</span>
-          </div>
-          <div style="padding:0;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;">
-              <thead>
-                <tr style="background:#F9F5EE;border-bottom:1px solid #E5E0D8;">
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">LM Referral #</th>
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Consult Type</th>
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">GC</th>
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Session Date</th>
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">LM Status</th>
-                  <th style="padding:9px 16px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.04em;">Report / Submission</th>
-                  <th style="padding:9px 16px;"></th>
-                </tr>
-              </thead>
-              <tbody>
-
-                <!-- Row 1: Completed pre-test consult -->
-                <tr style="border-bottom:1px solid #E5E0D8;cursor:pointer;" onclick="toggleLmRow('lmrow1')">
-                  <td style="padding:11px 16px;font-family:monospace;font-size:12px;font-weight:700;color:#6B21A8;">#24198</td>
-                  <td style="padding:11px 16px;">
-                    <span style="display:inline-block;background:#F0FDF4;color:#15803D;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">Pre-Test Counseling</span>
-                  </td>
-                  <td style="padding:11px 16px;font-weight:600;color:#374151;">Taylor Brooks, MS CGC</td>
-                  <td style="padding:11px 16px;color:#374151;">May 28, 2026</td>
-                  <td style="padding:11px 16px;">
-                    <span class="lm-status lm-status-completed"><span class="lm-status-dot" style="background:#059669;"></span>Completed</span>
-                  </td>
-                  <td style="padding:11px 16px;">
-                    <div style="font-size:12px;font-weight:600;color:#059669;">✓ Submitted to LM</div>
-                    <div style="font-size:11px;color:#6B7280;">Physician attested · GeneDx order placed</div>
-                  </td>
-                  <td style="padding:11px 16px;">
-                    <button class="btn btn-outline" style="padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();gcToast('Opening LM referral #24198 detail')">View in LM ↗</button>
-                  </td>
-                </tr>
-                <!-- Expanded detail row for #24198 -->
-                <tr id="lmrow1" class="lm-expand-row" style="display:none;">
-                  <td colspan="7">
-                    <div class="lm-expand-inner">
-                      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px;">LM Contact Log — Referral #24198</div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-open" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#9CA3AF;"></span>Open</span>
-                        <span class="lm-log-ts">May 26, 2026 8:02 AM</span>
-                        <span class="lm-log-action">Referral created · Pre-test BRCA counseling · Patient: Jennifer Walsh</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-scheduled" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#1D4ED8;"></span>Scheduled</span>
-                        <span class="lm-log-ts">May 27, 2026 9:14 AM</span>
-                        <span class="lm-log-action">Session scheduled · May 28, 2026 · Taylor Brooks, MS CGC · Video consult</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-ended" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#D97706;"></span>Ended</span>
-                        <span class="lm-log-ts">May 28, 2026 3:15 PM</span>
-                        <span class="lm-log-action">Session ended · Duration: 45 min · GC note authored — pending sign-off</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-ended" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#D97706;"></span>Ended</span>
-                        <span class="lm-log-ts">May 28, 2026 3:02 PM</span>
-                        <span class="lm-log-action">GC signed note — Approved · GCA Priya Sharma notified for submission review</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-ended" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#D97706;"></span>Ended</span>
-                        <span class="lm-log-ts">May 28, 2026 4:47 PM</span>
-                        <span class="lm-log-action">GCA submitted consult note to LM · Pre-test consult approved · Physician attestation requested</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-completed" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#059669;"></span>Completed</span>
-                        <span class="lm-log-ts">May 29, 2026 10:22 AM</span>
-                        <span class="lm-log-action">Physician attestation completed · Dr. A. Chen, MD · GeneDx BRCA1/2 order placed (GDX-2026-4721) · Referral closed</span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Row 2: In-progress results delivery consult -->
-                <tr style="border-bottom:1px solid #E5E0D8;cursor:pointer;" onclick="toggleLmRow('lmrow2')">
-                  <td style="padding:11px 16px;font-family:monospace;font-size:12px;font-weight:700;color:#6B21A8;">#24213</td>
-                  <td style="padding:11px 16px;">
-                    <span style="display:inline-block;background:#EDE9FE;color:#5B21B6;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">Results Delivery</span>
-                  </td>
-                  <td style="padding:11px 16px;font-weight:600;color:#374151;">Taylor Brooks, MS CGC</td>
-                  <td style="padding:11px 16px;color:#374151;">Jun 18, 2026</td>
-                  <td style="padding:11px 16px;">
-                    <span class="lm-status lm-status-ended"><span class="lm-status-dot" style="background:#D97706;"></span>Ended</span>
-                  </td>
-                  <td style="padding:11px 16px;">
-                    <div style="font-size:12px;font-weight:600;color:#D97706;">⏳ Pending GC Sign-Off</div>
-                    <div style="font-size:11px;color:#6B7280;">Note in draft · GCA submission blocked</div>
-                  </td>
-                  <td style="padding:11px 16px;">
-                    <button class="btn btn-primary" style="padding:4px 10px;font-size:11px;" onclick="event.stopPropagation();switchTab('notes', document.querySelectorAll('.gc-tab')[3])">Go to Notes ↗</button>
-                  </td>
-                </tr>
-                <!-- Expanded detail row for #24213 -->
-                <tr id="lmrow2" class="lm-expand-row" style="display:none;">
-                  <td colspan="7">
-                    <div class="lm-expand-inner">
-                      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#9CA3AF;margin-bottom:8px;">LM Contact Log — Referral #24213</div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-open" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#9CA3AF;"></span>Open</span>
-                        <span class="lm-log-ts">Jun 3, 2026 2:30 PM</span>
-                        <span class="lm-log-action">Referral created · Results delivery counseling · PATHOGENIC BRCA1 — disclosure required</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-scheduled" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#1D4ED8;"></span>Scheduled</span>
-                        <span class="lm-log-ts">Jun 10, 2026 11:05 AM</span>
-                        <span class="lm-log-action">Session scheduled · Jun 18, 2026 · Taylor Brooks, MS CGC · Async disclosure session</span>
-                      </div>
-                      <div class="lm-log-entry">
-                        <span class="lm-status lm-status-ended" style="width:80px;justify-content:center;flex-shrink:0;"><span class="lm-status-dot" style="background:#D97706;"></span>Ended</span>
-                        <span class="lm-log-ts">Jun 18, 2026 10:41 AM</span>
-                        <span class="lm-log-action">Session ended · GC note in progress (draft autosaved) · Awaiting GC sign-off</span>
-                      </div>
-                      <div class="lm-log-entry" style="opacity:0.45;">
-                        <span class="lm-status lm-status-completed" style="width:80px;justify-content:center;flex-shrink:0;background:#F3F4F6;color:#9CA3AF;"><span class="lm-status-dot" style="background:#D1D5DB;"></span>Completed</span>
-                        <span class="lm-log-ts">—</span>
-                        <span class="lm-log-action" style="color:#9CA3AF;font-weight:400;">Pending · GCA will submit directly to LM after GC sign-off (no physician attestation required for results delivery)</span>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Workflow explanation -->
-        <div style="display:flex;gap:14px;flex-wrap:wrap;">
-          <div class="gc-card" style="flex:1;min-width:220px;">
-            <div class="gc-card-header">
-              <div class="gc-card-title">Pre-Test Consult — Submission Path</div>
-            </div>
-            <div class="gc-card-body" style="font-size:12px;color:#374151;line-height:1.7;">
-              <div>1. GC reviews and signs note (Approve or Reject)</div>
-              <div>2. GCA reviews template completeness</div>
-              <div>3. GCA submits to LM</div>
-              <div style="padding-left:16px;color:#6B7280;">↳ <strong>Approved:</strong> LM routes test order for physician attestation</div>
-              <div style="padding-left:16px;color:#6B7280;">↳ <strong>Rejected:</strong> LM logs rejection with GC's reason</div>
-              <div>4. Referral status → Completed</div>
-            </div>
-          </div>
-          <div class="gc-card" style="flex:1;min-width:220px;">
-            <div class="gc-card-header">
-              <div class="gc-card-title">Results Delivery — Submission Path</div>
-            </div>
-            <div class="gc-card-body" style="font-size:12px;color:#374151;line-height:1.7;">
-              <div>1. GC reviews and signs note</div>
-              <div>2. GCA reviews template completeness</div>
-              <div>3. GCA submits directly to LM</div>
-              <div style="padding-left:16px;color:#6B7280;">↳ No physician attestation required</div>
-              <div>4. Referral status → Completed</div>
-              <div style="padding-left:16px;color:#6B7280;">↳ LM closes the referral immediately on submission</div>
-            </div>
-          </div>
-          <div class="gc-card" style="flex:1;min-width:220px;">
-            <div class="gc-card-header">
-              <div class="gc-card-title">GCA Template Review</div>
-            </div>
-            <div class="gc-card-body" style="font-size:12px;color:#374151;line-height:1.7;">
-              <div>GCA checks designated template sections per:</div>
-              <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:6px;padding:6px 10px;margin:6px 0;font-size:11px;font-style:italic;">"Reviewing and Submitting Genetic Consult Notes (PCD)"</div>
-              <div>If edits needed → GCA messages GC via <strong>Slack</strong></div>
-              <div>If complete → GCA submits to LM</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div><!-- end tab-lmlog -->
-
-    <!-- ══ TEST WORKFLOW TAB ══ -->
-    <div class="gc-body" id="tab-workflow" style="display:none;">
-      <div class="tab-panel-full active">
-        <div style="padding:20px;">
-
-          <!-- Stage progress tracker -->
-          <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;padding:20px;margin-bottom:20px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-              <div>
-                <div style="font-size:14px;font-weight:700;color:#111827;">BRCA Counseling — Multi-Stage Workflow</div>
-                <div style="font-size:11px;color:#6B7280;margin-top:2px;">Jennifer Walsh · CST-2026-10901 · Stage 2 of 4 active</div>
-              </div>
-              <span style="font-size:11px;font-weight:700;background:#EDE9FE;color:#6B21A8;border-radius:6px;padding:3px 10px;">GC-STG-001</span>
-            </div>
-
-            <!-- Stage progress bar -->
-            <div style="display:flex;gap:0;margin-bottom:20px;">
-              <!-- Stage 1 — Done -->
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
-                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:#059669;z-index:0;"></div>
-                <div style="width:32px;height:32px;border-radius:50%;background:#059669;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:1;">✓</div>
-                <div style="font-size:11px;font-weight:700;color:#059669;text-align:center;margin-top:6px;line-height:1.3;">Pre-Test<br>Consult</div>
-                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">May 28, 2026</div>
-              </div>
-              <!-- Stage 2 — Active -->
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
-                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:linear-gradient(to right, #6B21A8 40%, #E5E0D8 40%);z-index:0;"></div>
-                <div style="width:32px;height:32px;border-radius:50%;background:#6B21A8;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 0 0 4px #EDE9FE;">2</div>
-                <div style="font-size:11px;font-weight:700;color:#6B21A8;text-align:center;margin-top:6px;line-height:1.3;">Results<br>Disclosure</div>
-                <div style="font-size:10px;color:#6B21A8;text-align:center;margin-top:3px;font-weight:600;">In Progress</div>
-              </div>
-              <!-- Stage 3 — Pending -->
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
-                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:#E5E0D8;z-index:0;"></div>
-                <div style="width:32px;height:32px;border-radius:50%;background:#F3F4F6;color:#9CA3AF;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #E5E0D8;z-index:1;">3</div>
-                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-align:center;margin-top:6px;line-height:1.3;">Care Plan<br>& Referrals</div>
-                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">Pending</div>
-              </div>
-              <!-- Stage 4 — Pending -->
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
-                <div style="width:32px;height:32px;border-radius:50%;background:#F3F4F6;color:#9CA3AF;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #E5E0D8;z-index:1;">4</div>
-                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-align:center;margin-top:6px;line-height:1.3;">Chart<br>Close</div>
-                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">Pending</div>
-              </div>
-            </div>
-
-            <!-- Active stage detail -->
-            <div style="background:#FDFAFF;border:1.5px solid #6B21A8;border-radius:10px;padding:16px;">
-              <div style="font-size:12px;font-weight:700;color:#6B21A8;margin-bottom:10px;">▶ Stage 2 — Results Disclosure Counseling</div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-                <div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Gate Requirement</div>
-                  <div style="font-size:12px;font-weight:700;color:#111827;">Results disclosure session completed</div>
-                </div>
-                <div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
-                  <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Payment Trigger</div>
-                  <div style="font-size:12px;font-weight:700;color:#059669;">$250 — Upon stage completion</div>
-                </div>
-              </div>
-              <div style="margin-bottom:12px;">
-                <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:6px;">Stage Checklist</div>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;">
-                    <input type="checkbox" checked disabled style="accent-color:#6B21A8;"> BRCA1 result reviewed with patient
-                  </label>
-                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;">
-                    <input type="checkbox" checked disabled style="accent-color:#6B21A8;"> Hereditary cancer risk explained
-                  </label>
-                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
-                    <input type="checkbox" style="accent-color:#6B21A8;"> Post-disclosure care plan discussed
-                  </label>
-                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
-                    <input type="checkbox" style="accent-color:#6B21A8;"> Family testing recommendations provided
-                  </label>
-                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
-                    <input type="checkbox" style="accent-color:#6B21A8;"> Disclosure note signed in chart
-                  </label>
-                </div>
-              </div>
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-primary" style="flex:1;" onclick="gcToast('Stage 2 advancing — GCA notified to submit to LifeMap and trigger $250 payment event')">Advance to Stage 3 →</button>
-                <button class="btn btn-outline" onclick="gcToast('Stage flagged — supervisor notified')">Flag Issue</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- All stages summary table -->
-          <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;overflow:hidden;">
-            <div style="padding:14px 18px;border-bottom:1px solid #E5E0D8;font-size:13px;font-weight:700;color:#111827;">All Stages — BRCA Counseling</div>
-            <table style="width:100%;border-collapse:collapse;font-size:12px;">
-              <thead>
-                <tr style="background:#F9FAFB;">
-                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Stage</th>
-                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Gate Requirement</th>
-                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Payment</th>
-                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Status</th>
-                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Completed</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style="border-bottom:1px solid #F3F4F6;">
-                  <td style="padding:10px 14px;font-weight:700;">1 — Pre-Test Consult</td>
-                  <td style="padding:10px 14px;color:#374151;">Pre-test counseling session + consent signed</td>
-                  <td style="padding:10px 14px;color:#059669;font-weight:600;">$150</td>
-                  <td style="padding:10px 14px;"><span style="background:#D1FAE5;color:#065F46;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Complete</span></td>
-                  <td style="padding:10px 14px;color:#6B7280;">May 28, 2026</td>
-                </tr>
-                <tr style="border-bottom:1px solid #F3F4F6;background:#FDFAFF;">
-                  <td style="padding:10px 14px;font-weight:700;">2 — Results Disclosure</td>
-                  <td style="padding:10px 14px;color:#374151;">Disclosure session + disclosure note signed</td>
-                  <td style="padding:10px 14px;color:#059669;font-weight:600;">$250</td>
-                  <td style="padding:10px 14px;"><span style="background:#EDE9FE;color:#6B21A8;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">In Progress</span></td>
-                  <td style="padding:10px 14px;color:#6B7280;">—</td>
-                </tr>
-                <tr style="border-bottom:1px solid #F3F4F6;">
-                  <td style="padding:10px 14px;font-weight:700;">3 — Care Plan & Referrals</td>
-                  <td style="padding:10px 14px;color:#374151;">Surveillance plan documented + referrals placed</td>
-                  <td style="padding:10px 14px;color:#6B7280;">$100</td>
-                  <td style="padding:10px 14px;"><span style="background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Pending</span></td>
-                  <td style="padding:10px 14px;color:#6B7280;">—</td>
-                </tr>
-                <tr>
-                  <td style="padding:10px 14px;font-weight:700;">4 — Chart Close</td>
-                  <td style="padding:10px 14px;color:#374151;">GC note signed + GCA LM submission confirmed</td>
-                  <td style="padding:10px 14px;color:#6B7280;">$75</td>
-                  <td style="padding:10px 14px;"><span style="background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Pending</span></td>
-                  <td style="padding:10px 14px;color:#6B7280;">—</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-        </div>
-      </div>
-    </div><!-- end tab-workflow -->
-
-  </div><!-- end gc-main -->
-</div><!-- end chart-shell -->
-
-<div class="gc-toast" id="gcToast"></div>
-
-{% endblock %}
-{% block scripts %}
+{% raw %}
 <script>
-// ── Demo Patient Registry ─────────────────────────────────────────────────────
+/* ── Patient registry ── */
 var GC_PATIENTS = {
-  1: {
-    initials: 'JW',
-    name: 'Jennifer Walsh',
-    meta: '42F · DOB: 03/15/1982 · MRN: EW-004821 · CST-2026-10901 · TX — Licensed ✓',
-    alertClass: 'gc-alert',
-    alert: 'PATHOGENIC Variant Identified — BRCA1 c.5266dupC · Results disclosure required · Post-disclosure care plan pending',
-    badges: [
-      {text: '⚠ BRCA1 Pathogenic', cls: 'gc-badge-pathogenic'},
-      {text: 'BRCA Counseling', cls: 'gc-badge-program'},
-      {text: 'Disclosure Pending', cls: 'gc-badge-status'},
-    ],
-    primaryBtn: 'Start Disclosure Session',
-    primaryAction: "gcToast('Starting disclosure session — timer started')",
-  },
-  2: {
-    initials: 'DM',
-    name: 'David Morales',
-    meta: '38M · DOB: 09/22/1985 · MRN: EW-008234 · CST-2026-11042 · CA — Licensed ✓',
-    alertClass: 'gc-alert gc-alert-info',
-    alert: 'Variant of Uncertain Significance — BRCA2 c.7397T>C · VUS counseling session scheduled · Family cascade testing recommended',
-    badges: [
-      {text: '⬡ BRCA2 VUS', cls: 'gc-badge-vus'},
-      {text: 'BRCA Counseling', cls: 'gc-badge-program'},
-      {text: 'Results Session Scheduled', cls: 'gc-badge-scheduled'},
-    ],
-    primaryBtn: 'Start Results Session',
-    primaryAction: "gcToast('Opening results delivery session for David Morales')",
-  },
-  3: {
-    initials: 'AP',
-    name: 'Amara Patel',
-    meta: '29F · DOB: 06/08/1995 · MRN: EW-011507 · CST-2026-11189 · FL — Licensed ✓',
-    alertClass: 'gc-alert gc-alert-pretest',
-    alert: 'Pre-Test Consult — Panel not yet ordered · Informed consent obtained · Awaiting lab order authorization',
-    badges: [
-      {text: '○ Pre-Test', cls: 'gc-badge-pretest'},
-      {text: 'Hereditary Cardiac Risk', cls: 'gc-badge-program'},
-      {text: 'Lab Order Pending', cls: 'gc-badge-pending'},
-    ],
-    primaryBtn: 'Submit Lab Order',
-    primaryAction: "gcToast('Opening lab order authorization for Amara Patel')",
-  },
+  1: { name:'Jennifer Walsh', record:'42F · DOB: 03/15/1982 · MRN: EW-004821 · CST-2026-10901 · TX — Licensed ✓' },
+  2: { name:'David Morales',  record:'38M · DOB: 07/22/1987 · MRN: EW-005103 · CST-2026-10910 · CA — Licensed ✓' },
+  3: { name:'Amara Patel',    record:'29F · DOB: 11/04/1996 · MRN: EW-005218 · CST-2026-10924 · NY — Licensed ✓' }
 };
 
-// Render patient-specific header from Flask-injected patient_id
-var PATIENT_ID = {{ patient_id }};
-var pt = GC_PATIENTS[PATIENT_ID] || GC_PATIENTS[1];
+/* ── Left panel collapse ── */
+function toggleLeft() {
+  var el = document.getElementById('chartLeft');
+  var btn = document.getElementById('leftCollapseBtn');
+  el.classList.toggle('collapsed');
+  btn.innerHTML = el.classList.contains('collapsed')
+    ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>';
+}
 
-document.addEventListener('DOMContentLoaded', function() {
-  // Update page title
-  document.title = 'GC Chart — ' + pt.name + ' | Telehealth';
+/* ── Accordion ── */
+function toggleAcc(hdr) {
+  var body = hdr.nextElementSibling;
+  var chev = hdr.querySelector('.acc-chevron');
+  if (!body) return;
+  var closed = body.classList.toggle('closed');
+  if (chev) chev.style.transform = closed ? 'rotate(-90deg)' : '';
+}
 
-  // Avatar
-  var av = document.querySelector('.gc-avatar');
-  if (av) av.textContent = pt.initials;
+/* ── Right panel icon nav ── */
+function switchRP(idx, btn) {
+  document.querySelectorAll('.right-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.rp-vnav-btn').forEach(function(b) { b.classList.remove('active'); });
+  var panel = document.getElementById('rp-' + idx);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  var footer = document.getElementById('docFooter');
+  if (footer) footer.style.display = (idx === 0) ? 'flex' : 'none';
+}
 
-  // Name + meta
-  var nm = document.querySelector('.gc-patient-name');
-  if (nm) nm.textContent = pt.name;
-  var meta = document.querySelector('.gc-patient-meta');
-  if (meta) meta.textContent = pt.meta;
+/* ── Smart template sections ── */
+function toggleStSection(hdr) {
+  hdr.closest('.st-section').classList.toggle('open');
+}
 
-  // Alert bar
-  var alertEl = document.querySelector('.gc-alert');
-  if (alertEl) {
-    alertEl.className = pt.alertClass;
-    alertEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> ' + pt.alert;
+/* ── Phenotype P/N/NA ── */
+function setPhen(btn, val) {
+  var grp = btn.closest('.phen-btns');
+  grp.querySelectorAll('.phen-btn').forEach(function(b) { b.className = 'phen-btn'; });
+  btn.classList.add('active-' + val);
+}
+
+/* ── Center compose tabs ── */
+function switchCtab(btn, panelId) {
+  document.querySelectorAll('.async-compose .ctab').forEach(function(b) { b.classList.remove('active'); });
+  ['ctab-msg','ctab-note','ctab-task'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  btn.classList.add('active');
+  var panel = document.getElementById(panelId);
+  if (panel) panel.style.display = 'block';
+}
+
+/* ── Communication tabs ── */
+function switchCommTab(btn, panelId) {
+  document.querySelectorAll('.comm-tab').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.comm-panel').forEach(function(p) { p.style.display='none'; p.classList.remove('active'); });
+  btn.classList.add('active');
+  var panel = document.getElementById(panelId);
+  if (panel) { panel.style.display = 'block'; panel.classList.add('active'); }
+}
+
+/* ── Video / Async toggle ── */
+function switchToVideo() {
+  document.getElementById('asyncWorkspace').classList.remove('active');
+  document.getElementById('videoWorkspace').classList.add('active');
+}
+function switchToAsync() {
+  document.getElementById('videoWorkspace').classList.remove('active');
+  document.getElementById('asyncWorkspace').classList.add('active');
+}
+
+/* ── Sign & validate ── */
+function openSignModal() {
+  var errors = [];
+  var ct = document.getElementById('consultType');
+  if (ct && !ct.value) errors.push('Consult Type');
+  var mod = document.getElementById('modality');
+  if (mod && !mod.value) errors.push('Modality');
+  var rc = document.getElementById('resultClass');
+  if (rc && !rc.value) errors.push('Result Classification');
+  var rc2 = document.getElementById('reasonContact');
+  if (rc2 && !rc2.value) errors.push('Reason for Contact');
+  var planChecks = document.querySelectorAll('#planActions input[type=checkbox]:checked');
+  if (planChecks.length === 0) errors.push('Plan — at least one action required');
+
+  if (errors.length > 0) {
+    var errDiv = document.getElementById('valBanner');
+    if (errDiv) {
+      errDiv.style.display = 'block';
+      errDiv.innerHTML = '<strong>Required fields incomplete:</strong><ul style="margin:6px 0 0 14px;padding:0;">' +
+        errors.map(function(e) { return '<li>' + e + '</li>'; }).join('') + '</ul>';
+    }
+    switchRP(0, document.querySelector('.rp-vnav-btn.active'));
+    return;
   }
-
-  // Badges
-  var badgesEl = document.querySelector('.gc-badges');
-  if (badgesEl) {
-    badgesEl.innerHTML = pt.badges.map(function(b) {
-      return '<span class="gc-badge ' + b.cls + '">' + b.text + '</span>';
-    }).join('');
-  }
-
-  // Primary action button
-  var primBtn = document.querySelector('.gc-header-actions .btn-primary');
-  if (primBtn) {
-    primBtn.textContent = pt.primaryBtn;
-    primBtn.setAttribute('onclick', pt.primaryAction);
-  }
-
-  // Message button patient name
-  var msgBtn = document.querySelector('.gc-header-actions .btn-outline');
-  if (msgBtn) msgBtn.setAttribute('onclick', "gcToast('Message sent to " + pt.name + "')");
-});
-// ── End Patient Registry ───────────────────────────────────────────────────────
-
-function switchTab(name, el) {
-  document.querySelectorAll('.gc-body').forEach(function(b){ b.style.display = 'none'; });
-  document.querySelectorAll('.gc-tab').forEach(function(t){ t.classList.remove('active'); });
-  var panel = document.getElementById('tab-' + name);
-  if (panel) panel.style.display = 'flex';
-  el.classList.add('active');
+  document.getElementById('signModal').classList.add('open');
 }
 
-function gcToast(msg) {
-  var t = document.getElementById('gcToast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3500);
+function closeSignModal() {
+  document.getElementById('signModal').classList.remove('open');
 }
 
-function toggleLmRow(id) {
-  var row = document.getElementById(id);
-  if (!row) return;
-  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
-}
-
-function showRejectModal() {
-  var reason = prompt('Rejection reason (required — this will be recorded in LM and the test order will be rejected with this reason):');
-  if (reason && reason.trim()) {
-    gcToast('Note rejected and signed — Rejection reason logged · GCA notified · LM will record test order rejection');
-  }
-}
-
-/* ── Smart Template helpers ── */
-function setPhen(rowId, val) {
-  var row = document.getElementById(rowId);
-  if (!row) return;
-  row.querySelectorAll('.pn-btn').forEach(function(b) { b.classList.remove('active'); });
-  var target = row.querySelector('.pn-btn.pn-' + val.toLowerCase());
-  if (target) target.classList.add('active');
-  autosave();
-}
-
-function autosave() {
-  var meta = document.querySelector('#results-note-card .note-meta');
-  if (meta) {
-    var now = new Date();
-    meta.textContent = '⚠ Unsigned · Last autosaved: ' + now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ' · Template: GC Results Disclosure v2.1';
-    meta.style.color = '#D97706';
-  }
-}
-
-function updateResultBadge() {
-  var sel = document.getElementById('f-result-class');
-  autosave();
-}
-
-function showDataCorrectionTask() {
-  gcToast('Data correction task will be routed to GCA queue on sign — GCA will correct in Lab Module and notify you.');
-}
-
-/* ── Chart Finalization Enforcement (Req CFE-001) ── */
 function validateAndSign() {
-  var missing = [];
-
-  // Check all required <select> fields
-  document.querySelectorAll('.required-field').forEach(function(el) {
-    if (el.tagName === 'SELECT' && !el.value) {
-      var lbl = el.closest('.tpl-field') ? el.closest('.tpl-field').querySelector('.tpl-label') : null;
-      missing.push(lbl ? lbl.textContent.replace('*','').trim() : el.id);
-    }
-  });
-
-  // Check plan actions — at least one checkbox required
-  var planChecked = Array.from(document.querySelectorAll('#f-plan-actions input[type=checkbox]')).some(function(c){ return c.checked; });
-  if (!planChecked) missing.push('Actions Taken / Recommended (at least one required)');
-
-  // Check phenotypic required rows — all must have an active P/N/NA selection
-  var phenRows = ['phen-breast','phen-ovarian','phen-fam-breast','phen-fam-ovarian','phen-prostate','phen-pancreatic'];
-  phenRows.forEach(function(id) {
-    var row = document.getElementById(id);
-    if (row && !row.querySelector('.pn-btn.active')) {
-      missing.push('Phenotypic finding: ' + row.querySelector('span').textContent);
-    }
-  });
-
-  if (missing.length > 0) {
-    // Show inline validation banner
-    var banner = document.getElementById('validation-banner');
-    var list = document.getElementById('validation-list');
-    list.innerHTML = '';
-    missing.forEach(function(m) {
-      var li = document.createElement('li');
-      li.textContent = m;
-      list.appendChild(li);
-    });
-    banner.style.display = 'block';
-    banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    gcToast('⚠ ' + missing.length + ' required field(s) incomplete — chart cannot be finalized');
-  } else {
-    document.getElementById('validation-banner').style.display = 'none';
-    // Proceed with sign
-    var badge = document.getElementById('note-status-badge');
-    if (badge) { badge.textContent = 'Signed ✓'; badge.style.background = '#D1FAE5'; badge.style.color = '#065F46'; }
-    gcToast('✓ Note signed — all required fields validated · GCA Priya Sharma notified for LM submission · System enforced (CFE-001)');
+  if (!document.getElementById('confirmAccuracy').checked ||
+      !document.getElementById('confirmNccn').checked ||
+      !document.getElementById('confirmRoute').checked) {
+    var vErr = document.getElementById('validationErrors');
+    vErr.style.display = 'block';
+    vErr.textContent = 'Please confirm all three attestation statements before signing.';
+    return;
   }
+  closeSignModal();
+  var b = document.getElementById('signBanner');
+  b.classList.add('show');
+  setTimeout(function() { b.classList.remove('show'); }, 5000);
+}
+
+/* ── Toast ── */
+function gcToast(msg) {
+  var t = document.getElementById('gcToastEl');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(function() { t.style.display = 'none'; }, 3000);
 }
 </script>
+{% endraw %}
 {% endblock %}
