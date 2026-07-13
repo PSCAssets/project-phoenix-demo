@@ -1056,7 +1056,7 @@ var URGENT_MSGS = [
   { type:'chart',   initials:'KP', bg:'#059669', sender:'Kim Patel, NP',           patient:'D.R. \u00b7 C-20260601-022',     url:'/provider/chart/1?product=awv', dept:'\u2192 Physician (MD)', preview:'"AWV patient presenting with new chest tightness complaint — outside my scope, needs MD review today."', time:'41 min ago' }
 ];
 function openUrgentPanel() {
-  var body = document.BADREF;
+  var body = document.getElementById('urgPanelBody');
   if (!body) return;
   body.innerHTML = URGENT_MSGS.map(function(m) {
     var patChip = m.patient ? '<a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;text-decoration:none;font-weight:600;">\ud83d\udccb '+m.patient+'</a>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
@@ -1064,12 +1064,12 @@ function openUrgentPanel() {
     var actionLabel = m.type==='chart' ? '\u2192 Open Chart' : '\u2192 Open Message';
     return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+deptChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
   }).join('');
-  document.BADREF.style.display = 'flex';
-  document.BADREF.style.display = 'block';
+  document.getElementById('urgentPanel').style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
 }
 function closeUrgentPanel() {
-  document.BADREF.style.display = 'none';
-  document.BADREF.style.display = 'none';
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
 }
 </script>
 {% endraw %}
