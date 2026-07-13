@@ -266,62 +266,69 @@
 /* ── Drag handle ── */
 .chart-drag-handle{width:4px;cursor:col-resize;background:#E5E0D8;flex-shrink:0;transition:background 0.15s;}
 .chart-drag-handle:hover{background:#6B21A8;}
-/* ── Doc inner layout (rp-0 matching chart.html) ── */
+/* ── Doc inner layout (rp-0 matching chart.html exactly) ── */
 #rp-0{padding:0;overflow:hidden;display:none;flex-direction:column;}
 #rp-0.active{display:flex;}
-.doc-ctx-bar{height:38px;display:flex;align-items:center;padding:0 14px 0 56px;border-bottom:1px solid #E5E0D8;background:#fff;flex-shrink:0;gap:10px;}
-.doc-ctx-tab{padding:0 14px;height:38px;font-size:12px;font-weight:600;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:#6B7280;}
+.doc-ctx-bar{height:40px;display:flex;align-items:center;padding:0 14px 0 56px;border-bottom:1px solid #E5E0D8;background:#fff;flex-shrink:0;gap:10px;}
+.doc-ctx-tab{padding:0 14px;height:40px;font-size:12px;font-weight:600;background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;color:#6B7280;}
 .doc-ctx-tab.active{color:#6B21A8;border-bottom-color:#6B21A8;}
 .doc-ctx-ai{margin-left:auto;font-size:11px;font-weight:600;color:#6B21A8;background:#F3E8FF;padding:3px 10px;border-radius:12px;cursor:pointer;white-space:nowrap;}
 .doc-ctx-cfe{font-size:10px;font-weight:700;color:#D97706;background:#FEF3C7;padding:3px 8px;border-radius:8px;}
-.doc-sub-hdr{height:34px;display:flex;align-items:center;padding:0 14px 0 56px;border-bottom:1px solid #E5E0D8;background:#FAFAF9;flex-shrink:0;font-size:12px;color:#374151;font-weight:500;gap:6px;}
+.doc-sub-hdr{height:36px;display:flex;align-items:center;padding:0 14px 0 56px;border-bottom:1px solid #E5E0D8;background:#FAFAF9;flex-shrink:0;font-size:12px;color:#374151;font-weight:500;gap:6px;}
 .doc-sub-hdr-sep{color:#D1D5DB;}
 .doc-sub-status{font-size:11px;color:#D97706;font-weight:600;}
 .doc-body-cols{flex:1;display:flex;overflow:hidden;min-height:0;}
-/* Section nav */
-.doc-secnav{width:192px;min-width:192px;border-right:1px solid #E5E7EB;overflow-y:auto;flex-shrink:0;background:#FAFAF9;}
+/* Left section nav — minimal index like chart.html */
+.doc-secnav{width:180px;min-width:180px;border-right:1px solid #E5E7EB;overflow-y:auto;flex-shrink:0;background:#FAFAF9;}
 .doc-secnav::-webkit-scrollbar{width:2px;}
 .doc-secnav::-webkit-scrollbar-thumb{background:#E5E0D8;}
-.doc-secnav-grp{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;padding:8px 12px 4px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;}
-.doc-secnav-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px 8px 12px;cursor:pointer;border-bottom:1px solid #F3F4F6;border-left:3px solid transparent;transition:background .1s;position:relative;}
+.doc-secnav-grp{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;padding:8px 14px 4px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;border-top:1px solid #E5E7EB;}
+.doc-secnav-grp:first-child{border-top:none;}
+.doc-secnav-item{display:flex;align-items:center;gap:8px;padding:8px 12px 8px 14px;cursor:pointer;border-left:3px solid transparent;transition:background .1s;}
 .doc-secnav-item:hover{background:#F0EBF8;}
 .doc-secnav-item.active{background:#F3E8FF;border-left-color:#6B21A8;}
-.dsn-dot-wrap{display:flex;flex-direction:column;align-items:center;padding-top:2px;flex-shrink:0;}
-.dsn-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.dsn-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
 .dsn-dot-green{background:#22C55E;}
 .dsn-dot-yellow{background:#F59E0B;}
 .dsn-dot-gray{background:#E5E7EB;border:1.5px solid #D1D5DB;}
-.dsn-num{font-size:10px;font-weight:700;color:#9CA3AF;width:14px;flex-shrink:0;margin-top:1px;}
-.dsn-text{flex:1;min-width:0;}
-.dsn-title{font-size:11px;font-weight:600;color:#374151;line-height:1.3;margin-bottom:2px;}
-.doc-secnav-item.active .dsn-title{color:#5B21B6;}
-.dsn-preview{font-size:10px;color:#9CA3AF;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-/* Section content */
-.doc-content{flex:1;overflow-y:auto;background:#fff;}
+.dsn-name{font-size:12px;color:#374151;font-weight:500;}
+.doc-secnav-item.active .dsn-name{color:#5B21B6;font-weight:600;}
+/* Center — expandable section rows (key format matching chart.html) */
+.doc-content{flex:1;overflow-y:auto;background:#F8FAFC;padding:10px;}
 .doc-content::-webkit-scrollbar{width:3px;}
 .doc-content::-webkit-scrollbar-thumb{background:#E5E0D8;border-radius:3px;}
-.doc-section{display:none;padding:16px 16px 20px;}
-.doc-section.active{display:block;}
-.doc-section-title{font-size:13px;font-weight:700;color:#111827;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
-.doc-section-num{width:22px;height:22px;border-radius:50%;background:#6B21A8;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-/* Gap / CFE checklist col */
-.doc-gaps{width:220px;min-width:220px;border-left:1px solid #E5E7EB;background:#F9FAFB;overflow-y:auto;flex-shrink:0;}
+.doc-grp-hdr{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#9CA3AF;padding:10px 4px 4px;}
+.doc-grp-hdr:first-child{padding-top:0;}
+.doc-sec-row{border:1px solid #E5E7EB;border-radius:10px;margin-bottom:8px;overflow:hidden;background:#fff;}
+.doc-sec-row-hd{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;transition:background .1s;}
+.doc-sec-row-hd:hover{background:#F9FAFB;}
+.doc-sec-row.expanded .doc-sec-row-hd{border-bottom:1px solid #E5E7EB;background:#F9FAFB;}
+.doc-sec-circle{width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-sec-row-title{font-size:13px;font-weight:700;color:#111827;flex:1;}
+.doc-sec-row-preview{font-size:11px;color:#9CA3AF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;text-align:right;}
+.doc-sec-row-arrow{font-size:16px;color:#9CA3AF;flex-shrink:0;transition:transform .2s;margin-left:4px;}
+.doc-sec-row.expanded .doc-sec-row-arrow{transform:rotate(90deg);}
+.doc-sec-row-body{display:none;padding:16px 16px 12px;background:#FAFAF9;border-top:1px solid #F0EBE4;}
+.doc-sec-row.expanded .doc-sec-row-body{display:block;}
+/* Right — CFE checklist */
+.doc-gaps{width:220px;min-width:220px;border-left:1px solid #E5E7EB;background:#FEF9F0;overflow-y:auto;flex-shrink:0;}
 .doc-gaps::-webkit-scrollbar{width:2px;}
 .doc-gaps::-webkit-scrollbar-thumb{background:#E5E0D8;}
-.doc-gaps-hdr{padding:10px 12px 6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#6B7280;border-bottom:1px solid #E5E0D8;}
-.doc-gaps-score{padding:10px 12px;border-bottom:1px solid #E5E0D8;text-align:center;}
-.doc-gaps-score-num{font-size:28px;font-weight:800;color:#6B21A8;line-height:1;}
+.doc-gaps-hdr{padding:10px 12px 6px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#92400E;border-bottom:1px solid #FDE68A;}
+.doc-gaps-score{padding:12px;border-bottom:1px solid #FDE68A;text-align:center;background:#FFFBEB;}
+.doc-gaps-score-num{font-size:30px;font-weight:800;color:#6B21A8;line-height:1;}
 .doc-gaps-score-label{font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-top:2px;}
 .doc-gaps-score-sub{font-size:10px;color:#9CA3AF;margin-top:2px;}
-.doc-gaps-item{display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid #F0EBE4;}
-.dgi-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.doc-gaps-grp-hdr{padding:8px 12px 3px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:#92400E;}
+.doc-gaps-item{display:flex;align-items:flex-start;gap:8px;padding:7px 12px;border-bottom:1px solid #F3EADA;}
+.dgi-icon{font-size:12px;flex-shrink:0;margin-top:1px;}
 .dgi-text{flex:1;min-width:0;}
-.dgi-title{font-size:11px;font-weight:700;color:#374151;margin-bottom:2px;}
+.dgi-title{font-size:11px;font-weight:700;color:#374151;margin-bottom:1px;}
 .dgi-desc{font-size:10px;color:#6B7280;line-height:1.4;}
 .dgi-action{font-size:10px;font-weight:600;color:#6B21A8;cursor:pointer;margin-top:3px;display:inline-block;}
-.dgi-complete{opacity:0.5;}
-.dgi-complete .dgi-title{text-decoration:line-through;color:#9CA3AF;}
-/* Doc footer (adjusted for new layout) */
+.dgi-complete .dgi-title{color:#9CA3AF;text-decoration:line-through;font-weight:400;}
+.dgi-complete .dgi-desc{color:#C4B5A5;}
+/* Doc footer */
 .doc-footer{border-top:1px solid #E5E0D8;padding:10px 16px 10px 56px;background:#fff;display:flex;align-items:center;gap:8px;flex-shrink:0;}
 /* ── Sign modal ── */
 .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;justify-content:center;align-items:center;}
@@ -699,244 +706,211 @@
         <!-- 3-column body -->
         <div class="doc-body-cols">
 
-          <!-- Section nav -->
+          <!-- Left: minimal section index (like chart.html) -->
           <div class="doc-secnav">
-            <div class="doc-secnav-grp">HISTORY</div>
-
-            <div class="doc-secnav-item active" onclick="showDocSec('sec-reason', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">1</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Reason for Contact</div>
-                <div class="dsn-preview">Results disclosure, async</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-concerns', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">2</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Patient Concerns</div>
-                <div class="dsn-preview">Cancer risk, surgical options</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-understanding', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">3</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Prior Understanding</div>
-                <div class="dsn-preview">Limited knowledge</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-grp">GENETIC FINDINGS</div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-testresults', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">4</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Genetic Test Results</div>
-                <div class="dsn-preview">BRCA1 Pathogenic (Class 5)</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-phenotype', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-yellow"></div></div>
-              <span class="dsn-num">5</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Phenotypic Findings</div>
-                <div class="dsn-preview">5/6 fields documented</div>
-              </div>
-            </div>
-
+            <div class="doc-secnav-grp">SECTIONS</div>
+            <div class="doc-secnav-item active" onclick="jumpToDocSec('sec-reason',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Reason for Contact</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-concerns',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Patient Concerns</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-understanding',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Prior Understanding</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-testresults',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Genetic Test Results</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-phenotype',this)"><span class="dsn-dot dsn-dot-yellow"></span><span class="dsn-name">Phenotypic Findings</span></div>
             <div class="doc-secnav-grp">ASSESSMENT</div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-impression', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">6</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Clinical Impression</div>
-                <div class="dsn-preview">HBOC syndrome confirmed</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-psych', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">7</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Psychological Status</div>
-                <div class="dsn-preview">Distressed — support provided</div>
-              </div>
-            </div>
-
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-impression',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Clinical Impression</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-psych',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Psychological Status</span></div>
             <div class="doc-secnav-grp">PLAN</div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-actions', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-yellow"></div></div>
-              <span class="dsn-num">8</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Actions Taken</div>
-                <div class="dsn-preview">3/6 selected</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-followup', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-green"></div></div>
-              <span class="dsn-num">9</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Follow-Up</div>
-                <div class="dsn-preview">Jul 27, 2026</div>
-              </div>
-            </div>
-
-            <div class="doc-secnav-item" onclick="showDocSec('sec-route', this)">
-              <div class="dsn-dot-wrap"><div class="dsn-dot dsn-dot-gray"></div></div>
-              <span class="dsn-num">10</span>
-              <div class="dsn-text">
-                <div class="dsn-title">Sign &amp; Route</div>
-                <div class="dsn-preview">Pending — required</div>
-              </div>
-            </div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-actions',this)"><span class="dsn-dot dsn-dot-yellow"></span><span class="dsn-name">Actions Taken</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-followup',this)"><span class="dsn-dot dsn-dot-green"></span><span class="dsn-name">Follow-Up</span></div>
+            <div class="doc-secnav-item" onclick="jumpToDocSec('sec-route',this)"><span class="dsn-dot dsn-dot-gray"></span><span class="dsn-name">Sign &amp; Route</span></div>
           </div>
 
-          <!-- Section content -->
-          <div class="doc-content">
+          <!-- Center: all sections as expandable accordion rows (chart.html format) -->
+          <div class="doc-content" id="docContent">
 
-            <!-- Sec 1: Reason for Contact -->
-            <div class="doc-section active" id="sec-reason">
-              <div class="doc-section-title"><div class="doc-section-num">1</div>Reason for Contact</div>
-              <div class="st-row">
-                <div class="st-field">
-                  <label>Consult Type</label>
-                  <select class="st-select" id="consultType"><option value="">— Select —</option><option selected>Results Disclosure</option><option>Pre-Test Counseling</option><option>Post-Disclosure Follow-Up</option></select>
-                </div>
-                <div class="st-field">
-                  <label>Modality</label>
-                  <select class="st-select" id="modality"><option value="">— Select —</option><option selected>Async</option><option>Video</option><option>Phone</option></select>
-                </div>
-              </div>
-              <div class="st-field">
-                <label>Reason for Contact</label>
-                <select class="st-select" id="reasonContact"><option value="">— Select —</option><option selected>Positive genetic test result — disclosure counseling</option><option>Pre-test counseling and consent</option><option>Post-disclosure care planning</option></select>
-              </div>
-            </div>
+            <div class="doc-grp-hdr">SECTIONS</div>
 
-            <!-- Sec 2: Patient Concerns -->
-            <div class="doc-section" id="sec-concerns">
-              <div class="doc-section-title"><div class="doc-section-num">2</div>Patient Concerns</div>
-              <div class="st-field">
-                <label>Select all that apply</label>
-                <div class="picklist-wrap">
-                  <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Cancer risk / prognosis</span>
-                  <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Surgical options</span>
-                  <span class="pick-opt" onclick="this.classList.toggle('selected')">Impact on children / family</span>
-                  <span class="pick-opt" onclick="this.classList.toggle('selected')">Insurance implications</span>
-                  <span class="pick-opt" onclick="this.classList.toggle('selected')">Emotional / psychological</span>
-                  <span class="pick-opt" onclick="this.classList.toggle('selected')">Partner / relationship impact</span>
-                </div>
+            <!-- Row 1 -->
+            <div class="doc-sec-row expanded" id="sec-reason">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">1</div>
+                <div class="doc-sec-row-title">Reason for Contact</div>
+                <div class="doc-sec-row-preview">Results disclosure — Async</div>
+                <div class="doc-sec-row-arrow">›</div>
               </div>
-            </div>
-
-            <!-- Sec 3: Prior Understanding -->
-            <div class="doc-section" id="sec-understanding">
-              <div class="doc-section-title"><div class="doc-section-num">3</div>Prior Understanding</div>
-              <div class="st-field">
-                <label>Patient's Prior Understanding of Genetics</label>
-                <select class="st-select"><option value="">— Select —</option><option selected>Limited — new to genetic testing concepts</option><option>Moderate — had family testing discussions</option><option>Strong — healthcare background</option></select>
-              </div>
-            </div>
-
-            <!-- Sec 4: Genetic Test Results -->
-            <div class="doc-section" id="sec-testresults">
-              <div class="doc-section-title"><div class="doc-section-num">4</div>Genetic Test Results</div>
-              <div class="st-row">
-                <div class="st-field">
-                  <label>Test Type</label>
-                  <select class="st-select"><option selected>BRCA1/2 Full Seq + Del/Dup</option></select>
-                </div>
-                <div class="st-field">
-                  <label>Result Classification</label>
-                  <select class="st-select" id="resultClass">
-                    <option value="">— Select —</option>
-                    <option value="pathogenic" selected>Pathogenic (Class 5)</option>
-                    <option value="likely_path">Likely Pathogenic (Class 4)</option>
-                    <option value="vus">VUS (Class 3)</option>
-                    <option value="likely_benign">Likely Benign (Class 2)</option>
-                    <option value="benign">Benign (Class 1)</option>
-                    <option value="negative">Negative</option>
-                  </select>
-                </div>
-              </div>
-              <div class="st-row">
-                <div class="st-field">
-                  <label>Gene</label>
-                  <input class="st-input" value="BRCA1" id="geneField">
-                </div>
-                <div class="st-field">
-                  <label>Variant (HGVS)</label>
-                  <input class="st-input" value="c.5266dupC" id="variantField">
-                </div>
-              </div>
-              <div class="st-field">
-                <label>Inheritance Pattern</label>
-                <select class="st-select"><option selected>Autosomal Dominant</option><option>Autosomal Recessive</option><option>X-Linked</option><option>Mitochondrial</option></select>
-              </div>
-            </div>
-
-            <!-- Sec 5: Phenotypic Findings -->
-            <div class="doc-section" id="sec-phenotype">
-              <div class="doc-section-title"><div class="doc-section-num">5</div>Phenotypic Findings</div>
-              <div class="phen-grid" id="phenGrid">
-                <div class="phen-row"><span class="phen-label">Family history of breast cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
-                <div class="phen-row"><span class="phen-label">Family history of ovarian cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
-                <div class="phen-row"><span class="phen-label">Personal cancer diagnosis</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
-                <div class="phen-row"><span class="phen-label">Ashkenazi Jewish ancestry</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
-                <div class="phen-row"><span class="phen-label">Prior risk-reduction surgery</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
-                <div class="phen-row"><span class="phen-label">Chemoprevention discussed</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn active-NA" onclick="setPhen(this,'NA')">NA</button></div></div>
-              </div>
-            </div>
-
-            <!-- Sec 6: Clinical Impression -->
-            <div class="doc-section" id="sec-impression">
-              <div class="doc-section-title"><div class="doc-section-num">6</div>Clinical Impression</div>
-              <div class="st-field">
-                <label>GC Clinical Impression</label>
-                <textarea class="st-textarea" rows="4">Patient presents with confirmed BRCA1 c.5266dupC pathogenic variant (Class 5). Counseling addressed significantly elevated lifetime risks for breast (87%) and ovarian (44%) cancers consistent with HBOC syndrome. Ashkenazi Jewish founder mutation confirmed. Patient is emotionally processing; expressed desire for surgical risk reduction options.</textarea>
-              </div>
-              <div class="st-row">
-                <div class="st-field">
-                  <label>Risk Disclosure Completed</label>
-                  <div style="display:flex;gap:12px;margin-top:6px;">
-                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc" checked> Yes</label>
-                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc"> No</label>
+              <div class="doc-sec-row-body">
+                <div class="st-row">
+                  <div class="st-field">
+                    <label>Consult Type</label>
+                    <select class="st-select" id="consultType"><option value="">— Select —</option><option selected>Results Disclosure</option><option>Pre-Test Counseling</option><option>Post-Disclosure Follow-Up</option></select>
+                  </div>
+                  <div class="st-field">
+                    <label>Modality</label>
+                    <select class="st-select" id="modality"><option value="">— Select —</option><option selected>Async</option><option>Video</option><option>Phone</option></select>
                   </div>
                 </div>
                 <div class="st-field">
-                  <label>NCCN Guidelines Reviewed</label>
-                  <div style="display:flex;gap:12px;margin-top:6px;">
-                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn" checked> Yes</label>
-                    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn"> No</label>
+                  <label>Reason for Contact</label>
+                  <select class="st-select" id="reasonContact"><option value="">— Select —</option><option selected>Positive genetic test result — disclosure counseling</option><option>Pre-test counseling and consent</option><option>Post-disclosure care planning</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="doc-sec-row" id="sec-concerns">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">2</div>
+                <div class="doc-sec-row-title">Patient Concerns</div>
+                <div class="doc-sec-row-preview">Cancer risk, surgical options</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="st-field">
+                  <label>Select all that apply</label>
+                  <div class="picklist-wrap">
+                    <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Cancer risk / prognosis</span>
+                    <span class="pick-opt selected" onclick="this.classList.toggle('selected')">Surgical options</span>
+                    <span class="pick-opt" onclick="this.classList.toggle('selected')">Impact on children / family</span>
+                    <span class="pick-opt" onclick="this.classList.toggle('selected')">Insurance implications</span>
+                    <span class="pick-opt" onclick="this.classList.toggle('selected')">Emotional / psychological</span>
+                    <span class="pick-opt" onclick="this.classList.toggle('selected')">Partner / relationship impact</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Sec 7: Psychological Status -->
-            <div class="doc-section" id="sec-psych">
-              <div class="doc-section-title"><div class="doc-section-num">7</div>Psychological Status</div>
-              <div class="st-field">
-                <label>Psychological Status</label>
-                <select class="st-select"><option value="">— Select —</option><option selected>Distressed — emotional support provided</option><option>Neutral — informational focus</option><option>Positive — patient feels prepared</option></select>
+            <!-- Row 3 -->
+            <div class="doc-sec-row" id="sec-understanding">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">3</div>
+                <div class="doc-sec-row-title">Prior Understanding</div>
+                <div class="doc-sec-row-preview">Limited knowledge</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="st-field">
+                  <label>Patient's Prior Understanding of Genetics</label>
+                  <select class="st-select"><option value="">— Select —</option><option selected>Limited — new to genetic testing concepts</option><option>Moderate — had family testing discussions</option><option>Strong — healthcare background</option></select>
+                </div>
               </div>
             </div>
 
-            <!-- Sec 8: Actions Taken -->
-            <div class="doc-section" id="sec-actions">
-              <div class="doc-section-title"><div class="doc-section-num">8</div>Actions Taken</div>
-              <div class="st-field">
-                <label>Select all that apply</label>
-                <div id="planActions" style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+            <!-- Row 4 -->
+            <div class="doc-sec-row" id="sec-testresults">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">4</div>
+                <div class="doc-sec-row-title">Genetic Test Results</div>
+                <div class="doc-sec-row-preview">BRCA1 Pathogenic (Class 5)</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="st-row">
+                  <div class="st-field">
+                    <label>Test Type</label>
+                    <select class="st-select"><option selected>BRCA1/2 Full Seq + Del/Dup</option></select>
+                  </div>
+                  <div class="st-field">
+                    <label>Result Classification</label>
+                    <select class="st-select" id="resultClass"><option value="">— Select —</option><option value="pathogenic" selected>Pathogenic (Class 5)</option><option value="likely_path">Likely Pathogenic (Class 4)</option><option value="vus">VUS (Class 3)</option><option value="negative">Negative</option></select>
+                  </div>
+                </div>
+                <div class="st-row">
+                  <div class="st-field">
+                    <label>Gene</label>
+                    <input class="st-input" value="BRCA1" id="geneField">
+                  </div>
+                  <div class="st-field">
+                    <label>Variant (HGVS)</label>
+                    <input class="st-input" value="c.5266dupC" id="variantField">
+                  </div>
+                </div>
+                <div class="st-field">
+                  <label>Inheritance Pattern</label>
+                  <select class="st-select"><option selected>Autosomal Dominant</option><option>Autosomal Recessive</option><option>X-Linked</option><option>Mitochondrial</option></select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 5 -->
+            <div class="doc-sec-row" id="sec-phenotype">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">5</div>
+                <div class="doc-sec-row-title">Phenotypic Findings</div>
+                <div class="doc-sec-row-preview">5/6 fields documented</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="phen-grid" id="phenGrid">
+                  <div class="phen-row"><span class="phen-label">Family history of breast cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                  <div class="phen-row"><span class="phen-label">Family history of ovarian cancer</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                  <div class="phen-row"><span class="phen-label">Personal cancer diagnosis</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                  <div class="phen-row"><span class="phen-label">Ashkenazi Jewish ancestry</span><div class="phen-btns"><button class="phen-btn active-P" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                  <div class="phen-row"><span class="phen-label">Prior risk-reduction surgery</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn active-N" onclick="setPhen(this,'N')">N</button><button class="phen-btn" onclick="setPhen(this,'NA')">NA</button></div></div>
+                  <div class="phen-row"><span class="phen-label">Chemoprevention discussed</span><div class="phen-btns"><button class="phen-btn" onclick="setPhen(this,'P')">P</button><button class="phen-btn" onclick="setPhen(this,'N')">N</button><button class="phen-btn active-NA" onclick="setPhen(this,'NA')">NA</button></div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="doc-grp-hdr">ASSESSMENT</div>
+
+            <!-- Row 6 -->
+            <div class="doc-sec-row" id="sec-impression">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">6</div>
+                <div class="doc-sec-row-title">Clinical Impression</div>
+                <div class="doc-sec-row-preview">HBOC syndrome confirmed</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="st-field">
+                  <label>GC Clinical Impression</label>
+                  <textarea class="st-textarea" rows="4">Patient presents with confirmed BRCA1 c.5266dupC pathogenic variant (Class 5). Counseling addressed significantly elevated lifetime risks for breast (87%) and ovarian (44%) cancers consistent with HBOC syndrome. Ashkenazi Jewish founder mutation confirmed. Patient is emotionally processing; expressed desire for surgical risk reduction options.</textarea>
+                </div>
+                <div class="st-row">
+                  <div class="st-field">
+                    <label>Risk Disclosure Completed</label>
+                    <div style="display:flex;gap:12px;margin-top:6px;">
+                      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc" checked> Yes</label>
+                      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="riskDisc"> No</label>
+                    </div>
+                  </div>
+                  <div class="st-field">
+                    <label>NCCN Guidelines Reviewed</label>
+                    <div style="display:flex;gap:12px;margin-top:6px;">
+                      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn" checked> Yes</label>
+                      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:normal;"><input type="radio" name="nccn"> No</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 7 -->
+            <div class="doc-sec-row" id="sec-psych">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">7</div>
+                <div class="doc-sec-row-title">Psychological Status</div>
+                <div class="doc-sec-row-preview">Distressed — support provided</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div class="st-field">
+                  <label>Psychological Status</label>
+                  <select class="st-select"><option value="">— Select —</option><option selected>Distressed — emotional support provided</option><option>Neutral — informational focus</option><option>Positive — patient feels prepared</option></select>
+                </div>
+              </div>
+            </div>
+
+            <div class="doc-grp-hdr">PLAN</div>
+
+            <!-- Row 8 -->
+            <div class="doc-sec-row" id="sec-actions">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">8</div>
+                <div class="doc-sec-row-title">Actions Taken</div>
+                <div class="doc-sec-row-preview">3/6 selected</div>
+                <div class="doc-sec-row-arrow">›</div>
+              </div>
+              <div class="doc-sec-row-body">
+                <div id="planActions" style="display:flex;flex-direction:column;gap:6px;">
                   <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Risk-reduction surgery discussed (bilateral mastectomy, BSO)</label>
                   <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Enhanced surveillance plan reviewed (annual MRI + mammogram)</label>
                   <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:normal;"><input type="checkbox" checked> Referral placed to high-risk breast oncology</label>
@@ -947,52 +921,63 @@
               </div>
             </div>
 
-            <!-- Sec 9: Follow-Up -->
-            <div class="doc-section" id="sec-followup">
-              <div class="doc-section-title"><div class="doc-section-num">9</div>Follow-Up</div>
-              <div class="st-row">
-                <div class="st-field">
-                  <label>Follow-Up Scheduled</label>
-                  <select class="st-select"><option>Yes — Care Plan session</option><option>No</option><option>Patient will schedule</option></select>
-                </div>
-                <div class="st-field">
-                  <label>Follow-Up Date</label>
-                  <input type="date" class="st-input" value="2026-07-27">
-                </div>
+            <!-- Row 9 -->
+            <div class="doc-sec-row" id="sec-followup">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle">9</div>
+                <div class="doc-sec-row-title">Follow-Up</div>
+                <div class="doc-sec-row-preview">Jul 27, 2026 — Care Plan</div>
+                <div class="doc-sec-row-arrow">›</div>
               </div>
-              <div class="st-field">
-                <label>Additional Notes (optional)</label>
-                <textarea class="st-textarea" rows="2" placeholder="Any additional context for the attending physician..."></textarea>
+              <div class="doc-sec-row-body">
+                <div class="st-row">
+                  <div class="st-field">
+                    <label>Follow-Up Scheduled</label>
+                    <select class="st-select"><option>Yes — Care Plan session</option><option>No</option><option>Patient will schedule</option></select>
+                  </div>
+                  <div class="st-field">
+                    <label>Follow-Up Date</label>
+                    <input type="date" class="st-input" value="2026-07-27">
+                  </div>
+                </div>
+                <div class="st-field">
+                  <label>Additional Notes (optional)</label>
+                  <textarea class="st-textarea" rows="2" placeholder="Any additional context for the attending physician..."></textarea>
+                </div>
               </div>
             </div>
 
-            <!-- Sec 10: Sign & Route -->
-            <div class="doc-section" id="sec-route">
-              <div class="doc-section-title"><div class="doc-section-num">10</div>Sign &amp; Route</div>
-              <div class="st-field">
-                <label>Physician Notification Required</label>
-                <select class="st-select"><option selected>Yes — route for attestation</option><option>No</option></select>
+            <!-- Row 10 -->
+            <div class="doc-sec-row" id="sec-route">
+              <div class="doc-sec-row-hd" onclick="toggleDocRow(this)">
+                <div class="doc-sec-circle" style="background:#E5E7EB;color:#6B7280;">10</div>
+                <div class="doc-sec-row-title">Sign &amp; Route</div>
+                <div class="doc-sec-row-preview">Pending — required</div>
+                <div class="doc-sec-row-arrow">›</div>
               </div>
-              <div style="margin-top:14px;">
-                <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;">Submission Pipeline</div>
-                <div class="sub-pipeline">
-                  <div class="sub-step"><div class="sub-dot sub-done">✓</div><div class="sub-label">GC Draft</div></div>
-                  <span class="sub-arrow">›</span>
-                  <div class="sub-step"><div class="sub-dot sub-active">2</div><div class="sub-label">GC Approve</div></div>
-                  <span class="sub-arrow">›</span>
-                  <div class="sub-step"><div class="sub-dot sub-pending">3</div><div class="sub-label">Physician Review</div></div>
-                  <span class="sub-arrow">›</span>
-                  <div class="sub-step"><div class="sub-dot sub-pending">4</div><div class="sub-label">Attestation</div></div>
-                  <span class="sub-arrow">›</span>
-                  <div class="sub-step"><div class="sub-dot sub-pending">5</div><div class="sub-label">Released</div></div>
+              <div class="doc-sec-row-body">
+                <div class="st-field">
+                  <label>Physician Notification Required</label>
+                  <select class="st-select"><option selected>Yes — route for attestation</option><option>No</option></select>
                 </div>
-              </div>
-              <div style="margin-top:14px;">
+                <div style="margin:12px 0;">
+                  <div class="sub-pipeline">
+                    <div class="sub-step"><div class="sub-dot sub-done">✓</div><div class="sub-label">GC Draft</div></div>
+                    <span class="sub-arrow">›</span>
+                    <div class="sub-step"><div class="sub-dot sub-active">2</div><div class="sub-label">GC Approve</div></div>
+                    <span class="sub-arrow">›</span>
+                    <div class="sub-step"><div class="sub-dot sub-pending">3</div><div class="sub-label">MD Review</div></div>
+                    <span class="sub-arrow">›</span>
+                    <div class="sub-step"><div class="sub-dot sub-pending">4</div><div class="sub-label">Attestation</div></div>
+                    <span class="sub-arrow">›</span>
+                    <div class="sub-step"><div class="sub-dot sub-pending">5</div><div class="sub-label">Released</div></div>
+                  </div>
+                </div>
                 <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="openSignModal()">Approve &amp; Sign Note ✓</button>
               </div>
             </div>
 
-            <div id="valBanner" style="display:none;background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;margin:12px 16px;font-size:12px;color:#DC2626;"></div>
+            <div id="valBanner" style="display:none;background:#FEE2E2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:12px;color:#DC2626;"></div>
           </div><!-- /doc-content -->
 
           <!-- CFE-001 / Documentation Quality -->
@@ -1065,7 +1050,7 @@
               <div class="dgi-text">
                 <div class="dgi-title">Cascade testing</div>
                 <div class="dgi-desc">Siblings not yet addressed in Actions Taken — required for CFE-001</div>
-                <span class="dgi-action" onclick="showDocSec('sec-actions', null)">Go to Actions →</span>
+                <span class="dgi-action" onclick="jumpToDocSec('sec-actions', null)">Go to Actions →</span>
               </div>
             </div>
             <div class="doc-gaps-item">
@@ -1073,7 +1058,7 @@
               <div class="dgi-text">
                 <div class="dgi-title">Chemoprevention noted</div>
                 <div class="dgi-desc">Must be marked discussed or N/A before signing</div>
-                <span class="dgi-action" onclick="showDocSec('sec-phenotype', null)">Go to Phenotype →</span>
+                <span class="dgi-action" onclick="jumpToDocSec('sec-phenotype', null)">Go to Phenotype →</span>
               </div>
             </div>
           </div>
@@ -1317,19 +1302,25 @@ function switchRP(idx, btn) {
   if (footer) footer.style.display = (idx === 0) ? 'flex' : 'none';
 }
 
-/* ── Section navigator within doc panel ── */
-function showDocSec(secId, navItem) {
-  document.querySelectorAll('.doc-section').forEach(function(s) { s.classList.remove('active'); });
-  document.querySelectorAll('.doc-secnav-item').forEach(function(n) { n.classList.remove('active'); });
-  var sec = document.getElementById(secId);
-  if (sec) sec.classList.add('active');
-  if (navItem) navItem.classList.add('active');
-  else {
-    // find the nav item that targets this section
-    document.querySelectorAll('.doc-secnav-item').forEach(function(n) {
-      if (n.getAttribute('onclick') && n.getAttribute('onclick').indexOf(secId) > -1) n.classList.add('active');
-    });
-  }
+/* ── Section accordion (chart.html format) ── */
+function toggleDocRow(hdr) {
+  var row = hdr.closest('.doc-sec-row');
+  var isExpanded = row.classList.contains('expanded');
+  document.querySelectorAll('.doc-sec-row.expanded').forEach(function(r) { r.classList.remove('expanded'); });
+  if (!isExpanded) row.classList.add('expanded');
+  updateDocNavActive(row.id);
+}
+function jumpToDocSec(secId, navEl) {
+  document.querySelectorAll('.doc-sec-row.expanded').forEach(function(r) { r.classList.remove('expanded'); });
+  var row = document.getElementById(secId);
+  if (row) { row.classList.add('expanded'); row.scrollIntoView({behavior:'smooth',block:'start'}); }
+  updateDocNavActive(secId);
+}
+function updateDocNavActive(secId) {
+  document.querySelectorAll('.doc-secnav-item').forEach(function(n) {
+    n.classList.remove('active');
+    if (n.getAttribute('onclick') && n.getAttribute('onclick').indexOf(secId) > -1) n.classList.add('active');
+  });
 }
 
 /* ── Smart template sections ── */
