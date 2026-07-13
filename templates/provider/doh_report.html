@@ -121,6 +121,39 @@ tbody tr:last-child td { border-bottom:none; }
 .success-banner { display:none; background:#D1FAE5; border:1px solid #6EE7B7; border-radius:10px; padding:12px 16px; margin-bottom:14px; font-size:13px; font-weight:600; color:#065F46; align-items:center; gap:8px; }
 .success-banner.visible { display:flex; }
 
+/* ── Activity Timeline ── */
+.tl-compose { display:flex; border-bottom:1px solid var(--border); }
+.tl-tab { flex:1; padding:10px 4px; font-size:12px; font-weight:600; color:#6B7280; text-align:center; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+.tl-tab:hover { color:#0F766E; }
+.tl-tab.active { color:#0F766E; border-bottom-color:#0F766E; }
+.tl-tab .tl-ico { margin-right:4px; }
+.tl-input-row { display:flex; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border); }
+.tl-input { flex:1; border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; font-family:inherit; outline:none; color:#374151; }
+.tl-input:focus { border-color:#0F766E; }
+.tl-add-btn { background:#0F766E; color:#fff; border:none; border-radius:8px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.tl-add-btn:hover { background:#0D5F58; }
+.tl-section-label { font-size:10px; font-weight:800; letter-spacing:0.08em; text-transform:uppercase; color:#9CA3AF; padding:10px 14px 4px; }
+.tl-entry { display:flex; gap:10px; padding:10px 14px; border-bottom:1px solid #F3F4F6; cursor:default; }
+.tl-entry:hover { background:#FAFAF8; }
+.tl-entry:last-child { border-bottom:none; }
+.tl-arrow { color:#9CA3AF; font-size:10px; margin-top:2px; flex-shrink:0; }
+.tl-entry-ico { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.ico-task    { background:#D1FAE5; }
+.ico-note    { background:#FEF3C7; }
+.ico-call    { background:#DBEAFE; }
+.ico-msg     { background:#EDE9FE; }
+.ico-fax     { background:#F0FDFA; }
+.ico-system  { background:#F3F4F6; }
+.ico-warn    { background:#FEF3C7; }
+.tl-body { flex:1; min-width:0; }
+.tl-title { font-size:13px; font-weight:600; color:#111827; }
+.tl-title .tl-status-chip { display:inline-block; font-size:10px; font-weight:700; padding:1px 7px; border-radius:8px; margin-left:6px; vertical-align:middle; }
+.chip-prog  { background:#DBEAFE; color:#1E40AF; }
+.chip-done  { background:#D1FAE5; color:#065F46; }
+.chip-warn  { background:#FEF3C7; color:#92400E; }
+.tl-sub  { font-size:12px; color:#6B7280; margin-top:1px; }
+.tl-date { font-size:11px; color:#9CA3AF; flex-shrink:0; margin-top:2px; }
+.tl-empty { padding:28px 14px; text-align:center; font-size:13px; color:#9CA3AF; font-style:italic; }
 </style>
 {% endblock %}
 
@@ -312,6 +345,73 @@ tbody tr:last-child td { border-bottom:none; }
       </div>
     </div>
 
+    <!-- Activity Timeline -->
+    <div class="section" id="activitySection">
+      <div class="sec-header">
+        <div class="sec-title">Activity Timeline</div>
+        <span class="sec-badge" style="background:#F3F4F6;color:#374151;" id="activityBadge">3 entries</span>
+      </div>
+
+      <!-- Compose tabs -->
+      <div class="tl-compose">
+        <div class="tl-tab active" onclick="setTab('call',this)"><span class="tl-ico">📞</span> Log a Call</div>
+        <div class="tl-tab" onclick="setTab('msg',this)"><span class="tl-ico">✉️</span> Send Message</div>
+        <div class="tl-tab" onclick="setTab('note',this)"><span class="tl-ico">📝</span> Add Note</div>
+        <div class="tl-tab" onclick="setTab('task',this)"><span class="tl-ico">✅</span> New Task</div>
+      </div>
+      <div class="tl-input-row">
+        <input class="tl-input" id="tlInput" placeholder="Log a call recap, note, or task description…" />
+        <button class="tl-add-btn" onclick="addTimelineEntry()">Add</button>
+      </div>
+
+      <!-- Entries -->
+      <div id="timelineBody">
+        <!-- UPCOMING -->
+        <div class="tl-section-label">Upcoming</div>
+        <div class="tl-entry">
+          <div class="tl-arrow">▶</div>
+          <div class="tl-entry-ico ico-task">✅</div>
+          <div class="tl-body">
+            <div class="tl-title">Fax Delivery Confirmation</div>
+            <div class="tl-sub">Confirm receipt with FL Merlin portal — check delivery status by end of day</div>
+          </div>
+          <div class="tl-date">Today</div>
+        </div>
+
+        <!-- PAST ACTIVITY -->
+        <div class="tl-section-label">Past Activity</div>
+        <div id="tlPastEntries">
+          <div class="tl-entry">
+            <div class="tl-arrow">▶</div>
+            <div class="tl-entry-ico ico-warn">⚠️</div>
+            <div class="tl-body">
+              <div class="tl-title">SLA Warning <span class="tl-status-chip chip-warn">OVERDUE</span></div>
+              <div class="tl-sub">Report overdue — 24-hour SLA window passed without submission</div>
+            </div>
+            <div class="tl-date">Jun 24</div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-arrow">▶</div>
+            <div class="tl-entry-ico ico-system">⚙️</div>
+            <div class="tl-body">
+              <div class="tl-title">Record Auto-Generated</div>
+              <div class="tl-sub">DOH Rule Engine created this record when Gonorrhea NAAT result confirmed positive</div>
+            </div>
+            <div class="tl-date">Jun 23</div>
+          </div>
+          <div class="tl-entry">
+            <div class="tl-arrow">▶</div>
+            <div class="tl-entry-ico ico-note">📝</div>
+            <div class="tl-body">
+              <div class="tl-title">Note Added — Crystal Veliz</div>
+              <div class="tl-sub">Minor patient — confirmed legal clearance not yet obtained. Holding submission pending supervisor review.</div>
+            </div>
+            <div class="tl-date">Jun 23</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- RIGHT COLUMN — Action panel -->
@@ -425,6 +525,67 @@ tbody tr:last-child td { border-bottom:none; }
 <script>
 var currentMethod = '';
 var submissionLog = [];
+var currentTab = 'call';
+var tlCount = 3;
+
+/* ── Tab switching ── */
+function setTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.tl-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  var placeholders = {
+    call: 'Recap this call — who you spoke to, what was discussed…',
+    msg:  'Compose a message to send to the DOH coordinator or agency…',
+    note: 'Add an internal note visible only to the DOH reporting team…',
+    task: 'Describe the task and optionally add a due date…'
+  };
+  document.getElementById('tlInput').placeholder = placeholders[tab];
+}
+
+/* ── Manual timeline entry ── */
+function addTimelineEntry() {
+  var text = document.getElementById('tlInput').value.trim();
+  if (!text) return;
+
+  var cfg = {
+    call: { ico: '📞', cls: 'ico-call',  label: 'Call Logged — Crystal Veliz' },
+    msg:  { ico: '✉️', cls: 'ico-msg',   label: 'Message Sent — Crystal Veliz' },
+    note: { ico: '📝', cls: 'ico-note',  label: 'Note Added — Crystal Veliz' },
+    task: { ico: '✅', cls: 'ico-task',  label: 'Task Created' }
+  }[currentTab];
+
+  var now = new Date();
+  var dateLabel = now.toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
+  prependTimelineEntry(cfg.ico, cfg.cls, cfg.label, text, dateLabel, '');
+
+  document.getElementById('tlInput').value = '';
+}
+
+/* ── Prepend a single entry into the Past Activity list ── */
+function prependTimelineEntry(ico, icoClass, title, sub, date, chipHtml) {
+  tlCount++;
+  document.getElementById('activityBadge').textContent = tlCount + ' entr' + (tlCount === 1 ? 'y' : 'ies');
+
+  var el = document.createElement('div');
+  el.className = 'tl-entry';
+  el.innerHTML =
+    '<div class="tl-arrow">▶</div>' +
+    '<div class="tl-entry-ico ' + icoClass + '">' + ico + '</div>' +
+    '<div class="tl-body">' +
+      '<div class="tl-title">' + title + (chipHtml ? ' ' + chipHtml : '') + '</div>' +
+      '<div class="tl-sub">' + sub + '</div>' +
+    '</div>' +
+    '<div class="tl-date">' + date + '</div>';
+
+  var container = document.getElementById('tlPastEntries');
+  container.insertBefore(el, container.firstChild);
+}
+
+function updateChar() {
+  var v = document.getElementById('coordNotes').value;
+  document.getElementById('charCount').textContent = v.length + ' / 500';
+  if (v.length > 500) document.getElementById('coordNotes').value = v.slice(0, 500);
+}
 
 function openModal(method) {
   currentMethod = method;
@@ -460,16 +621,30 @@ function closeModal() {
 function confirmSubmit() {
   var now = new Date();
   var ts = now.toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'});
+  var dateShort = now.toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
   var methods = {fax:'Fax · (305) 555-0182', email:'Email · merlin@flhealth.gov', phone:'Phone · Verbal'};
   var icons   = {fax:'&#128231;', email:'&#9993;', phone:'&#9990;'};
   var confirm = document.getElementById('confirmNum').value || '—';
-  var notes   = document.getElementById('modalNotes').value || '—';
+  var notes   = document.getElementById('modalNotes').value || '';
 
-  submissionLog.unshift({method: currentMethod, label: methods[currentMethod], icon: icons[currentMethod], ts: ts, confirm: confirm, notes: notes});
+  submissionLog.unshift({method: currentMethod, label: methods[currentMethod], icon: icons[currentMethod], ts: ts, confirm: confirm, notes: notes || '—'});
   renderHistory();
   closeModal();
 
-  // Update status
+  // Log to activity timeline
+  var tlCfg = {
+    fax:   { ico: '📠', cls: 'ico-fax',   title: 'E-Fax Sent — FL Dept. of Health',
+              sub: 'FL-MERLIN STI Case Report faxed to (305) 555-0182' + (confirm !== '—' ? ' · Confirmation: ' + confirm : '') + (notes ? ' · ' + notes : '') },
+    email: { ico: '✉️', cls: 'ico-msg',   title: 'Email Submitted — FL Dept. of Health',
+              sub: 'Report sent to merlin@flhealth.gov' + (confirm !== '—' ? ' · Confirmation: ' + confirm : '') + (notes ? ' · ' + notes : '') },
+    phone: { ico: '📞', cls: 'ico-call',  title: 'Phone Report Logged',
+              sub: (document.getElementById('phoneContact').value ? 'Spoke with: ' + document.getElementById('phoneContact').value + ' · ' : '') + 'Verbal submission · FL Dept. of Health' + (notes ? ' · ' + notes : '') }
+  }[currentMethod];
+
+  var chip = '<span class="tl-status-chip chip-done">✓ SUBMITTED</span>';
+  prependTimelineEntry(tlCfg.ico, tlCfg.cls, tlCfg.title, tlCfg.sub, dateShort, chip);
+
+  // Update status banner
   var banner = document.getElementById('statusBanner');
   banner.className = 'status-banner s-done';
   banner.innerHTML = '<div class="status-dot"></div><div class="status-label">Submitted</div><span style="font-size:11px;color:#6B7280;margin-left:auto;">Submitted ' + ts + ' · ' + methods[currentMethod] + '</span>';
