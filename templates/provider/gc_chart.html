@@ -257,6 +257,7 @@
       <div class="gc-tab" onclick="switchTab('consents',this)">Consents</div>
       <div class="gc-tab" onclick="switchTab('referrals',this)">Referrals</div>
       <div class="gc-tab" onclick="switchTab('lmlog',this)">LM Contact Log</div>
+      <div class="gc-tab" onclick="switchTab('workflow',this)">Test Workflow</div>
     </div>
 
     <!-- ══ SUMMARY TAB ══ -->
@@ -1293,6 +1294,142 @@ PLAN: GeneDx BRCA1/2 full sequencing + large rearrangement analysis ordered. Res
 
       </div>
     </div><!-- end tab-lmlog -->
+
+    <!-- ══ TEST WORKFLOW TAB ══ -->
+    <div class="gc-body" id="tab-workflow" style="display:none;">
+      <div class="tab-panel-full active">
+        <div style="padding:20px;">
+
+          <!-- Stage progress tracker -->
+          <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;padding:20px;margin-bottom:20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <div style="font-size:14px;font-weight:700;color:#111827;">BRCA Counseling — Multi-Stage Workflow</div>
+                <div style="font-size:11px;color:#6B7280;margin-top:2px;">Jennifer Walsh · CST-2026-10901 · Stage 2 of 4 active</div>
+              </div>
+              <span style="font-size:11px;font-weight:700;background:#EDE9FE;color:#6B21A8;border-radius:6px;padding:3px 10px;">GC-STG-001</span>
+            </div>
+
+            <!-- Stage progress bar -->
+            <div style="display:flex;gap:0;margin-bottom:20px;">
+              <!-- Stage 1 — Done -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
+                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:#059669;z-index:0;"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:#059669;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:1;">✓</div>
+                <div style="font-size:11px;font-weight:700;color:#059669;text-align:center;margin-top:6px;line-height:1.3;">Pre-Test<br>Consult</div>
+                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">May 28, 2026</div>
+              </div>
+              <!-- Stage 2 — Active -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
+                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:linear-gradient(to right, #6B21A8 40%, #E5E0D8 40%);z-index:0;"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:#6B21A8;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:1;box-shadow:0 0 0 4px #EDE9FE;">2</div>
+                <div style="font-size:11px;font-weight:700;color:#6B21A8;text-align:center;margin-top:6px;line-height:1.3;">Results<br>Disclosure</div>
+                <div style="font-size:10px;color:#6B21A8;text-align:center;margin-top:3px;font-weight:600;">In Progress</div>
+              </div>
+              <!-- Stage 3 — Pending -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;">
+                <div style="position:absolute;top:16px;left:calc(50% + 16px);right:calc(-50% + 16px);height:2px;background:#E5E0D8;z-index:0;"></div>
+                <div style="width:32px;height:32px;border-radius:50%;background:#F3F4F6;color:#9CA3AF;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #E5E0D8;z-index:1;">3</div>
+                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-align:center;margin-top:6px;line-height:1.3;">Care Plan<br>& Referrals</div>
+                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">Pending</div>
+              </div>
+              <!-- Stage 4 — Pending -->
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+                <div style="width:32px;height:32px;border-radius:50%;background:#F3F4F6;color:#9CA3AF;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #E5E0D8;z-index:1;">4</div>
+                <div style="font-size:11px;font-weight:700;color:#9CA3AF;text-align:center;margin-top:6px;line-height:1.3;">Chart<br>Close</div>
+                <div style="font-size:10px;color:#9CA3AF;text-align:center;margin-top:3px;">Pending</div>
+              </div>
+            </div>
+
+            <!-- Active stage detail -->
+            <div style="background:#FDFAFF;border:1.5px solid #6B21A8;border-radius:10px;padding:16px;">
+              <div style="font-size:12px;font-weight:700;color:#6B21A8;margin-bottom:10px;">▶ Stage 2 — Results Disclosure Counseling</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+                <div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Gate Requirement</div>
+                  <div style="font-size:12px;font-weight:700;color:#111827;">Results disclosure session completed</div>
+                </div>
+                <div style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
+                  <div style="font-size:10px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Payment Trigger</div>
+                  <div style="font-size:12px;font-weight:700;color:#059669;">$250 — Upon stage completion</div>
+                </div>
+              </div>
+              <div style="margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:6px;">Stage Checklist</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;">
+                    <input type="checkbox" checked disabled style="accent-color:#6B21A8;"> BRCA1 result reviewed with patient
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;">
+                    <input type="checkbox" checked disabled style="accent-color:#6B21A8;"> Hereditary cancer risk explained
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
+                    <input type="checkbox" style="accent-color:#6B21A8;"> Post-disclosure care plan discussed
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
+                    <input type="checkbox" style="accent-color:#6B21A8;"> Family testing recommendations provided
+                  </label>
+                  <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer;" onclick="gcToast('Checklist item updated')">
+                    <input type="checkbox" style="accent-color:#6B21A8;"> Disclosure note signed in chart
+                  </label>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-primary" style="flex:1;" onclick="gcToast('Stage 2 advancing — GCA notified to submit to LifeMap and trigger $250 payment event')">Advance to Stage 3 →</button>
+                <button class="btn btn-outline" onclick="gcToast('Stage flagged — supervisor notified')">Flag Issue</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- All stages summary table -->
+          <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;overflow:hidden;">
+            <div style="padding:14px 18px;border-bottom:1px solid #E5E0D8;font-size:13px;font-weight:700;color:#111827;">All Stages — BRCA Counseling</div>
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead>
+                <tr style="background:#F9FAFB;">
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Stage</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Gate Requirement</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Payment</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Status</th>
+                  <th style="padding:9px 14px;text-align:left;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;">Completed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid #F3F4F6;">
+                  <td style="padding:10px 14px;font-weight:700;">1 — Pre-Test Consult</td>
+                  <td style="padding:10px 14px;color:#374151;">Pre-test counseling session + consent signed</td>
+                  <td style="padding:10px 14px;color:#059669;font-weight:600;">$150</td>
+                  <td style="padding:10px 14px;"><span style="background:#D1FAE5;color:#065F46;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Complete</span></td>
+                  <td style="padding:10px 14px;color:#6B7280;">May 28, 2026</td>
+                </tr>
+                <tr style="border-bottom:1px solid #F3F4F6;background:#FDFAFF;">
+                  <td style="padding:10px 14px;font-weight:700;">2 — Results Disclosure</td>
+                  <td style="padding:10px 14px;color:#374151;">Disclosure session + disclosure note signed</td>
+                  <td style="padding:10px 14px;color:#059669;font-weight:600;">$250</td>
+                  <td style="padding:10px 14px;"><span style="background:#EDE9FE;color:#6B21A8;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">In Progress</span></td>
+                  <td style="padding:10px 14px;color:#6B7280;">—</td>
+                </tr>
+                <tr style="border-bottom:1px solid #F3F4F6;">
+                  <td style="padding:10px 14px;font-weight:700;">3 — Care Plan & Referrals</td>
+                  <td style="padding:10px 14px;color:#374151;">Surveillance plan documented + referrals placed</td>
+                  <td style="padding:10px 14px;color:#6B7280;">$100</td>
+                  <td style="padding:10px 14px;"><span style="background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Pending</span></td>
+                  <td style="padding:10px 14px;color:#6B7280;">—</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 14px;font-weight:700;">4 — Chart Close</td>
+                  <td style="padding:10px 14px;color:#374151;">GC note signed + GCA LM submission confirmed</td>
+                  <td style="padding:10px 14px;color:#6B7280;">$75</td>
+                  <td style="padding:10px 14px;"><span style="background:#F3F4F6;color:#6B7280;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">Pending</span></td>
+                  <td style="padding:10px 14px;color:#6B7280;">—</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- end tab-workflow -->
 
   </div><!-- end gc-main -->
 </div><!-- end chart-shell -->

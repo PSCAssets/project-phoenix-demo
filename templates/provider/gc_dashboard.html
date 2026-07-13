@@ -327,17 +327,17 @@
         <div class="stat-value green">3</div>
         <div class="stat-sub">+1 vs. yesterday</div>
       </div>
-      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="document.getElementById('consultTable').scrollIntoView({behavior:'smooth'})">
+      <div class="stat-card accent-navy">
         <div class="stat-label">Active Consults</div>
         <div class="stat-value">5</div>
         <div class="stat-sub">Genetics cases only</div>
       </div>
-      <div class="stat-card accent-amber" style="cursor:pointer;" onclick="document.getElementById('pendingTable').scrollIntoView({behavior:'smooth'})">
+      <div class="stat-card accent-amber">
         <div class="stat-label">Pending Chart Close</div>
         <div class="stat-value amber">1</div>
         <div class="stat-sub">Requires signature</div>
       </div>
-      <div class="stat-card accent-blue" style="cursor:pointer;" onclick="document.getElementById('refillTable').scrollIntoView({behavior:'smooth'})">
+      <div class="stat-card accent-blue">
         <div class="stat-label">Genetic Reports Pending</div>
         <div class="stat-value">2</div>
         <div class="stat-sub">Awaiting lab results</div>
@@ -384,32 +384,32 @@
               </tr>
             </thead>
             <tbody id="consultTbody">
-              <tr data-program="BRCA Counseling" data-type="async" data-wait-sec="7200" data-status="Approaching" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+              <tr data-program="BRCA Counseling" data-type="async" data-wait-sec="7200" data-status="Approaching" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
                 <td><div class="pri-dot p2" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Jennifer Walsh</div><div class="cr-id">BRCA Counseling</div></td>
                 <td><span class="cr-program">BRCA Counseling</span></td>
                 <td><span class="cr-type">Async</span></td>
                 <td><span style="color:#F59E0B;font-weight:600;">&lt; 2 hrs</span></td>
                 <td><span class="cr-status pending">Approaching</span></td>
-                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Open</button></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/gc/chart/1'">Open</button></td>
               </tr>
-              <tr data-program="Hereditary Cancer Panel" data-type="video" data-wait-sec="14400" data-status="On Track" onclick="window.location.href='/provider/chart?type=video'" style="cursor:pointer">
+              <tr data-program="Hereditary Cancer Panel" data-type="video" data-wait-sec="14400" data-status="On Track" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
                 <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Robert Kim</div><div class="cr-id">Hereditary Cancer Panel</div></td>
                 <td><span class="cr-program">Hereditary Cancer Panel</span></td>
                 <td><span class="cr-type">Video</span></td>
                 <td><span style="color:#6B7280;">4 hrs remaining</span></td>
                 <td><span class="cr-status in-progress">On Track</span></td>
-                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=video'">Open</button></td>
+                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/gc/chart/1'">Open</button></td>
               </tr>
-              <tr data-program="Carrier Screening" data-type="async" data-wait-sec="21600" data-status="On Track" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
+              <tr data-program="Carrier Screening" data-type="async" data-wait-sec="21600" data-status="On Track" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
                 <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Angela Torres</div><div class="cr-id">Carrier Screening</div></td>
                 <td><span class="cr-program">Carrier Screening</span></td>
                 <td><span class="cr-type">Async</span></td>
                 <td><span style="color:#6B7280;">6 hrs remaining</span></td>
                 <td><span class="cr-status in-progress">On Track</span></td>
-                <td><button class="cr-btn secondary" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">View</button></td>
+                <td><button class="cr-btn secondary" onclick="event.stopPropagation();window.location.href='/provider/gc/chart/1'">View</button></td>
               </tr>
             </tbody>
           </table>
@@ -713,7 +713,7 @@
   </div>
 </div>
   <!-- Urgent Messages Panel (URG-MSG-001) -->
-  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:1100;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
     <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
       <span style="font-size:16px;">🚨</span>
       <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
@@ -1060,8 +1060,8 @@ function signOrder(btn, orderId) {
 }
 
 var URGENT_MSGS = [
-  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they're asking about the results and I don't have authority to discuss."', time:'12 min ago' },
-  { type:'chart',   initials:'PS', bg:'#0891B2', sender:'Priya Sharma, MA',       patient:'Marcus J. \u00b7 CST-2026-10849', url:'/provider/chart/1', preview:'"Critical lab result returned — testosterone panel flagged outside normal range. Please review before closing chart."', time:'28 min ago' },
+  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they\'re asking about the results and I don\'t have authority to discuss."', time:'12 min ago' },
+  { type:'chart',   initials:'PS', bg:'#0891B2', sender:'Priya Sharma, GCA',      patient:'A.M. \u00b7 CST-2026-10901', url:'/provider/gc/chart/1', preview:'"BRCA1 pathogenic result returned — results disclosure counseling not yet completed. Please review before closing chart."', time:'28 min ago' },
   { type:'chart',   initials:'KP', bg:'#059669', sender:'Kim Patel, NP',           patient:'D.R. \u00b7 C-20260601-022',     url:'/provider/chart/1?product=awv', dept:'\u2192 Physician (MD)', preview:'"AWV patient presenting with new chest tightness complaint — outside my scope, needs MD review today."', time:'41 min ago' }
 ];
 function openUrgentPanel() {

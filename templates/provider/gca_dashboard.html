@@ -87,13 +87,13 @@ tbody tr:hover { background:#FAF7F2; }
       <div class="stat-val">11</div>
       <div class="stat-sub">across all GCs</div>
     </div>
-    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('gca-prep-queue').scrollIntoView({behavior:'smooth'})">
+    <div class="stat-card">
       <div class="accent" style="background:#D97706;"></div>
       <div class="stat-label">Prep Needed</div>
       <div class="stat-val" style="color:#D97706;">4</div>
       <div class="stat-sub">action required</div>
     </div>
-    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('gca-prep-queue').scrollIntoView({behavior:'smooth'})">
+    <div class="stat-card">
       <div class="accent" style="background:#1D4ED8;"></div>
       <div class="stat-label">In Progress</div>
       <div class="stat-val" style="color:#1D4ED8;">3</div>
@@ -257,7 +257,7 @@ function openPortal(partner) {
 }
 
 var URGENT_MSGS = [
-  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they're asking about the results and I don't have authority to discuss."', time:'12 min ago' },
+  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they\'re asking about the results and I don\'t have authority to discuss."', time:'12 min ago' },
   { type:'chart',   initials:'PS', bg:'#0891B2', sender:'Priya Sharma, MA',       patient:'Marcus J. \u00b7 CST-2026-10849', url:'/provider/chart/1', preview:'"Critical lab result returned — testosterone panel flagged outside normal range. Please review before closing chart."', time:'28 min ago' },
   { type:'chart',   initials:'KP', bg:'#059669', sender:'Kim Patel, NP',           patient:'D.R. \u00b7 C-20260601-022',     url:'/provider/chart/1?product=awv', dept:'\u2192 Physician (MD)', preview:'"AWV patient presenting with new chest tightness complaint — outside my scope, needs MD review today."', time:'41 min ago' }
 ];
@@ -280,7 +280,7 @@ function closeUrgentPanel() {
 </script>
 
   <!-- Urgent Messages Panel (URG-MSG-001) -->
-  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:1100;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
     <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
       <span style="font-size:16px;">🚨</span>
       <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
@@ -293,6 +293,6 @@ function closeUrgentPanel() {
     </div>
     <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
   </div>
-  <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+  <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:1099;"></div>
 
 {% endblock %}

@@ -88,6 +88,9 @@ tbody tr:last-child td { border-bottom:none; }
 .btn-phone { background:#fff; color:#374151; border:1px solid var(--border); }
 .btn-phone:hover { border-color:var(--teal); }
 .btn-phone .ico { background:#F3F4F6; }
+.btn-portal { background:#6B21A8; color:#fff; }
+.btn-portal:hover { background:#5B1898; }
+.btn-portal .ico { background:rgba(255,255,255,0.2); }
 
 .panel-field label { display:block; font-size:11px; font-weight:700; color:#6B7280; margin-bottom:4px; }
 .panel-field { margin-bottom:10px; }
@@ -334,6 +337,76 @@ tbody tr:last-child td { border-bottom:none; }
       </div>
     </div>
 
+    <!-- Clinical Follow-Up -->
+    <div class="section">
+      <div class="sec-header">
+        <div class="sec-title">Clinical Follow-Up</div>
+        <span class="sec-badge" style="background:#EDE9FE;color:#6B21A8;">Read-only · Clinical view</span>
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;margin-bottom:12px;padding:0 18px;">&#128274; Clinical data is read-only in DOH reporting view. To take clinical action, open the patient chart.</div>
+
+      <!-- Active Consult -->
+      <div style="padding:0 18px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Active Consultation</div>
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:#111827;margin-bottom:2px;">CST-2026-10849 — STI/Gonorrhea Async Consult</div>
+            <div style="font-size:11px;color:#6B7280;margin-bottom:6px;">Submitted Jun 10, 2026 · Dr. Sarah Lee, MD · Status: <span style="color:#D97706;font-weight:600;">Awaiting Provider Response</span></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span style="font-size:10px;font-weight:600;background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 7px;">SLA: 1h 24m remaining</span>
+              <span style="font-size:10px;font-weight:600;background:#DBEAFE;color:#1D4ED8;border-radius:4px;padding:2px 7px;">Async</span>
+            </div>
+          </div>
+          <a href="/provider/chart?type=async" style="font-size:11px;font-weight:600;color:#6B21A8;text-decoration:none;white-space:nowrap;">Open Chart ↗</a>
+        </div>
+      </div>
+
+      <!-- Treatment -->
+      <div style="padding:0 18px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Treatment</div>
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="background:#F3F4F6;"><th style="padding:7px 12px;text-align:left;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;">Medication</th><th style="padding:7px 12px;text-align:left;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;">Dose</th><th style="padding:7px 12px;text-align:left;font-size:10px;font-weight:600;color:#6B7280;text-transform:uppercase;">Status</th></tr></thead>
+            <tbody>
+              <tr style="border-top:1px solid #F3F4F6;"><td style="padding:8px 12px;font-weight:600;color:#111827;">Ceftriaxone</td><td style="padding:8px 12px;color:#374151;">500mg IM · Single dose</td><td style="padding:8px 12px;"><span style="background:#D1FAE5;color:#065F46;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;">Prescribed</span></td></tr>
+              <tr style="border-top:1px solid #F3F4F6;"><td style="padding:8px 12px;font-weight:600;color:#111827;">Doxycycline</td><td style="padding:8px 12px;color:#374151;">100mg BID · 7 days</td><td style="padding:8px 12px;"><span style="background:#D1FAE5;color:#065F46;border-radius:4px;padding:1px 7px;font-size:10px;font-weight:700;">Prescribed</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Reported Symptoms -->
+      <div style="padding:0 18px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Reported Symptoms</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;background:#FEF2F2;color:#991B1B;border-radius:4px;padding:3px 9px;">Urethral discharge</span>
+          <span style="font-size:11px;font-weight:600;background:#FEF2F2;color:#991B1B;border-radius:4px;padding:3px 9px;">Dysuria</span>
+          <span style="font-size:11px;font-weight:600;background:#FEF3C7;color:#92400E;border-radius:4px;padding:3px 9px;">Mild pelvic discomfort</span>
+        </div>
+      </div>
+
+      <!-- Referral Status -->
+      <div style="padding:0 18px 14px;">
+        <div style="font-size:11px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Referral Status</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#111827;">Partner Notification — FL DOH</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px;">DIS referral submitted · Jun 10, 2026</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;border-radius:4px;padding:2px 8px;">Pending DIS</span>
+          </div>
+          <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#111827;">Test-of-Cure Follow-Up</div>
+              <div style="font-size:11px;color:#6B7280;margin-top:2px;">Recommended in 7 days · Patient notified</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;background:#DBEAFE;color:#1D4ED8;border-radius:4px;padding:2px 8px;">Scheduled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Submission history -->
     <div class="section">
       <div class="sec-header">
@@ -442,6 +515,10 @@ tbody tr:last-child td { border-bottom:none; }
       <button class="action-btn btn-phone" onclick="openModal('phone')">
         <div class="ico">&#9990;</div>
         <div><div>Log Phone Report</div><div style="font-size:11px;opacity:0.8;font-weight:400;">Manual verbal submission</div></div>
+      </button>
+      <button class="action-btn btn-portal" onclick="openModal('portal')">
+        <div class="ico">&#127760;</div>
+        <div><div>Submit via State Portal</div><div style="font-size:11px;opacity:0.8;font-weight:400;display:flex;align-items:center;gap:4px;">FL MERLIN Portal <a href="https://merlin.doh.state.fl.us" target="_blank" onclick="event.stopPropagation()" style="color:rgba(255,255,255,0.75);font-size:10px;text-decoration:underline;">Open Portal ↗</a></div></div>
       </button>
     </div>
 
@@ -602,6 +679,10 @@ function openModal(method) {
     title.textContent = 'Submit via Email';
     destLine.innerHTML = '&#9993; Sending to: merlin@flhealth.gov';
     fieldPhone.style.display = 'none';
+  } else if (method === 'portal') {
+    title.textContent = 'Log Portal Submission';
+    destLine.innerHTML = '&#127760; FL MERLIN Portal — <a href="https://merlin.doh.state.fl.us" target="_blank" style="color:var(--teal);">merlin.doh.state.fl.us ↗</a>';
+    fieldPhone.style.display = 'none';
   } else {
     title.textContent = 'Log Phone Submission';
     destLine.innerHTML = '&#9990; Phone — (305) 555-0811';
@@ -622,8 +703,8 @@ function confirmSubmit() {
   var now = new Date();
   var ts = now.toLocaleString('en-US', {month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit'});
   var dateShort = now.toLocaleString('en-US', {month:'short', day:'numeric', hour:'numeric', minute:'2-digit'});
-  var methods = {fax:'Fax · (305) 555-0182', email:'Email · merlin@flhealth.gov', phone:'Phone · Verbal'};
-  var icons   = {fax:'&#128231;', email:'&#9993;', phone:'&#9990;'};
+  var methods = {fax:'Fax · (305) 555-0182', email:'Email · merlin@flhealth.gov', phone:'Phone · Verbal', portal:'Portal · FL MERLIN'};
+  var icons   = {fax:'&#128231;', email:'&#9993;', phone:'&#9990;', portal:'&#127760;'};
   var confirm = document.getElementById('confirmNum').value || '—';
   var notes   = document.getElementById('modalNotes').value || '';
 
@@ -638,7 +719,9 @@ function confirmSubmit() {
     email: { ico: '✉️', cls: 'ico-msg',   title: 'Email Submitted — FL Dept. of Health',
               sub: 'Report sent to merlin@flhealth.gov' + (confirm !== '—' ? ' · Confirmation: ' + confirm : '') + (notes ? ' · ' + notes : '') },
     phone: { ico: '📞', cls: 'ico-call',  title: 'Phone Report Logged',
-              sub: (document.getElementById('phoneContact').value ? 'Spoke with: ' + document.getElementById('phoneContact').value + ' · ' : '') + 'Verbal submission · FL Dept. of Health' + (notes ? ' · ' + notes : '') }
+              sub: (document.getElementById('phoneContact').value ? 'Spoke with: ' + document.getElementById('phoneContact').value + ' · ' : '') + 'Verbal submission · FL Dept. of Health' + (notes ? ' · ' + notes : '') },
+    portal:{ ico: '🌐', cls: 'ico-msg',  title: 'Portal Submission Logged — FL MERLIN',
+              sub: 'Submitted via FL MERLIN state portal · merlin.doh.state.fl.us' + (confirm !== '—' ? ' · Confirmation: ' + confirm : '') + (notes ? ' · ' + notes : '') }
   }[currentMethod];
 
   var chip = '<span class="tl-status-chip chip-done">✓ SUBMITTED</span>';
