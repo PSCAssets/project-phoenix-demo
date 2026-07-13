@@ -96,31 +96,31 @@ tbody tr:hover { background:#F0FDFA; }
       <div class="stat-val" style="color:#DC2626;">3</div>
       <div class="stat-sub">require immediate action</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/provider/doh/queue'">
       <div class="bar" style="background:var(--amber);"></div>
       <div class="stat-label">Open Reports</div>
       <div class="stat-val" style="color:var(--amber);">47</div>
       <div class="stat-sub">across 18 states</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/provider/doh/queue?status=overdue'">
       <div class="bar" style="background:var(--red);"></div>
       <div class="stat-label">Overdue</div>
       <div class="stat-val" style="color:var(--red);">6</div>
       <div class="stat-sub">&gt; 24h SLA</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/provider/doh/queue?status=in_progress'">
       <div class="bar" style="background:#1D4ED8;"></div>
       <div class="stat-label">In Progress</div>
       <div class="stat-val" style="color:#1D4ED8;">14</div>
       <div class="stat-sub">being worked</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/provider/doh/history?period=today'">
       <div class="bar" style="background:var(--green);"></div>
       <div class="stat-label">Submitted Today</div>
       <div class="stat-val" style="color:var(--green);">11</div>
       <div class="stat-sub">via fax &amp; email</div>
     </div>
-    <div class="stat-card">
+    <div class="stat-card" style="cursor:pointer;" onclick="window.location='/provider/doh/history?period=week'">
       <div class="bar" style="background:var(--teal);"></div>
       <div class="stat-label">This Week</div>
       <div class="stat-val" style="color:var(--teal);">58</div>
