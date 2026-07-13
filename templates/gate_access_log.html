@@ -145,6 +145,49 @@
       font-size: 14px; color: #9CA3AF; font-style: italic;
     }
 
+    /* ── Session summary bar table ── */
+    .summary-grid {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .summary-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 16px; border-bottom: 1px solid #F3F4F6;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row:hover { background: #FAFAF8; }
+    .summary-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #EDE9FE; color: #6B21A8;
+      font-size: 10px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .summary-name { font-size: 13px; font-weight: 600; width: 180px; flex-shrink: 0; color: #111827; }
+    .bar-wrap { flex: 1; background: #F3F4F6; border-radius: 4px; height: 10px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; background: #7C3AED; transition: width 0.3s; }
+    .summary-count { font-size: 12px; font-weight: 700; color: #6B21A8; min-width: 28px; text-align: right; }
+
+    /* ── Filter / sort controls ── */
+    .table-controls {
+      padding: 12px 16px; border-bottom: 1.5px solid #E5E7EB;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .filter-input {
+      flex: 1; padding: 7px 12px; border: 1.5px solid #E5E0D8; border-radius: 8px;
+      font-size: 13px; color: #111827; background: #fff; outline: none;
+      font-family: inherit;
+    }
+    .filter-input:focus { border-color: #7C3AED; }
+    .filter-clear {
+      font-size: 12px; color: #9CA3AF; cursor: pointer; background: none;
+      border: none; font-family: inherit; padding: 0 4px;
+    }
+    .filter-clear:hover { color: #374151; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: #6B21A8; }
+    th.sort-asc::after  { content: ' ↑'; color: #6B21A8; }
+    th.sort-desc::after { content: ' ↓'; color: #6B21A8; }
+
     .back-link {
       display: inline-flex; align-items: center; gap: 6px;
       font-size: 13px; color: #6B21A8; font-weight: 600;
@@ -211,23 +254,50 @@
     </div>
   </div>
 
+  <!-- Session Summary -->
+  <div class="section-label">Session Summary</div>
+  <div class="data-card">
+    {% if users %}
+    {% set max_sessions = users | map(attribute='total_sessions') | max %}
+    <div class="summary-grid">
+      {% for u in users | sort(attribute='total_sessions', reverse=True) %}
+      {% set initials = (u.name.split()[0][0] + u.name.split()[-1][0]) | upper if u.name.split()|length > 1 else u.name[:2]|upper %}
+      <div class="summary-row">
+        <div class="summary-avatar">{{ initials }}</div>
+        <div class="summary-name">{{ u.name.split()[0] }} {{ u.name.split()[-1] if u.name.split()|length > 1 else '' }}</div>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:{{ (u.total_sessions / max_sessions * 100) | round | int }}%"></div>
+        </div>
+        <div class="summary-count">{{ u.total_sessions }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">No users have signed in yet.</div>
+    {% endif %}
+  </div>
+
   <!-- Per-user breakdown -->
   <div class="section-label">Users ({{ unique_users }} total)</div>
   <div class="data-card">
     {% if users %}
-    <table>
+    <div class="table-controls">
+      <input class="filter-input" id="userFilter" type="text" placeholder="Filter by name or email…" oninput="filterUsers()" />
+      <button class="filter-clear" onclick="clearFilter()">✕ Clear</button>
+    </div>
+    <table id="usersTable">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th style="text-align:center;">Sessions</th>
-          <th>First Visit</th>
-          <th>Last Visit</th>
+          <th class="sortable" onclick="sortUsers('name', this)">Name</th>
+          <th class="sortable" onclick="sortUsers('email', this)">Email</th>
+          <th class="sortable" style="text-align:center;" onclick="sortUsers('sessions', this)">Sessions</th>
+          <th class="sortable" onclick="sortUsers('first', this)">First Visit</th>
+          <th class="sortable" onclick="sortUsers('last', this)">Last Visit</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="usersBody">
         {% for u in users %}
-        <tr>
+        <tr data-name="{{ u.name | lower }}" data-email="{{ u.email | lower }}" data-sessions="{{ u.total_sessions }}" data-first="{{ u.first_seen }}" data-last="{{ u.last_seen }}">
           <td>
             <div class="name-cell">
               <div class="avatar">{{ (u.name.split()[0][0] + u.name.split()[-1][0]) | upper if u.name.split()|length > 1 else u.name[:2]|upper }}</div>
@@ -286,5 +356,52 @@
   </div>
 
 </div>
+
+<script>
+  let sortCol = null, sortDir = 1;
+
+  function filterUsers() {
+    const q = document.getElementById('userFilter').value.toLowerCase();
+    document.querySelectorAll('#usersBody tr').forEach(row => {
+      const match = row.dataset.name.includes(q) || row.dataset.email.includes(q);
+      row.style.display = match ? '' : 'none';
+    });
+  }
+
+  function clearFilter() {
+    document.getElementById('userFilter').value = '';
+    filterUsers();
+  }
+
+  function sortUsers(col, th) {
+    const body = document.getElementById('usersBody');
+    const rows = Array.from(body.querySelectorAll('tr'));
+
+    // Toggle direction if same column
+    if (sortCol === col) { sortDir *= -1; } else { sortDir = 1; }
+    sortCol = col;
+
+    // Update header indicators
+    document.querySelectorAll('#usersTable th').forEach(h => {
+      h.classList.remove('sort-asc', 'sort-desc');
+    });
+    th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+
+    rows.sort((a, b) => {
+      let av, bv;
+      if (col === 'sessions') {
+        av = parseInt(a.dataset.sessions); bv = parseInt(b.dataset.sessions);
+      } else if (col === 'name')  { av = a.dataset.name;  bv = b.dataset.name; }
+      else if (col === 'email')   { av = a.dataset.email; bv = b.dataset.email; }
+      else if (col === 'first')   { av = a.dataset.first; bv = b.dataset.first; }
+      else if (col === 'last')    { av = a.dataset.last;  bv = b.dataset.last; }
+      if (av < bv) return -1 * sortDir;
+      if (av > bv) return  1 * sortDir;
+      return 0;
+    });
+
+    rows.forEach(r => body.appendChild(r));
+  }
+</script>
 </body>
 </html>
