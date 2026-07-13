@@ -206,7 +206,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
     <div class="stats-strip">
       <div class="stat-card asap">
         <div class="stat-num" id="statAsap">2</div>
-        <div class="stat-label">ASAP Consults</div>
+        <div class="stat-label">On Demand Consults</div>
       </div>
       <div class="stat-card gc">
         <div class="stat-num" id="statMine">3</div>
@@ -263,7 +263,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
           </tr>
         </thead>
         <tbody>
-          <!-- ASAP rows first -->
+          <!-- On Demand rows first -->
           <tr class="asap-row" data-state="NY" data-stype="Results Delivery 45">
             <td>M.R. · 52F</td>
             <td>Galleri Multi-Cancer</td>
@@ -271,8 +271,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td><span class="badge-state">NY</span></td>
             <td>Grail / Elevance</td>
             <td><span class="wait-warn">47 min</span></td>
-            <td>ASAP</td>
-            <td><span class="badge badge-asap">ASAP</span></td>
+            <td>On Demand</td>
+            <td><span class="badge badge-asap">On Demand</span></td>
             <td class="actions-cell">
               <button class="take-btn" onclick="gcTake(this)">Take</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 1)">Route</button>
@@ -286,8 +286,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td><span class="badge-state">NJ</span></td>
             <td>Quest Diagnostics</td>
             <td><span class="wait-warn">22 min</span></td>
-            <td>ASAP</td>
-            <td><span class="badge badge-asap">ASAP</span></td>
+            <td>On Demand</td>
+            <td><span class="badge badge-asap">On Demand</span></td>
             <td class="actions-cell">
               <button class="take-btn" onclick="gcTake(this)">Take</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 2)">Route</button>
@@ -301,8 +301,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td><span class="badge-state">NJ</span></td>
             <td>Invitae / Eli Lilly</td>
             <td><span class="wait-warn">1h 30m</span></td>
-            <td>ASAP</td>
-            <td><span class="badge badge-asap">ASAP</span></td>
+            <td>On Demand</td>
+            <td><span class="badge badge-asap">On Demand</span></td>
             <td class="actions-cell">
               <button class="take-btn" onclick="gcTake(this)">Take</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 3)">Route</button>
@@ -316,8 +316,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
             <td><span class="badge-state">NY</span></td>
             <td>Color Genomics</td>
             <td><span class="wait-warn">15m</span></td>
-            <td>ASAP</td>
-            <td><span class="badge badge-asap">ASAP</span></td>
+            <td>On Demand</td>
+            <td><span class="badge badge-asap">On Demand</span></td>
             <td class="actions-cell">
               <button class="take-btn" onclick="gcTake(this)">Take</button>
               <button class="route-btn" onclick="gcToggleRoute(this.closest('tr'), 4)">Route</button>
@@ -506,7 +506,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-s
       <button class="modal-close" onclick="closeModal('availModal')">×</button>
     </div>
     <div class="modal-body">
-      <div class="info-box">Set your available hours per state. GCA uses this to schedule ASAP and scheduled consults. Hours logged here flow to the <strong>GC Billing Report</strong> for hourly tracking.</div>
+      <div class="info-box">Set your available hours per state. GCA uses this to schedule On Demand and Scheduled consults. Hours logged here flow to the <strong>GC Billing Report</strong> for hourly tracking.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div class="form-group"><label class="form-label">Monday</label><select class="form-select"><option>Available 9am–5pm</option><option>Available 12pm–6pm</option><option>Unavailable</option></select></div>
         <div class="form-group"><label class="form-label">Tuesday</label><select class="form-select"><option>Available 9am–5pm</option><option>Available 12pm–6pm</option><option>Unavailable</option></select></div>
