@@ -259,7 +259,7 @@
       <div class="topbar-sub">Thursday, May 28, 2026 &nbsp;·&nbsp; 10:26 AM CST</div>
     </div>
     <div class="topbar-right">
-      <button onclick="document.getElementById('gcSchedPanel').style.display=document.getElementById('gcSchedPanel').style.display==='none'?'block':'none'" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Schedule New</button>
+      <button onclick="document.getElementById(\'\1\').style.display=document.getElementById(\'\1\').style.display==='none'?'block':'none'" style="background:#6B21A8;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;">+ Schedule New</button>
       <div class="notif-bell" onclick="alert('Notification inbox — 5 unread alerts')" title="Notifications">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
@@ -375,7 +375,7 @@
               </tr>
             </thead>
             <tbody id="consultTbody">
-              <tr data-program="BRCA Counseling" data-type="async" data-wait-sec="7200" data-status="Approaching" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
+              <tr data-program="BRCA Counseling" data-type="async" data-wait-sec="7200" data-status="Approaching" onclick="window.location.href=\'\2\'" style="cursor:pointer">
                 <td><div class="pri-dot p2" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Jennifer Walsh</div><div class="cr-id">BRCA Counseling</div></td>
                 <td><span class="cr-program">BRCA Counseling</span></td>
@@ -384,7 +384,7 @@
                 <td><span class="cr-status pending">Approaching</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/gc/chart/1'">Open</button></td>
               </tr>
-              <tr data-program="Hereditary Cancer Panel" data-type="video" data-wait-sec="14400" data-status="On Track" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
+              <tr data-program="Hereditary Cancer Panel" data-type="video" data-wait-sec="14400" data-status="On Track" onclick="window.location.href=\'\2\'" style="cursor:pointer">
                 <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Robert Kim</div><div class="cr-id">Hereditary Cancer Panel</div></td>
                 <td><span class="cr-program">Hereditary Cancer Panel</span></td>
@@ -393,7 +393,7 @@
                 <td><span class="cr-status in-progress">On Track</span></td>
                 <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/gc/chart/1'">Open</button></td>
               </tr>
-              <tr data-program="Carrier Screening" data-type="async" data-wait-sec="21600" data-status="On Track" onclick="window.location.href='/provider/gc/chart/1'" style="cursor:pointer">
+              <tr data-program="Carrier Screening" data-type="async" data-wait-sec="21600" data-status="On Track" onclick="window.location.href=\'\2\'" style="cursor:pointer">
                 <td><div class="pri-dot p3" style="margin:0 auto"></div></td>
                 <td><div class="cr-patient">Angela Torres</div><div class="cr-id">Carrier Screening</div></td>
                 <td><span class="cr-program">Carrier Screening</span></td>
@@ -746,11 +746,11 @@ function tickTimers() {
   warnSecs = Math.max(0, warnSecs - 1);
   const bm = Math.floor(breachSecs/60), bs = breachSecs%60;
   const wm = Math.floor(warnSecs/60),   ws = warnSecs%60;
-  document.getElementById('slaTimer1').textContent = `+${pad(bm)}:${pad(bs)}`;
-  document.getElementById('slaTimer2').textContent = `${pad(wm)}:${pad(ws)}`;
+  document.BADREF.textContent = `+${pad(bm)}:${pad(bs)}`;
+  document.BADREF.textContent = `${pad(wm)}:${pad(ws)}`;
   if (warnSecs === 0) {
-    document.getElementById('slaTimer2').classList.remove('warn');
-    document.getElementById('slaTimer2').classList.add('breach');
+    document.BADREF.classList.remove('warn');
+    document.BADREF.classList.add('breach');
   }
 }
 setInterval(tickTimers, 1000);
@@ -761,7 +761,7 @@ const allData = [{ day:'Jan', val:52 },{ day:'Feb', val:48 },{ day:'Mar', val:61
 
 function renderChart(data) {
   const max = Math.max(...data.map(d=>d.val), 1);
-  const bars = document.getElementById('chartBars');
+  const bars = document.BADREF;
   bars.innerHTML = data.map(d => {
     const h = Math.round((d.val / max) * 86);
     return `<div class="chart-bar-wrap"><div class="chart-bar-val">${d.val || ''}</div><div class="chart-bar${d.today?' today':''}" style="height:${h}px" title="${d.day}: ${d.val} consults${d.today?' (in progress)':''}"></div><div class="chart-bar-label">${d.day}</div></div>`;
@@ -769,30 +769,30 @@ function renderChart(data) {
 }
 
 function setChartFilter(btn, key) {
-  document.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+  document.BADREF.forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderChart({ week: weekData, month: monthData, all: allData }[key]);
 }
 renderChart(weekData);
 
 function filterConsults(program) {
-  const tbody = document.getElementById('consultTbody');
-  const rows = tbody.querySelectorAll('tr');
+  const tbody = document.BADREF;
+  const rows = tbody.BADREF;
   let visible = 0;
   rows.forEach(row => {
     const rowProgram = row.getAttribute('data-program');
     if (program === 'all' || rowProgram === program) { row.classList.remove('consult-hidden'); visible++; }
     else { row.classList.add('consult-hidden'); }
   });
-  document.getElementById('consultCount').textContent = visible;
+  document.BADREF.textContent = visible;
 }
 
 function filterConsultsByType(type, btn) {
-  document.querySelectorAll('.ct-filter-btn').forEach(b => {
+  document.BADREF.forEach(b => {
     b.style.background = '#fff'; b.style.color = '#374151'; b.style.borderColor = '#E5E0D8';
   });
   btn.style.background = '#6B21A8'; btn.style.color = '#fff'; btn.style.borderColor = '#6B21A8';
-  document.querySelectorAll('#consultTbody tr[data-type]').forEach(row => {
+  document.BADREF.forEach(row => {
     row.style.display = (type === 'all' || row.dataset.type === type) ? '' : 'none';
   });
 }
@@ -811,18 +811,18 @@ function getSortValue(row, col) {
     default:         return '';
   }
 }
-document.querySelectorAll('th.sortable').forEach(th => {
+document.BADREF.forEach(th => {
   th.addEventListener('click', function() {
     const col = this.getAttribute('data-col');
     const tableId = this.getAttribute('data-table');
     const table = document.getElementById(tableId);
-    const tbody = table.querySelector('tbody');
+    const tbody = table.BADREF;
     const key = tableId + '_' + col;
     const dir = sortState[key] === 'asc' ? 'desc' : 'asc';
     sortState[key] = dir;
-    table.querySelectorAll('th.sortable').forEach(h => h.classList.remove('sort-asc','sort-desc'));
+    table.BADREF.forEach(h => h.classList.remove('sort-asc','sort-desc'));
     this.classList.add(dir === 'asc' ? 'sort-asc' : 'sort-desc');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const rows = Array.from(tbody.BADREF);
     rows.sort((a, b) => {
       const av = getSortValue(a, col), bv = getSortValue(b, col);
       if (typeof av === 'number' && typeof bv === 'number') return dir === 'asc' ? av - bv : bv - av;
@@ -843,7 +843,7 @@ function openPreConsult(patient, cstId, type, product, mode, time, dur) {
 }
 
 function showPCStep(step) {
-  var existing = document.getElementById('pcOverlay');
+  var existing = document.BADREF;
   if (existing) existing.remove();
 
   var overlay = document.createElement('div');
@@ -893,7 +893,7 @@ function showPCStep(step) {
 
   var footerBtns = '';
   if (step===1) {
-    footerBtns = '<button onclick="document.getElementById('pcOverlay').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    footerBtns = '<button onclick="document.getElementById(\'\1\').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
       + '<button onclick="validateChecklist()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Next: Review</button>';
   } else if (step===2) {
     footerBtns = '<button onclick="showPCStep(1)" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Back</button>'
@@ -916,10 +916,10 @@ function showPCStep(step) {
 }
 
 function validateChecklist() {
-  var all = document.querySelectorAll('#pcOverlay input[type=checkbox]');
+  var all = document.BADREF;
   var unchecked = Array.from(all).filter(function(cb){ return !cb.checked; });
   if (unchecked.length > 0) {
-    var lbl = unchecked[0].closest('label');
+    var lbl = unchecked[0].BADREF;
     lbl.style.border = '1.5px solid #DC2626';
     lbl.style.background = '#FEF2F2';
     setTimeout(function(){ lbl.style.border=''; lbl.style.background=''; }, 2000);
@@ -929,14 +929,14 @@ function validateChecklist() {
 }
 
 function launchSession() {
-  document.getElementById('pcOverlay').remove();
+  document.BADREF.remove();
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:inherit;';
   t.innerHTML = '<div style="width:80px;height:80px;border-radius:50%;background:#6B21A8;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:36px;">&#128249;</div>'
     + '<div style="font-size:22px;font-weight:700;margin-bottom:8px;">Session Starting...</div>'
     + '<div style="font-size:14px;color:#9CA3AF;margin-bottom:32px;">Connecting to '+_pcData.patient+'</div>'
     + '<div style="font-size:13px;color:#6B7280;background:#2a2a4e;padding:12px 24px;border-radius:8px;margin-bottom:24px;">Chart note auto-created - Timer started - '+_pcData.cstId+'</div>'
-    + '<button onclick="this.closest('div').remove()" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;">Exit Demo Session</button>';
+    + '<button onclick="this.closest(\'div\').remove()" style="background:#6B21A8;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;">Exit Demo Session</button>';
   document.body.appendChild(t);
 }
 
@@ -954,14 +954,14 @@ function sendPrepMaterials(patient, product) {
     + '<textarea rows="2" placeholder="Add a personal note to the patient..." style="width:100%;padding:7px 10px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:12px;resize:none;box-sizing:border-box;"></textarea></div>'
     + '</div>'
     + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
-    + '<button onclick="this.closest('div[style]').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
-    + '<button onclick="confirmSendPrep(this,''+patient+'')" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Send Now</button>'
+    + '<button onclick="this.closest(\'\1\').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="confirmSendPrep(this,\'+patient+\')" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Send Now</button>'
     + '</div></div>';
   document.body.appendChild(overlay);
 }
 
 function confirmSendPrep(btn, patient) {
-  btn.closest('div[style]').remove();
+  btn.BADREF.remove();
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);';
   t.textContent = 'Prep materials sent to '+patient+'. Patient notified via email and portal.';
@@ -979,7 +979,7 @@ function openResultsDisclosure(patient, cstId, product, finding, mode, time, dur
     + '<div style="padding:16px 20px 12px;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;justify-content:space-between;">'
     + '<div><div style="font-size:14px;font-weight:700;color:#111827;">Results Disclosure Session</div>'
     + '<div style="font-size:12px;color:#6B7280;margin-top:2px;">'+cstId+' · '+mode+' · '+time+' · '+dur+' min</div></div>'
-    + '<button onclick="this.closest('div[style]').remove()" style="background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;line-height:1;">×</button></div>'
+    + '<button onclick="this.closest(\'\1\').remove()" style="background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;line-height:1;">×</button></div>'
     + '<div style="padding:16px 20px;">'
     + '<div style="padding:12px 14px;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;margin-bottom:14px;font-size:13px;display:flex;gap:10px;align-items:flex-start;">'
     + '<span style="font-size:16px;flex-shrink:0;">⚠</span>'
@@ -991,16 +991,16 @@ function openResultsDisclosure(patient, cstId, product, finding, mode, time, dur
       }).join('')
     + '</div>'
     + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:space-between;gap:8px;">'
-    + '<button onclick="this.closest('div[style]').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
+    + '<button onclick="this.closest(\'\1\').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Cancel</button>'
     + '<div style="display:flex;gap:8px;">'
-    + '<button onclick="window.location.href='/provider/gc/chart/1'" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;">Open Chart →</button>'
+    + '<button onclick="window.location.href=\'\1\'" style="background:#fff;border:1px solid #E5E0D8;color:#374151;border-radius:7px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;">Open Chart →</button>'
     + '<button onclick="startDisclosureSession(this)" style="background:#059669;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Start Disclosure Session</button>'
     + '</div></div></div>';
   document.body.appendChild(overlay);
 }
 
 function startDisclosureSession(btn) {
-  btn.closest('div[style]').remove();
+  btn.BADREF.remove();
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);max-width:360px;';
   t.textContent = 'Results disclosure session started — Timer running. Chart note will be auto-created on close.';
@@ -1035,14 +1035,14 @@ function submitGeneDxOrder(btn) {
       }).join('')
     + '</div>'
     + '<div style="padding:12px 20px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">'
-    + '<button onclick="this.closest('div[style]').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>'
-    + '<button onclick="signOrder(this,''+orderId+'')" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Submit →</button>'
+    + '<button onclick="this.closest(\'\1\').remove()" style="background:#F3F4F6;color:#374151;border:none;border-radius:7px;padding:8px 16px;font-size:12px;font-weight:600;cursor:pointer;">Close</button>'
+    + '<button onclick="signOrder(this,\''+orderId+'\')" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 20px;font-size:12px;font-weight:600;cursor:pointer;">Sign &amp; Submit →</button>'
     + '</div></div>';
   document.body.appendChild(overlay);
 }
 
 function signOrder(btn, orderId) {
-  btn.closest('div[style]').remove();
+  btn.BADREF.remove();
   var t = document.createElement('div');
   t.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#059669;color:#fff;padding:12px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.18);';
   t.textContent = 'Order '+orderId+' signed and submitted to GeneDx. Patient notified.';
@@ -1051,12 +1051,12 @@ function signOrder(btn, orderId) {
 }
 
 var URGENT_MSGS = [
-  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they\'re asking about the results and I don\'t have authority to discuss."', time:'12 min ago' },
+  { type:'message', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they\'re asking about the results and I don\'t have authority to discuss."', time:'12 min ago' },
   { type:'chart',   initials:'PS', bg:'#0891B2', sender:'Priya Sharma, GCA',      patient:'A.M. \u00b7 CST-2026-10901', url:'/provider/gc/chart/1', preview:'"BRCA1 pathogenic result returned — results disclosure counseling not yet completed. Please review before closing chart."', time:'28 min ago' },
   { type:'chart',   initials:'KP', bg:'#059669', sender:'Kim Patel, NP',           patient:'D.R. \u00b7 C-20260601-022',     url:'/provider/chart/1?product=awv', dept:'\u2192 Physician (MD)', preview:'"AWV patient presenting with new chest tightness complaint — outside my scope, needs MD review today."', time:'41 min ago' }
 ];
 function openUrgentPanel() {
-  var body = document.getElementById('urgPanelBody');
+  var body = document.BADREF;
   if (!body) return;
   body.innerHTML = URGENT_MSGS.map(function(m) {
     var patChip = m.patient ? '<a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;text-decoration:none;font-weight:600;">\ud83d\udccb '+m.patient+'</a>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
@@ -1064,12 +1064,12 @@ function openUrgentPanel() {
     var actionLabel = m.type==='chart' ? '\u2192 Open Chart' : '\u2192 Open Message';
     return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+deptChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
   }).join('');
-  document.getElementById('urgentPanel').style.display = 'flex';
-  document.getElementById('urgOverlay').style.display = 'block';
+  document.BADREF.style.display = 'flex';
+  document.BADREF.style.display = 'block';
 }
 function closeUrgentPanel() {
-  document.getElementById('urgentPanel').style.display = 'none';
-  document.getElementById('urgOverlay').style.display = 'none';
+  document.BADREF.style.display = 'none';
+  document.BADREF.style.display = 'none';
 }
 </script>
 {% endraw %}
