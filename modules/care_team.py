@@ -34,6 +34,10 @@ def psr_dxs_call(consult_id):
 def queue():
     return render_template("care_team/queue.html")
 
+@bp.route("/task/<task_id>")
+def ct_task_detail(task_id):
+    return render_template("care_team/ct_task_detail.html", task_id=task_id)
+
 @bp.route("/gaps")
 def gaps_dashboard():
     return render_template("care_team/gaps_under_construction.html")

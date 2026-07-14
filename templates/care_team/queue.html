@@ -181,7 +181,7 @@
         <tbody id="queueBody">
 
           <!-- Manual tasks -->
-          <tr data-urgency="CRITICAL" data-category="Follow-up" data-source="manual">
+          <tr data-urgency="CRITICAL" data-category="Follow-up" data-source="manual" data-task="T001">
             <td><span class="pri-dot pri-critical"></span></td>
             <td><span class="patient-name">J.P.</span></td>
             <td><span class="consult-id">CST-2026-10848</span></td>
@@ -191,13 +191,13 @@
             <td><span class="urgency-tag urg-critical">CRITICAL</span></td>
             <td>52m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T001')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T001')">View</button>
             </td>
           </tr>
 
-          <tr data-urgency="HIGH" data-category="Care Coord" data-source="manual">
+          <tr data-urgency="HIGH" data-category="Care Coord" data-source="manual" data-task="T002">
             <td><span class="pri-dot pri-high"></span></td>
             <td><span class="patient-name">D.K.</span></td>
             <td><span class="consult-id">CST-2026-10850</span></td>
@@ -207,14 +207,14 @@
             <td><span class="urgency-tag urg-high">HIGH</span></td>
             <td>44m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T002')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T002')">View</button>
             </td>
           </tr>
 
           <!-- Auto-generated: Unable to Reach -->
-          <tr class="auto-row" data-urgency="CRITICAL" data-category="Auto-Generated" data-source="auto">
+          <tr class="auto-row" data-urgency="CRITICAL" data-category="Auto-Generated" data-source="auto" data-task="T003">
             <td><span class="pri-dot pri-critical"></span></td>
             <td><span class="patient-name">R.M.</span></td>
             <td><span class="consult-id">CST-2026-10862</span></td>
@@ -224,14 +224,14 @@
             <td><span class="urgency-tag urg-critical">CRITICAL</span></td>
             <td>18m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T003')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T003')">View</button>
             </td>
           </tr>
 
           <!-- Auto-generated: Untreated Rx -->
-          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto">
+          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto" data-task="T004">
             <td><span class="pri-dot pri-high"></span></td>
             <td><span class="patient-name">K.S.</span></td>
             <td><span class="consult-id">CST-2026-10857</span></td>
@@ -241,14 +241,14 @@
             <td><span class="urgency-tag urg-high">HIGH</span></td>
             <td>2h 14m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T004')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T004')">View</button>
             </td>
           </tr>
 
           <!-- Auto-generated: Reassignment Needed -->
-          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto">
+          <tr class="auto-row" data-urgency="HIGH" data-category="Auto-Generated" data-source="auto" data-task="T005">
             <td><span class="pri-dot pri-high"></span></td>
             <td><span class="patient-name">B.T.</span></td>
             <td><span class="consult-id">CST-2026-10851</span></td>
@@ -258,14 +258,14 @@
             <td><span class="urgency-tag urg-high">HIGH</span></td>
             <td>47m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T005')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T005')">View</button>
             </td>
           </tr>
 
           <!-- Auto-generated: Post-Consult Follow-up -->
-          <tr class="auto-row" data-urgency="NORMAL" data-category="Auto-Generated" data-source="auto">
+          <tr class="auto-row" data-urgency="NORMAL" data-category="Auto-Generated" data-source="auto" data-task="T006">
             <td><span class="pri-dot pri-normal"></span></td>
             <td><span class="patient-name">L.H.</span></td>
             <td><span class="consult-id">CST-2026-10849</span></td>
@@ -275,9 +275,9 @@
             <td><span class="urgency-tag urg-normal">NORMAL</span></td>
             <td>1h 30m</td>
             <td>
-              <button class="action-btn green-btn" onclick="takeTask(this)">Take</button>
+              <button class="action-btn green-btn" onclick="takeTask(this,'T006')">Take</button>
               <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
-              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>
+              <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="viewTask('T006')">View</button>
             </td>
           </tr>
 
@@ -366,13 +366,13 @@ function filterQueue() {
   document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
 }
 
-function takeTask(btn) {
+function takeTask(btn, taskId) {
   var row = btn.closest('tr');
   var patient = row.querySelectorAll('td')[1].innerText.trim();
-  if (!confirm('Take task for ' + patient + '?\n\nThis assigns the task to you and moves it to My Dashboard.')) return;
+  if (!confirm('Take task for ' + patient + '?\n\nThis assigns the task to you and opens the task detail.')) return;
   row.remove();
   updateCount();
-  alert('Task assigned to you. It now appears in My Dashboard.');
+  window.location.href = '/care-team/task/' + (taskId || 'T001');
 }
 
 function routeTask(btn) {
@@ -402,7 +402,7 @@ function updateCount() {
   document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
 }
 
-function ctViewChart() { alert('Opening chart…\n\n(In production this navigates to the patient chart.)'); }
+function viewTask(taskId) { window.location.href = '/care-team/task/' + taskId; }
 
 document.getElementById('routeModal').addEventListener('click', function(e) {
   if (e.target === this) closeRouteModal();
