@@ -44,10 +44,16 @@
 
   /* Script panel */
   .script-panel { margin:0 14px 14px; background:#FEF9C3; border:1px solid #FDE68A; border-radius:8px; padding:12px; }
-  .script-step { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+  .script-step { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; transition:opacity .2s; }
   .script-step:last-child { margin-bottom:0; }
-  .step-num { width:20px; height:20px; background:#F59E0B; color:#fff; border-radius:50%; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .script-step.pending { opacity:0.4; pointer-events:none; }
+  .script-step.active { opacity:1; }
+  .script-step.done-step { opacity:0.7; }
+  .step-num { width:20px; height:20px; background:#D1D5DB; color:#fff; border-radius:50%; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+  .step-num.active-num { background:#F59E0B; }
   .step-num.done { background:#059669; }
+  .step-next-btn { margin-top:6px; font-size:11px; font-weight:700; color:#fff; background:#F59E0B; border:none; border-radius:5px; padding:4px 12px; cursor:pointer; display:inline-block; }
+  .step-next-btn:hover { background:#D97706; }
   .step-text { font-size:11px; color:#374151; line-height:1.5; }
   .hipaa-verify-btn { width:100%; background:#059669; color:#fff; border:none; border-radius:7px; padding:8px; font-size:11px; font-weight:700; cursor:pointer; font-family:inherit; margin-top:8px; }
   .hipaa-verify-btn.verified { background:#D1FAE5; color:#065F46; cursor:default; }
@@ -182,20 +188,22 @@
       <!-- HIPAA Call Script -->
       <div style="padding:0 14px 4px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#6B7280;">HIPAA Call Script <span style="font-family:monospace;color:#9CA3AF;">DXS-CALL-003</span></div>
       <div class="script-panel">
-        <div class="script-step">
-          <div class="step-num done" id="step1num">1</div>
-          <div class="step-text"><strong>Initial contact</strong><br>"Hi, may I please speak with the account holder?"<br><em style="color:#9CA3AF;font-size:10px;">Do not identify reason for call.</em></div>
+        <div class="script-step active" id="step1wrap">
+          <div class="step-num active-num" id="step1num">1</div>
+          <div class="step-text"><strong>Initial contact</strong><br>"Hi, may I please speak with the account holder?"<br><em style="color:#9CA3AF;font-size:10px;">Do not identify reason for call.</em><br>
+          <button class="step-next-btn" id="step1btn" onclick="advanceStep(1)">✓ Done — Next Step</button></div>
         </div>
-        <div class="script-step">
-          <div class="step-num done" id="step2num">2</div>
-          <div class="step-text"><strong>HIPAA Verify</strong><br>"To protect your privacy, may I confirm your date of birth and zip code?"</div>
+        <div class="script-step pending" id="step2wrap">
+          <div class="step-num" id="step2num">2</div>
+          <div class="step-text"><strong>HIPAA Verify</strong><br>"To protect your privacy, may I confirm your date of birth and zip code?"<br>
+          <button class="step-next-btn" id="step2btn" onclick="advanceStep(2)">✓ Done — Next Step</button></div>
         </div>
-        <div class="script-step">
-          <div class="step-num" id="step3num" style="background:#D1D5DB;">3</div>
+        <div class="script-step pending" id="step3wrap">
+          <div class="step-num" id="step3num">3</div>
           <div class="step-text"><strong>Disclose reason</strong><br>"We're calling regarding recent lab results from your Everlywell Testosterone Program."</div>
         </div>
-        <div class="script-step">
-          <div class="step-num" id="step4num" style="background:#D1D5DB;">4</div>
+        <div class="script-step pending" id="step4wrap">
+          <div class="step-num" id="step4num">4</div>
           <div class="step-text"><strong>Results discussion</strong><br>Use talking points in Block 3 →</div>
         </div>
 
@@ -318,15 +326,25 @@
 
   <!-- Footer: End-of-call actions -->
   <div class="call-footer">
-    <span class="footer-label">End-of-Call Action:</span>
-    <button class="btn-initiate" id="initiateBtn" onclick="initiateConsult()" disabled style="background:#D1D5DB;color:#9CA3AF;cursor:not-allowed;">
-      🔒 Initiate Patient Consult
-      <span style="font-size:10px;font-family:monospace;color:#9CA3AF;">DXS-CALL-004</span>
-    </button>
-    <button class="btn-pcp" id="pcpBtn" onclick="pcpReferral()" disabled style="opacity:0.4;cursor:not-allowed;">
-      → Refer to PCP
-    </button>
-    <span style="font-size:11px;color:#F59E0B;font-weight:600;">⚠ Complete HIPAA verification to enable actions</span>
+    <div id="footerMain" style="display:flex;align-items:center;gap:14px;width:100%;">
+      <span class="footer-label">End-of-Call Action:</span>
+      <button class="btn-initiate" id="initiateBtn" onclick="initiateConsult()" disabled style="background:#D1D5DB;color:#9CA3AF;cursor:not-allowed;">
+        🔒 Initiate Patient Consult
+        <span style="font-size:10px;font-family:monospace;color:#9CA3AF;">DXS-CALL-004</span>
+      </button>
+      <button class="btn-pcp" id="pcpBtn" onclick="pcpReferral()" disabled style="opacity:0.4;cursor:not-allowed;">
+        → Refer to PCP
+      </button>
+      <span id="hipaaWarn" style="font-size:11px;color:#F59E0B;font-weight:600;">⚠ Complete HIPAA verification to enable actions</span>
+    </div>
+    <div id="footerConfirm" style="display:none;align-items:center;gap:14px;width:100%;">
+      <div style="flex:1;">
+        <div id="confirmMsg" style="font-size:13px;font-weight:700;color:#111827;margin-bottom:3px;"></div>
+        <div id="confirmSub" style="font-size:11px;color:#6B7280;"></div>
+      </div>
+      <button onclick="confirmAction()" style="background:#059669;color:#fff;border:none;border-radius:9px;padding:12px 24px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">✅ Confirm — Return to Queue</button>
+      <button onclick="cancelConfirm()" style="background:#F9FAFB;border:1.5px solid #D1D5DB;color:#374151;border-radius:9px;padding:12px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;">← Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -344,17 +362,41 @@ setInterval(function(){
 }, 1000);
 
 var hipaaVerified = false;
+var pendingAction = null;
+
+function advanceStep(n) {
+  if (n === 1) {
+    // Step 1 → done, Step 2 → active
+    document.getElementById('step1num').className = 'step-num done';
+    document.getElementById('step1wrap').className = 'script-step done-step';
+    document.getElementById('step1btn').style.display = 'none';
+    document.getElementById('step2num').className = 'step-num active-num';
+    document.getElementById('step2wrap').className = 'script-step active';
+  } else if (n === 2) {
+    // Step 2 → done, highlight HIPAA button
+    document.getElementById('step2num').className = 'step-num done';
+    document.getElementById('step2wrap').className = 'script-step done-step';
+    document.getElementById('step2btn').style.display = 'none';
+    var hBtn = document.getElementById('hipaaBtn');
+    hBtn.style.boxShadow = '0 0 0 3px #6EE7B7';
+    hBtn.style.transform = 'scale(1.02)';
+  }
+}
 
 function markHipaaVerified() {
   if (hipaaVerified) return;
   hipaaVerified = true;
 
-  // Advance script steps
-  document.getElementById('step3num').style.background = '#059669';
-  document.getElementById('step4num').style.background = '#059669';
+  // Mark steps 3 + 4 done
+  document.getElementById('step3num').className = 'step-num done';
+  document.getElementById('step3wrap').className = 'script-step done-step';
+  document.getElementById('step4num').className = 'step-num done';
+  document.getElementById('step4wrap').className = 'script-step done-step';
   var btn = document.getElementById('hipaaBtn');
   btn.textContent = '✓ HIPAA Verified';
   btn.className = 'hipaa-verify-btn verified';
+  btn.style.boxShadow = '';
+  btn.style.transform = '';
 
   // Unlock results panel
   document.getElementById('resultsPanel').style.opacity = '1';
@@ -367,39 +409,61 @@ function markHipaaVerified() {
   initiateBtn.style.background = '#7C3AED';
   initiateBtn.style.color = '#fff';
   initiateBtn.style.cursor = 'pointer';
-  initiateBtn.textContent = '';
   initiateBtn.innerHTML = '🚀 Initiate Patient Consult <span style="font-size:10px;font-family:monospace;color:#C4B5FD;">DXS-CALL-004</span>';
   var pcpBtn = document.getElementById('pcpBtn');
   pcpBtn.disabled = false;
   pcpBtn.style.opacity = '1';
   pcpBtn.style.cursor = 'pointer';
-  // Hide the warning
-  var warn = initiateBtn.parentElement.querySelector('span[style*="F59E0B"]');
-  if (warn) warn.style.display = 'none';
+  document.getElementById('hipaaWarn').style.display = 'none';
 
   showToast('✓ HIPAA verified — results unlocked');
 }
 
-function initiateConsult() {
-  showToast('✅ Patient directed to portal — consult initiated');
-  setTimeout(function(){
-    if (confirm('Consult initiated.\n\nPatient has been directed to the Everlywell portal to select On Demand or Scheduled consult.\n\nMark this DXS item as Consult Initiated and return to queue?')) {
-      window.location = '/care-team/psr/dxs-queue';
-    }
-  }, 1500);
+function showConfirm(msg, sub, action) {
+  pendingAction = action;
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmSub').textContent = sub;
+  document.getElementById('footerMain').style.display = 'none';
+  document.getElementById('footerConfirm').style.display = 'flex';
 }
 
-function pcpReferral() {
-  if (confirm('Log PCP Referral and close this DXS call?')) {
+function confirmAction() {
+  document.getElementById('footerConfirm').style.display = 'none';
+  document.getElementById('footerMain').style.display = 'flex';
+  if (pendingAction === 'consult') {
+    showToast('✅ Patient directed to portal — consult initiated');
+    setTimeout(function(){ window.location = '/care-team/psr/dxs-queue'; }, 2000);
+  } else if (pendingAction === 'pcp') {
     showToast('→ PCP Referral logged in activity timeline');
     setTimeout(function(){ window.location = '/care-team/psr/dxs-queue'; }, 2000);
   }
+  pendingAction = null;
+}
+
+function cancelConfirm() {
+  document.getElementById('footerConfirm').style.display = 'none';
+  document.getElementById('footerMain').style.display = 'flex';
+  pendingAction = null;
+}
+
+function initiateConsult() {
+  showConfirm(
+    '🚀 Direct patient to their Everlywell portal to initiate consult',
+    'Patient will log in and select On Demand (immediate) or Scheduled. No link is sent — portal is the entry point.',
+    'consult'
+  );
+}
+
+function pcpReferral() {
+  showConfirm(
+    '→ Log PCP Referral and close this DXS call?',
+    'This will log the referral in the activity timeline and return you to the queue.',
+    'pcp'
+  );
 }
 
 function endCall() {
-  if (confirm('End call and return to queue?')) {
-    window.location = '/care-team/psr/dxs-queue';
-  }
+  window.location = '/care-team/psr/dxs-queue';
 }
 
 function showToast(msg) {
