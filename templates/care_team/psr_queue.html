@@ -77,6 +77,14 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 
 .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;z-index:2000;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
+.badge-self-sched{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
+.timing-card{flex:1;border:2px solid #E5E0D8;border-radius:8px;padding:12px;cursor:pointer;text-align:center;transition:all .15s;background:#fff;}
+.timing-card:hover{border-color:#6EE7B7;background:#F0FDF4;}
+.timing-card.selected{border-color:#059669;background:#F0FDF4;}
+.sched-slot{display:inline-block;padding:4px 10px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin:2px;background:#fff;color:#374151;}
+.sched-slot:hover{border-color:#059669;color:#059669;}
+.sched-slot.slot-sel{border-color:#059669;background:#059669;color:#fff;}
+.sched-slot.slot-busy{opacity:.4;cursor:default;color:#9CA3AF;text-decoration:line-through;}
 </style>
 {% endblock %}
 {% block content %}
@@ -102,6 +110,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
       <button class="filter-btn" onclick="applyFilter('attempt2',this)">2nd Attempt</button>
       <button class="filter-btn" onclick="applyFilter('attempt3',this)">3rd Attempt</button>
       <button class="filter-btn" onclick="applyFilter('exhausted',this)" style="color:var(--red);border-color:#FCA5A5;">Exhausted</button>
+      <button class="filter-btn" onclick="applyFilter('selfschedule',this)" style="color:#92400E;border-color:#FCD34D;">⏳ Self-Schedule</button>
       <button class="filter-btn" onclick="applyFilter('closed',this)">Closed Today</button>
       <div style="width:1px;background:#E5E0D8;height:24px;flex-shrink:0;"></div>
       <select class="filter-select" id="filterClient" onchange="applyAllFilters()">
@@ -210,6 +219,23 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
           <tr data-status="pending"><td>E.T. · 59M</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>VA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0,null)">View</button></td></tr>
           <tr data-status="pending"><td>F.M. · 47F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>WA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0,null)">View</button></td></tr>
           <tr data-status="pending"><td>J.V. · 44M</td><td>Thyroid Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>MA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0,null)">View</button></td></tr>
+          <!-- Pending Self-Schedule (ticket open, 1 BD follow-up) -->
+          <tr data-status="selfschedule" style="background:#FFFBEB;">
+            <td>L.P. · 42F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td>
+            <td><span class="badge badge-hipaa">✓ Verified</span></td>
+            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
+            <td>Today 9:15 AM</td><td>1</td>
+            <td><span class="badge badge-self-sched">⏳ Self-Schedule</span><br><span style="font-size:10px;color:#92400E;margin-top:2px;display:block;">Follow-up: Jul 15</span></td>
+            <td><button class="btn-secondary" onclick="openPatientModal('L.P., 42F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',1,'selfschedule')">View</button></td>
+          </tr>
+          <tr data-status="selfschedule" style="background:#FFFBEB;">
+            <td>V.R. · 55F</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>NJ</td>
+            <td><span class="badge badge-hipaa">✓ Verified</span></td>
+            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
+            <td>Yesterday 4:02 PM</td><td>2</td>
+            <td><span class="badge badge-self-sched">⏳ Self-Schedule</span><br><span style="font-size:10px;color:#DC2626;font-weight:700;margin-top:2px;display:block;">⚠ Overdue: Jul 14</span></td>
+            <td><button class="btn-primary" style="background:var(--amber);" onclick="openCallModal('V.R., 55F','Galleri Multi-Cancer','Abnormal','Grail / Elevance','NJ',1)">Follow Up</button> <button class="btn-secondary" onclick="openPatientModal('V.R., 55F','Galleri Multi-Cancer','Abnormal','Grail / Elevance','NJ',1,'selfschedule')">View</button></td>
+          </tr>
           <!-- Exhausted -->
           <tr class="exhausted-row" data-status="exhausted"><td>S.L. · 67F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>2 days ago</td><td>5</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 25')">Letter Sent ✓</button></td></tr>
           <tr class="exhausted-row" data-status="exhausted"><td>B.W. · 78M</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>FL</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>3 days ago</td><td>6</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 24')">Letter Sent ✓</button></td></tr>
@@ -277,8 +303,8 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
         <div id="ptCallHistory" style="padding:12px 14px;font-size:12px;color:#374151;line-height:1.8;">—</div>
       </div>
       <!-- Consult Status -->
-      <div id="ptConsultSection" style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;font-size:12px;color:#1E40AF;display:none;">
-        <div style="font-weight:700;margin-bottom:4px;">📋 Active Consult Request</div>
+      <div id="ptConsultSection" style="border-radius:8px;padding:12px 14px;font-size:12px;display:none;">
+        <div style="font-weight:700;margin-bottom:4px;" id="ptConsultTitle">📋 Active Consult Request</div>
         <div id="ptConsultDetail">—</div>
       </div>
     </div>
@@ -342,24 +368,82 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
         <!-- Consult Request Panel — shown when patient says Yes -->
         <div id="consultRequestPanel" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px;margin-top:4px;">
           <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:10px;">📋 Initiate Consult Request</div>
-          <div class="form-group" style="margin-bottom:10px;">
-            <label class="form-label">Consult Type</label>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:#fff;border:1.5px solid #D1D5DB;border-radius:6px;padding:6px 12px;cursor:pointer;">
-                <input type="radio" name="consultType" value="video"> 🎥 Video Call
-              </label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:#fff;border:1.5px solid #D1D5DB;border-radius:6px;padding:6px 12px;cursor:pointer;">
-                <input type="radio" name="consultType" value="phone"> 📞 Telephonic
-              </label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:12px;background:#fff;border:1.5px solid #D1D5DB;border-radius:6px;padding:6px 12px;cursor:pointer;">
-                <input type="radio" name="consultType" value="async"> 💬 Async Message
-              </label>
+          <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">How does the patient want to connect?</div>
+          <div style="display:flex;gap:8px;margin-bottom:4px;">
+            <div class="timing-card" id="cardOnDemand" onclick="selectTiming('ondemand')">
+              <div style="font-size:18px;margin-bottom:3px;">⚡</div>
+              <div style="font-size:12px;font-weight:700;color:#111827;">On Demand</div>
+              <div style="font-size:10px;color:#6B7280;margin-top:2px;">Enter live queue now</div>
+            </div>
+            <div class="timing-card" id="cardScheduled" onclick="selectTiming('scheduled')">
+              <div style="font-size:18px;margin-bottom:3px;">📅</div>
+              <div style="font-size:12px;font-weight:700;color:#111827;">Scheduled</div>
+              <div style="font-size:10px;color:#6B7280;margin-top:2px;">Book a date &amp; time</div>
             </div>
           </div>
-          <div style="font-size:11px;color:#4B7A5C;margin-bottom:10px;">Care Product: <span id="consultCareProduct" style="font-weight:600;">—</span></div>
-          <button onclick="submitConsultRequest()" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">
-            ✓ Create Consult Request → Routes to Scheduler
-          </button>
+
+          <!-- On Demand confirmation -->
+          <div id="onDemandPanel" style="display:none;margin-top:10px;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:6px;padding:10px;">
+            <div style="font-size:12px;font-weight:700;color:#065F46;margin-bottom:3px;">✅ On Demand — Portal Link Sent</div>
+            <div style="font-size:11px;color:#065F46;line-height:1.5;">Patient receives a portal link via SMS + email. They log in and join the live provider queue immediately. This call ends when confirmed.</div>
+          </div>
+
+          <!-- Scheduled: agent books or patient self-schedules -->
+          <div id="scheduledSubPanel" style="display:none;margin-top:10px;">
+            <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">How will the appointment be booked?</div>
+            <div style="display:flex;gap:14px;margin-bottom:10px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+                <input type="radio" name="schedWho" value="agent" onclick="showSchedMode('agent')"> Agent schedules now
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
+                <input type="radio" name="schedWho" value="patient" onclick="showSchedMode('patient')"> Patient self-schedules in portal
+              </label>
+            </div>
+
+            <!-- Agent schedules inline -->
+            <div id="agentSchedForm" style="display:none;border:1px solid #E5E0D8;border-radius:7px;padding:12px;background:#fff;">
+              <div style="display:flex;gap:10px;margin-bottom:10px;">
+                <div style="flex:1;">
+                  <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">MODALITY</div>
+                  <select class="form-select" id="agentSchedModality" style="width:100%;font-size:12px;">
+                    <option value="">Select...</option>
+                    <option>🎥 Video Call</option>
+                    <option>📞 Telephonic</option>
+                    <option>💬 Async Message</option>
+                  </select>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">DATE</div>
+                  <input type="date" class="form-input" id="agentSchedDate" style="width:100%;font-size:12px;" onchange="loadAgentSlots()">
+                </div>
+              </div>
+              <div id="agentSlotArea" style="display:none;margin-bottom:10px;">
+                <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:6px;">AVAILABLE TIMES</div>
+                <div id="agentSlotPills"></div>
+              </div>
+              <div style="margin-bottom:10px;">
+                <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">PROVIDER</div>
+                <select class="form-select" id="agentSchedProvider" style="width:100%;font-size:12px;">
+                  <option>Dr. Sarah Lee, MD</option>
+                  <option>Dr. Marcus Webb, MD</option>
+                  <option>Dr. Priya Sharma, MD</option>
+                </select>
+              </div>
+              <button onclick="bookAgentSched()" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">✓ Confirm &amp; Book Appointment</button>
+              <div id="agentSchedConfirm" style="display:none;margin-top:8px;padding:8px;background:#DCFCE7;border-radius:6px;font-size:12px;color:#166534;font-weight:600;text-align:center;"></div>
+            </div>
+
+            <!-- Patient self-schedules -->
+            <div id="patientSelfSchedPanel" style="display:none;border:1px solid #FCD34D;border-radius:7px;padding:12px;background:#FFFBEB;">
+              <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px;">⏳ Patient Will Self-Schedule</div>
+              <div style="font-size:11px;color:#78350F;line-height:1.5;margin-bottom:8px;">Portal link sent via SMS + email. Ticket stays <strong>open</strong> — if no appointment is booked within 1 business day, this record surfaces in the queue for follow-up.</div>
+              <div style="font-size:11px;background:#FEF9EE;border-radius:5px;padding:8px;color:#78350F;">
+                <strong>Auto follow-up due:</strong> <span id="selfSchedDueDate" style="font-family:monospace;font-weight:700;">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="consultCareProduct" style="display:none;"></div>
           <div id="consultConfirm" style="display:none;margin-top:8px;padding:8px;background:#DCFCE7;border-radius:6px;font-size:12px;color:#166534;font-weight:600;text-align:center;"></div>
         </div>
         <!-- Escalation options -->
@@ -408,12 +492,18 @@ var PATIENT_DATA = {
   'E.T., 59M': { name:'Edwin T. Morrison',     dob:'12/05/1965', zip:'ZIP: 22030' },
   'F.M., 47F': { name:'Frances M. Delacroix',  dob:'06/18/1977', zip:'ZIP: 98101' },
   'J.V., 44M': { name:'James V. Callahan',     dob:'03/27/1980', zip:'ZIP: 02101' },
+  'L.P., 42F': { name:'Linda P. Osei',         dob:'04/05/1984', zip:'ZIP: 10003' },
+  'V.R., 55F': { name:'Victoria R. Hammond',   dob:'09/17/1970', zip:'ZIP: 07302' },
 };
 
 var _currentProduct = '';
+var _selectedTiming = null;
+var _selectedSchedSlot = null;
 
 function openCallModal(patient, product, result, client, state, attempts) {
   _currentProduct = product;
+  _selectedTiming = null;
+  _selectedSchedSlot = null;
   document.getElementById('callModalTitle').textContent = 'Log Call — ' + patient;
   document.getElementById('callModalSub').textContent = product + ' · ' + result + ' · ' + client + ' · ' + state;
   document.getElementById('callOutcome').value = '';
@@ -421,10 +511,17 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('consultRequestPanel').style.display = 'none';
   document.getElementById('consultConfirm').style.display = 'none';
   document.getElementById('escalateConfirm').style.display = 'none';
-  document.getElementById('consultCareProduct').textContent = product;
+  document.getElementById('onDemandPanel').style.display = 'none';
+  document.getElementById('scheduledSubPanel').style.display = 'none';
+  document.getElementById('agentSchedForm').style.display = 'none';
+  document.getElementById('patientSelfSchedPanel').style.display = 'none';
+  document.getElementById('agentSchedConfirm').style.display = 'none';
+  document.getElementById('agentSlotArea').style.display = 'none';
+  document.getElementById('cardOnDemand').className = 'timing-card';
+  document.getElementById('cardScheduled').className = 'timing-card';
   document.getElementById('attemptWarning').style.display = attempts >= 2 ? '' : 'none';
   document.querySelectorAll('input[name="consultInterest"]').forEach(function(r){ r.checked = false; });
-  document.querySelectorAll('input[name="consultType"]').forEach(function(r){ r.checked = false; });
+  document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
   document.querySelectorAll('input[name="escalation"]').forEach(function(r){ r.checked = false; });
   ['hv1','hv2','hv3'].forEach(function(id){ document.getElementById(id).checked = false; });
 
@@ -448,15 +545,73 @@ function outcomeChanged() {
 function toggleConsultRequest(show) {
   document.getElementById('consultRequestPanel').style.display = show ? '' : 'none';
   document.getElementById('consultConfirm').style.display = 'none';
+  if (!show) { _selectedTiming = null; }
 }
 
-function submitConsultRequest() {
-  var type = document.querySelector('input[name="consultType"]:checked');
-  if (!type) { showToast('Select a consult type first'); return; }
-  var typeLabel = {video:'Video Call', phone:'Telephonic', async:'Async Message'}[type.value];
-  var cstId = 'CST-2026-' + (10900 + Math.floor(Math.random() * 99));
-  var el = document.getElementById('consultConfirm');
-  el.textContent = '✓ Consult request created: ' + cstId + ' · ' + typeLabel + ' · Routed to Scheduler';
+function selectTiming(t) {
+  _selectedTiming = t;
+  document.getElementById('cardOnDemand').className = 'timing-card' + (t === 'ondemand' ? ' selected' : '');
+  document.getElementById('cardScheduled').className = 'timing-card' + (t === 'scheduled' ? ' selected' : '');
+  document.getElementById('onDemandPanel').style.display = (t === 'ondemand') ? '' : 'none';
+  document.getElementById('scheduledSubPanel').style.display = (t === 'scheduled') ? '' : 'none';
+  if (t === 'scheduled') {
+    document.getElementById('agentSchedForm').style.display = 'none';
+    document.getElementById('patientSelfSchedPanel').style.display = 'none';
+    document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
+  }
+}
+
+function showSchedMode(mode) {
+  document.getElementById('agentSchedForm').style.display = (mode === 'agent') ? '' : 'none';
+  document.getElementById('patientSelfSchedPanel').style.display = (mode === 'patient') ? '' : 'none';
+  if (mode === 'patient') {
+    var due = new Date();
+    due.setDate(due.getDate() + 1);
+    if (due.getDay() === 6) due.setDate(due.getDate() + 2);
+    if (due.getDay() === 0) due.setDate(due.getDate() + 1);
+    document.getElementById('selfSchedDueDate').textContent = due.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) + ' by 5:00 PM';
+  }
+}
+
+var AVAIL_SLOTS = ['8:30 AM','9:00 AM','9:30 AM','10:00 AM','11:30 AM','1:00 PM','2:00 PM','3:30 PM','4:00 PM'];
+var BUSY_SLOTS  = ['9:00 AM','11:30 AM','3:30 PM'];
+
+function loadAgentSlots() {
+  var d = document.getElementById('agentSchedDate').value;
+  if (!d) return;
+  _selectedSchedSlot = null;
+  var area = document.getElementById('agentSlotArea');
+  var pills = document.getElementById('agentSlotPills');
+  area.style.display = '';
+  pills.innerHTML = '';
+  AVAIL_SLOTS.forEach(function(slot) {
+    var busy = BUSY_SLOTS.indexOf(slot) >= 0;
+    var el = document.createElement('span');
+    el.className = 'sched-slot' + (busy ? ' slot-busy' : '');
+    el.textContent = slot + (busy ? ' ✗' : '');
+    if (!busy) { el.onclick = function(){ selectAgentSlot(el, slot); }; }
+    pills.appendChild(el);
+  });
+}
+
+function selectAgentSlot(el, slot) {
+  document.querySelectorAll('.sched-slot').forEach(function(s){ s.classList.remove('slot-sel'); });
+  el.classList.add('slot-sel');
+  _selectedSchedSlot = slot;
+}
+
+function bookAgentSched() {
+  var modality = document.getElementById('agentSchedModality').value;
+  var date = document.getElementById('agentSchedDate').value;
+  var provider = document.getElementById('agentSchedProvider').value;
+  if (!modality) { showToast('Select a modality'); return; }
+  if (!date) { showToast('Select a date'); return; }
+  if (!_selectedSchedSlot) { showToast('Select a time slot'); return; }
+  var apptId = 'APT-2026-' + (1000 + Math.floor(Math.random() * 899));
+  var dateObj = new Date(date + 'T12:00:00');
+  var dateStr = dateObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+  var el = document.getElementById('agentSchedConfirm');
+  el.innerHTML = '✅ Appointment booked: ' + apptId + '<br>' + modality + ' · ' + dateStr + ' · ' + _selectedSchedSlot + '<br>' + provider;
   el.style.display = '';
 }
 
@@ -481,19 +636,22 @@ var _callHistory = {
   'H.O., 36F': 'No prior attempts.',
   'E.T., 59M': 'No prior attempts.',
   'F.M., 47F': 'No prior attempts.',
-  'J.V., 44M': 'No prior attempts.'
+  'J.V., 44M': 'No prior attempts.',
+  'L.P., 42F': 'Jul 14 9:15 AM — Reached · Patient confirmed interest in consult.\n⏳ Patient elected to self-schedule via portal. Follow-up due: Jul 15, 2026 by 5:00 PM.',
+  'V.R., 55F': 'Jul 13 4:02 PM — Reached · Patient confirmed interest in consult.\n⏳ Patient elected to self-schedule via portal. Follow-up due: Jul 14, 2026 by 5:00 PM.\n⚠ No appointment booked — follow-up required.'
 };
 
 var _labDates = {
   'M.J., 45F':'Jun 26, 2026','A.K., 38F':'Jun 27, 2026','C.L., 29F':'Jun 25, 2026',
   'R.S., 62M':'Jun 28, 2026','P.W., 71F':'Jun 27, 2026','G.R., 54M':'Jun 29, 2026',
   'T.B., 51M':'Jun 27, 2026','D.N., 43F':'Jun 28, 2026','H.O., 36F':'Jun 26, 2026',
-  'E.T., 59M':'Jun 25, 2026','F.M., 47F':'Jun 28, 2026','J.V., 44M':'Jun 27, 2026'
+  'E.T., 59M':'Jun 25, 2026','F.M., 47F':'Jun 28, 2026','J.V., 44M':'Jun 27, 2026',
+  'L.P., 42F':'Jul 10, 2026','V.R., 55F':'Jul 9, 2026'
 };
 
 var _ptCallModalArgs = null;
 
-function openPatientModal(patient, product, result, client, state, attempts, consult) {
+function openPatientModal(patient, product, result, client, state, attempts, consultstatus) {
   _ptCallModalArgs = {patient:patient, product:product, result:result, client:client, state:state, attempts:attempts};
   document.getElementById('ptModalName').textContent = 'Patient Record — ' + patient;
   document.getElementById('ptModalSub').textContent = product + ' · ' + result;
@@ -512,7 +670,29 @@ function openPatientModal(patient, product, result, client, state, attempts, con
   document.getElementById('ptCallHistory').innerHTML = hist;
   var csEl = document.getElementById('ptConsultSection');
   var cdEl = document.getElementById('ptConsultDetail');
-  if (consult) { csEl.style.display=''; cdEl.textContent=consult; } else { csEl.style.display='none'; }
+  var ctEl = document.getElementById('ptConsultTitle');
+  if (consultstatus === 'selfschedule') {
+    csEl.style.display = '';
+    csEl.style.background = '#FFFBEB';
+    csEl.style.border = '1px solid #FCD34D';
+    csEl.style.color = '#78350F';
+    ctEl.textContent = '⏳ Pending Patient Self-Schedule';
+    var overdue = (patient === 'V.R., 55F');
+    cdEl.innerHTML = (overdue ? '<span style="color:#DC2626;font-weight:700;">⚠ Overdue — patient has not scheduled.</span><br>' : '') +
+      'Patient was reached and agreed to schedule their consult via the Everlywell portal.<br>' +
+      '<strong>Portal link sent:</strong> ' + (overdue ? 'Jul 13' : 'Jul 14') + ', 2026<br>' +
+      '<strong>Follow-up due:</strong> ' + (overdue ? '<span style="color:#DC2626;font-weight:700;">Jul 14, 2026 by 5:00 PM — PAST DUE</span>' : 'Jul 15, 2026 by 5:00 PM') + '<br>' +
+      '<strong>Action:</strong> ' + (overdue ? 'Call patient to confirm scheduling or determine if they need assistance.' : 'Monitor portal — no action needed unless deadline passes.');
+  } else if (consultstatus && consultstatus !== 'selfschedule') {
+    csEl.style.display = '';
+    csEl.style.background = '#EFF6FF';
+    csEl.style.border = '1px solid #BFDBFE';
+    csEl.style.color = '#1E40AF';
+    ctEl.textContent = '📋 Active Consult Request';
+    cdEl.textContent = consultstatus;
+  } else {
+    csEl.style.display = 'none';
+  }
   document.getElementById('ptLogCallBtn').onclick = function() {
     closeModal('patientModal');
     openCallModal(_ptCallModalArgs.patient,_ptCallModalArgs.product,_ptCallModalArgs.result,_ptCallModalArgs.client,_ptCallModalArgs.state,_ptCallModalArgs.attempts);
@@ -521,8 +701,22 @@ function openPatientModal(patient, product, result, client, state, attempts, con
 }
 
 function logCall() {
-  closeModal('callModal');
-  showToast('Call logged successfully');
+  var schedWho = document.querySelector('input[name="schedWho"]:checked');
+  if (_selectedTiming === 'ondemand') {
+    closeModal('callModal');
+    showToast('✅ On Demand — portal link sent. Call closed.');
+  } else if (_selectedTiming === 'scheduled' && schedWho && schedWho.value === 'agent') {
+    var confirmed = document.getElementById('agentSchedConfirm').style.display !== 'none';
+    if (!confirmed) { showToast('Complete the scheduling form first'); return; }
+    closeModal('callModal');
+    showToast('✅ Appointment booked. Call closed.');
+  } else if (_selectedTiming === 'scheduled' && schedWho && schedWho.value === 'patient') {
+    closeModal('callModal');
+    showToast('⏳ Self-schedule follow-up created. Ticket stays open.');
+  } else {
+    closeModal('callModal');
+    showToast('Call logged successfully');
+  }
 }
 
 var _activeStatus = 'all';
