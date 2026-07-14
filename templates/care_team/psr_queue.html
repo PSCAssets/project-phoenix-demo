@@ -356,98 +356,53 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
         </select>
       </div>
       <div id="schedulingSection" style="display:none;">
-        <!-- Patient reached: consult interest -->
+        <!-- Patient Portal — Next Steps -->
         <div class="form-group">
-          <label class="form-label">Patient Interested in Consult?</label>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="yes" onclick="toggleConsultRequest(true)"> Yes — wants to schedule now</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="declined" onclick="toggleConsultRequest(false)"> Declined consult</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultInterest" value="na" onclick="toggleConsultRequest(false)"> N/A</label>
+          <label class="form-label">Patient Portal — Next Steps</label>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="directed"> Patient directed to portal to select consult type</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="confirmed"> Patient confirmed portal access &amp; will log in</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="escalate"> Patient needs portal registration assistance — escalate</label>
           </div>
         </div>
-        <!-- Consult Request Panel — shown when patient says Yes -->
-        <div id="consultRequestPanel" style="display:none;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:14px;margin-top:4px;">
-          <div style="font-size:12px;font-weight:700;color:#166534;margin-bottom:10px;">📋 Initiate Consult Request</div>
-          <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">How does the patient want to connect?</div>
-          <div style="display:flex;gap:8px;margin-bottom:4px;">
-            <div class="timing-card" id="cardOnDemand" onclick="selectTiming('ondemand')">
-              <div style="font-size:18px;margin-bottom:3px;">⚡</div>
-              <div style="font-size:12px;font-weight:700;color:#111827;">On Demand</div>
-              <div style="font-size:10px;color:#6B7280;margin-top:2px;">Enter live queue now</div>
+        <!-- Consult Preference Discussed -->
+        <div class="form-group">
+          <label class="form-label">Consult Preference Discussed</label>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="ondemand" onclick="consultPrefChanged('ondemand')"> On Demand — patient wants immediate availability</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="scheduled" onclick="consultPrefChanged('scheduled')"> Scheduled — patient will select time in portal</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="decide" onclick="consultPrefChanged('decide')"> Patient will decide in portal</label>
+            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="declined" onclick="consultPrefChanged('declined')"> Patient declined</label>
+          </div>
+        </div>
+
+        <!-- On Demand panel — state check + portal link notice -->
+        <div id="onDemandConsultPanel" style="display:none;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:8px;padding:14px;">
+          <div style="font-size:11px;font-weight:700;color:#065F46;margin-bottom:10px;">⚡ On Demand — Verify &amp; Confirm</div>
+          <div style="display:flex;gap:10px;margin-bottom:10px;">
+            <div style="flex:1;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:8px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:2px;">Patient State on File</div>
+              <div style="font-size:13px;font-weight:700;color:#059669;" id="odStateDisplay">—</div>
             </div>
-            <div class="timing-card" id="cardScheduled" onclick="selectTiming('scheduled')">
-              <div style="font-size:18px;margin-bottom:3px;">📅</div>
-              <div style="font-size:12px;font-weight:700;color:#111827;">Scheduled</div>
-              <div style="font-size:10px;color:#6B7280;margin-top:2px;">Book a date &amp; time</div>
+            <div style="flex:1;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:8px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:2px;">Provider Coverage</div>
+              <div style="font-size:12px;font-weight:700;color:#059669;" id="odCoverageDisplay">Verified ✓</div>
             </div>
           </div>
-
-          <!-- On Demand confirmation -->
-          <div id="onDemandPanel" style="display:none;margin-top:10px;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:6px;padding:10px;">
-            <div style="font-size:12px;font-weight:700;color:#065F46;margin-bottom:3px;">✅ On Demand — Portal Link Sent</div>
-            <div style="font-size:11px;color:#065F46;line-height:1.5;">Patient receives a portal link via SMS + email. They log in and join the live provider queue immediately. This call ends when confirmed.</div>
+          <div style="font-size:12px;color:#065F46;line-height:1.6;background:#D1FAE5;border-radius:6px;padding:10px;">
+            A portal access link will be sent to <strong id="odPatientNameDisplay">the patient</strong> to create or log into their Everlywell patient portal. They will be connected with an available provider in their state.
           </div>
+        </div>
 
-          <!-- Scheduled: agent books or patient self-schedules -->
-          <div id="scheduledSubPanel" style="display:none;margin-top:10px;">
-            <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">How will the appointment be booked?</div>
-            <div style="display:flex;gap:14px;margin-bottom:10px;">
-              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="radio" name="schedWho" value="agent" onclick="showSchedModeAndUpdateBtn('agent')"> Agent schedules now
-              </label>
-              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="radio" name="schedWho" value="patient" onclick="showSchedModeAndUpdateBtn('patient')"> Patient self-schedules in portal
-              </label>
-            </div>
-
-            <!-- Agent schedules inline -->
-            <div id="agentSchedForm" style="display:none;border:1px solid #E5E0D8;border-radius:7px;padding:12px;background:#fff;">
-              <div style="display:flex;gap:10px;margin-bottom:10px;">
-                <div style="flex:1;">
-                  <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">MODALITY</div>
-                  <select class="form-select" id="agentSchedModality" style="width:100%;font-size:12px;">
-                    <option value="">Select...</option>
-                    <option>🎥 Video Call</option>
-                    <option>📞 Telephonic</option>
-                    <option>💬 Async Message</option>
-                  </select>
-                </div>
-                <div style="flex:1;">
-                  <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">DATE</div>
-                  <input type="date" class="form-input" id="agentSchedDate" style="width:100%;font-size:12px;" onchange="loadAgentSlots()">
-                </div>
-              </div>
-              <div id="agentSlotArea" style="display:none;margin-bottom:10px;">
-                <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:6px;">AVAILABLE TIMES</div>
-                <div id="agentSlotPills"></div>
-              </div>
-              <div style="margin-bottom:10px;">
-                <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">PROVIDER</div>
-                <select class="form-select" id="agentSchedProvider" style="width:100%;font-size:12px;">
-                  <option>Dr. Sarah Lee, MD</option>
-                  <option>Dr. Marcus Webb, MD</option>
-                  <option>Dr. Priya Sharma, MD</option>
-                </select>
-              </div>
-              <button onclick="bookAgentSched()" style="background:#059669;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;width:100%;">✓ Confirm &amp; Book Appointment</button>
-              <div id="agentSchedConfirm" style="display:none;margin-top:8px;padding:8px;background:#DCFCE7;border-radius:6px;font-size:12px;color:#166534;font-weight:600;text-align:center;"></div>
-            </div>
-
-            <!-- Patient self-schedules -->
-            <div id="patientSelfSchedPanel" style="display:none;border:1px solid #FCD34D;border-radius:7px;padding:12px;background:#FFFBEB;">
-              <div style="font-size:12px;font-weight:700;color:#92400E;margin-bottom:6px;">⏳ Patient Will Self-Schedule</div>
-              <div style="font-size:11px;color:#78350F;line-height:1.5;margin-bottom:8px;">Portal link sent via SMS + email. Ticket stays <strong>open</strong> — if no appointment is booked within 1 business day, this record surfaces in the queue for follow-up.</div>
-              <div style="font-size:11px;background:#FEF9EE;border-radius:5px;padding:8px;color:#78350F;">
-                <strong>Auto follow-up due:</strong> <span id="selfSchedDueDate" style="font-family:monospace;font-weight:700;">—</span>
-              </div>
-            </div>
-          </div>
-
-          <div id="consultCareProduct" style="display:none;"></div>
-          <div id="consultConfirm" style="display:none;margin-top:8px;padding:8px;background:#DCFCE7;border-radius:6px;font-size:12px;color:#166534;font-weight:600;text-align:center;"></div>
+        <!-- Scheduled — launch wizard -->
+        <div id="schedWizardLaunch" style="display:none;">
+          <button type="button" onclick="launchSchedulingWizard()" style="width:100%;background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;">
+            📅 Open Scheduling Wizard →
+          </button>
+          <div style="font-size:10px;color:#6B7280;text-align:center;margin-top:4px;">Demographics · Appt Type · Provider (state-filtered) · Date &amp; Time · Confirm</div>
         </div>
         <!-- Escalation options -->
-        <div class="form-group" style="margin-top:10px;">
+        <div class="form-group" style="margin-top:2px;">
           <label class="form-label">Escalation Needed?</label>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
             <button type="button" onclick="escalate('nurse')" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">🩺 Escalate to Nurse</button>
@@ -497,33 +452,18 @@ var PATIENT_DATA = {
 };
 
 var _currentProduct = '';
-var _selectedTiming = null;
-var _selectedSchedSlot = null;
-
 function openCallModal(patient, product, result, client, state, attempts) {
   _currentProduct = product;
-  _selectedTiming = null;
-  _selectedSchedSlot = null;
   document.getElementById('callModalTitle').textContent = 'Log Call — ' + patient;
   document.getElementById('callModalSub').textContent = product + ' · ' + result + ' · ' + client + ' · ' + state;
   document.getElementById('callOutcome').value = '';
   document.getElementById('schedulingSection').style.display = 'none';
-  document.getElementById('consultRequestPanel').style.display = 'none';
-  document.getElementById('consultConfirm').style.display = 'none';
   document.getElementById('escalateConfirm').style.display = 'none';
-  document.getElementById('onDemandPanel').style.display = 'none';
-  document.getElementById('scheduledSubPanel').style.display = 'none';
-  document.getElementById('agentSchedForm').style.display = 'none';
-  document.getElementById('patientSelfSchedPanel').style.display = 'none';
-  document.getElementById('agentSchedConfirm').style.display = 'none';
-  document.getElementById('agentSlotArea').style.display = 'none';
-  document.getElementById('cardOnDemand').className = 'timing-card';
-  document.getElementById('cardScheduled').className = 'timing-card';
-  updateLogCallBtn('default');
+  document.getElementById('schedWizardLaunch').style.display = 'none';
+  document.getElementById('onDemandConsultPanel').style.display = 'none';
   document.getElementById('attemptWarning').style.display = attempts >= 2 ? '' : 'none';
-  document.querySelectorAll('input[name="consultInterest"]').forEach(function(r){ r.checked = false; });
-  document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
-  document.querySelectorAll('input[name="escalation"]').forEach(function(r){ r.checked = false; });
+  document.querySelectorAll('input[name="portalNextStep"]').forEach(function(r){ r.checked = false; });
+  document.querySelectorAll('input[name="consultPref"]').forEach(function(r){ r.checked = false; });
   ['hv1','hv2','hv3'].forEach(function(id){ document.getElementById(id).checked = false; });
 
   // Populate inline HIPAA verification values
@@ -532,116 +472,27 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('hvDOB').textContent  = pd.dob;
   document.getElementById('hvZIP').textContent  = pd.zip;
 
+  // Pre-populate On Demand panel with state + patient name
+  document.getElementById('odStateDisplay').textContent = state + ' ✓';
+  document.getElementById('odCoverageDisplay').textContent = 'Provider available in ' + state;
+  document.getElementById('odPatientNameDisplay').textContent = pd.name !== '—' ? pd.name : patient;
+
   document.getElementById('callModal').classList.add('open');
 }
 
 function outcomeChanged() {
   var v = document.getElementById('callOutcome').value;
   document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'portal_notified') ? '' : 'none';
-  if (v !== 'reached') {
-    document.getElementById('consultRequestPanel').style.display = 'none';
-  }
 }
 
-function toggleConsultRequest(show) {
-  document.getElementById('consultRequestPanel').style.display = show ? '' : 'none';
-  document.getElementById('consultConfirm').style.display = 'none';
-  if (!show) { _selectedTiming = null; }
+function consultPrefChanged(pref) {
+  document.getElementById('onDemandConsultPanel').style.display = (pref === 'ondemand') ? '' : 'none';
+  document.getElementById('schedWizardLaunch').style.display = (pref === 'scheduled') ? '' : 'none';
 }
 
-function selectTiming(t) {
-  _selectedTiming = t;
-  document.getElementById('cardOnDemand').className = 'timing-card' + (t === 'ondemand' ? ' selected' : '');
-  document.getElementById('cardScheduled').className = 'timing-card' + (t === 'scheduled' ? ' selected' : '');
-  document.getElementById('onDemandPanel').style.display = (t === 'ondemand') ? '' : 'none';
-  document.getElementById('scheduledSubPanel').style.display = (t === 'scheduled') ? '' : 'none';
-  if (t === 'scheduled') {
-    document.getElementById('agentSchedForm').style.display = 'none';
-    document.getElementById('patientSelfSchedPanel').style.display = 'none';
-    document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
-    updateLogCallBtn('scheduled-pending');
-  } else if (t === 'ondemand') {
-    updateLogCallBtn('ondemand');
-  }
-}
-
-function showSchedModeAndUpdateBtn(mode) {
-  showSchedMode(mode);
-  updateLogCallBtn(mode === 'patient' ? 'selfschedule' : 'scheduled-pending');
-}
-
-function updateLogCallBtn(state) {
-  var btn = document.getElementById('logCallBtn');
-  if (!btn) return;
-  if (state === 'ondemand') {
-    btn.textContent = '⚡ Send Portal Link & Close Call';
-    btn.style.background = '#059669';
-  } else if (state === 'selfschedule') {
-    btn.textContent = '⏳ Set Follow-Up & Close Call';
-    btn.style.background = '#D97706';
-  } else {
-    btn.textContent = 'Log Call';
-    btn.style.background = '';
-  }
-}
-
-function showSchedMode(mode) {
-  document.getElementById('agentSchedForm').style.display = (mode === 'agent') ? '' : 'none';
-  document.getElementById('patientSelfSchedPanel').style.display = (mode === 'patient') ? '' : 'none';
-  if (mode === 'patient') {
-    var due = new Date();
-    due.setDate(due.getDate() + 1);
-    if (due.getDay() === 6) due.setDate(due.getDate() + 2);
-    if (due.getDay() === 0) due.setDate(due.getDate() + 1);
-    document.getElementById('selfSchedDueDate').textContent = due.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}) + ' by 5:00 PM';
-  }
-}
-
-var AVAIL_SLOTS = ['8:30 AM','9:00 AM','9:30 AM','10:00 AM','11:30 AM','1:00 PM','2:00 PM','3:30 PM','4:00 PM'];
-var BUSY_SLOTS  = ['9:00 AM','11:30 AM','3:30 PM'];
-
-function loadAgentSlots() {
-  var d = document.getElementById('agentSchedDate').value;
-  if (!d) return;
-  _selectedSchedSlot = null;
-  var area = document.getElementById('agentSlotArea');
-  var pills = document.getElementById('agentSlotPills');
-  area.style.display = '';
-  pills.innerHTML = '';
-  AVAIL_SLOTS.forEach(function(slot) {
-    var busy = BUSY_SLOTS.indexOf(slot) >= 0;
-    var el = document.createElement('span');
-    el.className = 'sched-slot' + (busy ? ' slot-busy' : '');
-    el.textContent = slot + (busy ? ' ✗' : '');
-    if (!busy) { el.onclick = function(){ selectAgentSlot(el, slot); }; }
-    pills.appendChild(el);
-  });
-}
-
-function selectAgentSlot(el, slot) {
-  document.querySelectorAll('.sched-slot').forEach(function(s){ s.classList.remove('slot-sel'); });
-  el.classList.add('slot-sel');
-  _selectedSchedSlot = slot;
-}
-
-function bookAgentSched() {
-  var modality = document.getElementById('agentSchedModality').value;
-  var date = document.getElementById('agentSchedDate').value;
-  var provider = document.getElementById('agentSchedProvider').value;
-  if (!modality) { showToast('Select a modality'); return; }
-  if (!date) { showToast('Select a date'); return; }
-  if (!_selectedSchedSlot) { showToast('Select a time slot'); return; }
-  var apptId = 'APT-2026-' + (1000 + Math.floor(Math.random() * 899));
-  var dateObj = new Date(date + 'T12:00:00');
-  var dateStr = dateObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
-  var el = document.getElementById('agentSchedConfirm');
-  el.innerHTML = '✅ Appointment booked: ' + apptId + '<br>' + modality + ' · ' + dateStr + ' at ' + _selectedSchedSlot + ' · ' + provider;
-  el.style.display = '';
-  // Close modal after short delay so agent sees the confirmation
-  setTimeout(function(){
-    closeModal('callModal');
-    showToast('✅ Appointment booked — ' + dateStr + ' at ' + _selectedSchedSlot + '. Call closed.');
-  }, 2200);
+function launchSchedulingWizard() {
+  closeModal('callModal');
+  window.location = '/scheduler/search-patient?tab=patient';
 }
 
 function escalate(type) {
@@ -730,18 +581,11 @@ function openPatientModal(patient, product, result, client, state, attempts, con
 }
 
 function logCall() {
-  var schedWho = document.querySelector('input[name="schedWho"]:checked');
-  if (_selectedTiming === 'ondemand') {
+  var pref = document.querySelector('input[name="consultPref"]:checked');
+  if (pref && (pref.value === 'ondemand' || pref.value === 'scheduled')) {
+    // Wizard should have been launched — if still here just log and close
     closeModal('callModal');
-    showToast('✅ On Demand — portal link sent. Call closed.');
-  } else if (_selectedTiming === 'scheduled' && schedWho && schedWho.value === 'agent') {
-    var confirmed = document.getElementById('agentSchedConfirm').style.display !== 'none';
-    if (!confirmed) { showToast('Complete the scheduling form first'); return; }
-    closeModal('callModal');
-    showToast('✅ Appointment booked. Call closed.');
-  } else if (_selectedTiming === 'scheduled' && schedWho && schedWho.value === 'patient') {
-    closeModal('callModal');
-    showToast('⏳ Self-schedule follow-up created. Ticket stays open.');
+    showToast('Call logged — ' + (pref.value === 'ondemand' ? 'On Demand' : 'Scheduled') + ' preference recorded');
   } else {
     closeModal('callModal');
     showToast('Call logged successfully');
