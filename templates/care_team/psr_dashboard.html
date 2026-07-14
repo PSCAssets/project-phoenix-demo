@@ -266,16 +266,31 @@ main.main-content { margin-left: 56px; display: flex; flex-direction: column; ov
         <div class="modal-title" id="callModalTitle">Log Outbound Call</div>
         <div class="modal-sub" id="callModalSub"></div>
       </div>
-      <button class="modal-close" onclick="closeModal('callModal')">×</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <a id="viewChartBtn" href="/provider/queue" style="font-size:12px;font-weight:600;color:#6B21A8;text-decoration:none;padding:4px 10px;border:1.5px solid #C4B5FD;border-radius:6px;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          View Chart
+        </a>
+        <button class="modal-close" onclick="closeModal('callModal')">×</button>
+      </div>
     </div>
     <div class="modal-body">
       <!-- HIPAA Verification -->
       <div class="hipaa-check" id="hipaaSection">
         <div class="hipaa-title">⚠️ HIPAA 3-Point Verification — Required Before Sharing Results</div>
         <div class="hipaa-items">
-          <label class="hipaa-item"><input type="checkbox" id="hv1"> Patient confirmed full legal name</label>
-          <label class="hipaa-item"><input type="checkbox" id="hv2"> Patient confirmed Date of Birth</label>
-          <label class="hipaa-item"><input type="checkbox" id="hv3"> Patient confirmed ZIP code or last 4 SSN</label>
+          <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+            <span style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="hv1"> Full legal name</span>
+            <span id="hvName" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;letter-spacing:0.01em;">—</span>
+          </label>
+          <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+            <span style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="hv2"> Date of birth</span>
+            <span id="hvDOB" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;">—</span>
+          </label>
+          <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+            <span style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="hv3"> ZIP code or last 4 SSN</span>
+            <span id="hvZIP" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;">—</span>
+          </label>
         </div>
         <p style="font-size:11px;color:#92400E;margin-top:8px;">All three must be confirmed before result details are discussed. If patient cannot verify, log as Unable to Verify and escalate to supervisor.</p>
       </div>
@@ -289,25 +304,27 @@ main.main-content { margin-left: 56px; display: flex; flex-direction: column; ov
           <option value="no_answer">No Answer (no voicemail)</option>
           <option value="wrong_number">Wrong Number</option>
           <option value="no_verify">Unable to Verify Identity (HIPAA)</option>
-          <option value="declined">Patient Declined Consult Offer</option>
-          <option value="scheduled">Consult Scheduled — Link Sent</option>
+          <option value="declined">Patient Declined Consult</option>
+          <option value="portal_notified">Reached — Patient Directed to Portal</option>
         </select>
       </div>
 
       <div id="schedulingSection" style="display:none;">
         <div class="form-group">
-          <label class="form-label">Scheduling Link Sent?</label>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="linkSent" value="yes"> Yes — sent via email</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="linkSent" value="no"> No — patient will call back</label>
+          <label class="form-label">Patient Portal — Next Steps</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="portalStatus" value="directed"> Patient directed to portal to select consult type</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="portalStatus" value="confirmed"> Patient confirmed portal access &amp; will log in</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="portalStatus" value="assist"> Patient needs portal registration assistance — escalate</label>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Consult Offer Made?</label>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="offerMade" value="yes"> Yes — proactive offer</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="offerMade" value="patient_asked"> Patient requested it</label>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="offerMade" value="no"> Not applicable</label>
+          <label class="form-label">Consult Preference Discussed</label>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultPref" value="ondemand"> On Demand — patient wants immediate availability</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultPref" value="scheduled"> Scheduled — patient will select time in portal</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultPref" value="portal_decides"> Patient will decide in portal</label>
+            <label style="display:flex;align-items:center;gap:6px;font-size:12px;"><input type="radio" name="consultPref" value="declined"> Patient declined</label>
           </div>
         </div>
       </div>
@@ -333,6 +350,14 @@ main.main-content { margin-left: 56px; display: flex; flex-direction: column; ov
 {% block scripts %}
 {% raw %}
 <script>
+var PATIENT_DATA = {
+  'M.J., 45F': { name: 'Margaret J. Collins',   dob: '03/22/1979', zip: 'ZIP: 10012' },
+  'R.S., 62M': { name: 'Robert S. Harmon',       dob: '07/08/1962', zip: 'ZIP: 33101' },
+  'A.K., 38F': { name: 'Alicia K. Torres',       dob: '11/14/1986', zip: 'ZIP: 90210' },
+  'T.B., 51M': { name: 'Thomas B. Whitfield',    dob: '05/30/1973', zip: 'ZIP: 75201' },
+  'C.L., 29F': { name: 'Claire L. Beaumont',     dob: '09/03/1995', zip: 'ZIP: 10011' },
+};
+
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 function openCallModal(patient, product, result, client, state, attempts) {
@@ -344,12 +369,19 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('hv1').checked = false;
   document.getElementById('hv2').checked = false;
   document.getElementById('hv3').checked = false;
+
+  // Populate HIPAA verification values
+  var pd = PATIENT_DATA[patient] || { name: '—', dob: '—', zip: '—' };
+  document.getElementById('hvName').textContent = pd.name;
+  document.getElementById('hvDOB').textContent = pd.dob;
+  document.getElementById('hvZIP').textContent = pd.zip;
+
   document.getElementById('callModal').classList.add('open');
 }
 
 function outcomeChanged() {
   var v = document.getElementById('callOutcome').value;
-  document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'scheduled') ? '' : 'none';
+  document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'portal_notified') ? '' : 'none';
 }
 
 function logCall() {
