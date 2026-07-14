@@ -54,7 +54,7 @@
 
   .main { margin-left: 56px; margin-top: 56px; padding: 24px; flex: 1; }
 
-  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
   .stat-card {
     background: var(--white); border-radius: 12px; border: 1px solid var(--border);
     padding: 20px; position: relative; overflow: hidden;
@@ -175,6 +175,12 @@
 
   <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
   <div class="stat-grid">
+    <div class="stat-card" style="border:1.5px solid #DC2626;cursor:pointer;" onclick="openUrgentPanel()">
+      <div class="accent" style="background:#DC2626"></div>
+      <div class="stat-label" style="color:#DC2626;">Urgent Messages</div>
+      <div class="stat-value" style="color:#DC2626;">2</div>
+      <div class="stat-sub" style="color:#DC2626;">Require immediate action</div>
+    </div>
     <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-queue-heading').scrollIntoView({behavior:'smooth'})">
       <div class="accent" style="background:var(--ct-green)"></div>
       <div class="stat-label">Active Cases</div>
@@ -290,6 +296,23 @@
   </div>
 
 </main>
+
+<!-- Urgent Messages Panel (URG-MSG-001) -->
+<div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <span style="font-size:16px;">🚨</span>
+    <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
+    <span id="urgPanelCount" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;border-radius:10px;padding:2px 8px;">2</span>
+    <button onclick="closeUrgentPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:4px;padding:2px 10px;margin-left:8px;">✕</button>
+  </div>
+  <div style="padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA;font-size:11px;color:#991B1B;flex-shrink:0;">
+    These messages require your immediate attention. Click any message to open it directly.
+    <span style="float:right;font-family:monospace;color:#FCA5A5;">URG-MSG-001</span>
+  </div>
+  <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+<div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -326,6 +349,26 @@ function ctTakeTask(btn) { var td = btn.closest('td'); btn.closest('tr').querySe
 function ctRouteTask() { alert('Route task…\n\n(In production this opens a routing modal to reassign to another team member or escalate.)'); }
 function ctCloseTask(btn) { if (confirm('Close this task?\n\nNote: Close Task marks the task closed — separate from the consultation being marked Complete.')) { btn.closest('tr').remove(); } }
 function ctViewChart() { alert('Opening chart…\n\n(In production this navigates to the patient chart.)'); }
+
+var CT_URGENT_MSGS = [
+  { type:'chart', initials:'SL', bg:'#059669', sender:'Dr. Lee, MD', patient:'M.R. · CST-2026-10841', url:'/provider/messages', preview:'"M.R. care plan updated — please review the new GLP-1 dosing notes and confirm patient follow-up schedule before end of day."', time:'12 min ago' },
+  { type:'message', initials:'JM', bg:'#6B21A8', sender:'Jennifer M., RN', patient:'T.W. · CST-2026-10835', url:'/provider/messages', preview:'"T.W. labs need follow-up — patient hasn\'t responded to the 48h check-in message. Can you reach out today?"', time:'34 min ago' }
+];
+function openUrgentPanel() {
+  var body = document.getElementById('urgPanelBody');
+  if (!body) return;
+  body.innerHTML = CT_URGENT_MSGS.map(function(m) {
+    var patChip = m.patient ? '<span style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;font-weight:600;">📋 '+m.patient+'</span>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
+    var actionLabel = m.type==='chart' ? '→ Open Chart' : '→ Open Message';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
+  }).join('');
+  document.getElementById('urgentPanel').style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
+}
+function closeUrgentPanel() {
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
+}
 </script>
 {% endraw %}
 {% endblock %}

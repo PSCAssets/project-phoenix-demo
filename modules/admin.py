@@ -150,6 +150,11 @@ def doh_config():
 
 # ── Peer Review (M17) ────────────────────────────────────────────────────────
 
+@bp.route("/scripting-config")
+def scripting_config():
+    return render_template("admin/scripting_config.html")
+
+
 @bp.route("/peer-review")
 def peer_review_config():
     return render_template("admin/peer_review_config.html")

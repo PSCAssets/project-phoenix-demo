@@ -189,11 +189,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
     <div class="card">
       <div class="card-title">Quick Actions</div>
-      <button class="ql-btn" onclick="goTo('/provider/messages')">
+      <button class="ql-btn" onclick="openMo('msgProviderModal')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Message Patient
       </button>
-      <button class="ql-btn" onclick="goTo('/provider/queue')">
+      <button class="ql-btn" onclick="goTo('/provider/chart/1')">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         View Full Chart
       </button>
@@ -210,6 +210,27 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <!-- CENTER -->
   <div class="center-col">
+
+    <!-- Stage Progress Bar -->
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;display:flex;align-items:center;margin-bottom:4px;">
+      <div id="ctStageDot1" style="width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+      <div id="ctStageLabel1" style="font-size:11px;font-weight:700;color:#6B21A8;margin-left:7px;white-space:nowrap;">Verify &amp; Context</div>
+      <div style="flex:1;height:2px;background:#E5E0D8;margin:0 8px;"></div>
+      <div id="ctStageDot2" style="width:26px;height:26px;border-radius:50%;background:#E5E0D8;color:#9CA3AF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+      <div id="ctStageLabel2" style="font-size:11px;font-weight:600;color:#9CA3AF;margin-left:7px;white-space:nowrap;">Resolution</div>
+      <div style="flex:1;height:2px;background:#E5E0D8;margin:0 8px;"></div>
+      <div id="ctStageDot3" style="width:26px;height:26px;border-radius:50%;background:#E5E0D8;color:#9CA3AF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+      <div id="ctStageLabel3" style="font-size:11px;font-weight:600;color:#9CA3AF;margin-left:7px;white-space:nowrap;">Log &amp; Close</div>
+    </div>
+
+    <!-- Stage 1: Verify & Context -->
+    <div id="ctStage1">
+
+    <!-- Script from admin config: Stage 1 — Patient Verification -->
+    <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#92400E;margin-bottom:6px;">📋 Stage 1 Script — Patient Verification <span style="font-family:monospace;font-size:9px;color:#D97706;">ADMIN-SCRIPT-S1</span></div>
+      <div style="font-size:12px;color:#374151;line-height:1.65;" id="ctScript1">Loading script…</div>
+    </div>
 
     <div class="ctx-card">
       <h3>
@@ -239,9 +260,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <h3 style="margin-bottom:10px;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
         Recent Activity — Patient Chart
-        <button onclick="goTo('/provider/queue')" style="margin-left:auto;font-size:11px;font-weight:600;color:#6B21A8;background:none;border:none;cursor:pointer;text-decoration:underline;">Open Full Chart →</button>
+        <button onclick="goTo('/provider/chart/1')" style="margin-left:auto;font-size:11px;font-weight:600;color:#6B21A8;background:none;border:none;cursor:pointer;text-decoration:underline;">Open Full Chart →</button>
       </h3>
       <div id="inlineTimeline" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <!-- Inline Activity Action Buttons -->
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #F5F0EA;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:7px;">Log Activity</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;" id="inlineActivityBtns">
+          <button class="btn btn-outline" onclick="ctLogActivity('phone','inline')" style="border-color:#059669;color:#059669;font-size:11px;padding:5px 10px;">📞 Phone</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('email','inline')" style="border-color:#6B21A8;color:#6B21A8;font-size:11px;padding:5px 10px;">✉️ Email</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('note','inline')" style="border-color:#374151;color:#374151;font-size:11px;padding:5px 10px;">📝 Note</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('task','inline')" style="border-color:#D97706;color:#D97706;font-size:11px;padding:5px 10px;">✅ Task</button>
+        </div>
+        <div id="ctActivityFormInline" style="display:none;margin-top:9px;background:#F9F9F9;border-radius:8px;padding:10px;">
+          <div id="ctActivityTitleInline" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#374151;margin-bottom:8px;"></div>
+          <div id="ctActivityOutcomeRowInline" style="display:none;margin-bottom:8px;">
+            <select class="fs" id="ctActivityOutcomeInline" style="font-size:12px;"></select>
+          </div>
+          <textarea class="ft" id="ctActivityNotesInline" rows="2" placeholder="Add notes…" style="font-size:12px;margin-bottom:8px;"></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-success" onclick="ctSaveActivity('inline')" style="font-size:12px;">Save</button>
+            <button class="btn btn-outline" onclick="document.getElementById('ctActivityFormInline').style.display='none'" style="font-size:12px;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 1 nav -->
+    <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-primary" onclick="ctGoStage(2)" style="font-size:12px;">Next: Resolution →</button>
+    </div>
+
+    </div><!-- /Stage 1 -->
+
+    <!-- Stage 2: Resolution Action -->
+    <div id="ctStage2" style="display:none;">
+
+    <!-- Script from admin config: Stage 2 — Resolution (task-type specific) -->
+    <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#92400E;margin-bottom:6px;">📋 Stage 2 Script — Resolution <span style="font-family:monospace;font-size:9px;color:#D97706;" id="ctScript2Tag">ADMIN-SCRIPT-S2</span></div>
+      <div style="font-size:12px;color:#374151;line-height:1.65;" id="ctScript2">Loading script…</div>
     </div>
 
     <!-- Task-specific action panel -->
@@ -265,7 +323,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT001" rows="2" placeholder="Document what was discussed…"></textarea></div>
         <div class="btn-row">
           <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Schedule Appointment</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
@@ -292,7 +350,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT002" rows="2" placeholder="New date/time confirmed or other notes…"></textarea></div>
         <div class="btn-row">
           <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Open Scheduling Wizard</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
@@ -317,8 +375,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
         <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT003" rows="2" placeholder="Steps taken, pharmacy info, outcome…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="goTo('/provider/messages')">✉️ Message Provider</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
+          <button class="btn btn-primary" onclick="openMo('msgProviderModal')">✉️ Message Provider</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
         </div>
       </div>
     </div>
@@ -345,8 +403,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
         <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT004" rows="2" placeholder="Describe what was discussed and resolution…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
@@ -370,15 +428,55 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         </div>
         <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT005" rows="2" placeholder="What was explained or actioned…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Send Instructions to Patient</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Send Instructions to Patient</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
         </div>
       </div>
     </div>
 
+    <!-- Stage 2 nav -->
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">
+      <button class="btn btn-outline" onclick="ctGoStage(1)" style="font-size:12px;">← Back</button>
+      <button class="btn btn-primary" onclick="ctGoStage(3)" style="font-size:12px;">Next: Log &amp; Close →</button>
+    </div>
+
+    </div><!-- /Stage 2 -->
+
+    <!-- Stage 3: Log & Close -->
+    <div id="ctStage3" style="display:none;">
+
+    <!-- Activity Log Actions -->
+    <div class="action-card">
+      <div class="action-hdr"><h3>📋 Log Activity</h3><span style="color:#6B7280;font-size:11px;">Add entry to chart timeline</span></div>
+      <div class="action-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <button class="btn btn-outline" onclick="ctLogActivity('phone','s3')" style="border-color:#059669;color:#059669;font-size:11px;padding:6px 12px;">📞 Phone Call</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('email','s3')" style="border-color:#6B21A8;color:#6B21A8;font-size:11px;padding:6px 12px;">✉️ Email</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('note','s3')" style="border-color:#374151;color:#374151;font-size:11px;padding:6px 12px;">📝 Note</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('task','s3')" style="border-color:#D97706;color:#D97706;font-size:11px;padding:6px 12px;">✅ Task</button>
+        </div>
+        <div id="ctActivityFormS3" style="display:none;background:#F9F9F9;border-radius:8px;padding:10px;">
+          <div id="ctActivityTitleS3" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#374151;margin-bottom:8px;"></div>
+          <div id="ctActivityOutcomeRowS3" style="display:none;margin-bottom:8px;">
+            <select class="fs" id="ctActivityOutcomeS3" style="font-size:12px;"></select>
+          </div>
+          <textarea class="ft" id="ctActivityNotesS3" rows="2" placeholder="Add notes…" style="font-size:12px;margin-bottom:8px;"></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-success" onclick="ctSaveActivity('s3')" style="font-size:12px;">Save to Timeline</button>
+            <button class="btn btn-outline" onclick="document.getElementById('ctActivityFormS3').style.display='none'" style="font-size:12px;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 back nav -->
+    <div style="display:flex;justify-content:flex-start;margin-bottom:4px;">
+      <button class="btn btn-outline" onclick="ctGoStage(2)" style="font-size:12px;">← Back to Resolution</button>
+    </div>
+
     <!-- Bottom action bar -->
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <button class="btn btn-outline" onclick="goTo('/provider/queue')" style="flex:1;justify-content:center;">
+      <button class="btn btn-outline" onclick="goTo('/provider/chart/1')" style="flex:1;justify-content:center;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
         Open Chart
       </button>
@@ -408,6 +506,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
         Task completed and logged. Returning to queue…
       </div>
     </div>
+
+    </div><!-- /Stage 3 -->
 
   </div>
 
@@ -472,6 +572,38 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     <div class="mf">
       <button class="btn btn-outline" onclick="closeMo('routeModal')">Cancel</button>
       <button class="btn btn-primary" onclick="confirmRoute()">Route Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message Patient / Provider Modal -->
+<div class="mo" id="msgProviderModal">
+  <div class="mb">
+    <h3>✉️ Send Message</h3>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">To</label>
+      <select class="fs" id="msgTo">
+        <option>Patient</option>
+        <option>Primary Provider</option>
+        <option>Pharmacy</option>
+        <option>Billing Department</option>
+        <option>Care Team Supervisor</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Message</label>
+      <textarea class="ft" id="msgBody" rows="4" placeholder="Type your message here…"></textarea>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label class="fl">Priority</label>
+      <select class="fs" id="msgPriority">
+        <option>Normal</option>
+        <option>Urgent</option>
+      </select>
+    </div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('msgProviderModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendProviderMessage()">Log &amp; Send</button>
     </div>
   </div>
 </div>
@@ -639,6 +771,17 @@ function init() {
   var panel = document.getElementById('action-' + TASK_ID);
   if (panel) panel.style.display = '';
 
+  // Initialize stage 1 script
+  var s1 = document.getElementById('ctScript1');
+  if (s1) {
+    s1.textContent = ADMIN_SCRIPTS.stage1
+      .replace('[patient]', task.patient)
+      .replace('[name]', 'Alex Kim')
+      .replace('[program]', task.product);
+  }
+  // Start on stage 1
+  ctGoStage(1);
+
   renderLog();
 }
 
@@ -785,6 +928,103 @@ openMo = function(id) {
   }
   _origOpenMo(id);
 };
+
+// ─── Admin scripting config (source of truth: admin/scripting_config page) ───
+var ADMIN_SCRIPTS = {
+  stage1: 'Hello, may I speak with [patient]? This is [name] from Everlywell\'s Care Team calling regarding your [program] account. This call may be recorded for quality purposes. Before we get started, could you please verify your date of birth for me?',
+  stage2: {
+    'No Show': 'I\'m reaching out because it looks like you had a scheduled consult with us today that we missed you at. I wanted to check in and see how you\'re doing, and help get you rescheduled at a time that works better for you. Would that work?',
+    'Reschedule Appointment': 'I see you submitted a request to reschedule your upcoming appointment — we\'re happy to help with that. Do you have a preferred date or time in mind, or would you like me to check what\'s available with your provider?',
+    'Pharmacy Question': 'I understand you\'re having some trouble getting your prescription filled at your pharmacy. I\'m going to work through some options with you right now to get this resolved as quickly as possible.',
+    'Billing Issue': 'I see there\'s a question about a recent charge on your account. I want to make sure we get this completely cleared up for you today. Could you walk me through what you\'re seeing on your end?',
+    'Product Question': 'I understand you have a question about your at-home test kit — I\'m happy to walk you through it step by step. Do you have the kit in front of you right now so we can go through it together?'
+  }
+};
+
+var _ctStage = 1;
+
+function ctGoStage(n) {
+  _ctStage = n;
+  [1,2,3].forEach(function(s) {
+    var el = document.getElementById('ctStage' + s);
+    if (el) el.style.display = (s === n) ? '' : 'none';
+  });
+  // Progress bar dot + label updates
+  var labels = ['Verify & Context','Resolution','Log & Close'];
+  [1,2,3].forEach(function(s) {
+    var dot = document.getElementById('ctStageDot' + s);
+    var lbl = document.getElementById('ctStageLabel' + s);
+    if (dot) {
+      if (s < n)       { dot.style.background = '#059669'; dot.style.color = '#fff'; }
+      else if (s === n){ dot.style.background = '#6B21A8'; dot.style.color = '#fff'; }
+      else             { dot.style.background = '#E5E0D8'; dot.style.color = '#9CA3AF'; }
+    }
+    if (lbl) {
+      lbl.style.color = (s <= n) ? '#6B21A8' : '#9CA3AF';
+      lbl.style.fontWeight = (s === n) ? '700' : '600';
+    }
+  });
+  // Populate stage 2 script from admin config
+  if (n === 2) {
+    var s2 = document.getElementById('ctScript2');
+    if (s2 && task) {
+      s2.textContent = ADMIN_SCRIPTS.stage2[task.type] || 'Please follow standard resolution protocol for this task type.';
+      var tag = document.getElementById('ctScript2Tag');
+      if (tag) tag.textContent = 'ADMIN-SCRIPT-' + task.type.replace(/\s+/g,'-').toUpperCase().substring(0,12);
+    }
+  }
+}
+
+// Activity logging (supports both inline and stage-3 instances)
+var _ctActivityType = '';
+var CT_ACTIVITY_OPTIONS = {
+  phone: { label: '📞 Phone Call', dot: 'green',  outcomes: ['Reached — spoke with patient','Left voicemail','No answer','Wrong number / disconnected','Patient requested callback'] },
+  email: { label: '✉️ Email',      dot: 'purple', outcomes: ['Email sent to patient','Email sent to provider','Email sent to pharmacy','Awaiting reply'] },
+  note:  { label: '📝 Note',       dot: '',       outcomes: [] },
+  task:  { label: '✅ Task',        dot: 'amber',  outcomes: ['Task created — assigned to team','Task created — self','Follow-up reminder set','Escalation flag added'] }
+};
+
+function ctLogActivity(type, ctx) {
+  var suffix = (ctx === 'inline') ? 'Inline' : 'S3';
+  _ctActivityType = type;
+  var cfg = CT_ACTIVITY_OPTIONS[type];
+  document.getElementById('ctActivityTitle'  + suffix).textContent = cfg.label;
+  var outRow = document.getElementById('ctActivityOutcomeRow' + suffix);
+  var outSel = document.getElementById('ctActivityOutcome'    + suffix);
+  if (cfg.outcomes.length > 0) {
+    outSel.innerHTML = '<option value="">— Select outcome —</option>' +
+      cfg.outcomes.map(function(o){ return '<option>' + o + '</option>'; }).join('');
+    outRow.style.display = '';
+  } else {
+    outRow.style.display = 'none';
+  }
+  document.getElementById('ctActivityNotes' + suffix).value = '';
+  document.getElementById('ctActivityForm'  + suffix).style.display = '';
+}
+
+function ctSaveActivity(ctx) {
+  var suffix = (ctx === 'inline') ? 'Inline' : 'S3';
+  var notes   = document.getElementById('ctActivityNotes'   + suffix).value.trim();
+  var outEl   = document.getElementById('ctActivityOutcome' + suffix);
+  var outcome = outEl ? outEl.value : '';
+  var cfg  = CT_ACTIVITY_OPTIONS[_ctActivityType] || { label: 'Activity', dot: '' };
+  var text = cfg.label + (outcome ? ': ' + outcome : '');
+  addLog(text, cfg.dot, notes || 'Logged by Alex Kim');
+  document.getElementById('ctActivityForm' + suffix).style.display = 'none';
+  toast((cfg.label || 'Activity') + ' logged to chart');
+}
+
+// Message provider/patient — logs inline instead of navigating away
+function sendProviderMessage() {
+  var to   = document.getElementById('msgTo').value;
+  var body = document.getElementById('msgBody').value.trim();
+  if (!body) { toast('Please enter a message.'); return; }
+  var dot = to === 'Patient' ? 'purple' : 'blue';
+  addLog('✉️ Message sent → ' + to, dot, body.substring(0,80) + (body.length > 80 ? '…' : ''));
+  closeMo('msgProviderModal');
+  document.getElementById('msgBody').value = '';
+  toast('Message logged in chart activity');
+}
 
 function toast(msg) {
   var t = document.getElementById('_toast');
