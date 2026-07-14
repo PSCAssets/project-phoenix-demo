@@ -326,7 +326,7 @@
         <div>
           <div class="topbar-name">{{ session.get('display_name', 'Dr. Sarah Lee, MD') }}</div>
           <div class="topbar-role">Internal Medicine · Provider Portal MD</div>
-          <div class="topbar-license-warn" style="font-size:10px;color:#F59E0B;margin-top:3px;">⚠ CA License expires Dec 15, 2026 — <a onclick="alert('Opening license renewal portal...')" style="color:#F59E0B;cursor:pointer;text-decoration:underline;">Renew</a></div>
+          <div class="topbar-license-warn" id="licBanner" style="font-size:10px;color:#F59E0B;margin-top:3px;">⚠ CA License expires Dec 15, 2026 — <a onclick="openLicenseModal()" style="color:#F59E0B;cursor:pointer;text-decoration:underline;">Update Status</a></div>
         </div>
       </div>
     </div>
@@ -617,7 +617,7 @@
                   <td><span class="cr-type">Async</span></td>
                   <td style="font-size:10px;color:#6B7280;white-space:nowrap">Questionnaire Sent</td>
                   <td><span class="pending-wait" style="margin-left:0;text-align:left">1d 2h</span></td>
-                  <td><button class="cr-btn secondary" onclick="event.stopPropagation();alert('Sending follow-up to F.H. for CST-2026-10838')">Follow Up</button></td>
+                  <td></td>
                 </tr>
                 <tr data-type="Async" data-duration-sec="64800" onclick="alert('View CST-2026-10847')">
                   <td><div class="pri-dot p4" style="margin:0 auto"></div></td>
@@ -628,7 +628,7 @@
                   <td><span class="cr-type">Async</span></td>
                   <td style="font-size:10px;color:#6B7280;white-space:nowrap">Photo Upload Pending</td>
                   <td><span class="pending-wait" style="margin-left:0;text-align:left">18h</span></td>
-                  <td><button class="cr-btn secondary" onclick="event.stopPropagation();alert('Sending follow-up to E.V. for CST-2026-10847')">Follow Up</button></td>
+                  <td></td>
                 </tr>
                 <tr data-type="Async" data-duration-sec="180000" onclick="alert('View CST-2026-10829')">
                   <td><div class="pri-dot p4" style="margin:0 auto"></div></td>
@@ -639,7 +639,7 @@
                   <td><span class="cr-type">Async</span></td>
                   <td style="font-size:10px;color:#6B7280;white-space:nowrap">Awaiting Patient Response</td>
                   <td><span class="pending-wait" style="margin-left:0;text-align:left">2d 1h</span></td>
-                  <td><button class="cr-btn secondary" onclick="event.stopPropagation();alert('Sending follow-up to H.M. for CST-2026-10829')">Follow Up</button></td>
+                  <td></td>
                 </tr>
               </tbody>
             </table>
@@ -881,6 +881,56 @@
   </div>
   <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
 
+  <!-- License Status Modal (M01-LIC-004) -->
+  <div id="licModalOverlay" onclick="closeLicenseModal()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:500;"></div>
+  <div id="licModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:501;background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.18);width:460px;max-width:94vw;font-family:inherit;">
+    <div style="padding:20px 24px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="font-size:15px;font-weight:700;color:#374151;">License Expiry — Update Status</div>
+        <button onclick="closeLicenseModal()" style="background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;line-height:1;">×</button>
+      </div>
+      <div style="font-size:12px;color:#6B7280;margin-bottom:18px;">⚠ CA License · Expires Dec 15, 2026 · Source: Verifiable</div>
+      <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:10px;">Select a status to notify Clinical Operations:</div>
+
+      <!-- Option 1 -->
+      <label id="licOpt1" onclick="selectLicOpt(1)" style="display:flex;align-items:flex-start;gap:10px;border:1.5px solid #E5E0D8;border-radius:9px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;">
+        <input type="radio" name="licStatus" value="renewing" style="margin-top:2px;accent-color:#6B21A8;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#374151;">Renew In Progress</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:2px;">Renewal has been initiated. Provide details below.</div>
+        </div>
+      </label>
+
+      <!-- Option 2 -->
+      <label id="licOpt2" onclick="selectLicOpt(2)" style="display:flex;align-items:flex-start;gap:10px;border:1.5px solid #E5E0D8;border-radius:9px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:border-color 0.15s;">
+        <input type="radio" name="licStatus" value="not_renewing" style="margin-top:2px;accent-color:#6B21A8;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#374151;">Not Renewing</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:2px;">This license will not be renewed. Reason required.</div>
+        </div>
+      </label>
+
+      <!-- Option 3 -->
+      <label id="licOpt3" onclick="selectLicOpt(3)" style="display:flex;align-items:flex-start;gap:10px;border:1.5px solid #E5E0D8;border-radius:9px;padding:12px 14px;margin-bottom:14px;cursor:pointer;transition:border-color 0.15s;">
+        <input type="radio" name="licStatus" value="info_needed" style="margin-top:2px;accent-color:#6B21A8;">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#374151;">Request More Information</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:2px;">Need guidance from Clinical Operations on next steps.</div>
+        </div>
+      </label>
+
+      <!-- Notes field -->
+      <div style="margin-bottom:18px;">
+        <label style="font-size:11px;font-weight:700;color:#374151;display:block;margin-bottom:5px;" id="licNotesLabel">Notes <span style="color:#9CA3AF;font-weight:400;">(optional)</span></label>
+        <textarea id="licNotes" rows="3" placeholder="Add any relevant details..." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:none;outline:none;box-sizing:border-box;"></textarea>
+      </div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #F0EBE4;display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeLicenseModal()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;font-family:inherit;">Cancel</button>
+      <button onclick="submitLicenseStatus()" id="licSubmitBtn" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Submit to Care Team</button>
+    </div>
+  </div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -1078,6 +1128,40 @@ function showToast(msg) {
 }
 
 
+
+// ── License Status Modal (M01-LIC-004) ──────────────────────────────
+function openLicenseModal() {
+  document.getElementById('licModal').style.display = 'block';
+  document.getElementById('licModalOverlay').style.display = 'block';
+}
+function closeLicenseModal() {
+  document.getElementById('licModal').style.display = 'none';
+  document.getElementById('licModalOverlay').style.display = 'none';
+}
+function selectLicOpt(n) {
+  [1,2,3].forEach(function(i) {
+    var el = document.getElementById('licOpt'+i);
+    el.style.borderColor = (i===n) ? '#6B21A8' : '#E5E0D8';
+    el.style.background  = (i===n) ? '#F5F3FF' : '#fff';
+  });
+  var labels = {1:'Notes (renewal details, submitted date, portal reference):', 2:'Reason for not renewing (required):', 3:'Notes (optional):'};
+  document.getElementById('licNotesLabel').textContent = labels[n];
+}
+function submitLicenseStatus() {
+  var sel = document.querySelector('input[name="licStatus"]:checked');
+  if (!sel) { alert('Please select a status option.'); return; }
+  var labels = {renewing:'Renew In Progress', not_renewing:'Not Renewing', info_needed:'Request More Information'};
+  var status = labels[sel.value];
+  var notes = document.getElementById('licNotes').value.trim();
+  if (sel.value === 'not_renewing' && !notes) { alert('A reason is required when selecting Not Renewing.'); return; }
+  // Close modal and update banner to reflect submitted status
+  closeLicenseModal();
+  var banner = document.getElementById('licBanner');
+  banner.style.color = '#6B7280';
+  banner.innerHTML = '✓ CA License · Status submitted to Care Team: <strong>' + status + '</strong>' +
+    (notes ? ' — "' + notes.substring(0,60) + (notes.length>60?'…':'') + '"' : '') +
+    ' <span style="font-size:10px;color:#9CA3AF;">(Care Team Queue · Pending review)</span>';
+}
 </script>
 {% endraw %}
 {% endblock %}
