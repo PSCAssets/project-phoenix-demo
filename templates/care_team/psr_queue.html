@@ -365,14 +365,20 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="escalate"> Patient needs portal registration assistance — escalate</label>
           </div>
         </div>
-        <!-- Consult Preference Discussed -->
+        <!-- Initiate Consult — On Demand / Scheduled cards -->
         <div class="form-group">
-          <label class="form-label">Consult Preference Discussed</label>
-          <div style="display:flex;flex-direction:column;gap:7px;">
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="ondemand" onclick="consultPrefChanged('ondemand')"> On Demand — patient wants immediate availability</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="scheduled" onclick="consultPrefChanged('scheduled')"> Scheduled — patient will select time in portal</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="decide" onclick="consultPrefChanged('decide')"> Patient will decide in portal</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="consultPref" value="declined" onclick="consultPrefChanged('declined')"> Patient declined</label>
+          <label class="form-label">Initiate Consult</label>
+          <div style="display:flex;gap:10px;">
+            <div id="psrCardOD" onclick="selectConsultType('ondemand')" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .15s;text-align:center;background:#fff;">
+              <div style="font-size:24px;margin-bottom:6px;">⚡</div>
+              <div style="font-size:13px;font-weight:700;color:#059669;">On Demand</div>
+              <div style="font-size:10px;color:#6B7280;margin-top:4px;line-height:1.5;">Immediate connection<br>Portal link sent to patient</div>
+            </div>
+            <div id="psrCardSched" onclick="selectConsultType('scheduled')" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .15s;text-align:center;background:#fff;">
+              <div style="font-size:24px;margin-bottom:6px;">📅</div>
+              <div style="font-size:13px;font-weight:700;color:#7C3AED;">Scheduled</div>
+              <div style="font-size:10px;color:#6B7280;margin-top:4px;line-height:1.5;">Opens scheduling wizard<br>State-filtered provider slots</div>
+            </div>
           </div>
         </div>
 
@@ -392,14 +398,6 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
           <div style="font-size:12px;color:#065F46;line-height:1.6;background:#D1FAE5;border-radius:6px;padding:10px;">
             A portal access link will be sent to <strong id="odPatientNameDisplay">the patient</strong> to create or log into their Everlywell patient portal. They will be connected with an available provider in their state.
           </div>
-        </div>
-
-        <!-- Scheduled — launch wizard -->
-        <div id="schedWizardLaunch" style="display:none;">
-          <button type="button" onclick="launchSchedulingWizard()" style="width:100%;background:#7C3AED;color:#fff;border:none;border-radius:8px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;">
-            📅 Open Scheduling Wizard →
-          </button>
-          <div style="font-size:10px;color:#6B7280;text-align:center;margin-top:4px;">Demographics · Appt Type · Provider (state-filtered) · Date &amp; Time · Confirm</div>
         </div>
         <!-- Escalation options -->
         <div class="form-group" style="margin-top:2px;">
@@ -459,11 +457,11 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('callOutcome').value = '';
   document.getElementById('schedulingSection').style.display = 'none';
   document.getElementById('escalateConfirm').style.display = 'none';
-  document.getElementById('schedWizardLaunch').style.display = 'none';
   document.getElementById('onDemandConsultPanel').style.display = 'none';
   document.getElementById('attemptWarning').style.display = attempts >= 2 ? '' : 'none';
   document.querySelectorAll('input[name="portalNextStep"]').forEach(function(r){ r.checked = false; });
-  document.querySelectorAll('input[name="consultPref"]').forEach(function(r){ r.checked = false; });
+  selectedConsultType = null;
+  ['psrCardOD','psrCardSched'].forEach(function(id){ var el = document.getElementById(id); if(el){ el.style.border = '2px solid #E5E7EB'; el.style.background = '#fff'; } });
   ['hv1','hv2','hv3'].forEach(function(id){ document.getElementById(id).checked = false; });
 
   // Populate inline HIPAA verification values
@@ -485,9 +483,26 @@ function outcomeChanged() {
   document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'portal_notified') ? '' : 'none';
 }
 
-function consultPrefChanged(pref) {
-  document.getElementById('onDemandConsultPanel').style.display = (pref === 'ondemand') ? '' : 'none';
-  document.getElementById('schedWizardLaunch').style.display = (pref === 'scheduled') ? '' : 'none';
+var selectedConsultType = null;
+function selectConsultType(type) {
+  selectedConsultType = type;
+  // Reset card styles
+  document.getElementById('psrCardOD').style.border = '2px solid #E5E7EB';
+  document.getElementById('psrCardOD').style.background = '#fff';
+  document.getElementById('psrCardSched').style.border = '2px solid #E5E7EB';
+  document.getElementById('psrCardSched').style.background = '#fff';
+
+  if (type === 'ondemand') {
+    document.getElementById('psrCardOD').style.border = '2px solid #059669';
+    document.getElementById('psrCardOD').style.background = '#F0FDF4';
+    document.getElementById('onDemandConsultPanel').style.display = '';
+  } else {
+    document.getElementById('onDemandConsultPanel').style.display = 'none';
+    // Scheduled: log and launch wizard immediately
+    closeModal('callModal');
+    showToast('Call logged — Launching scheduling wizard...');
+    setTimeout(function(){ window.location = '/scheduler/search-patient?tab=patient'; }, 800);
+  }
 }
 
 function launchSchedulingWizard() {
@@ -581,11 +596,9 @@ function openPatientModal(patient, product, result, client, state, attempts, con
 }
 
 function logCall() {
-  var pref = document.querySelector('input[name="consultPref"]:checked');
-  if (pref && (pref.value === 'ondemand' || pref.value === 'scheduled')) {
-    // Wizard should have been launched — if still here just log and close
+  if (selectedConsultType === 'ondemand' || selectedConsultType === 'scheduled') {
     closeModal('callModal');
-    showToast('Call logged — ' + (pref.value === 'ondemand' ? 'On Demand' : 'Scheduled') + ' preference recorded');
+    showToast('Call logged — ' + (selectedConsultType === 'ondemand' ? 'On Demand' : 'Scheduled') + ' preference recorded');
   } else {
     closeModal('callModal');
     showToast('Call logged successfully');
