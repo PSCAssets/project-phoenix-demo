@@ -219,186 +219,177 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       <p class="ctx-text" id="taskCtx">Loading…</p>
     </div>
 
-    <!-- T001: Follow-up Outreach -->
-    <div id="action-T001" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>📞 Outreach Workflow</h3><span>Log contact attempts</span></div>
+    <!-- Contact Patient Button (shared across all task types) -->
+    <div class="action-card" style="background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;">
+      <div class="action-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#065F46;margin-bottom:3px;">Outbound Contact</div>
+          <div style="font-size:14px;font-weight:700;color:#111827;" id="patPhDisplay">—</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:2px;" id="patEmailDisplay">—</div>
+        </div>
+        <button class="btn btn-success" onclick="openMo('contactModal')" style="font-size:13px;padding:9px 22px;white-space:nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 013 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          Contact Patient
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Activity Timeline (inline from chart) -->
+    <div class="ctx-card">
+      <h3 style="margin-bottom:10px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        Recent Activity — Patient Chart
+        <button onclick="goTo('/provider/queue')" style="margin-left:auto;font-size:11px;font-weight:600;color:#6B21A8;background:none;border:none;cursor:pointer;text-decoration:underline;">Open Full Chart →</button>
+      </h3>
+      <div id="inlineTimeline" style="display:flex;flex-direction:column;gap:6px;"></div>
+    </div>
+
+    <!-- Task-specific action panel -->
+    <!-- CT001: No Show -->
+    <div id="action-CT001" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>⚠️ No Show — Reschedule Outreach</h3><span style="color:#DC2626;font-weight:600;">CRITICAL · Contact within 2h</span></div>
       <div class="action-body">
-        <div class="fg"><label class="fl">Previous Attempts</label>
-          <div class="attempt-log" id="alog-T001">
-            <div class="attempt-entry"><span class="adot adot-vm"></span><span class="atype">Portal message</span><span style="flex:1;font-size:11px;color:#6B7280;">Post-consult auto-message via portal</span><span class="atime">Jul 9 · 2:14 PM</span></div>
-          </div>
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:11px;font-size:12px;color:#7F1D1D;margin-bottom:12px;line-height:1.6;">
+          Patient <strong>S.R.</strong> missed their scheduled Thyroid Program consult at <strong>9:30 AM</strong> today. Contact the patient to determine the reason and reschedule as soon as possible.
         </div>
-        <div class="fg">
-          <label class="fl">Log New Attempt</label>
-          <div class="fr">
-            <div class="fg"><select class="fs" id="at-T001"><option value="">— Type —</option><option>Phone call — No answer</option><option>Phone call — Voicemail left</option><option>Phone call — Spoke with patient</option><option>SMS sent</option><option>Portal message sent</option></select></div>
-            <button class="btn btn-outline btn-sm" onclick="logAttempt('T001')" style="height:34px;white-space:nowrap;">Log Attempt</button>
-          </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT001">
+            <option value="">— Select outcome —</option>
+            <option>Reached — appointment rescheduled</option>
+            <option>Reached — patient cancelled, no reschedule</option>
+            <option>Left voicemail — patient to call back</option>
+            <option>No answer — follow-up attempt scheduled</option>
+            <option>Escalate — third no-show</option>
+          </select>
         </div>
-        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-T001" rows="2" placeholder="Add context…"></textarea></div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT001" rows="2" placeholder="Document what was discussed…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="goTo('/provider/schedule')">📅 Schedule Appointment</button>
+          <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Schedule Appointment</button>
           <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
 
-    <!-- T002: Care Coordination -->
-    <div id="action-T002" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>💬 Patient Coordination</h3><span>Respond to patient inquiry</span></div>
+    <!-- CT002: Reschedule Appointment -->
+    <div id="action-CT002" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>📅 Reschedule Appointment</h3><span style="color:#D97706;font-weight:600;">HIGH · Patient requested change</span></div>
       <div class="action-body">
-        <div class="fg">
-          <label class="fl">Patient Question</label>
-          <div style="background:#F9F5FF;border:1px solid #C4B5FD;border-radius:8px;padding:11px;font-size:13px;color:#374151;line-height:1.5;">
-            "When will my next lab kit arrive? I have a follow-up scheduled for July 20 and need the results first."
-            <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Via patient portal · Jul 9 · 11:38 AM</div>
-          </div>
+        <div style="background:#FAF7F2;border:1px solid #E5E0D8;border-radius:8px;padding:11px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Current Appt</span>Jul 18 at 2:00 PM</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Provider</span>Dr. Simone Patel, MD</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Program</span>Metabolic Health</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Reason</span>Patient schedule conflict</div>
         </div>
         <div class="fg"><label class="fl">Resolution</label>
-          <select class="fs" id="res-T002">
+          <select class="fs" id="res-CT002">
             <option value="">— Select outcome —</option>
-            <option>Lab kit shipped — tracking sent to patient</option>
-            <option>Lab kit delayed — patient notified, consult rescheduled</option>
-            <option>Lab kit re-ordered — patient notified</option>
-            <option>Referred to provider for guidance</option>
+            <option>Rescheduled — new date confirmed with patient</option>
+            <option>Patient will self-schedule via portal</option>
+            <option>Patient cancelled — no reschedule requested</option>
+            <option>Unable to reach — follow-up needed</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Response / Notes</label><textarea class="ft" id="n-T002" rows="3" placeholder="Describe what you did or type a message to the patient…"></textarea></div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT002" rows="2" placeholder="New date/time confirmed or other notes…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="goTo('/provider/messages')">✉️ Send Message to Patient</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/schedule')">📅 Reschedule Consult</button>
+          <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Open Scheduling Wizard</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
 
-    <!-- T003: Unable to Reach -->
-    <div id="action-T003" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>⚡ Unable to Reach — Escalated</h3><span style="color:#DC2626;font-weight:600;">CRITICAL · Manual outreach required</span></div>
+    <!-- CT003: Pharmacy Question -->
+    <div id="action-CT003" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>💊 Pharmacy Question</h3><span style="color:#D97706;font-weight:600;">HIGH · Rx-related inquiry</span></div>
       <div class="action-body">
-        <div class="fg"><label class="fl">Auto-Attempt History</label>
-          <div class="attempt-log">
-            <div class="attempt-entry"><span class="adot adot-miss"></span><span class="atype">Auto-call #1</span><span style="flex:1;font-size:11px;color:#6B7280;">No answer — 30s ring</span><span class="atime">9:02 AM</span></div>
-            <div class="attempt-entry"><span class="adot adot-miss"></span><span class="atype">Auto-call #2</span><span style="flex:1;font-size:11px;color:#6B7280;">No answer — 30s ring</span><span class="atime">9:10 AM</span></div>
-            <div class="attempt-entry"><span class="adot adot-miss"></span><span class="atype">Auto-call #3</span><span style="flex:1;font-size:11px;color:#6B7280;">No answer — escalated</span><span class="atime">9:18 AM</span></div>
-          </div>
-        </div>
-        <div class="fg">
-          <label class="fl">Log Manual Attempt</label>
-          <div class="fr">
-            <div class="fg"><select class="fs" id="at-T003"><option value="">— Type —</option><option>Phone call — No answer</option><option>Phone call — Voicemail left</option><option>Phone call — Spoke with patient</option><option>SMS sent</option><option>Portal message sent</option></select></div>
-            <button class="btn btn-outline btn-sm" onclick="logAttempt('T003')" style="height:34px;white-space:nowrap;">Log Attempt</button>
-          </div>
-        </div>
-        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-T003" rows="2" placeholder="Add context…"></textarea></div>
-        <div class="btn-row">
-          <button class="btn btn-primary" onclick="goTo('/care-team/psr/dxs-queue')">📞 Open DXS Queue</button>
-          <button class="btn btn-outline" onclick="openMo('callbackModal')">📅 Schedule Callback</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Send Message</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- T004: Untreated Rx -->
-    <div id="action-T004" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>💊 Untreated Rx — Investigation</h3><span style="color:#D97706;font-weight:600;">Consult closed without Rx record</span></div>
-      <div class="action-body">
-        <div class="fg"><label class="fl">Consult Summary</label>
-          <div style="background:#FAF7F2;border:1px solid var(--border);border-radius:8px;padding:11px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
-            <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Provider</span>Dr. Alencar, NP</div>
-            <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Program</span>Weight Management</div>
-            <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Expected Rx</span>Tirzepatide 2.5mg</div>
-            <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Rx Status</span><span style="color:#DC2626;font-weight:600;">Not Found</span></div>
-          </div>
+        <div style="background:#F9F5FF;border:1px solid #C4B5FD;border-radius:8px;padding:11px;font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px;">
+          "My pharmacy said they can't fill my Tirzepatide prescription — they're saying it's out of stock. What do I do?"
+          <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Via patient portal · Today · 8:47 AM</div>
         </div>
         <div class="fg"><label class="fl">Resolution</label>
-          <select class="fs" id="res-T004">
-            <option value="">— Select finding —</option>
-            <option>Rx sent via outside pharmacy — logged manually</option>
-            <option>Patient declined Rx — documented in chart</option>
-            <option>Provider will re-open and issue Rx</option>
-            <option>Rx not clinically indicated — consult closed correctly</option>
-            <option>Requires clinical operations review</option>
+          <select class="fs" id="res-CT003">
+            <option value="">— Select outcome —</option>
+            <option>Pharmacy located — patient directed to alternative</option>
+            <option>Prior auth required — initiated with provider</option>
+            <option>Referred to clinical team for alternative Rx</option>
+            <option>Patient directed to contact pharmacy directly</option>
+            <option>Escalated to provider for review</option>
           </select>
         </div>
-        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-T004" rows="3" placeholder="Describe findings and action taken…"></textarea></div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT003" rows="2" placeholder="Steps taken, pharmacy info, outcome…"></textarea></div>
         <div class="btn-row">
           <button class="btn btn-primary" onclick="goTo('/provider/messages')">✉️ Message Provider</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Patient Chart</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
         </div>
       </div>
     </div>
 
-    <!-- T005: Reassignment Needed -->
-    <div id="action-T005" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>🔄 Provider Reassignment</h3><span style="color:#D97706;font-weight:600;">SLA: 8h remaining · OR license required</span></div>
+    <!-- CT004: Billing Issue -->
+    <div id="action-CT004" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>💳 Billing Issue</h3><span style="color:#6B7280;">NORMAL · Charge dispute</span></div>
       <div class="action-body">
-        <div class="fg"><label class="fl">Current Provider</label>
-          <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:7px;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:8px;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <div><strong>Dr. Goldstein, MD</strong> — Thyroid · Schedule conflict</div>
-          </div>
+        <div style="background:#FAF7F2;border:1px solid #E5E0D8;border-radius:8px;padding:11px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Charge Date</span>Jul 7, 2026</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Amount</span>$199.00</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Service</span>Annual Wellness Consult</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Status</span><span style="color:#DC2626;font-weight:600;">Disputed</span></div>
         </div>
-        <div class="fg"><label class="fl">Select New Provider</label>
-          <div class="prov-list">
-            <div class="prov-row" onclick="selectProv(this,'Dr. Simone Patel, MD')">
-              <div class="pav">SP</div>
-              <div style="flex:1;"><div class="pname">Dr. Simone Patel, MD</div><div class="pmeta">Thyroid · OR licensed · 3 open slots today</div></div>
-              <span class="pbadge">Available</span>
-            </div>
-            <div class="prov-row" onclick="selectProv(this,'Dr. Daniel Kim, MD')">
-              <div class="pav">DK</div>
-              <div style="flex:1;"><div class="pname">Dr. Daniel Kim, MD</div><div class="pmeta">Thyroid, Metabolic · OR licensed · 1 slot</div></div>
-              <span class="pbadge busy">Limited</span>
-            </div>
-            <div class="prov-row" onclick="selectProv(this,'Dr. Ama Osei, MD')">
-              <div class="pav">AO</div>
-              <div style="flex:1;"><div class="pname">Dr. Ama Osei, MD</div><div class="pmeta">Thyroid · OR licensed · 5 open slots today</div></div>
-              <span class="pbadge">Available</span>
-            </div>
-          </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT004">
+            <option value="">— Select outcome —</option>
+            <option>Charge explained — patient satisfied</option>
+            <option>Refund issued — documented in system</option>
+            <option>Escalated to billing department</option>
+            <option>Insurance submitted — pending EOB</option>
+            <option>Patient to follow up with insurance directly</option>
+          </select>
         </div>
-        <div class="fg"><label class="fl">Note (optional)</label><textarea class="ft" id="n-T005" rows="2" placeholder="Context for the new provider…"></textarea></div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT004" rows="2" placeholder="Describe what was discussed and resolution…"></textarea></div>
         <div class="btn-row">
-          <button class="btn btn-primary" id="reassignBtn" onclick="doReassign()" disabled style="opacity:0.5;">Confirm Reassignment</button>
-          <button class="btn btn-outline" onclick="goTo('/provider/queue')">View Consult</button>
-        </div>
-        <div id="reassignOk" class="success-banner" style="display:none;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
-          Reassigned to <strong id="reassignedTo" style="margin-left:3px;"></strong> · SLA clock resumed
+          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Message Patient</button>
         </div>
       </div>
     </div>
 
-    <!-- T006: Post-Consult Follow-up -->
-    <div id="action-T006" class="action-card" style="display:none;">
-      <div class="action-hdr"><h3>✅ Post-Consult Checklist</h3><span>Complete all 3 steps to resolve</span></div>
+    <!-- CT005: Product Question -->
+    <div id="action-CT005" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>❓ Product Question</h3><span style="color:#6B7280;">NORMAL · Education needed</span></div>
       <div class="action-body">
-        <div class="cl-item" id="cl1" onclick="toggleCl('cl1','cb1','Lab kit order status verified')">
-          <input type="checkbox" class="cl-cb" id="cb1" onclick="event.stopPropagation();toggleCl('cl1','cb1','Lab kit order status verified')" />
-          <div class="cl-content">
-            <div class="cl-title">Confirm lab kit ordered</div>
-            <div class="cl-desc">Verify A1C retest kit ordered and shipped to patient L.H.</div>
-            <div class="cl-act"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();addLog('Lab kit order verified','green','');clProgress()">Mark Verified</button></div>
-          </div>
+        <div style="background:#F9F5FF;border:1px solid #C4B5FD;border-radius:8px;padding:11px;font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px;">
+          "I received my Testosterone test kit but I'm not sure how to collect the sample. Can someone walk me through it?"
+          <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Via patient portal · Today · 10:22 AM</div>
         </div>
-        <div class="cl-item" id="cl2" onclick="toggleCl('cl2','cb2','Follow-up consult scheduled')">
-          <input type="checkbox" class="cl-cb" id="cb2" onclick="event.stopPropagation();toggleCl('cl2','cb2','Follow-up consult scheduled')" />
-          <div class="cl-content">
-            <div class="cl-title">Schedule 30-day follow-up consult</div>
-            <div class="cl-desc">Book follow-up with Dr. Lee — Annual Wellness · ~Aug 6</div>
-            <div class="cl-act"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();goTo('/provider/schedule')">Open Scheduler →</button></div>
-          </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT005">
+            <option value="">— Select outcome —</option>
+            <option>Patient educated — collection instructions provided</option>
+            <option>Replacement kit sent — patient reported defect</option>
+            <option>Referred to provider education resources</option>
+            <option>Escalated to clinical team</option>
+          </select>
         </div>
-        <div class="cl-item" id="cl3" onclick="toggleCl('cl3','cb3','Patient reminder sent')">
-          <input type="checkbox" class="cl-cb" id="cb3" onclick="event.stopPropagation();toggleCl('cl3','cb3','Patient reminder sent')" />
-          <div class="cl-content">
-            <div class="cl-title">Send patient follow-up reminder</div>
-            <div class="cl-desc">Message patient L.H. with next steps and appointment info.</div>
-            <div class="cl-act"><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();goTo('/provider/messages')">Open Messages →</button></div>
-          </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT005" rows="2" placeholder="What was explained or actioned…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="goTo('/provider/messages')">✉️ Send Instructions to Patient</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/queue')">👤 View Chart</button>
         </div>
-        <div id="clProg" style="margin-top:10px;padding:9px 12px;background:#FAF7F2;border-radius:7px;font-size:12px;color:#6B7280;text-align:center;">0 of 3 steps complete</div>
       </div>
+    </div>
+
+    <!-- Bottom action bar -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-outline" onclick="goTo('/provider/queue')" style="flex:1;justify-content:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Open Chart
+      </button>
+      <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')" style="flex:1;justify-content:center;background:#059669;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule Consultation
+      </button>
+      <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient&reschedule=1')" style="flex:1;justify-content:center;background:#7C3AED;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Reschedule Consult
+      </button>
     </div>
 
     <!-- Resolution -->
@@ -429,6 +420,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   </div>
 
 </main>
+
+<!-- Contact Patient Modal -->
+<div class="mo" id="contactModal">
+  <div class="mb">
+    <h3>📞 Log Outbound Call</h3>
+    <div style="background:#F0FDF4;border:1px solid #6EE7B7;border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:700;color:#065F46;text-transform:uppercase;margin-bottom:3px;">Calling</div>
+      <div style="font-size:14px;font-weight:700;color:#111827;" id="contactModalPhone">—</div>
+      <div style="font-size:12px;color:#6B7280;" id="contactModalPatient">—</div>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Call Outcome</label>
+      <select class="fs" id="callOutcome">
+        <option value="">— Select outcome —</option>
+        <option value="reached">Reached — spoke with patient</option>
+        <option value="voicemail">Left voicemail</option>
+        <option value="no_answer">No answer</option>
+        <option value="wrong_number">Wrong number / disconnected</option>
+        <option value="callback">Patient requested callback</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Call Notes</label>
+      <textarea class="ft" id="callNotes" rows="3" placeholder="What was discussed, next steps, patient response…"></textarea>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label class="fl">Resolution Status</label>
+      <select class="fs" id="callResolution">
+        <option value="">— Select status —</option>
+        <option value="resolved">Resolved — no further action needed</option>
+        <option value="followup">Follow-up needed</option>
+        <option value="escalate">Escalate to supervisor</option>
+      </select>
+    </div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('contactModal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveCallLog()">Save Call Log</button>
+    </div>
+  </div>
+</div>
 
 <!-- Route Modal -->
 <div class="mo" id="routeModal">
@@ -471,92 +502,77 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 {% raw %}
 <script>
 var TASKS = {
-  'T001': {
-    patient:'J.P.',initials:'JP',dob:'03/14/1968 (58 yrs)',phone:'(512) 447-2819',
-    product:'Testosterone Program',client:'Everlywell Direct',
-    consultId:'CST-2026-10848',resultDate:'Jul 7, 2026',
-    category:'Follow-up',type:'Outreach',urgency:'CRITICAL',
-    wait:'52 min',sla:'Contact within 2h of flag',slaW:'38%',slaC:'red',isAuto:false,
-    trigger:'Provider posted follow-up note: patient did not respond to initial message after 48h.',
-    ctx:'Patient J.P. completed a Testosterone consult on Jul 7. Provider Dr. Lee flagged for outreach — patient has not responded to the post-consult portal message and has a follow-up lab pending. SLA: contact within 24h of flag.',
+  'CT001': {
+    patient:'S.R.',initials:'SR',dob:'04/12/1985 (41 yrs)',phone:'(512) 334-9801',email:'s.reyes@email.com',
+    product:'Thyroid Program',client:'Everlywell Direct',
+    consultId:'CST-2026-10871',resultDate:'Jul 14, 2026',
+    category:'No Show',type:'No Show',urgency:'CRITICAL',
+    wait:'1h 12m',sla:'Contact within 2h',slaW:'60%',slaC:'red',isAuto:false,
+    trigger:'Patient did not attend scheduled consult at 9:30 AM. No cancellation notice received.',
+    ctx:'Patient S.R. had a Thyroid Program consult scheduled for 9:30 AM today and did not attend. No prior cancellation. This is the first no-show on record for this patient. Contact patient to reschedule as soon as possible.',
     log:[
-      {dot:'amber',time:'Jul 7 · 10:42 AM',text:'Consult completed',sub:'Dr. Lee, MD'},
-      {dot:'purple',time:'Jul 9 · 2:14 PM',text:'Auto follow-up message sent via portal',sub:'No response received'},
-      {dot:'red',time:'Jul 11 · 9:00 AM',text:'Provider flagged for CT outreach',sub:'SLA timer started'},
-      {dot:'',time:'Today · 10:08 AM',text:'Task created in CT Queue',sub:'Unassigned · 52 min wait'}
+      {dot:'green',time:'Jul 7 · 11:00 AM',text:'Consult scheduled',sub:'Dr. Patel, MD · Thyroid Program'},
+      {dot:'amber',time:'Jul 13 · 4:30 PM',text:'Appointment reminder sent',sub:'SMS + portal notification'},
+      {dot:'red',time:'Today · 9:35 AM',text:'No-show flagged',sub:'Patient did not attend — 9:30 AM consult'},
+      {dot:'',time:'Today · 10:02 AM',text:'Task created in CT Queue',sub:'Unassigned · 1h 12m wait'}
     ]
   },
-  'T002': {
-    patient:'D.K.',initials:'DK',dob:'09/22/1979 (46 yrs)',phone:'(213) 558-9034',
+  'CT002': {
+    patient:'D.M.',initials:'DM',dob:'11/30/1978 (47 yrs)',phone:'(213) 667-4422',email:'d.martin@email.com',
     product:'Metabolic Health',client:'Everlywell Direct',
-    consultId:'CST-2026-10850',resultDate:'Jul 9, 2026',
-    category:'Care Coord',type:'Coordination',urgency:'HIGH',
-    wait:'44 min',sla:'Respond within 4h',slaW:'60%',slaC:'amber',isAuto:false,
-    trigger:'Patient submitted a question via portal about lab kit timing for Jul 20 follow-up.',
-    ctx:'Patient D.K. has an upcoming follow-up consult on Jul 20 for Metabolic Health. She submitted a portal question about her lab kit shipment. Tracking shows a potential delay. Care team needs to coordinate with lab/shipping and update the patient before her appointment.',
+    consultId:'CST-2026-10864',resultDate:'Jul 9, 2026',
+    category:'Reschedule',type:'Reschedule Appointment',urgency:'HIGH',
+    wait:'38m',sla:'Reschedule within 48h',slaW:'40%',slaC:'amber',isAuto:false,
+    trigger:'Patient submitted reschedule request via portal — Jul 18 consult conflicts with work travel.',
+    ctx:'Patient D.M. submitted a portal request to reschedule their Metabolic Health consult on Jul 18 at 2:00 PM. Reason: work travel conflict. Contact patient to confirm a new date and time with Dr. Patel.',
     log:[
-      {dot:'green',time:'Jul 9 · 8:00 AM',text:'Lab kit ordered',sub:'Expected delivery: Jul 12'},
-      {dot:'amber',time:'Jul 9 · 11:38 AM',text:'Patient submitted portal question',sub:'"When will my kit arrive?"'},
-      {dot:'',time:'Today · 10:16 AM',text:'Task created in CT Queue',sub:'Unassigned · 44 min wait'}
+      {dot:'green',time:'Jul 9 · 2:00 PM',text:'Follow-up consult scheduled',sub:'Dr. Patel, MD · Jul 18 2:00 PM'},
+      {dot:'amber',time:'Today · 9:44 AM',text:'Patient submitted reschedule request',sub:'Reason: travel conflict'},
+      {dot:'',time:'Today · 9:52 AM',text:'Task created in CT Queue',sub:'Unassigned · 38 min wait'}
     ]
   },
-  'T003': {
-    patient:'R.M.',initials:'RM',dob:'07/30/1981 (44 yrs)',phone:'(737) 284-6510',
-    product:'Testosterone Program',client:'Everlywell Direct',
-    consultId:'CST-2026-10862',resultDate:'Jul 10, 2026',
-    category:'Auto-Generated',type:'Unable to Reach',urgency:'CRITICAL',
-    wait:'18 min',sla:'2nd attempt within 2h',slaW:'84%',slaC:'red',isAuto:true,
-    trigger:'⚡ Auto-generated: 3 automated call attempts failed. Patient unreachable. Escalated to care team.',
-    ctx:'Testosterone abnormal result flagged. The DXS system made 3 automated call attempts — all resulted in no answer. Escalated to care team for manual follow-up. SLA: second manual attempt required within 2 hours of escalation.',
-    log:[
-      {dot:'red',time:'Jul 10 · 5:45 PM',text:'Abnormal result flagged',sub:'Testosterone · Out of range'},
-      {dot:'purple',time:'Today · 9:02 AM',text:'DXS auto-call #1',sub:'No answer — 30s ring'},
-      {dot:'purple',time:'Today · 9:10 AM',text:'DXS auto-call #2',sub:'No answer — 30s ring'},
-      {dot:'red',time:'Today · 9:18 AM',text:'DXS auto-call #3 failed — escalated',sub:'Care team task created'},
-      {dot:'',time:'Today · 10:42 AM',text:'Task entered CT Queue',sub:'Unassigned · 18 min wait'}
-    ]
-  },
-  'T004': {
-    patient:'K.S.',initials:'KS',dob:'11/05/1975 (50 yrs)',phone:'(469) 823-7451',
+  'CT003': {
+    patient:'L.C.',initials:'LC',dob:'06/18/1991 (35 yrs)',phone:'(737) 558-3301',email:'l.chen@email.com',
     product:'Weight Management',client:'Everlywell Direct',
-    consultId:'CST-2026-10857',resultDate:'Jul 8, 2026',
-    category:'Auto-Generated',type:'Untreated Rx Consult',urgency:'HIGH',
-    wait:'2h 14m',sla:'Resolve within 24h',slaW:'20%',slaC:'',isAuto:true,
-    trigger:'⚡ Auto-generated: Consult closed without a prescription record. Expected: Tirzepatide 2.5mg.',
-    ctx:'Platform detected that Weight Management consult CST-2026-10857 was closed by Dr. Alencar, NP without a prescription record. Care team must contact the provider and document the resolution — possible causes: Rx sent via outside pharmacy, patient declined, or oversight.',
+    consultId:'CST-2026-10869',resultDate:'Jul 11, 2026',
+    category:'Pharmacy',type:'Pharmacy Question',urgency:'HIGH',
+    wait:'55m',sla:'Respond within 4h',slaW:'50%',slaC:'amber',isAuto:false,
+    trigger:'Patient submitted portal message: pharmacy unable to fill Tirzepatide Rx — out of stock.',
+    ctx:'Patient L.C. was prescribed Tirzepatide 2.5mg after a Weight Management consult on Jul 11. The patient reports their local pharmacy cannot fill the prescription due to a stock shortage. Contact patient and assist with locating an alternative pharmacy or next steps.',
     log:[
-      {dot:'amber',time:'Jul 8 · 2:00 PM',text:'Consult completed',sub:'Dr. Alencar, NP · Weight Management'},
-      {dot:'red',time:'Jul 8 · 2:05 PM',text:'Auto-detection: no Rx record found',sub:'Expected: Tirzepatide 2.5mg'},
-      {dot:'',time:'Today · 8:46 AM',text:'Task created in CT Queue',sub:'Unassigned · 2h 14m wait'}
+      {dot:'green',time:'Jul 11 · 3:15 PM',text:'Consult completed',sub:'Dr. Alencar, NP · Weight Management'},
+      {dot:'purple',time:'Jul 11 · 3:18 PM',text:'Rx sent to pharmacy',sub:'Tirzepatide 2.5mg · CVS Austin'},
+      {dot:'amber',time:'Today · 8:47 AM',text:'Patient portal message received',sub:'"Pharmacy says out of stock"'},
+      {dot:'',time:'Today · 9:05 AM',text:'Task created in CT Queue',sub:'Unassigned · 55 min wait'}
     ]
   },
-  'T005': {
-    patient:'B.T.',initials:'BT',dob:'02/18/1990 (36 yrs)',phone:'(503) 664-2987',
-    product:'Thyroid Program',client:'Everlywell Health Plans',
-    consultId:'CST-2026-10851',resultDate:'Jul 9, 2026',
-    category:'Auto-Generated',type:'Reassignment Needed',urgency:'HIGH',
-    wait:'47 min',sla:'8h remaining',slaW:'52%',slaC:'amber',isAuto:true,
-    trigger:'⚡ Auto-generated: Dr. Goldstein flagged consult for reassignment — schedule conflict.',
-    ctx:'Dr. Goldstein has a scheduling conflict and initiated reassignment for this Thyroid consult. The new provider must hold an active OR license. SLA clock is paused during reassignment — 8 hours remain once the new provider accepts. Select an available OR-licensed provider and confirm.',
-    log:[
-      {dot:'amber',time:'Jul 9 · 1:30 PM',text:'Consult opened',sub:'Dr. Goldstein, MD · Thyroid'},
-      {dot:'red',time:'Today · 10:13 AM',text:'Provider flagged for reassignment',sub:'Reason: Schedule conflict'},
-      {dot:'purple',time:'Today · 10:14 AM',text:'SLA paused — awaiting reassignment',sub:'8h remaining'},
-      {dot:'',time:'Today · 10:13 AM',text:'Task created in CT Queue',sub:'Unassigned · 47 min wait'}
-    ]
-  },
-  'T006': {
-    patient:'L.H.',initials:'LH',dob:'05/29/1962 (64 yrs)',phone:'(312) 744-8820',
+  'CT004': {
+    patient:'T.W.',initials:'TW',dob:'09/03/1969 (56 yrs)',phone:'(469) 221-8847',email:'t.wilson@email.com',
     product:'Annual Wellness',client:'Everlywell Health Plans',
-    consultId:'CST-2026-10849',resultDate:'Jul 6, 2026',
-    category:'Auto-Generated',type:'Post-Consult Follow-up',urgency:'NORMAL',
-    wait:'1h 30m',sla:'5 business days',slaW:'10%',slaC:'',isAuto:true,
-    trigger:'⚡ Auto-generated: Consult closed with "Follow-up needed." Reason: A1C retest required.',
-    ctx:'Annual Wellness consult completed Jul 6. Provider Dr. Lee noted A1C results require a retest before the care plan can be finalized. Care team needs to: (1) confirm the retest lab kit is ordered, (2) schedule a 30-day follow-up consult (~Aug 6), and (3) send the patient a reminder.',
+    consultId:'CST-2026-10858',resultDate:'Jul 7, 2026',
+    category:'Billing',type:'Billing Issue',urgency:'NORMAL',
+    wait:'2h 3m',sla:'Respond within 24h',slaW:'15%',slaC:'',isAuto:false,
+    trigger:'Patient called in disputing a $199 charge for Annual Wellness consult — claims insurance should cover.',
+    ctx:'Patient T.W. is disputing the $199 charge for an Annual Wellness consult on Jul 7. Patient states they were told their Everlywell Health Plan covers this service at 100%. Review the benefit tier and clarify coverage, or escalate to the billing department.',
     log:[
-      {dot:'green',time:'Jul 6 · 3:15 PM',text:'Consult completed',sub:'Dr. Lee, MD · Annual Wellness'},
-      {dot:'amber',time:'Jul 6 · 3:15 PM',text:'Provider noted: follow-up needed',sub:'A1C retest required'},
-      {dot:'',time:'Today · 9:30 AM',text:'Task created in CT Queue',sub:'Unassigned · 1h 30m wait'}
+      {dot:'green',time:'Jul 7 · 10:30 AM',text:'Annual Wellness consult completed',sub:'Dr. Lee, MD'},
+      {dot:'amber',time:'Jul 10 · 9:00 AM',text:'Invoice sent to patient',sub:'$199.00 — Annual Wellness Consult'},
+      {dot:'red',time:'Today · 7:57 AM',text:'Patient called — billing dispute',sub:'Disputes charge — claims insurance covers'},
+      {dot:'',time:'Today · 7:58 AM',text:'Task created in CT Queue',sub:'Unassigned · 2h 3m wait'}
+    ]
+  },
+  'CT005': {
+    patient:'P.K.',initials:'PK',dob:'03/27/1995 (31 yrs)',phone:'(503) 812-4459',email:'p.kapoor@email.com',
+    product:'Testosterone',client:'Everlywell Direct',
+    consultId:'CST-2026-10861',resultDate:'Jul 12, 2026',
+    category:'Product',type:'Product Question',urgency:'NORMAL',
+    wait:'1h 47m',sla:'Respond within 8h',slaW:'25%',slaC:'',isAuto:false,
+    trigger:'Patient submitted portal message — unsure how to collect Testosterone sample from at-home kit.',
+    ctx:'Patient P.K. received their Testosterone at-home test kit and submitted a portal question about sample collection. They are unsure of the correct process. Contact patient to walk through collection instructions or send written guidance.',
+    log:[
+      {dot:'green',time:'Jul 12 · 1:00 PM',text:'Lab kit delivered',sub:'Testosterone panel · At-home kit'},
+      {dot:'amber',time:'Today · 10:22 AM',text:'Patient portal question received',sub:'"How do I collect the sample?"'},
+      {dot:'',time:'Today · 10:23 AM',text:'Task created in CT Queue',sub:'Unassigned · 1h 47m wait'}
     ]
   }
 };
@@ -600,7 +616,26 @@ function init() {
   // Context
   document.getElementById('taskCtx').textContent = task.ctx;
 
-  // Show action panel
+  // Contact Patient card
+  var phEl = document.getElementById('patPhDisplay');
+  var emEl = document.getElementById('patEmailDisplay');
+  if (phEl) phEl.textContent = task.phone || '—';
+  if (emEl) emEl.textContent = task.email || '—';
+
+  // Inline activity timeline (last 3 entries from chart)
+  var tl = document.getElementById('inlineTimeline');
+  if (tl) {
+    var entries = task.log.slice(-3).reverse();
+    tl.innerHTML = entries.map(function(e) {
+      return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #F5F0EA;">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:' + ({green:'#059669',amber:'#D97706',red:'#DC2626',purple:'#6B21A8',blue:'#1D4ED8'}[e.dot]||'#D1D5DB') + ';margin-top:4px;flex-shrink:0;"></div>' +
+        '<div><div style="font-size:11px;font-weight:600;color:#374151;">' + e.text + '</div>' +
+        (e.sub ? '<div style="font-size:10px;color:#9CA3AF;">' + e.sub + '</div>' : '') +
+        '<div style="font-size:10px;color:#9CA3AF;">' + e.time + '</div></div></div>';
+    }).join('');
+  }
+
+  // Show task-specific action panel
   var panel = document.getElementById('action-' + TASK_ID);
   if (panel) panel.style.display = '';
 
@@ -717,6 +752,39 @@ function completeTask() {
   toast('Task marked complete');
   setTimeout(function(){ window.location.href = '/care-team/queue'; }, 2800);
 }
+
+function saveCallLog() {
+  var outcome = document.getElementById('callOutcome').value;
+  var notes = document.getElementById('callNotes').value.trim();
+  var resolution = document.getElementById('callResolution').value;
+  if (!outcome) { toast('Select a call outcome first.'); return; }
+  var outcomeLabels = {
+    reached: 'Reached — spoke with patient',
+    voicemail: 'Left voicemail',
+    no_answer: 'No answer',
+    wrong_number: 'Wrong number / disconnected',
+    callback: 'Patient requested callback'
+  };
+  var dot = outcome === 'reached' ? 'green' : outcome === 'voicemail' ? 'amber' : 'red';
+  addLog('📞 Call: ' + (outcomeLabels[outcome] || outcome), dot, notes ? notes.substring(0,60) : 'Logged by Alex Kim');
+  closeMo('contactModal');
+  document.getElementById('callOutcome').value = '';
+  document.getElementById('callNotes').value = '';
+  document.getElementById('callResolution').value = '';
+  toast('Call logged — activity updated');
+}
+
+// Populate contact modal when opened
+var _origOpenMo = openMo;
+openMo = function(id) {
+  if (id === 'contactModal') {
+    var ph = document.getElementById('contactModalPhone');
+    var pt = document.getElementById('contactModalPatient');
+    if (ph) ph.textContent = task.phone || '—';
+    if (pt) pt.textContent = task.patient + ' · ' + task.product;
+  }
+  _origOpenMo(id);
+};
 
 function toast(msg) {
   var t = document.getElementById('_toast');

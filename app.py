@@ -204,7 +204,7 @@ def inject_sidebar_nav():
     if _req.blueprint in ('admin', 'patient'):
         return dict(sidebar_nav=[], user_role=role)
     # care_team blueprint: suppress g-sidebar for any role that shouldn't see it there
-    if _req.blueprint == 'care_team' and role not in ('care_team', 'care_team_gaps', 'provider_psr'):
+    if _req.blueprint == 'care_team' and role not in ('care_team', 'care_team_dxs', 'care_team_gaps', 'provider_psr'):
         return dict(sidebar_nav=[], user_role=role)
 
     # Index page (login screen) — no sidebar
@@ -339,13 +339,20 @@ def inject_sidebar_nav():
         ],
         'care_team': [
             ('My Dashboard',  '/care-team/',                      'home',      ['/care-team/']),
-            ('CT Queue',      '/care-team/queue',                 'clipboard', ['/care-team/queue']),
+            ('CT Queue',      '/care-team/queue',                 'clipboard', ['/care-team/queue', '/care-team/task']),
             ('Patient Queue', '/provider/queue',                  'users',     ['/provider/queue']),
-            ('DXS Queue',     '/care-team/psr/dxs-queue',        'clipboard', ['/care-team/psr/dxs-queue', '/care-team/psr/dxs-call']),
             ('Thyroid Queue', '/care-team/psr/thyroid-queue',     'clipboard', ['/care-team/psr/thyroid-queue']),
             ('Network Schedule', '/provider/schedule',            'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',               'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',               'settings',  ['/provider/settings']),
+        ],
+        'care_team_dxs': [
+            ('DXS Queue',        '/care-team/psr/dxs-queue',     'clipboard', ['/care-team/psr/dxs-queue', '/care-team/psr/dxs-call']),
+            ('Patient Queue',    '/provider/queue',               'users',     ['/provider/queue']),
+            ('Patient Mgmt',     '/provider/patient-management',  'clipboard', ['/provider/patient-management']),
+            ('Network Schedule', '/provider/schedule',            'calendar',  ['/provider/schedule']),
+            ('Messages',         '/provider/messages',            'message',   ['/provider/messages']),
+            ('Settings',         '/provider/settings',            'settings',  ['/provider/settings']),
         ],
         'care_team_gaps': [
             ('Dashboard',     '/care-team/gaps',         'home',      ['/care-team/gaps']),
@@ -517,6 +524,7 @@ ROLE_NAMES = {
     'provider_doh':     'Crystal Veliz, DOH Coordinator',
     'scheduler':        'David Nguyen',
     'care_team':        'Alex Kim',
+    'care_team_dxs':   'Casey Brooks, DXS Specialist',
     'patient':          'Marcus Johnson',
     'admin':            'Chris Navarro',
     'qa_reviewer':      'Quinn Patel, QA Reviewer',
@@ -536,6 +544,7 @@ ROLE_DESTINATIONS = {
     'provider_doh':     'provider.doh_dashboard',
     'scheduler':        'scheduler.dashboard',
     'care_team':        'care_team.dashboard',
+    'care_team_dxs':   'care_team.psr_dxs_queue',
     'admin':            'admin.dashboard',
     'qa_reviewer':      'provider.qa_reviewer_dashboard',
     'gc_admin':         'provider.gca_dashboard',
