@@ -302,9 +302,18 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
     <div class="modal-body">
       <div class="hipaa-check" id="hipaaSection">
         <div class="hipaa-title">⚠️ HIPAA 3-Point Verification — Required Before Sharing Results</div>
-        <label class="hipaa-item"><input type="checkbox" id="hv1"> Full legal name confirmed</label>
-        <label class="hipaa-item"><input type="checkbox" id="hv2"> Date of birth confirmed</label>
-        <label class="hipaa-item"><input type="checkbox" id="hv3"> ZIP code or last 4 SSN confirmed</label>
+        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv1"> Full legal name confirmed</span>
+          <span id="hvName" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
+        </label>
+        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv2"> Date of birth confirmed</span>
+          <span id="hvDOB" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
+        </label>
+        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
+          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv3"> ZIP code or last 4 SSN confirmed</span>
+          <span id="hvZIP" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
+        </label>
         <p style="font-size:11px;color:#92400E;margin-top:8px;">If unable to verify, select "Unable to Verify Identity" and do not share result details.</p>
       </div>
       <div class="form-group">
@@ -317,7 +326,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
           <option value="wrong_number">Wrong Number</option>
           <option value="no_verify">Unable to Verify Identity (HIPAA)</option>
           <option value="declined">Patient Declined Consult Offer</option>
-          <option value="scheduled">Consult Scheduled — Link Sent</option>
+          <option value="portal_notified">Reached — Patient Directed to Portal</option>
         </select>
       </div>
       <div id="schedulingSection" style="display:none;">
@@ -386,6 +395,21 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 <script>
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 
+var PATIENT_DATA = {
+  'M.J., 45F': { name:'Margaret J. Collins',  dob:'03/22/1979', zip:'ZIP: 10012' },
+  'A.K., 38F': { name:'Alicia K. Torres',      dob:'11/14/1986', zip:'ZIP: 90210' },
+  'C.L., 29F': { name:'Claire L. Beaumont',    dob:'09/03/1995', zip:'ZIP: 10011' },
+  'R.S., 62M': { name:'Robert S. Harmon',      dob:'07/08/1962', zip:'ZIP: 33101' },
+  'P.W., 71F': { name:'Patricia W. Nguyen',    dob:'02/14/1953', zip:'ZIP: 75001' },
+  'G.R., 54M': { name:'Gerald R. Okonkwo',     dob:'10/30/1970', zip:'ZIP: 07030' },
+  'T.B., 51M': { name:'Thomas B. Whitfield',   dob:'05/30/1973', zip:'ZIP: 75201' },
+  'D.N., 43F': { name:'Diana N. Petersen',     dob:'04/11/1981', zip:'ZIP: 60614' },
+  'H.O., 36F': { name:'Hannah O. Fitzgerald',  dob:'08/22/1988', zip:'ZIP: 30301' },
+  'E.T., 59M': { name:'Edwin T. Morrison',     dob:'12/05/1965', zip:'ZIP: 22030' },
+  'F.M., 47F': { name:'Frances M. Delacroix',  dob:'06/18/1977', zip:'ZIP: 98101' },
+  'J.V., 44M': { name:'James V. Callahan',     dob:'03/27/1980', zip:'ZIP: 02101' },
+};
+
 var _currentProduct = '';
 
 function openCallModal(patient, product, result, client, state, attempts) {
@@ -403,12 +427,19 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.querySelectorAll('input[name="consultType"]').forEach(function(r){ r.checked = false; });
   document.querySelectorAll('input[name="escalation"]').forEach(function(r){ r.checked = false; });
   ['hv1','hv2','hv3'].forEach(function(id){ document.getElementById(id).checked = false; });
+
+  // Populate inline HIPAA verification values
+  var pd = PATIENT_DATA[patient] || { name:'—', dob:'—', zip:'—' };
+  document.getElementById('hvName').textContent = pd.name;
+  document.getElementById('hvDOB').textContent  = pd.dob;
+  document.getElementById('hvZIP').textContent  = pd.zip;
+
   document.getElementById('callModal').classList.add('open');
 }
 
 function outcomeChanged() {
   var v = document.getElementById('callOutcome').value;
-  document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'scheduled') ? '' : 'none';
+  document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'portal_notified') ? '' : 'none';
   if (v !== 'reached') {
     document.getElementById('consultRequestPanel').style.display = 'none';
   }
