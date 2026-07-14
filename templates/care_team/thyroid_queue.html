@@ -423,7 +423,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
         <div class="modal-title" id="modalTitle">Thyroid History</div>
         <div class="modal-sub" id="modalSub">Review patient and determine action</div>
       </div>
-      <a id="viewChartBtn" href="/provider/queue" style="margin-left:auto;font-size:12px;font-weight:600;color:#7C3AED;text-decoration:none;border:1px solid #DDD6FE;border-radius:6px;padding:4px 10px;background:#F5F3FF;white-space:nowrap;align-self:center;margin-right:10px;">📋 View Chart</a>
+      <a id="viewChartBtn" href="#" target="_blank" style="margin-left:auto;font-size:12px;font-weight:600;color:#7C3AED;text-decoration:none;border:1px solid #DDD6FE;border-radius:6px;padding:4px 10px;background:#F5F3FF;white-space:nowrap;align-self:center;margin-right:10px;">📋 View Chart</a>
       <button class="modal-close" onclick="closeModal()">&#215;</button>
     </div>
     <div class="modal-body" id="modalBody">
@@ -437,58 +437,118 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 
 <div class="toast" id="toast"></div>
 
-<!-- Schedule / Reschedule Overlay -->
+<!-- Schedule / Reschedule Overlay — multi-step wizard -->
 <div class="overlay" id="scheduleOverlay">
-  <div class="modal" style="width:480px;">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="schedModalTitle">Schedule Consult</div>
-        <div class="modal-sub" id="schedModalSub">Book a Thyroid Initial Consult for this patient</div>
+  <div class="modal" style="width:520px;">
+
+    <!-- Step 1: On Demand vs. Scheduled -->
+    <div id="schedStep1">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="schedModalTitle">Schedule Consult</div>
+          <div class="modal-sub" id="schedPatientPill">—</div>
+        </div>
+        <button class="modal-close" onclick="closeScheduleModal()">&#215;</button>
       </div>
-      <button class="modal-close" onclick="closeScheduleModal()">&#215;</button>
+      <div class="modal-body">
+        <div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:14px;">How would the patient like to proceed?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div id="cardOD" onclick="goSchedStep('od')" style="border:2px solid #E5E0D8;border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='#059669';this.style.background='#ECFDF5';" onmouseout="this.style.borderColor='#E5E0D8';this.style.background='#fff';">
+            <div style="font-size:24px;margin-bottom:8px;">⚡</div>
+            <div style="font-size:14px;font-weight:700;color:#059669;margin-bottom:5px;">On Demand</div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.5;">Connect with an available provider immediately. No wait, no scheduling.</div>
+            <div style="margin-top:10px;font-size:11px;font-weight:700;color:#059669;background:#D1FAE5;border-radius:4px;padding:3px 8px;display:inline-block;">Provider available now</div>
+          </div>
+          <div id="cardSched" onclick="goSchedStep('sched')" style="border:2px solid #E5E0D8;border-radius:10px;padding:18px;cursor:pointer;transition:all .15s;" onmouseover="this.style.borderColor='#7C3AED';this.style.background='#F5F3FF';" onmouseout="this.style.borderColor='#E5E0D8';this.style.background='#fff';">
+            <div style="font-size:24px;margin-bottom:8px;">📅</div>
+            <div style="font-size:14px;font-weight:700;color:#7C3AED;margin-bottom:5px;">Scheduled</div>
+            <div style="font-size:12px;color:#6B7280;line-height:1.5;">Pick a date and time that works for the patient from open provider slots.</div>
+            <div style="margin-top:10px;font-size:11px;font-weight:700;color:#7C3AED;background:#EDE9FE;border-radius:4px;padding:3px 8px;display:inline-block;">Choose from open slots</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+      </div>
     </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Consult Type</label>
-        <select class="form-select" id="schedConsultType">
-          <option>Thyroid Initial Consult</option>
-          <option>Thyroid Follow-Up Consult</option>
-        </select>
+
+    <!-- Step 2a: On Demand -->
+    <div id="schedStepOD" style="display:none;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">⚡ On Demand Consult</div>
+          <div class="modal-sub" id="schedODSub">Confirm patient details before connecting</div>
+        </div>
+        <button class="modal-close" onclick="closeScheduleModal()">&#215;</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div class="form-group">
-          <label class="form-label">Date</label>
-          <input type="date" class="form-input" id="schedDate">
+      <div class="modal-body">
+        <div style="background:#D1FAE5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#065F46;margin-bottom:4px;">✅ PROVIDER AVAILABLE NOW</div>
+          <div style="font-size:13px;color:#374151;">Dr. Sarah Patel, MD is accepting on-demand thyroid consults. Patient will be connected immediately.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:12px 14px;">
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">Patient</div><div style="font-size:13px;font-weight:600;" id="odPatientName">—</div></div>
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">State</div><div style="font-size:13px;font-weight:600;" id="odState">—</div></div>
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">Care Product</div><div style="font-size:13px;font-weight:600;">Thyroid Program</div></div>
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">Consult Type</div><div style="font-size:13px;font-weight:600;">On Demand — Telephonic</div></div>
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">Medication</div><div style="font-size:13px;font-weight:600;" id="odRxd">—</div></div>
+          <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:3px;">Consent on File</div><div style="font-size:13px;font-weight:600;color:#15803D;">Yes</div></div>
+        </div>
+        <div id="odConfirm" style="display:none;margin-top:12px;background:#D1FAE5;border:1px solid #6EE7B7;border-radius:6px;padding:10px 12px;font-size:12px;color:#065F46;font-weight:600;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="goSchedStep('1')">&#8592; Back</button>
+        <button class="btn-primary" style="background:#059669;" onclick="confirmOD()">⚡ Connect Patient Now</button>
+      </div>
+    </div>
+
+    <!-- Step 2b: Scheduled -->
+    <div id="schedStepSched" style="display:none;">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title">📅 Scheduled Consult</div>
+          <div class="modal-sub" id="schedSchedSub">Select a date, time, and provider</div>
+        </div>
+        <button class="modal-close" onclick="closeScheduleModal()">&#215;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Pre-filled patient summary -->
+        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:flex;gap:20px;flex-wrap:wrap;">
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;margin-bottom:2px;">Patient</span><span style="font-size:13px;font-weight:600;" id="schedPatientFill">—</span></div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;margin-bottom:2px;">State</span><span style="font-size:13px;font-weight:600;" id="schedStateFill">—</span></div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;margin-bottom:2px;">Care Product</span><span style="font-size:13px;font-weight:600;">Thyroid Program</span></div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;margin-bottom:2px;">Consult Type</span><span style="font-size:13px;font-weight:600;" id="schedTypeFill">Thyroid Initial</span></div>
         </div>
         <div class="form-group">
-          <label class="form-label">Time</label>
-          <select class="form-select" id="schedTime">
-            <option>9:00 AM</option><option>9:30 AM</option><option>10:00 AM</option>
-            <option>10:30 AM</option><option>11:00 AM</option><option>11:30 AM</option>
-            <option>1:00 PM</option><option>1:30 PM</option><option>2:00 PM</option>
-            <option>2:30 PM</option><option>3:00 PM</option><option>3:30 PM</option>
+          <label class="form-label">Select Date</label>
+          <input type="date" class="form-input" id="schedDateInput" onchange="renderSlots()">
+        </div>
+        <div id="slotsSection" style="display:none;margin-bottom:14px;">
+          <div style="font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Available Times</div>
+          <div id="slotPills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          <div id="slotHint" style="font-size:11px;color:#9CA3AF;margin-top:8px;">Gray = unavailable · Click a time to select</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Provider</label>
+          <select class="form-select" id="schedProviderSel">
+            <option>Dr. Sarah Patel, MD (Current Provider)</option>
+            <option>Dr. James Richardson, MD</option>
+            <option>Dr. Amelia Chen, NP</option>
+            <option>Dr. Marcus Webb, MD</option>
           </select>
         </div>
+        <div class="form-group">
+          <label class="form-label">Note (Optional)</label>
+          <textarea class="form-input" id="schedNoteInput" rows="2" placeholder="e.g. Patient prefers morning, has work constraints after 3 PM"></textarea>
+        </div>
+        <div id="schedConfirm2" style="display:none;background:#D1FAE5;border:1px solid #6EE7B7;border-radius:6px;padding:10px 12px;font-size:12px;color:#065F46;font-weight:600;"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">Provider</label>
-        <select class="form-select" id="schedProvider">
-          <option>Dr. Sarah Patel, MD (Current Provider)</option>
-          <option>Dr. James Richardson, MD</option>
-          <option>Dr. Amelia Chen, NP</option>
-          <option>Dr. Marcus Webb, MD</option>
-        </select>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="goSchedStep('1')">&#8592; Back</button>
+        <button class="btn-primary" onclick="confirmSched()">Confirm Appointment</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Note (Optional)</label>
-        <textarea class="form-input" id="schedNote" rows="2" placeholder="e.g. Patient requested morning slot, preferred Tue/Thu"></textarea>
-      </div>
-      <div id="schedConfirm" style="display:none;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:6px;padding:10px 12px;font-size:12px;color:#065F46;font-weight:600;"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeScheduleModal()">Cancel</button>
-      <button class="btn-primary" onclick="confirmSchedule()">Confirm Scheduling</button>
-    </div>
+
   </div>
 </div>
 
@@ -497,6 +557,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 {% block scripts %}
 <script>
 var currentRowIdx = null;
+var currentPatientKey = null;
 
 var SCENARIOS = {
   a: {
@@ -531,26 +592,28 @@ var SCENARIOS = {
 };
 
 var PATIENTS = {
-  'PA44F': { name:'P.A. · 44F', lastSession:'Jun 16', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
-  'DL58M': { name:'D.L. · 58M', lastSession:'Jun 14', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 2, 2026 · 10:30 AM' },
-  'TR61F': { name:'T.R. · 61F', lastSession:'Jun 13', nextSession:'Today', check:'Same-day', rxd:'Yes — Methimazole 10mg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'none', consultDate:null },
-  'MK52F': { name:'M.K. · 52F', lastSession:'Jun 10', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
-  'CH39F': { name:'C.H. · 39F', lastSession:'Jun 18', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 1, 2026 · 2:00 PM' },
-  'RS55F': { name:'R.S. · 55F', lastSession:'Jun 5',  nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'none', consultDate:null },
-  'EM47F': { name:'E.M. · 47F', lastSession:'Jun 12', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 125mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'initiated', consultDate:null },
-  'LT42F': { name:'L.T. · 42F', lastSession:'Jun 15', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'scheduled', consultDate:'Jul 3, 2026 · 9:00 AM' },
-  'FO71F': { name:'F.O. · 71F', lastSession:'Jun 20', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 4 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 1, 2026 · 11:00 AM' },
-  'NA38F': { name:'N.A. · 38F', lastSession:'Jun 11', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'none', consultDate:null },
-  'HB49F': { name:'H.B. · 49F', lastSession:'Jun 8',  nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
-  'SN34F': { name:'S.N. · 34F', lastSession:'Jun 22', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 25mcg', consent:'Yes', labs:'Thyroid test purchased 1 week ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 2, 2026 · 3:30 PM' },
-  'WC67M': { name:'W.C. · 67M', lastSession:'Jun 19', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 4, 2026 · 10:00 AM' },
-  'IF53F': { name:'I.F. · 53F', lastSession:'Jun 17', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 3, 2026 · 1:00 PM' },
-  'QD45M': { name:'Q.D. · 45M', lastSession:'Jun 21', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 5 weeks ago', labsColor:'#15803D', consultStatus:'initiated', consultDate:null }
+  'PA44F': { name:'P.A. · 44F', state:'NY', chartId:1,  lastSession:'Jun 16', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
+  'DL58M': { name:'D.L. · 58M', state:'TX', chartId:2,  lastSession:'Jun 14', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 2, 2026 · 10:30 AM' },
+  'TR61F': { name:'T.R. · 61F', state:'CA', chartId:3,  lastSession:'Jun 13', nextSession:'Today', check:'Same-day', rxd:'Yes — Methimazole 10mg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'none', consultDate:null },
+  'MK52F': { name:'M.K. · 52F', state:'IL', chartId:4,  lastSession:'Jun 10', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
+  'CH39F': { name:'C.H. · 39F', state:'FL', chartId:5,  lastSession:'Jun 18', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 1, 2026 · 2:00 PM' },
+  'RS55F': { name:'R.S. · 55F', state:'WA', chartId:6,  lastSession:'Jun 5',  nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'none', consultDate:null },
+  'EM47F': { name:'E.M. · 47F', state:'NJ', chartId:7,  lastSession:'Jun 12', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 125mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'initiated', consultDate:null },
+  'LT42F': { name:'L.T. · 42F', state:'TX', chartId:8,  lastSession:'Jun 15', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'scheduled', consultDate:'Jul 3, 2026 · 9:00 AM' },
+  'FO71F': { name:'F.O. · 71F', state:'GA', chartId:9,  lastSession:'Jun 20', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 4 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 1, 2026 · 11:00 AM' },
+  'NA38F': { name:'N.A. · 38F', state:'MA', chartId:10, lastSession:'Jun 11', nextSession:'Today', check:'Same-day', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Results finalized — no active consult', labsColor:'#2563EB', consultStatus:'none', consultDate:null },
+  'HB49F': { name:'H.B. · 49F', state:'OH', chartId:11, lastSession:'Jun 8',  nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 100mcg', consent:'Yes', labs:'No thyroid test purchase in the last 6 weeks', labsColor:'#D97706', consultStatus:'initiated', consultDate:null },
+  'SN34F': { name:'S.N. · 34F', state:'NY', chartId:12, lastSession:'Jun 22', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 25mcg', consent:'Yes', labs:'Thyroid test purchased 1 week ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 2, 2026 · 3:30 PM' },
+  'WC67M': { name:'W.C. · 67M', state:'VA', chartId:13, lastSession:'Jun 19', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 75mcg', consent:'Yes', labs:'Thyroid test purchased 3 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 4, 2026 · 10:00 AM' },
+  'IF53F': { name:'I.F. · 53F', state:'CO', chartId:14, lastSession:'Jun 17', nextSession:'Today', check:'1-week', rxd:'Yes — Levothyroxine 88mcg', consent:'Yes', labs:'Thyroid test purchased 2 weeks ago', labsColor:'#15803D', consultStatus:'scheduled', consultDate:'Jul 3, 2026 · 1:00 PM' },
+  'QD45M': { name:'Q.D. · 45M', state:'AZ', chartId:15, lastSession:'Jun 21', nextSession:'Today', check:'2-week', rxd:'Yes — Levothyroxine 50mcg', consent:'Yes', labs:'Thyroid test purchased 5 weeks ago', labsColor:'#15803D', consultStatus:'initiated', consultDate:null }
 };
 
 function openModal(patientKey, scenario, rowIdx) {
   currentRowIdx = rowIdx;
+  currentPatientKey = patientKey;
   var p = PATIENTS[patientKey];
+  document.getElementById('viewChartBtn').href = '/provider/chart/' + p.chartId + '?type=thyroid';
   var s = JSON.parse(JSON.stringify(SCENARIOS[scenario])); // shallow copy so we can override
   // For Scenario B same-day patients, the session is the touchpoint — override label/desc/steps
   if (scenario === 'b' && p.check === 'Same-day') {
@@ -695,46 +758,112 @@ document.getElementById('reviewOverlay').addEventListener('click', function(e) {
 });
 
 var schedMode = 'schedule';
+var selectedSlot = null;
+var AVAIL_SLOTS = ['8:30 AM','9:00 AM','9:30 AM','10:00 AM','11:00 AM','1:00 PM','1:30 PM','2:30 PM','3:00 PM','4:00 PM'];
+var BUSY_SLOTS  = ['9:00 AM','11:00 AM','3:00 PM']; // varies demo; some busy
+
 function scheduleConsult() {
   schedMode = 'schedule';
-  document.getElementById('schedModalTitle').textContent = 'Schedule Consult';
-  document.getElementById('schedModalSub').textContent = 'Book a Thyroid Initial Consult for this patient';
-  document.getElementById('schedConfirm').style.display = 'none';
-  document.getElementById('schedDate').value = '';
-  document.getElementById('schedNote').value = '';
-  document.getElementById('scheduleOverlay').classList.add('open');
+  openSchedWizard();
 }
 
 function rescheduleConsult() {
   schedMode = 'reschedule';
-  document.getElementById('schedModalTitle').textContent = 'Reschedule Consult';
-  document.getElementById('schedModalSub').textContent = 'Modify the existing consult appointment';
-  document.getElementById('schedConfirm').style.display = 'none';
-  document.getElementById('schedDate').value = '';
-  document.getElementById('schedNote').value = '';
+  openSchedWizard();
+}
+
+function openSchedWizard() {
+  var p = PATIENTS[currentPatientKey];
+  if (!p) return;
+  // Populate Step 1 header
+  var title = schedMode === 'reschedule' ? 'Reschedule Consult' : 'Schedule Consult';
+  document.getElementById('schedModalTitle').textContent = title;
+  document.getElementById('schedPatientPill').textContent = p.name + ' · ' + p.state + ' · Thyroid Program';
+  // Populate On Demand step
+  document.getElementById('odPatientName').textContent = p.name;
+  document.getElementById('odState').textContent = p.state;
+  document.getElementById('odRxd').textContent = p.rxd.replace('Yes — ','');
+  document.getElementById('odConfirm').style.display = 'none';
+  // Populate Scheduled step
+  document.getElementById('schedPatientFill').textContent = p.name;
+  document.getElementById('schedStateFill').textContent = p.state;
+  document.getElementById('schedTypeFill').textContent = p.consultStatus === 'scheduled' ? 'Thyroid Follow-Up' : 'Thyroid Initial';
+  document.getElementById('schedSchedSub').textContent = title + ' — ' + p.name;
+  document.getElementById('schedDateInput').value = '';
+  document.getElementById('slotsSection').style.display = 'none';
+  document.getElementById('slotPills').innerHTML = '';
+  document.getElementById('schedNoteInput').value = '';
+  document.getElementById('schedConfirm2').style.display = 'none';
+  selectedSlot = null;
+  goSchedStep('1');
   document.getElementById('scheduleOverlay').classList.add('open');
+}
+
+function goSchedStep(step) {
+  document.getElementById('schedStep1').style.display    = (step === '1')     ? '' : 'none';
+  document.getElementById('schedStepOD').style.display   = (step === 'od')    ? '' : 'none';
+  document.getElementById('schedStepSched').style.display = (step === 'sched') ? '' : 'none';
 }
 
 function closeScheduleModal() {
   document.getElementById('scheduleOverlay').classList.remove('open');
 }
 
-function confirmSchedule() {
-  var date = document.getElementById('schedDate').value;
-  var time = document.getElementById('schedTime').value;
-  var provider = document.getElementById('schedProvider').value;
+function renderSlots() {
+  var date = document.getElementById('schedDateInput').value;
+  if (!date) return;
+  selectedSlot = null;
+  var html = '';
+  AVAIL_SLOTS.forEach(function(slot) {
+    var busy = BUSY_SLOTS.indexOf(slot) >= 0;
+    if (busy) {
+      html += '<span style="padding:6px 14px;border:1.5px solid #E5E0D8;border-radius:20px;font-size:12px;font-weight:600;color:#D1D5DB;background:#F9FAFB;cursor:default;">' + slot + '</span>';
+    } else {
+      html += '<span class="slt" onclick="selectSlot(this,\'' + slot + '\')" style="padding:6px 14px;border:1.5px solid #E5E0D8;border-radius:20px;font-size:12px;font-weight:600;color:#374151;background:#fff;cursor:pointer;transition:all .12s;">' + slot + '</span>';
+    }
+  });
+  document.getElementById('slotPills').innerHTML = html;
+  document.getElementById('slotsSection').style.display = '';
+}
+
+function selectSlot(el, slot) {
+  selectedSlot = slot;
+  document.querySelectorAll('.slt').forEach(function(s) {
+    s.style.background = '#fff';
+    s.style.borderColor = '#E5E0D8';
+    s.style.color = '#374151';
+  });
+  el.style.background = '#7C3AED';
+  el.style.borderColor = '#7C3AED';
+  el.style.color = '#fff';
+}
+
+function confirmOD() {
+  var p = PATIENTS[currentPatientKey];
+  var el = document.getElementById('odConfirm');
+  el.textContent = '⚡ Connected — Dr. Sarah Patel, MD is joining with ' + (p ? p.name : 'patient') + ' now. Consult ID: OD-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  el.style.display = '';
+  showToast('On Demand consult initiated');
+  setTimeout(function() { closeScheduleModal(); }, 3000);
+}
+
+function confirmSched() {
+  var date = document.getElementById('schedDateInput').value;
+  var provider = document.getElementById('schedProviderSel').value;
   if (!date) { showToast('Please select a date'); return; }
+  if (!selectedSlot) { showToast('Please select a time slot'); return; }
   var d = new Date(date + 'T12:00:00');
   var dateStr = d.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
-  var providerShort = provider.split(' (')[0];
-  var msg = (schedMode === 'reschedule')
-    ? '✅ Consult rescheduled · ' + dateStr + ' at ' + time + ' · ' + providerShort
-    : '✅ Consult scheduled · ' + dateStr + ' at ' + time + ' · ' + providerShort;
-  var el = document.getElementById('schedConfirm');
-  el.textContent = msg;
+  var p = PATIENTS[currentPatientKey];
+  var name = p ? p.name : 'patient';
+  var provShort = provider.split(' (')[0];
+  var verb = schedMode === 'reschedule' ? 'Rescheduled' : 'Scheduled';
+  var apptId = 'APT-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  var el = document.getElementById('schedConfirm2');
+  el.textContent = '✅ ' + verb + ' · ' + dateStr + ' at ' + selectedSlot + ' · ' + provShort + ' · ' + name + ' · ' + apptId;
   el.style.display = '';
-  showToast(schedMode === 'reschedule' ? 'Consult rescheduled' : 'Consult scheduled');
-  setTimeout(function() { closeScheduleModal(); }, 2800);
+  showToast('Consult ' + verb.toLowerCase());
+  setTimeout(function() { closeScheduleModal(); }, 3000);
 }
 
 document.getElementById('scheduleOverlay').addEventListener('click', function(e) {
