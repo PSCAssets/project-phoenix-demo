@@ -341,6 +341,7 @@ def inject_sidebar_nav():
             ('My Dashboard',  '/care-team/',                      'home',      ['/care-team/']),
             ('CT Queue',      '/care-team/queue',                 'clipboard', ['/care-team/queue']),
             ('Patient Queue', '/provider/queue',                  'users',     ['/provider/queue']),
+            ('DXS Queue',     '/care-team/psr/dxs-queue',        'clipboard', ['/care-team/psr/dxs-queue', '/care-team/psr/dxs-call']),
             ('Thyroid Queue', '/care-team/psr/thyroid-queue',     'clipboard', ['/care-team/psr/thyroid-queue']),
             ('Network Schedule', '/provider/schedule',            'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',               'message',   ['/provider/messages']),
