@@ -393,10 +393,10 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:8px;">How will the appointment be booked?</div>
             <div style="display:flex;gap:14px;margin-bottom:10px;">
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="radio" name="schedWho" value="agent" onclick="showSchedMode('agent')"> Agent schedules now
+                <input type="radio" name="schedWho" value="agent" onclick="showSchedModeAndUpdateBtn('agent')"> Agent schedules now
               </label>
               <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;">
-                <input type="radio" name="schedWho" value="patient" onclick="showSchedMode('patient')"> Patient self-schedules in portal
+                <input type="radio" name="schedWho" value="patient" onclick="showSchedModeAndUpdateBtn('patient')"> Patient self-schedules in portal
               </label>
             </div>
 
@@ -467,7 +467,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('callModal')">Cancel</button>
-      <button class="btn-primary" onclick="logCall()">Log Call</button>
+      <button class="btn-primary" id="logCallBtn" onclick="logCall()">Log Call</button>
     </div>
   </div>
 </div>
@@ -519,6 +519,7 @@ function openCallModal(patient, product, result, client, state, attempts) {
   document.getElementById('agentSlotArea').style.display = 'none';
   document.getElementById('cardOnDemand').className = 'timing-card';
   document.getElementById('cardScheduled').className = 'timing-card';
+  updateLogCallBtn('default');
   document.getElementById('attemptWarning').style.display = attempts >= 2 ? '' : 'none';
   document.querySelectorAll('input[name="consultInterest"]').forEach(function(r){ r.checked = false; });
   document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
@@ -558,6 +559,29 @@ function selectTiming(t) {
     document.getElementById('agentSchedForm').style.display = 'none';
     document.getElementById('patientSelfSchedPanel').style.display = 'none';
     document.querySelectorAll('input[name="schedWho"]').forEach(function(r){ r.checked = false; });
+    updateLogCallBtn('scheduled-pending');
+  } else if (t === 'ondemand') {
+    updateLogCallBtn('ondemand');
+  }
+}
+
+function showSchedModeAndUpdateBtn(mode) {
+  showSchedMode(mode);
+  updateLogCallBtn(mode === 'patient' ? 'selfschedule' : 'scheduled-pending');
+}
+
+function updateLogCallBtn(state) {
+  var btn = document.getElementById('logCallBtn');
+  if (!btn) return;
+  if (state === 'ondemand') {
+    btn.textContent = '⚡ Send Portal Link & Close Call';
+    btn.style.background = '#059669';
+  } else if (state === 'selfschedule') {
+    btn.textContent = '⏳ Set Follow-Up & Close Call';
+    btn.style.background = '#D97706';
+  } else {
+    btn.textContent = 'Log Call';
+    btn.style.background = '';
   }
 }
 
@@ -611,8 +635,13 @@ function bookAgentSched() {
   var dateObj = new Date(date + 'T12:00:00');
   var dateStr = dateObj.toLocaleDateString('en-US', {month:'short', day:'numeric'});
   var el = document.getElementById('agentSchedConfirm');
-  el.innerHTML = '✅ Appointment booked: ' + apptId + '<br>' + modality + ' · ' + dateStr + ' · ' + _selectedSchedSlot + '<br>' + provider;
+  el.innerHTML = '✅ Appointment booked: ' + apptId + '<br>' + modality + ' · ' + dateStr + ' at ' + _selectedSchedSlot + ' · ' + provider;
   el.style.display = '';
+  // Close modal after short delay so agent sees the confirmation
+  setTimeout(function(){
+    closeModal('callModal');
+    showToast('✅ Appointment booked — ' + dateStr + ' at ' + _selectedSchedSlot + '. Call closed.');
+  }, 2200);
 }
 
 function escalate(type) {
