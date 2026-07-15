@@ -162,3 +162,7 @@ def peer_review_config():
 @bp.route("/peer-review/reports")
 def peer_review_reports():
     return render_template("admin/peer_review_reports.html")
+
+@bp.route("/document-library")
+def document_library():
+    return render_template("admin/document_library.html")

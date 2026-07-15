@@ -1,0 +1,717 @@
+{% extends "base.html" %}
+{% block title %}Document Library — Admin{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; background: #F3F4F6; }
+
+  /* ── Layout ── */
+  .admin-shell { display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; overflow-y: auto; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; background: #7C3AED; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+  .page-body { margin-left: 240px; margin-top: 60px; display: flex; height: calc(100vh - 60px); overflow: hidden; }
+
+  /* ── Left category sidebar ── */
+  .cat-sidebar { width: 220px; flex-shrink: 0; background: #fff; border-right: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow-y: auto; }
+  .cat-header { padding: 14px 16px; border-bottom: 1px solid #F3F4F6; }
+  .cat-header-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #9CA3AF; }
+  .cat-item { display: flex; align-items: center; gap: 8px; padding: 8px 16px; font-size: 12px; color: #374151; cursor: pointer; transition: background .12s; border-radius: 0; border-left: 3px solid transparent; }
+  .cat-item:hover { background: #F9FAFB; color: #111827; }
+  .cat-item.active { background: #EFF6FF; color: #1D4ED8; border-left-color: #1D4ED8; font-weight: 600; }
+  .cat-item .cat-icon { font-size: 14px; flex-shrink: 0; }
+  .cat-item .cat-count { margin-left: auto; font-size: 10px; font-weight: 700; background: #F3F4F6; color: #6B7280; padding: 1px 6px; border-radius: 10px; }
+  .cat-item.active .cat-count { background: #DBEAFE; color: #1D4ED8; }
+  .cat-divider { height: 1px; background: #F3F4F6; margin: 6px 0; }
+
+  /* ── Main content area ── */
+  .lib-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+  .lib-topbar { padding: 14px 20px; background: #fff; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+  .lib-topbar-title { font-size: 16px; font-weight: 700; color: #111827; }
+  .lib-topbar-sub { font-size: 12px; color: #6B7280; margin-top: 1px; }
+  .btn-primary { background: #1D4ED8; color: #fff; border: none; padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-primary:hover { background: #1E40AF; }
+  .btn-secondary { background: #fff; color: #374151; border: 1px solid #D1D5DB; padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+  .btn-secondary:hover { background: #F9FAFB; }
+
+  .lib-toolbar { padding: 10px 20px; background: #F9FAFB; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+  .lib-search { flex: 1; min-width: 200px; max-width: 340px; position: relative; }
+  .lib-search input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 12px; background: #fff; outline: none; color: #111827; }
+  .lib-search input:focus { border-color: #1D4ED8; }
+  .lib-search svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: #9CA3AF; }
+  .lib-filter { padding: 6px 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 12px; background: #fff; color: #374151; cursor: pointer; outline: none; }
+  .lib-filter:focus { border-color: #1D4ED8; }
+  .lib-view-toggle { display: flex; border: 1px solid #D1D5DB; border-radius: 6px; overflow: hidden; }
+  .lib-view-btn { padding: 6px 10px; background: #fff; border: none; cursor: pointer; color: #6B7280; display: flex; align-items: center; font-size: 13px; transition: background .12s; }
+  .lib-view-btn:hover { background: #F3F4F6; }
+  .lib-view-btn.active { background: #1D4ED8; color: #fff; }
+  .filter-tag { display: flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; }
+  .filter-tag.all { background: #1D4ED8; color: #fff; border-color: #1D4ED8; }
+  .filter-tag.published { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+  .filter-tag.draft { background: #F3F4F6; color: #374151; border-color: #D1D5DB; }
+  .filter-tag.archived { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+  .filter-tag:not(.all):not(.published):not(.draft):not(.archived) { background: #fff; color: #374151; border-color: #D1D5DB; }
+
+  .lib-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
+
+  /* ── Document table ── */
+  .doc-table { width: 100%; border-collapse: collapse; }
+  .doc-table thead tr { background: #F9FAFB; }
+  .doc-table thead th { padding: 8px 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #6B7280; border-bottom: 2px solid #E5E7EB; white-space: nowrap; cursor: pointer; user-select: none; }
+  .doc-table thead th:hover { color: #111827; }
+  .doc-table tbody tr { border-bottom: 1px solid #F3F4F6; cursor: pointer; transition: background .1s; }
+  .doc-table tbody tr:last-child { border-bottom: none; }
+  .doc-table tbody tr:hover { background: #F0F7FF; }
+  .doc-table tbody tr.selected { background: #EFF6FF; }
+  .doc-table tbody td { padding: 10px 12px; vertical-align: middle; }
+
+  .doc-file-icon { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .doc-file-icon.pdf { background: #FEE2E2; }
+  .doc-file-icon.word { background: #DBEAFE; }
+  .doc-file-icon.video { background: #EDE9FE; }
+  .doc-file-icon.html { background: #D1FAE5; }
+  .doc-file-icon.img { background: #FEF3C7; }
+
+  .doc-name { font-size: 13px; font-weight: 600; color: #111827; }
+  .doc-name.archived { text-decoration: line-through; color: #9CA3AF; }
+  .doc-desc { font-size: 11px; color: #6B7280; margin-top: 1px; }
+
+  .ver-badge { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; background: #EFF6FF; color: #1D4ED8; }
+
+  .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .status-badge.published { background: #D1FAE5; color: #065F46; }
+  .status-badge.draft     { background: #F3F4F6; color: #374151; }
+  .status-badge.archived  { background: #FEF3C7; color: #92400E; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.published { background: #10B981; }
+  .status-dot.draft     { background: #9CA3AF; }
+  .status-dot.archived  { background: #F59E0B; }
+
+  .row-actions { display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
+  tr:hover .row-actions { opacity: 1; }
+  .row-action-btn { padding: 3px 9px; border-radius: 4px; font-size: 11px; font-weight: 500; border: 1px solid #D1D5DB; background: #fff; color: #374151; cursor: pointer; white-space: nowrap; }
+  .row-action-btn:hover { background: #F3F4F6; }
+  .row-action-btn.publish { border-color: #6EE7B7; color: #065F46; background: #D1FAE5; }
+  .row-action-btn.publish:hover { background: #A7F3D0; }
+  .row-action-btn.archive { border-color: #FDE68A; color: #92400E; background: #FEF3C7; }
+  .row-action-btn.archive:hover { background: #FDE68A; }
+
+  /* ── Detail panel ── */
+  .detail-panel { width: 380px; flex-shrink: 0; background: #fff; border-left: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow: hidden; transform: translateX(380px); transition: transform .25s ease; }
+  .detail-panel.open { transform: translateX(0); }
+  .lib-main.panel-open .lib-content { padding-right: 8px; }
+
+  .detail-header { padding: 16px 18px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: flex-start; gap: 10px; flex-shrink: 0; }
+  .detail-file-icon { width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .detail-title { font-size: 14px; font-weight: 700; color: #111827; line-height: 1.3; }
+  .detail-sub { font-size: 11px; color: #6B7280; margin-top: 3px; }
+  .detail-close { margin-left: auto; background: none; border: none; color: #6B7280; cursor: pointer; padding: 2px; font-size: 18px; line-height: 1; }
+  .detail-close:hover { color: #111827; }
+
+  .detail-actions { padding: 12px 18px; display: flex; gap: 8px; border-bottom: 1px solid #F3F4F6; flex-shrink: 0; flex-wrap: wrap; }
+  .detail-btn { padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+  .detail-btn.primary { background: #1D4ED8; color: #fff; }
+  .detail-btn.primary:hover { background: #1E40AF; }
+  .detail-btn.outline { background: #fff; color: #374151; border-color: #D1D5DB; }
+  .detail-btn.outline:hover { background: #F9FAFB; }
+  .detail-btn.green { background: #D1FAE5; color: #065F46; border-color: #A7F3D0; }
+  .detail-btn.green:hover { background: #A7F3D0; }
+  .detail-btn.amber { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+  .detail-btn.amber:hover { background: #FDE68A; }
+
+  .detail-body { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 16px; }
+  .detail-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #9CA3AF; margin-bottom: 8px; }
+  .detail-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
+  .detail-meta-item {}
+  .detail-meta-label { font-size: 10px; color: #9CA3AF; font-weight: 500; }
+  .detail-meta-value { font-size: 12px; color: #111827; font-weight: 600; margin-top: 1px; }
+
+  .version-list { display: flex; flex-direction: column; gap: 0; }
+  .version-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3F4F6; }
+  .version-row:last-child { border-bottom: none; }
+  .version-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: #EFF6FF; color: #1D4ED8; white-space: nowrap; flex-shrink: 0; }
+  .version-badge.current { background: #1D4ED8; color: #fff; }
+  .version-info { flex: 1; min-width: 0; }
+  .version-note { font-size: 12px; color: #111827; }
+  .version-meta { font-size: 10px; color: #9CA3AF; margin-top: 2px; }
+  .version-restore { font-size: 11px; color: #1D4ED8; cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .version-restore:hover { text-decoration: underline; }
+
+  .upload-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 500; align-items: center; justify-content: center; }
+  .upload-modal-overlay.open { display: flex; }
+  .upload-modal { background: #fff; border-radius: 12px; width: 520px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden; }
+  .modal-header { padding: 18px 24px; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 10px; }
+  .modal-title { font-size: 16px; font-weight: 700; color: #111827; flex: 1; }
+  .modal-close { background: none; border: none; color: #6B7280; font-size: 20px; cursor: pointer; padding: 0; line-height: 1; }
+  .modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-label { font-size: 12px; font-weight: 600; color: #374151; }
+  .form-input { padding: 8px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 13px; color: #111827; outline: none; }
+  .form-input:focus { border-color: #1D4ED8; }
+  .form-select { padding: 8px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 13px; color: #111827; outline: none; background: #fff; cursor: pointer; }
+  .form-select:focus { border-color: #1D4ED8; }
+  .drop-zone { border: 2px dashed #D1D5DB; border-radius: 8px; padding: 28px 20px; text-align: center; background: #F9FAFB; cursor: pointer; transition: border-color .15s, background .15s; }
+  .drop-zone:hover { border-color: #1D4ED8; background: #EFF6FF; }
+  .drop-zone-icon { font-size: 28px; margin-bottom: 8px; }
+  .drop-zone-text { font-size: 13px; color: #374151; font-weight: 500; }
+  .drop-zone-sub { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
+  .modal-footer { padding: 14px 24px; border-top: 1px solid #E5E7EB; display: flex; gap: 8px; justify-content: flex-end; }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="admin-shell">
+
+  <!-- Admin sidenav -->
+  <aside class="sidenav">
+    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+    <div class="nav-user">
+      <div class="nav-avatar">CN</div>
+      <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+    </div>
+    <nav style="padding: 8px 0; flex: 1;">
+      <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+      <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+      <a href="/admin/coordinator" class="nav-item"><span class="nav-icon">🗂</span> Coordinator</a>
+      <a href="/admin/users" class="nav-item"><span class="nav-icon">👥</span> User Management</a>
+      <a href="/admin/role-config" class="nav-item"><span class="nav-icon">🔐</span> Role Configuration</a>
+      <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
+      <a href="/admin/integrations" class="nav-item"><span class="nav-icon">🔌</span> Integrations</a>
+      <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Config</a>
+      <a href="/admin/doh-config" class="nav-item"><span class="nav-icon">🏥</span> DOH Configuration</a>
+      <a href="/admin/notifications" class="nav-item"><span class="nav-icon">🔔</span> Notification Templates</a>
+      <a href="/admin/audit-log" class="nav-item"><span class="nav-icon">📋</span> Audit Log</a>
+      <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+      <a href="/admin/document-library" class="nav-item active"><span class="nav-icon">📚</span> Document Library</a>
+    </nav>
+    <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+  </aside>
+
+  <div class="page-body" id="pageBody">
+
+    <!-- Category sidebar -->
+    <div class="cat-sidebar">
+      <div class="cat-header"><div class="cat-header-label">Libraries</div></div>
+
+      <div class="cat-item active" onclick="filterByCategory('all', this)">
+        <span class="cat-icon">📚</span> All Content
+        <span class="cat-count" id="catCountAll">10</span>
+      </div>
+
+      <div class="cat-divider"></div>
+      <div style="padding: 6px 16px 2px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: rgba(255,255,255,0.3); color: #9CA3AF;">Content Libraries</div>
+
+      <div class="cat-item" onclick="filterByCategory('Blurbs', this)">
+        <span class="cat-icon">💬</span> Blurb Library
+        <span class="cat-count" id="catCountBlurbs">2</span>
+      </div>
+      <div class="cat-item" onclick="filterByCategory('Consent Forms', this)">
+        <span class="cat-icon">📝</span> Consent Forms
+        <span class="cat-count" id="catCountConsent">3</span>
+      </div>
+      <div class="cat-item" onclick="filterByCategory('Patient Education', this)">
+        <span class="cat-icon">🎓</span> Patient Education
+        <span class="cat-count" id="catCountEdu">2</span>
+      </div>
+      <div class="cat-item" onclick="filterByCategory('Intake Templates', this)">
+        <span class="cat-icon">📋</span> Intake Templates
+        <span class="cat-count" id="catCountIntake">1</span>
+      </div>
+      <div class="cat-item" onclick="filterByCategory('Clinical Reference', this)">
+        <span class="cat-icon">🔬</span> Clinical Reference
+        <span class="cat-count" id="catCountClinical">1</span>
+      </div>
+      <div class="cat-item" onclick="filterByCategory('Provider Guides', this)">
+        <span class="cat-icon">📖</span> Provider Guides
+        <span class="cat-count" id="catCountGuides">1</span>
+      </div>
+
+      <div class="cat-divider"></div>
+      <div style="padding: 6px 16px 2px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #9CA3AF;">By Status</div>
+      <div class="cat-item" onclick="filterByStatus('Published', this)" style="padding-left:24px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#10B981;flex-shrink:0;display:inline-block;"></span> Published
+        <span class="cat-count">7</span>
+      </div>
+      <div class="cat-item" onclick="filterByStatus('Draft', this)" style="padding-left:24px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#9CA3AF;flex-shrink:0;display:inline-block;"></span> Draft
+        <span class="cat-count">2</span>
+      </div>
+      <div class="cat-item" onclick="filterByStatus('Archived', this)" style="padding-left:24px">
+        <span style="width:8px;height:8px;border-radius:50%;background:#F59E0B;flex-shrink:0;display:inline-block;"></span> Archived
+        <span class="cat-count">1</span>
+      </div>
+
+      <div style="padding: 16px; margin-top: auto; border-top: 1px solid #F3F4F6;">
+        <div style="font-size: 10px; color: #9CA3AF; text-align: center;">10 documents · 3 libraries</div>
+        <div style="font-size: 10px; color: #9CA3AF; text-align: center; margin-top: 2px;">Last updated: Jul 15, 2026</div>
+      </div>
+    </div>
+
+    <!-- Main content + detail panel wrapper -->
+    <div class="lib-main" id="libMain">
+
+      <!-- Top bar -->
+      <div class="lib-topbar">
+        <div>
+          <div class="lib-topbar-title">Document Library</div>
+          <div class="lib-topbar-sub">Manage all clinical content, blurbs, and consent forms · Version-controlled · Admin-only publishing</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn-secondary" onclick="alert('Generating library report...')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn-primary" onclick="openUploadModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Upload Document
+          </button>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="lib-toolbar">
+        <div class="lib-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search documents, categories, owners..." oninput="applyFilters()">
+        </div>
+        <select class="lib-filter" id="typeFilter" onchange="applyFilters()">
+          <option value="">All File Types</option>
+          <option value="PDF">PDF</option>
+          <option value="Word">Word</option>
+          <option value="Video">Video</option>
+          <option value="HTML">HTML Template</option>
+        </select>
+        <select class="lib-filter" id="ownerFilter" onchange="applyFilters()">
+          <option value="">All Owners</option>
+          <option value="Jessica Wheeler">Jessica Wheeler</option>
+          <option value="Dr. Sarah Lee">Dr. Sarah Lee</option>
+          <option value="Maria Rodriguez">Maria Rodriguez</option>
+          <option value="Chris Navarro">Chris Navarro</option>
+          <option value="Kyro Beshay">Kyro Beshay</option>
+        </select>
+        <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
+          <span style="font-size:11px;color:#6B7280;" id="resultCount">10 documents</span>
+        </div>
+      </div>
+
+      <!-- Document table -->
+      <div class="lib-content" id="libContent">
+        <table class="doc-table" id="docTable">
+          <thead>
+            <tr>
+              <th style="width:40px;"></th>
+              <th onclick="sortTable('name')">Document Name ↕</th>
+              <th onclick="sortTable('category')" style="width:140px">Category ↕</th>
+              <th onclick="sortTable('version')" style="width:80px;text-align:center">Version ↕</th>
+              <th onclick="sortTable('status')" style="width:110px">Status ↕</th>
+              <th onclick="sortTable('owner')" style="width:140px">Owner ↕</th>
+              <th onclick="sortTable('updated')" style="width:110px">Last Updated ↕</th>
+              <th style="width:180px"></th>
+            </tr>
+          </thead>
+          <tbody id="docTbody">
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-header">
+        <div class="detail-file-icon pdf" id="detailIcon">📄</div>
+        <div style="flex:1;min-width:0;">
+          <div class="detail-title" id="detailTitle">Document Name</div>
+          <div class="detail-sub" id="detailSub">Category · File Type</div>
+        </div>
+        <button class="detail-close" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="detail-actions" id="detailActions"></div>
+      <div class="detail-body">
+        <div>
+          <div class="detail-section-title">Document Details</div>
+          <div class="detail-meta-grid" id="detailMeta"></div>
+        </div>
+        <div>
+          <div class="detail-section-title">Version History</div>
+          <div class="version-list" id="versionHistory"></div>
+        </div>
+        <div>
+          <div class="detail-section-title">Description</div>
+          <div style="font-size:12px;color:#374151;line-height:1.6;" id="detailDesc"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="upload-modal-overlay" id="uploadModal" onclick="if(event.target===this)closeUploadModal()">
+  <div class="upload-modal">
+    <div class="modal-header">
+      <span style="font-size:20px;">📤</span>
+      <div class="modal-title">Upload New Document</div>
+      <button class="modal-close" onclick="closeUploadModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Document Title *</label>
+        <input class="form-input" type="text" placeholder="e.g. Weight Management Consent Form">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+          <label class="form-label">Category *</label>
+          <select class="form-select">
+            <option>Blurbs</option>
+            <option>Consent Forms</option>
+            <option>Patient Education</option>
+            <option>Intake Templates</option>
+            <option>Clinical Reference</option>
+            <option>Provider Guides</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Status</label>
+          <select class="form-select">
+            <option>Draft</option>
+            <option>Published</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Version Notes</label>
+        <input class="form-input" type="text" placeholder="e.g. Initial draft — pending legal review">
+      </div>
+      <div class="drop-zone" onclick="alert('File picker — select PDF, Word, or HTML file')">
+        <div class="drop-zone-icon">📁</div>
+        <div class="drop-zone-text">Drop file here or click to browse</div>
+        <div class="drop-zone-sub">PDF, Word (.docx), HTML Template · Max 50 MB</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+      <button class="btn-primary" onclick="alert('Document uploaded and saved as Draft. Admin review required before publishing.');closeUploadModal()">Upload &amp; Save Draft</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+const DOCS = [
+  {
+    id: 1, name: 'BRCA1/2 Pathogenic Variant — Patient Blurb', category: 'Blurbs', fileType: 'Word',
+    icon: '💬', iconClass: 'word', version: 'v2.1', status: 'Published',
+    owner: 'Dr. Sarah Lee', updated: '2026-07-10', updatedDisplay: 'Jul 10, 2026',
+    desc: 'Pre-approved clinical language for communicating BRCA1/2 pathogenic variant results to patients. Reviewed and approved by legal and clinical teams. Approved for use in GC consult documentation.',
+    size: '18 KB', views: 142,
+    versions: [
+      { ver: 'v2.1', note: 'Updated language per legal review — clarified hereditary risk section', by: 'Dr. Sarah Lee', date: 'Jul 10, 2026', current: true },
+      { ver: 'v2.0', note: 'Restructured for new disclosure workflow', by: 'Dr. Sarah Lee', date: 'Apr 22, 2026', current: false },
+      { ver: 'v1.0', note: 'Initial approved blurb', by: 'Dr. Sarah Lee', date: 'Feb 8, 2026', current: false },
+    ]
+  },
+  {
+    id: 2, name: 'Weight Management Consent Form (CPOM)', category: 'Consent Forms', fileType: 'PDF',
+    icon: '📄', iconClass: 'pdf', version: 'v1.3', status: 'Published',
+    owner: 'Jessica Wheeler', updated: '2026-06-28', updatedDisplay: 'Jun 28, 2026',
+    desc: 'Patient consent form for Weight Management program under CPOM multi-entity structure. Includes state-specific addenda for TX, IL, CA, and FL. Reviewed by legal and compliance.',
+    size: '124 KB', views: 381,
+    versions: [
+      { ver: 'v1.3', note: 'Added FL state addendum; updated CPOM entity language', by: 'Jessica Wheeler', date: 'Jun 28, 2026', current: true },
+      { ver: 'v1.2', note: 'CA addendum added per state regulatory requirement', by: 'Jessica Wheeler', date: 'May 4, 2026', current: false },
+      { ver: 'v1.1', note: 'IL-specific disclosure language updated', by: 'Jessica Wheeler', date: 'Mar 12, 2026', current: false },
+      { ver: 'v1.0', note: 'Initial consent form — TX and IL only', by: 'Jessica Wheeler', date: 'Jan 20, 2026', current: false },
+    ]
+  },
+  {
+    id: 3, name: 'A1C Management Patient Education Guide', category: 'Patient Education', fileType: 'PDF',
+    icon: '🎓', iconClass: 'pdf', version: 'v1.0', status: 'Draft',
+    owner: 'Maria Rodriguez', updated: '2026-07-14', updatedDisplay: 'Jul 14, 2026',
+    desc: 'Patient-facing education guide for A1C Management program participants. Covers diet, medication adherence, monitoring cadence, and when to contact the care team. Pending final clinical review before publish.',
+    size: '2.1 MB', views: 0,
+    versions: [
+      { ver: 'v1.0', note: 'Initial draft — clinical review pending', by: 'Maria Rodriguez', date: 'Jul 14, 2026', current: true },
+    ]
+  },
+  {
+    id: 4, name: 'Testosterone Therapy — AE Monitoring Protocol', category: 'Clinical Reference', fileType: 'PDF',
+    icon: '🔬', iconClass: 'pdf', version: 'v3.0', status: 'Published',
+    owner: 'Chris Navarro', updated: '2026-05-22', updatedDisplay: 'May 22, 2026',
+    desc: 'Clinical reference protocol for monitoring adverse events in Testosterone Therapy patients. Defines lab thresholds, escalation triggers, and documentation requirements for all prescribing providers.',
+    size: '340 KB', views: 217,
+    versions: [
+      { ver: 'v3.0', note: 'Updated lab thresholds per 2026 clinical guidelines', by: 'Chris Navarro', date: 'May 22, 2026', current: true },
+      { ver: 'v2.1', note: 'Added hematocrit threshold and monitoring note', by: 'Chris Navarro', date: 'Nov 10, 2025', current: false },
+      { ver: 'v2.0', note: 'Restructured into care product-specific sections', by: 'Chris Navarro', date: 'Aug 1, 2025', current: false },
+    ]
+  },
+  {
+    id: 5, name: 'BRCA2 VUS Result — Patient Blurb', category: 'Blurbs', fileType: 'Word',
+    icon: '💬', iconClass: 'word', version: 'v1.0', status: 'Draft',
+    owner: 'Dr. Sarah Lee', updated: '2026-07-12', updatedDisplay: 'Jul 12, 2026',
+    desc: 'Pre-written clinical language for communicating BRCA2 variant of uncertain significance (VUS) results. Emphasizes that VUS does not confirm increased risk. Pending GC team review before publishing.',
+    size: '14 KB', views: 0,
+    versions: [
+      { ver: 'v1.0', note: 'Initial draft — GC team review in progress', by: 'Dr. Sarah Lee', date: 'Jul 12, 2026', current: true },
+    ]
+  },
+  {
+    id: 6, name: 'Lipid/Cardio Intake Questionnaire Template', category: 'Intake Templates', fileType: 'HTML',
+    icon: '📋', iconClass: 'html', version: 'v2.0', status: 'Published',
+    owner: 'Kyro Beshay', updated: '2026-06-15', updatedDisplay: 'Jun 15, 2026',
+    desc: 'Standardized intake questionnaire template for Lipid/Cardio care product. Includes cardiovascular risk factors, medication history, family history section, and symptom screener. Configured as default intake in care product wizard.',
+    size: '48 KB', views: 94,
+    versions: [
+      { ver: 'v2.0', note: 'Added ASCVD risk screener section; restructured family history', by: 'Kyro Beshay', date: 'Jun 15, 2026', current: true },
+      { ver: 'v1.0', note: 'Initial template — standard cardiac intake', by: 'Kyro Beshay', date: 'Feb 28, 2026', current: false },
+    ]
+  },
+  {
+    id: 7, name: "Women's Health Welcome Letter", category: 'Consent Forms', fileType: 'Word',
+    icon: '📝', iconClass: 'word', version: 'v1.2', status: 'Archived',
+    owner: 'Jessica Wheeler', updated: '2026-04-30', updatedDisplay: 'Apr 30, 2026',
+    desc: "Welcome letter template for Women's Health program patients. Archived — superseded by v2.0 which was restructured to match new CPOM entity language. Do not use for new patients.",
+    size: '22 KB', views: 56,
+    versions: [
+      { ver: 'v1.2', note: 'Archived — superseded by v2.0 (new file)', by: 'Jessica Wheeler', date: 'Apr 30, 2026', current: true },
+      { ver: 'v1.1', note: 'Minor language updates', by: 'Jessica Wheeler', date: 'Jan 15, 2026', current: false },
+    ]
+  },
+  {
+    id: 8, name: 'Provider Onboarding Guide — Telehealth Platform', category: 'Provider Guides', fileType: 'PDF',
+    icon: '📖', iconClass: 'pdf', version: 'v1.0', status: 'Published',
+    owner: 'Chris Navarro', updated: '2026-07-01', updatedDisplay: 'Jul 1, 2026',
+    desc: 'Comprehensive onboarding guide for new providers joining the Everlywell Telehealth platform. Covers portal navigation, consult workflows, documentation requirements, SLA expectations, and escalation procedures.',
+    size: '1.4 MB', views: 28,
+    versions: [
+      { ver: 'v1.0', note: 'Initial guide — covers Phoenix platform v1.0 workflows', by: 'Chris Navarro', date: 'Jul 1, 2026', current: true },
+    ]
+  },
+  {
+    id: 9, name: 'Thyroid Management Patient Handout', category: 'Patient Education', fileType: 'PDF',
+    icon: '🎓', iconClass: 'pdf', version: 'v1.1', status: 'Published',
+    owner: 'Maria Rodriguez', updated: '2026-06-20', updatedDisplay: 'Jun 20, 2026',
+    desc: 'Patient handout covering TSH/T4 result interpretation, medication adherence guidance, lifestyle considerations, and follow-up scheduling for Thyroid Management patients.',
+    size: '840 KB', views: 63,
+    versions: [
+      { ver: 'v1.1', note: 'Added TSH reference ranges for pregnant patients', by: 'Maria Rodriguez', date: 'Jun 20, 2026', current: true },
+      { ver: 'v1.0', note: 'Initial handout', by: 'Maria Rodriguez', date: 'Apr 5, 2026', current: false },
+    ]
+  },
+  {
+    id: 10, name: 'Genetic Counseling Disclosure Template', category: 'Consent Forms', fileType: 'Word',
+    icon: '📝', iconClass: 'word', version: 'v4.0', status: 'Published',
+    owner: 'Jessica Wheeler', updated: '2026-07-08', updatedDisplay: 'Jul 8, 2026',
+    desc: 'Master consent and disclosure template for genetic counseling consultations. Covers BRCA, hereditary cancer panel, and carrier screening programs. Includes state-specific addenda for all licensed states. Most recent version incorporates updated disclosure requirements from Jul 2026 legal review.',
+    size: '210 KB', views: 198,
+    versions: [
+      { ver: 'v4.0', note: 'Updated multi-stage disclosure language; added hereditary cancer panel section', by: 'Jessica Wheeler', date: 'Jul 8, 2026', current: true },
+      { ver: 'v3.1', note: 'Added IL and CA addenda', by: 'Jessica Wheeler', date: 'Mar 20, 2026', current: false },
+      { ver: 'v3.0', note: 'Restructured for CPOM multi-entity', by: 'Jessica Wheeler', date: 'Dec 12, 2025', current: false },
+      { ver: 'v2.0', note: 'Carrier screening section added', by: 'Jessica Wheeler', date: 'Sep 4, 2025', current: false },
+    ]
+  },
+];
+
+let activeCategory = 'all';
+let activeStatus = '';
+let sortKey = 'updated';
+let sortDir = 'desc';
+let selectedId = null;
+
+function getStatusBadge(status) {
+  const cls = status.toLowerCase();
+  const dot = `<span class="status-dot ${cls}"></span>`;
+  return `<span class="status-badge ${cls}">${dot}${status}</span>`;
+}
+
+function getIcon(doc) {
+  const icons = { PDF: '📄', Word: '📝', HTML: '🌐', Video: '🎬' };
+  return icons[doc.fileType] || '📄';
+}
+
+function renderTable() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const typeF  = document.getElementById('typeFilter').value;
+  const ownerF = document.getElementById('ownerFilter').value;
+
+  let filtered = DOCS.filter(d => {
+    if (activeCategory !== 'all' && d.category !== activeCategory) return false;
+    if (activeStatus && d.status !== activeStatus) return false;
+    if (typeF && d.fileType !== typeF) return false;
+    if (ownerF && d.owner !== ownerF) return false;
+    if (search && !d.name.toLowerCase().includes(search) && !d.category.toLowerCase().includes(search) && !d.owner.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    let av = a[sortKey === 'updated' ? 'updated' : sortKey] || '';
+    let bv = b[sortKey === 'updated' ? 'updated' : sortKey] || '';
+    if (sortKey === 'version') { av = a.version; bv = b.version; }
+    const cmp = String(av).localeCompare(String(bv));
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  document.getElementById('resultCount').textContent = `${filtered.length} document${filtered.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('docTbody');
+  tbody.innerHTML = filtered.map(d => {
+    const nameClass = d.status === 'Archived' ? 'doc-name archived' : 'doc-name';
+    const rowSel = d.id === selectedId ? 'selected' : '';
+    let rowActions = '';
+    if (d.status === 'Draft') {
+      rowActions = `<button class="row-action-btn publish" onclick="event.stopPropagation();publishDoc(${d.id})">Publish</button>`;
+    } else if (d.status === 'Published') {
+      rowActions = `<button class="row-action-btn archive" onclick="event.stopPropagation();archiveDoc(${d.id})">Archive</button>`;
+    } else {
+      rowActions = `<button class="row-action-btn" onclick="event.stopPropagation();alert('Restoring ${d.name} to Draft...')">Restore</button>`;
+    }
+    return `<tr class="${rowSel}" onclick="openDetail(${d.id})">
+      <td><div class="doc-file-icon ${d.iconClass}">${d.icon}</div></td>
+      <td>
+        <div class="${nameClass}">${d.name}</div>
+        <div class="doc-desc">${d.category} · ${d.fileType} · ${d.size}</div>
+      </td>
+      <td><span style="font-size:11px;color:#374151">${d.category}</span></td>
+      <td style="text-align:center"><span class="ver-badge">${d.version}</span></td>
+      <td>${getStatusBadge(d.status)}</td>
+      <td><span style="font-size:12px;color:#374151">${d.owner}</span></td>
+      <td><span style="font-size:12px;color:#6B7280">${d.updatedDisplay}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="row-action-btn" onclick="event.stopPropagation();alert('Downloading ${d.name}...')">Download</button>
+          <button class="row-action-btn" onclick="event.stopPropagation();openDetail(${d.id})">Details</button>
+          ${rowActions}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function applyFilters() { renderTable(); }
+
+function filterByCategory(cat, el) {
+  activeCategory = cat;
+  activeStatus = '';
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function filterByStatus(status, el) {
+  activeStatus = status;
+  activeCategory = 'all';
+  document.querySelectorAll('.cat-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function sortTable(key) { sortDir = (sortKey === key && sortDir === 'asc') ? 'desc' : 'asc'; sortKey = key; renderTable(); }
+
+function openDetail(id) {
+  const doc = DOCS.find(d => d.id === id);
+  if (!doc) return;
+  selectedId = id;
+  renderTable();
+
+  document.getElementById('detailIcon').textContent = doc.icon;
+  document.getElementById('detailIcon').className = 'detail-file-icon ' + doc.iconClass;
+  document.getElementById('detailTitle').textContent = doc.name;
+  document.getElementById('detailSub').textContent = `${doc.category} · ${doc.fileType} · ${doc.size}`;
+
+  // Actions
+  let actions = `<button class="detail-btn outline" onclick="alert('Downloading ${doc.name}...')">⬇ Download</button>`;
+  if (doc.status === 'Draft') {
+    actions += `<button class="detail-btn green" onclick="publishDoc(${doc.id})">✓ Publish</button>`;
+    actions += `<button class="detail-btn outline" onclick="alert('Editing ${doc.name}...')">✏ Edit</button>`;
+  } else if (doc.status === 'Published') {
+    actions += `<button class="detail-btn outline" onclick="alert('Creating new version of ${doc.name}...')">+ New Version</button>`;
+    actions += `<button class="detail-btn amber" onclick="archiveDoc(${doc.id})">Archive</button>`;
+  } else {
+    actions += `<button class="detail-btn outline" onclick="alert('Restoring ${doc.name} to Draft...')">↺ Restore</button>`;
+  }
+  document.getElementById('detailActions').innerHTML = actions;
+
+  // Meta
+  document.getElementById('detailMeta').innerHTML = `
+    <div class="detail-meta-item"><div class="detail-meta-label">Status</div><div class="detail-meta-value">${getStatusBadge(doc.status)}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">Current Version</div><div class="detail-meta-value">${doc.version}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">File Type</div><div class="detail-meta-value">${doc.fileType}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">File Size</div><div class="detail-meta-value">${doc.size}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">Owner</div><div class="detail-meta-value">${doc.owner}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">Category</div><div class="detail-meta-value">${doc.category}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">Last Updated</div><div class="detail-meta-value">${doc.updatedDisplay}</div></div>
+    <div class="detail-meta-item"><div class="detail-meta-label">Total Views</div><div class="detail-meta-value">${doc.views}</div></div>
+  `;
+
+  // Version history
+  document.getElementById('versionHistory').innerHTML = doc.versions.map(v => `
+    <div class="version-row">
+      <span class="version-badge${v.current ? ' current' : ''}">${v.ver}</span>
+      <div class="version-info">
+        <div class="version-note">${v.note}</div>
+        <div class="version-meta">${v.by} · ${v.date}</div>
+      </div>
+      ${!v.current ? `<span class="version-restore" onclick="alert('Restoring ${doc.name} to ${v.ver}...')">Restore</span>` : '<span style="font-size:10px;color:#10B981;font-weight:600;">Current</span>'}
+    </div>
+  `).join('');
+
+  document.getElementById('detailDesc').textContent = doc.desc;
+
+  document.getElementById('detailPanel').classList.add('open');
+  document.getElementById('libMain').classList.add('panel-open');
+}
+
+function closeDetail() {
+  selectedId = null;
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('libMain').classList.remove('panel-open');
+  renderTable();
+}
+
+function publishDoc(id) {
+  const doc = DOCS.find(d => d.id === id);
+  if (!doc) return;
+  if (confirm(`Publish "${doc.name}" (${doc.version})? It will be visible to all licensed users immediately.`)) {
+    doc.status = 'Published';
+    doc.updated = '2026-07-15';
+    doc.updatedDisplay = 'Jul 15, 2026';
+    renderTable();
+    if (selectedId === id) openDetail(id);
+  }
+}
+
+function archiveDoc(id) {
+  const doc = DOCS.find(d => d.id === id);
+  if (!doc) return;
+  if (confirm(`Archive "${doc.name}"? It will no longer be accessible to providers.`)) {
+    doc.status = 'Archived';
+    renderTable();
+    if (selectedId === id) openDetail(id);
+  }
+}
+
+function openUploadModal() { document.getElementById('uploadModal').classList.add('open'); }
+function closeUploadModal() { document.getElementById('uploadModal').classList.remove('open'); }
+
+// Initialize
+renderTable();
+</script>
+{% endraw %}
+{% endblock %}

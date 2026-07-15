@@ -338,32 +338,37 @@
       </a>
     </div>
 
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
-    <div class="stats-row">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's planner view</div>
+    <div class="stats-row" style="grid-template-columns:repeat(6,1fr)">
       <div class="stat-card accent-red" style="cursor:pointer;" onclick="openUrgentPanel()">
         <div class="stat-label">Urgent Messages</div>
         <div class="stat-value red">3</div>
         <div class="stat-sub">Require immediate action</div>
       </div>
-      <div class="stat-card accent-green">
-        <div class="stat-label">Completed Today</div>
-        <div class="stat-value green">5</div>
-        <div class="stat-sub">+2 vs. yesterday</div>
+      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="alert('My Schedule — 2 appointments today')">
+        <div class="stat-label">Scheduled Consults</div>
+        <div class="stat-value">2</div>
+        <div class="stat-sub">Today's calendar</div>
       </div>
-      <div class="stat-card accent-navy" style="cursor:pointer;" onclick="document.getElementById('consultsTable').scrollIntoView({behavior:'smooth'})">
-        <div class="stat-label">Active Consults</div>
-        <div class="stat-value">8</div>
-        <div class="stat-sub">Assigned to you</div>
+      <div class="stat-card accent-blue" style="cursor:pointer;" onclick="filterConsults('async',document.querySelector('[data-filter=async]'))">
+        <div class="stat-label">Async Consults</div>
+        <div class="stat-value">5</div>
+        <div class="stat-sub">Awaiting review</div>
       </div>
       <div class="stat-card accent-amber" style="cursor:pointer;" onclick="document.getElementById('pendingTable').scrollIntoView({behavior:'smooth'})">
-        <div class="stat-label">Pending Chart Close</div>
+        <div class="stat-label">Open Encounters</div>
         <div class="stat-value amber">2</div>
-        <div class="stat-sub">Requires signature</div>
+        <div class="stat-sub">Requires chart close</div>
       </div>
-      <div class="stat-card accent-red" style="cursor:pointer;" onclick="document.getElementById('slaTable').scrollIntoView({behavior:'smooth'})">
-        <div class="stat-label">SLA Alerts</div>
-        <div class="stat-value red">2</div>
-        <div class="stat-sub">1 over SLA · 1 warning</div>
+      <div class="stat-card accent-amber" style="cursor:pointer;" onclick="document.getElementById('slaTable').scrollIntoView({behavior:'smooth'})">
+        <div class="stat-label">SLA Notifications</div>
+        <div class="stat-value amber">2</div>
+        <div class="stat-sub">1 overdue · 1 approaching</div>
+      </div>
+      <div class="stat-card" style="cursor:pointer;border-left:3px solid #2563EB;" onclick="window.location.href='/provider/lab-auth'">
+        <div class="stat-label">Lab Requisitions</div>
+        <div class="stat-value" style="color:#2563EB">8</div>
+        <div class="stat-sub" style="color:#2563EB">Tap to review &amp; approve all →</div>
       </div>
     </div>
 
