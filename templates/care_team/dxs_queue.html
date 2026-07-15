@@ -57,6 +57,17 @@
 
   .aws-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:9px; padding:12px 16px; margin-bottom:20px; font-size:12px; color:#1E40AF; display:flex; gap:10px; align-items:center; }
   .aws-dot { width:8px; height:8px; background:#22C55E; border-radius:50%; flex-shrink:0; box-shadow:0 0 0 2px #BBF7D0; }
+
+  /* ── 6-step scheduling wizard ── */
+  .wiz-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:400;align-items:center;justify-content:center; }
+  .wiz-overlay.open { display:flex; }
+  .wiz-step-col { display:flex;flex-direction:column;align-items:center;gap:5px;flex:1; }
+  .wiz-dot { width:28px;height:28px;border-radius:50%;background:#E5E7EB;border:2px solid #D1D5DB;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6B7280;transition:all .2s; }
+  .wiz-dot.wiz-active { background:#15803D;border-color:#15803D;color:#fff; }
+  .wiz-dot.wiz-done { background:#D1FAE5;border-color:#059669;color:#059669; }
+  .wiz-lbl { font-size:10px;font-weight:600;color:#9CA3AF;text-align:center;white-space:nowrap; }
+  .wiz-lbl.wiz-active { color:#15803D; }
+  .wiz-lbl.wiz-done { color:#059669; }
 </style>
 
 <div class="dxs-wrap">
@@ -170,6 +181,149 @@
 </div>
 <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
 
+<!-- DXS Queue 6-step Scheduling Wizard (QW-SCHED-001) -->
+<div class="wiz-overlay" id="qwOverlay">
+  <div style="background:#fff;border-radius:12px;width:560px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;">
+    <!-- Member header bar -->
+    <div style="background:#F0FDF4;border-bottom:1px solid #BBF7D0;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.06em;">MEMBER</span>
+      <span id="qwMemberName" style="font-size:13px;font-weight:700;color:#111827;"></span>
+      <span style="font-size:11px;color:#D1D5DB;">|</span>
+      <span id="qwMemberId" style="font-size:11px;font-family:monospace;color:#6B7280;"></span>
+      <span style="font-size:11px;color:#D1D5DB;">|</span>
+      <span id="qwMemberFacingId" style="font-size:11px;font-family:monospace;color:#6B7280;"></span>
+      <span style="font-size:11px;color:#D1D5DB;">|</span>
+      <span id="qwHealthPlan" style="font-size:11px;color:#6B7280;"></span>
+    </div>
+    <!-- Progress bar -->
+    <div style="padding:16px 20px 12px;border-bottom:1px solid #F3F4F6;flex-shrink:0;">
+      <div style="display:flex;align-items:flex-start;">
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot1">1</div><div class="wiz-lbl" id="qwLbl1">Demographics</div></div>
+        <div style="flex:1;height:2px;background:#E5E7EB;margin-top:13px;"></div>
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot2">2</div><div class="wiz-lbl" id="qwLbl2">Register</div></div>
+        <div style="flex:1;height:2px;background:#E5E7EB;margin-top:13px;"></div>
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot3">3</div><div class="wiz-lbl" id="qwLbl3">Appt Type</div></div>
+        <div style="flex:1;height:2px;background:#E5E7EB;margin-top:13px;"></div>
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot4">4</div><div class="wiz-lbl" id="qwLbl4">Provider</div></div>
+        <div style="flex:1;height:2px;background:#E5E7EB;margin-top:13px;"></div>
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot5">5</div><div class="wiz-lbl" id="qwLbl5">Dates</div></div>
+        <div style="flex:1;height:2px;background:#E5E7EB;margin-top:13px;"></div>
+        <div class="wiz-step-col"><div class="wiz-dot" id="qwDot6">6</div><div class="wiz-lbl" id="qwLbl6">Confirm</div></div>
+      </div>
+    </div>
+    <!-- Step content -->
+    <div style="flex:1;overflow-y:auto;padding:20px;">
+
+      <!-- Step 1: Demographics -->
+      <div id="qwStep1" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Patient Demographics</div>
+        <div style="border:1.5px solid #6EE7B7;border-radius:10px;background:#F0FDF4;padding:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">First Name</div><div id="qwFirstName" style="font-size:14px;font-weight:600;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">Last Name</div><div id="qwLastName" style="font-size:14px;font-weight:600;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">Date of Birth</div><div id="qwDOB" style="font-size:14px;font-weight:600;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">State</div><div id="qwState" style="font-size:14px;font-weight:600;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">Phone</div><div id="qwPhone" style="font-size:14px;font-weight:600;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:4px;">Email</div><div id="qwEmail" style="font-size:14px;font-weight:600;color:#111827;word-break:break-all;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Registration -->
+      <div id="qwStep2" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Registration Verification</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;"><span style="font-size:18px;color:#059669;">✓</span><div><div style="font-size:13px;font-weight:700;color:#065F46;">Identity Verified</div><div style="font-size:11px;color:#6B7280;">Photo ID and date of birth confirmed</div></div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;"><span style="font-size:18px;color:#059669;">✓</span><div><div style="font-size:13px;font-weight:700;color:#065F46;">HIPAA Verified</div><div style="font-size:11px;color:#6B7280;">Authorization and consent on file</div></div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;"><span style="font-size:18px;color:#059669;">✓</span><div><div style="font-size:13px;font-weight:700;color:#065F46;">Insurance Active</div><div style="font-size:11px;color:#6B7280;">Coverage confirmed for this care product</div></div></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:8px;background:#F0FDF4;border:1px solid #BBF7D0;"><span style="font-size:18px;color:#059669;">✓</span><div><div style="font-size:13px;font-weight:700;color:#065F46;">Consult Eligible</div><div style="font-size:11px;color:#6B7280;">Eligibility verified per benefit design</div></div></div>
+        </div>
+      </div>
+
+      <!-- Step 3: Appt Type + Modality -->
+      <div id="qwStep3" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:8px;">Appointment Type</div>
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <div id="qwTypeInitial" onclick="selectQWizApptType('initial',this)" style="flex:1;border:2px solid #15803D;border-radius:10px;padding:14px;cursor:pointer;background:#F0FDF4;">
+            <div style="font-size:13px;font-weight:700;color:#15803D;">Initial</div><div style="font-size:11px;color:#6B7280;margin-top:3px;">First-time consult</div>
+          </div>
+          <div id="qwTypeFollowup" onclick="selectQWizApptType('followup',this)" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;background:#fff;">
+            <div style="font-size:13px;font-weight:700;color:#374151;">Follow-up</div><div style="font-size:11px;color:#6B7280;margin-top:3px;">Returning patient</div>
+          </div>
+        </div>
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:8px;">Modality</div>
+        <div style="display:flex;gap:10px;">
+          <div id="qwModalPhone" onclick="selectQWizModality('phone',this)" style="flex:1;border:2px solid #15803D;border-radius:10px;padding:14px;cursor:pointer;background:#F0FDF4;">
+            <div style="font-size:13px;font-weight:700;color:#15803D;">📞 Telephonic</div><div style="font-size:11px;color:#6B7280;margin-top:3px;">Phone visit</div>
+          </div>
+          <div id="qwModalVideo" onclick="selectQWizModality('video',this)" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;background:#fff;">
+            <div style="font-size:13px;font-weight:700;color:#374151;">🎥 Video</div><div style="font-size:11px;color:#6B7280;margin-top:3px;">Video visit</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Provider -->
+      <div id="qwStep4" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:4px;">Select Provider</div>
+        <div style="font-size:11px;color:#6B7280;margin-bottom:12px;">Licensed in <span id="qwProvState">TX</span> · Showing available providers</div>
+        <div id="qwProviderList" style="display:flex;flex-direction:column;gap:10px;">
+          <div onclick="selectQWizProvider(this,'Dr. Sarah Lee, MD')" style="border:2px solid #15803D;border-radius:10px;padding:14px;cursor:pointer;background:#F0FDF4;display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#15803D;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">SL</div>
+            <div><div style="font-size:13px;font-weight:700;color:#111827;">Dr. Sarah Lee, MD</div><div style="font-size:11px;color:#6B7280;">Board-certified · Preferred Provider</div></div>
+          </div>
+          <div onclick="selectQWizProvider(this,'Dr. Marcus Webb, MD')" style="border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#6B7280;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">MW</div>
+            <div><div style="font-size:13px;font-weight:700;color:#111827;">Dr. Marcus Webb, MD</div><div style="font-size:11px;color:#6B7280;">Board-certified · Available</div></div>
+          </div>
+          <div onclick="selectQWizProvider(this,'Dr. Ana Reyes, NP')" style="border:2px solid #E5E7EB;border-radius:10px;padding:14px;cursor:pointer;background:#fff;display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#6B7280;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">AR</div>
+            <div><div style="font-size:13px;font-weight:700;color:#111827;">Dr. Ana Reyes, NP</div><div style="font-size:11px;color:#6B7280;">Licensed NP · Available</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 5: Date & Time -->
+      <div id="qwStep5" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:12px;">Select Date &amp; Time</div>
+        <input type="date" id="qwDateInput" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:14px;" oninput="qwRenderSlots()">
+        <div id="qwSlotsSection" style="display:none;">
+          <div style="font-size:12px;font-weight:600;color:#6B7280;margin-bottom:8px;">Available slots</div>
+          <div id="qwSlotPills" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- Step 6: Confirm -->
+      <div id="qwStep6" style="display:none;">
+        <div style="font-size:14px;font-weight:700;color:#111827;margin-bottom:14px;">Confirm Appointment</div>
+        <div style="border:1.5px solid #6EE7B7;border-radius:10px;background:#F0FDF4;padding:16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Member</div><div id="qwConfMember" style="font-size:13px;font-weight:700;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Member ID</div><div id="qwConfMemberId" style="font-size:13px;font-weight:700;color:#111827;font-family:monospace;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Appt Type</div><div id="qwConfApptType" style="font-size:13px;font-weight:700;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Modality</div><div id="qwConfModality" style="font-size:13px;font-weight:700;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Provider</div><div id="qwConfProvider" style="font-size:13px;font-weight:700;color:#111827;"></div></div>
+            <div><div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:3px;">Date &amp; Time</div><div id="qwConfDateTime" style="font-size:13px;font-weight:700;color:#111827;"></div></div>
+          </div>
+        </div>
+        <div id="qwConfirmMsg" style="display:none;margin-top:16px;padding:14px;background:#D1FAE5;border-radius:10px;text-align:center;">
+          <div style="font-size:15px;font-weight:700;color:#065F46;">✓ Consult Scheduled!</div>
+          <div id="qwConfirmId" style="font-size:12px;color:#6B7280;margin-top:4px;font-family:monospace;"></div>
+        </div>
+        <button id="qwConfirmBtn" onclick="qwConfirm()" style="width:100%;margin-top:16px;padding:12px;background:#15803D;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Confirm &amp; Schedule</button>
+      </div>
+    </div>
+    <!-- Footer -->
+    <div style="border-top:1px solid #F3F4F6;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+      <span id="qwFooterLabel" style="font-size:12px;color:#9CA3AF;"></span>
+      <div style="display:flex;gap:10px;">
+        <button id="qwBackBtn" onclick="qwGoStep(_qwStep-1)" style="padding:8px 18px;border:1.5px solid #D1D5DB;border-radius:8px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">← Back</button>
+        <button id="qwNextBtn" onclick="qwGoStep(_qwStep+1)" style="padding:8px 20px;background:#15803D;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">Next →</button>
+        <button onclick="closeQueueWiz()" style="padding:8px 14px;border:1.5px solid #E5E7EB;border-radius:8px;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:#6B7280;">✕ Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}{% raw %}<script>
 var DXS_URGENT_MSGS = [
@@ -193,17 +347,17 @@ function closeUrgentPanel() {
 }
 
 var QUEUE = [
-  { patient:'M.J.', consult:'CST-2026-48821', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'LDH Chol: High',type:'abnormal'},{label:'Vit D: Low',type:'abnormal'}], consultOffered:'Yes', agent:'Melanie M.', days:1, status:'In Progress' },
-  { patient:'S.P.', consult:'CST-2026-48756', product:'Weight Management', client:'Summus Medical', flags:[{label:'A1C: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:1, status:'In Progress' },
-  { patient:'R.T.', consult:'CST-2026-48812', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'Total T: Critical',type:'critical'},{label:'SHBG: Low',type:'abnormal'}], consultOffered:'Yes', agent:'Melanie M.', days:0, status:'Pending' },
-  { patient:'C.H.', consult:'CST-2026-48799', product:'Thyroid', client:'HealthFirst', flags:[{label:'TSH: High',type:'abnormal'}], consultOffered:'No', agent:'Carlos V.', days:0, status:'Pending' },
-  { patient:'A.K.', consult:'CST-2026-48783', product:'Annual Wellness Visit', client:'Summus Medical', flags:[{label:'Glucose: High',type:'abnormal'},{label:'LDL: High',type:'abnormal'}], consultOffered:'Yes', agent:'Unassigned', days:1, status:'Pending' },
-  { patient:'D.W.', consult:'CST-2026-48770', product:'Weight Management', client:'Everlywell Direct', flags:[{label:'Cortisol: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:2, status:'Pending' },
-  { patient:'F.N.', consult:'CST-2026-48764', product:'Testosterone', client:'HealthFirst', flags:[{label:'Estradiol: High',type:'abnormal'}], consultOffered:'Yes', agent:'Unassigned', days:2, status:'Pending' },
-  { patient:'L.B.', consult:'CST-2026-48751', product:'Skincare', client:'Everlywell Direct', flags:[{label:'DHEA-S: High',type:'abnormal'}], consultOffered:'No', agent:'Carlos V.', days:3, status:'Pending' },
-  { patient:'T.O.', consult:'CST-2026-48739', product:'Thyroid', client:'Summus Medical', flags:[{label:'Free T4: Low',type:'abnormal'},{label:'TSH: Critical',type:'critical'}], consultOffered:'Yes', agent:'Melanie M.', days:3, status:'Pending' },
-  { patient:'G.R.', consult:'CST-2026-48720', product:'Weight Management', client:'HealthFirst', flags:[{label:'Insulin: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:4, status:'Pending' },
-  { patient:'P.M.', consult:'CST-2026-48700', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'PSA: High',type:'abnormal'}], consultOffered:'Yes', agent:'Carlos V.', days:5, status:'Pending' },
+  { patient:'M.J.', firstName:'Marcus', lastName:'Johnson', dob:'Mar 12, 1985', phone:'(832) 555-0198', email:'m.johnson@email.com', memberId:'MBR-2026-58891', memberFacingId:'PT-2026-00201', healthPlan:'Everlywell360', state:'TX', consult:'CST-2026-48821', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'LDH Chol: High',type:'abnormal'},{label:'Vit D: Low',type:'abnormal'}], consultOffered:'Yes', agent:'Melanie M.', days:1, status:'In Progress' },
+  { patient:'S.P.', firstName:'Sandra', lastName:'Pierce', dob:'Jul 22, 1978', phone:'(614) 555-0211', email:'s.pierce@email.com', memberId:'MBR-2026-44532', memberFacingId:'PT-2026-00318', healthPlan:'Summus Medical', state:'OH', consult:'CST-2026-48756', product:'Weight Management', client:'Summus Medical', flags:[{label:'A1C: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:1, status:'In Progress' },
+  { patient:'R.T.', firstName:'Ryan', lastName:'Torres', dob:'Nov 5, 1990', phone:'(702) 555-0167', email:'r.torres@email.com', memberId:'MBR-2026-58812', memberFacingId:'PT-2026-00421', healthPlan:'Everlywell360', state:'NV', consult:'CST-2026-48812', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'Total T: Critical',type:'critical'},{label:'SHBG: Low',type:'abnormal'}], consultOffered:'Yes', agent:'Melanie M.', days:0, status:'Pending' },
+  { patient:'C.H.', firstName:'Catherine', lastName:'Hughes', dob:'Feb 18, 1965', phone:'(404) 555-0183', email:'c.hughes@email.com', memberId:'MBR-2026-44218', memberFacingId:'PT-2026-00512', healthPlan:'HealthFirst', state:'GA', consult:'CST-2026-48799', product:'Thyroid', client:'HealthFirst', flags:[{label:'TSH: High',type:'abnormal'}], consultOffered:'No', agent:'Carlos V.', days:0, status:'Pending' },
+  { patient:'A.K.', firstName:'Andrew', lastName:'Kim', dob:'Sep 3, 1982', phone:'(312) 555-0234', email:'a.kim@email.com', memberId:'MBR-2026-44783', memberFacingId:'PT-2026-00634', healthPlan:'Summus Medical', state:'IL', consult:'CST-2026-48783', product:'Annual Wellness Visit', client:'Summus Medical', flags:[{label:'Glucose: High',type:'abnormal'},{label:'LDL: High',type:'abnormal'}], consultOffered:'Yes', agent:'Unassigned', days:1, status:'Pending' },
+  { patient:'D.W.', firstName:'Diana', lastName:'Walsh', dob:'Apr 11, 1975', phone:'(512) 555-0178', email:'d.walsh@email.com', memberId:'MBR-2026-58770', memberFacingId:'PT-2026-00721', healthPlan:'Everlywell360', state:'TX', consult:'CST-2026-48770', product:'Weight Management', client:'Everlywell Direct', flags:[{label:'Cortisol: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:2, status:'Pending' },
+  { patient:'F.N.', firstName:'Frank', lastName:'Nguyen', dob:'Jan 29, 1988', phone:'(469) 555-0156', email:'f.nguyen@email.com', memberId:'MBR-2026-44764', memberFacingId:'PT-2026-00831', healthPlan:'HealthFirst', state:'TX', consult:'CST-2026-48764', product:'Testosterone', client:'HealthFirst', flags:[{label:'Estradiol: High',type:'abnormal'}], consultOffered:'Yes', agent:'Unassigned', days:2, status:'Pending' },
+  { patient:'L.B.', firstName:'Laura', lastName:'Brooks', dob:'Aug 7, 1971', phone:'(213) 555-0194', email:'l.brooks@email.com', memberId:'MBR-2026-58751', memberFacingId:'PT-2026-00923', healthPlan:'Everlywell360', state:'CA', consult:'CST-2026-48751', product:'Skincare', client:'Everlywell Direct', flags:[{label:'DHEA-S: High',type:'abnormal'}], consultOffered:'No', agent:'Carlos V.', days:3, status:'Pending' },
+  { patient:'T.O.', firstName:'Theresa', lastName:'Ochoa', dob:'Dec 14, 1960', phone:'(210) 555-0148', email:'t.ochoa@email.com', memberId:'MBR-2026-44739', memberFacingId:'PT-2026-01012', healthPlan:'Summus Medical', state:'TX', consult:'CST-2026-48739', product:'Thyroid', client:'Summus Medical', flags:[{label:'Free T4: Low',type:'abnormal'},{label:'TSH: Critical',type:'critical'}], consultOffered:'Yes', agent:'Melanie M.', days:3, status:'Pending' },
+  { patient:'G.R.', firstName:'Gerald', lastName:'Ross', dob:'Jun 25, 1955', phone:'(503) 555-0172', email:'g.ross@email.com', memberId:'MBR-2026-44720', memberFacingId:'PT-2026-01101', healthPlan:'HealthFirst', state:'OR', consult:'CST-2026-48720', product:'Weight Management', client:'HealthFirst', flags:[{label:'Insulin: High',type:'abnormal'}], consultOffered:'Yes', agent:'Jasmine R.', days:4, status:'Pending' },
+  { patient:'P.M.', firstName:'Paul', lastName:'Martinez', dob:'Oct 8, 1967', phone:'(305) 555-0161', email:'p.martinez@email.com', memberId:'MBR-2026-58700', memberFacingId:'PT-2026-01223', healthPlan:'Everlywell360', state:'FL', consult:'CST-2026-48700', product:'Testosterone', client:'Everlywell Direct', flags:[{label:'PSA: High',type:'abnormal'}], consultOffered:'Yes', agent:'Carlos V.', days:5, status:'Pending' },
 ];
 
 function ageClass(d) { if (d<=1) return 'age-ok'; if (d<=3) return 'age-warn'; return 'age-over'; }
@@ -224,10 +378,9 @@ function flagsHtml(flags) {
 }
 
 function actionBtn(item) {
-  var id = item.consult.split('-').pop();
-  if (item.status==='In Progress') return '<button class="btn-action btn-resume" onclick="openCall(\''+item.consult+'\')">Resume Call →</button>';
-  if (item.status==='Pending') return '<button class="btn-action btn-begin" onclick="openCall(\''+item.consult+'\')">Begin Call</button>';
-  return '<button class="btn-action btn-view" onclick="openCall(\''+item.consult+'\')">View</button>';
+  if (item.status==='In Progress') return '<button class="btn-action btn-resume" onclick="event.stopPropagation();openCall(\''+item.consult+'\')">Resume Call →</button>';
+  if (item.status==='Pending') return '<button class="btn-action btn-begin" onclick="event.stopPropagation();openCall(\''+item.consult+'\')">Begin Call</button>';
+  return '<button class="btn-action btn-view" onclick="event.stopPropagation();openCall(\''+item.consult+'\')">View</button>';
 }
 
 function openCall(consultId) {
@@ -241,7 +394,7 @@ function renderTable(data) {
     return;
   }
   tbody.innerHTML = data.map(function(item){
-    return '<tr>' +
+    return '<tr style="cursor:pointer;" onclick="openQueueSchedWizard(\''+item.consult+'\')">' +
       '<td><div style="font-weight:700;">'+item.patient+'</div><div style="font-size:11px;color:#6B7280;font-family:monospace;">'+item.consult+'</div></td>' +
       '<td style="font-size:12px;">'+item.product+'</td>' +
       '<td style="font-size:12px;color:#6B7280;">'+item.client+'</td>' +
@@ -274,5 +427,139 @@ function filterTable() {
 }
 
 renderTable(QUEUE);
+
+// ── Queue 6-step scheduling wizard ──
+var _qwStep = 1;
+var _qwApptType = 'initial';
+var _qwModality = 'phone';
+var _qwProvider = 'Dr. Sarah Lee, MD';
+var _qwSelectedSlot = null;
+var _qwCurrentPatient = null;
+
+var QW_AVAIL_SLOTS = ['8:00 AM','8:30 AM','9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','2:00 PM','2:30 PM','3:00 PM','3:30 PM','4:00 PM'];
+var QW_BUSY_SLOTS  = ['9:00 AM','11:00 AM','3:00 PM'];
+
+var QUEUE_BY_CONSULT = {};
+QUEUE.forEach(function(q){ QUEUE_BY_CONSULT[q.consult] = q; });
+
+function openQueueSchedWizard(consultId) {
+  var p = QUEUE_BY_CONSULT[consultId];
+  if (!p) return;
+  _qwCurrentPatient = p;
+  _qwApptType = 'initial'; _qwModality = 'phone'; _qwProvider = 'Dr. Sarah Lee, MD'; _qwSelectedSlot = null;
+  // Member header
+  document.getElementById('qwMemberName').textContent = p.firstName + ' ' + p.lastName;
+  document.getElementById('qwMemberId').textContent = p.memberId;
+  document.getElementById('qwMemberFacingId').textContent = p.memberFacingId;
+  document.getElementById('qwHealthPlan').textContent = p.healthPlan;
+  // Step 1 demographics
+  document.getElementById('qwFirstName').textContent = p.firstName;
+  document.getElementById('qwLastName').textContent = p.lastName;
+  document.getElementById('qwDOB').textContent = p.dob;
+  document.getElementById('qwState').textContent = p.state;
+  document.getElementById('qwPhone').textContent = p.phone;
+  document.getElementById('qwEmail').textContent = p.email;
+  document.getElementById('qwProvState').textContent = p.state;
+  // Reset confirm
+  document.getElementById('qwConfirmMsg').style.display = 'none';
+  document.getElementById('qwConfirmBtn').style.display = 'block';
+  // Reset date/slots
+  document.getElementById('qwDateInput').value = '';
+  document.getElementById('qwSlotsSection').style.display = 'none';
+  // Reset step 3 cards
+  document.getElementById('qwTypeInitial').style.border = '2px solid #15803D';
+  document.getElementById('qwTypeInitial').style.background = '#F0FDF4';
+  document.getElementById('qwTypeFollowup').style.border = '2px solid #E5E7EB';
+  document.getElementById('qwTypeFollowup').style.background = '#fff';
+  document.getElementById('qwModalPhone').style.border = '2px solid #15803D';
+  document.getElementById('qwModalPhone').style.background = '#F0FDF4';
+  document.getElementById('qwModalVideo').style.border = '2px solid #E5E7EB';
+  document.getElementById('qwModalVideo').style.background = '#fff';
+  // Reset provider cards
+  var provCards = document.querySelectorAll('#qwProviderList > div');
+  provCards.forEach(function(c,i){
+    c.style.border = i===0 ? '2px solid #15803D' : '2px solid #E5E7EB';
+    c.style.background = i===0 ? '#F0FDF4' : '#fff';
+  });
+  qwGoStep(1);
+  document.getElementById('qwOverlay').classList.add('open');
+}
+
+function closeQueueWiz() {
+  document.getElementById('qwOverlay').classList.remove('open');
+}
+
+var QW_STEP_LABELS = ['Demographics','Registration','Appt Type','Provider','Dates','Confirm'];
+
+function qwGoStep(n) {
+  if (n < 1 || n > 6) return;
+  _qwStep = n;
+  for (var i=1;i<=6;i++) {
+    document.getElementById('qwStep'+i).style.display = (i===n) ? 'block' : 'none';
+    var dot = document.getElementById('qwDot'+i);
+    var lbl = document.getElementById('qwLbl'+i);
+    dot.className = 'wiz-dot' + (i===n ? ' wiz-active' : i<n ? ' wiz-done' : '');
+    lbl.className = 'wiz-lbl' + (i===n ? ' wiz-active' : i<n ? ' wiz-done' : '');
+  }
+  document.getElementById('qwFooterLabel').textContent = 'Step ' + n + ' of 6 — ' + QW_STEP_LABELS[n-1];
+  document.getElementById('qwBackBtn').style.display = n===1 ? 'none' : 'inline-block';
+  document.getElementById('qwNextBtn').style.display = n===6 ? 'none' : 'inline-block';
+  if (n===6) {
+    var p = _qwCurrentPatient;
+    var dateVal = document.getElementById('qwDateInput').value;
+    var dateStr = dateVal ? new Date(dateVal+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) : '—';
+    document.getElementById('qwConfMember').textContent = p ? (p.firstName+' '+p.lastName) : '';
+    document.getElementById('qwConfMemberId').textContent = p ? p.memberId : '';
+    document.getElementById('qwConfApptType').textContent = _qwApptType==='initial' ? 'Initial' : 'Follow-up';
+    document.getElementById('qwConfModality').textContent = _qwModality==='phone' ? 'Telephonic' : 'Video';
+    document.getElementById('qwConfProvider').textContent = _qwProvider;
+    document.getElementById('qwConfDateTime').textContent = _qwSelectedSlot ? dateStr+' · '+_qwSelectedSlot : '—';
+  }
+}
+
+function selectQWizApptType(type, el) {
+  _qwApptType = type;
+  ['qwTypeInitial','qwTypeFollowup'].forEach(function(id){ document.getElementById(id).style.border='2px solid #E5E7EB'; document.getElementById(id).style.background='#fff'; });
+  el.style.border='2px solid #15803D'; el.style.background='#F0FDF4';
+}
+
+function selectQWizModality(mod, el) {
+  _qwModality = mod;
+  ['qwModalPhone','qwModalVideo'].forEach(function(id){ document.getElementById(id).style.border='2px solid #E5E7EB'; document.getElementById(id).style.background='#fff'; });
+  el.style.border='2px solid #15803D'; el.style.background='#F0FDF4';
+}
+
+function selectQWizProvider(el, name) {
+  _qwProvider = name;
+  document.querySelectorAll('#qwProviderList > div').forEach(function(c){ c.style.border='2px solid #E5E7EB'; c.style.background='#fff'; });
+  el.style.border='2px solid #15803D'; el.style.background='#F0FDF4';
+}
+
+function qwRenderSlots() {
+  var dateVal = document.getElementById('qwDateInput').value;
+  if (!dateVal) { document.getElementById('qwSlotsSection').style.display='none'; return; }
+  _qwSelectedSlot = null;
+  document.getElementById('qwSlotsSection').style.display='block';
+  document.getElementById('qwSlotPills').innerHTML = QW_AVAIL_SLOTS.map(function(s){
+    var busy = QW_BUSY_SLOTS.indexOf(s) >= 0;
+    return '<button onclick="qwSelectSlot(this,\''+s+'\')" style="padding:7px 14px;border-radius:20px;border:1.5px solid '+(busy?'#E5E7EB':'#D1D5DB')+';background:'+(busy?'#F9FAFB':'#fff')+';color:'+(busy?'#D1D5DB':'#374151')+';font-size:12px;font-weight:600;cursor:'+(busy?'not-allowed':'pointer')+';font-family:inherit;" '+(busy?'disabled':'')+'>'+s+'</button>';
+  }).join('');
+}
+
+function qwSelectSlot(el, slot) {
+  _qwSelectedSlot = slot;
+  document.querySelectorAll('#qwSlotPills button').forEach(function(b){ b.style.background='#fff'; b.style.borderColor='#D1D5DB'; b.style.color='#374151'; });
+  el.style.background='#15803D'; el.style.borderColor='#15803D'; el.style.color='#fff';
+}
+
+function qwConfirm() {
+  var dateVal = document.getElementById('qwDateInput').value;
+  if (!dateVal || !_qwSelectedSlot) { alert('Please select a date and time slot in step 5 before confirming.'); return; }
+  var aptId = 'APT-' + Math.random().toString(36).substr(2,6).toUpperCase();
+  document.getElementById('qwConfirmMsg').style.display='block';
+  document.getElementById('qwConfirmId').textContent = 'Appointment ID: ' + aptId;
+  document.getElementById('qwConfirmBtn').style.display='none';
+  setTimeout(function(){ closeQueueWiz(); }, 3000);
+}
 </script>{% endraw %}
 {% endblock %}

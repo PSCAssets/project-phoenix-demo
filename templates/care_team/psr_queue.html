@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}PSS Call Queue — Telehealth{% endblock %}
+{% block title %}Care Team Queue — Telehealth{% endblock %}
 {% block head %}
 <style>
 :root { --psr:#059669;--psr-dark:#047857;--psr-light:#ECFDF5;--psr-border:#6EE7B7;--amber:#D97706;--amber-bg:#FFFBEB;--red:#DC2626;--red-bg:#FEF2F2;--sidebar-w:220px; }
@@ -91,7 +91,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 
 <div class="main">
   <div class="topbar">
-    <div class="topbar-title">Outbound Call Queue</div>
+    <div class="topbar-title">Care Team Queue</div>
     <span class="topbar-badge">PSS — EverlyCare + DXS</span>
     <div class="topbar-right">
       <span style="font-size:12px;color:#6B7280;"><span id="pendingCount">14</span> pending · <span id="exhaustedCount">3</span> exhausted</span>
@@ -320,7 +320,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
   <div class="modal">
     <div class="modal-header">
       <div>
-        <div class="modal-title" id="callModalTitle">Log Outbound Call</div>
+        <div class="modal-title" id="callModalTitle">Log Call</div>
         <div class="modal-sub" id="callModalSub"></div>
       </div>
       <button class="modal-close" onclick="closeModal('callModal')">×</button>

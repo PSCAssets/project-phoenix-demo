@@ -340,8 +340,8 @@ def inject_sidebar_nav():
         'care_team': [
             ('My Dashboard',  '/care-team/',                      'home',      ['/care-team/']),
             ('CT Queue',      '/care-team/queue',                 'clipboard', ['/care-team/queue', '/care-team/task']),
-            ('Patient Queue', '/provider/queue',                  'users',     ['/provider/queue']),
             ('Thyroid Queue', '/care-team/psr/thyroid-queue',     'clipboard', ['/care-team/psr/thyroid-queue']),
+            ('Patient Queue', '/provider/queue',                  'users',     ['/provider/queue']),
             ('Network Schedule', '/provider/schedule',            'calendar',  ['/provider/schedule']),
             ('Messages',      '/provider/messages',               'message',   ['/provider/messages']),
             ('Settings',      '/provider/settings',               'settings',  ['/provider/settings']),
@@ -359,7 +359,7 @@ def inject_sidebar_nav():
         ],
         'provider_psr': [
             ('Dashboard',      '/care-team/psr',                  'home',      ['/care-team/psr']),
-            ('Call Queue',     '/care-team/psr/queue',            'phone',     ['/care-team/psr/queue']),
+            ('CT Queue',       '/care-team/psr/queue',            'clipboard', ['/care-team/psr/queue']),
             ('DXS Queue',      '/care-team/psr/dxs-queue',        'clipboard', ['/care-team/psr/dxs-queue', '/care-team/psr/dxs-call']),
             ('Thyroid Program','/care-team/psr/thyroid-queue',    'clipboard', ['/care-team/psr/thyroid-queue']),
             ('GC Queue',       '/provider/gc/queue',              'users',     ['/provider/gc/queue']),

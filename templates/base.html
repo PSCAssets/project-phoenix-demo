@@ -64,6 +64,110 @@
   .g-sib-item svg { width: 18px; height: 18px; flex-shrink: 0; }
   .g-sib-label { font-size: 9px; font-weight: 500; text-align: center; line-height: 1; color: inherit; }
   </style>
+
+  <!-- Global Online Status System -->
+  <style>
+  /* Status dot on avatar */
+  .nav-avatar-wrap { position: relative; display: inline-block; flex-shrink: 0; }
+  .nav-status-badge {
+    position: absolute; bottom: -2px; right: -2px;
+    width: 11px; height: 11px; border-radius: 50%;
+    border: 2px solid transparent; /* colored by JS-set parent bg */
+    background: #9CA3AF; transition: background .2s;
+  }
+  .nav-status-badge.online { background: #10B981; }
+  .nav-status-badge.offline { background: #9CA3AF; }
+  .nav-status-badge.busy { background: #F59E0B; }
+
+  /* Status chip (name area) */
+  .nav-status-chip {
+    display: flex; align-items: center; gap: 5px;
+    cursor: pointer; border-radius: 6px; padding: 2px 6px 2px 4px;
+    transition: background .15s;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    margin-top: 3px; width: fit-content;
+  }
+  .nav-status-chip:hover { background: rgba(255,255,255,0.18); }
+  .nav-status-chip-dot { width: 7px; height: 7px; border-radius: 50%; background: #9CA3AF; flex-shrink: 0; }
+  .nav-status-chip-dot.online { background: #10B981; }
+  .nav-status-chip-dot.offline { background: #9CA3AF; }
+  .nav-status-chip-dot.busy { background: #F59E0B; }
+  .nav-status-chip-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.7); white-space: nowrap; }
+
+  /* Status dropdown */
+  .nav-status-dropdown {
+    position: absolute; top: calc(100% + 8px); right: 0;
+    background: #fff; border: 1px solid #E5E0D8; border-radius: 10px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.16); min-width: 180px;
+    z-index: 900; overflow: hidden; display: none;
+  }
+  .nav-status-dropdown.open { display: block; }
+  .nav-status-dd-header { padding: 9px 14px 7px; font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: .06em; border-bottom: 1px solid #F3F4F6; }
+  .nav-status-dd-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; font-size: 13px; color: #111827;
+    cursor: pointer; transition: background .1s;
+  }
+  .nav-status-dd-item:hover { background: #F9FAFB; }
+  .nav-status-dd-item.active { font-weight: 700; }
+  .nav-status-dd-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .nav-status-dd-check { margin-left: auto; color: #6B21A8; font-size: 12px; }
+
+  /* Online status modal (login prompt) */
+  .pp-status-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 3000;
+    display: none; align-items: center; justify-content: center;
+  }
+  .pp-status-modal-overlay.open { display: flex; }
+  .pp-status-modal {
+    background: #fff; border-radius: 16px; padding: 32px 28px 24px;
+    width: 380px; max-width: 94vw; text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.2); position: relative;
+  }
+  .pp-status-modal-wave { font-size: 40px; margin-bottom: 12px; }
+  .pp-status-modal-title { font-size: 18px; font-weight: 800; color: #111827; margin-bottom: 8px; }
+  .pp-status-modal-body { font-size: 13px; color: #6B7280; line-height: 1.6; margin-bottom: 24px; }
+  .pp-status-modal-btns { display: flex; gap: 10px; }
+  .pp-status-btn-yes {
+    flex: 1; background: #10B981; color: #fff; border: none; border-radius: 9px;
+    padding: 11px 0; font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: inherit; transition: background .15s;
+  }
+  .pp-status-btn-yes:hover { background: #059669; }
+  .pp-status-btn-no {
+    flex: 1; background: #F3F4F6; color: #374151; border: none; border-radius: 9px;
+    padding: 11px 0; font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: background .15s;
+  }
+  .pp-status-btn-no:hover { background: #E5E7EB; }
+
+  /* Activity detected prompt (bottom toast) */
+  .pp-activity-prompt {
+    position: fixed; bottom: 28px; right: 28px; z-index: 2500;
+    background: #1F2937; color: #fff; border-radius: 12px;
+    padding: 14px 16px; width: 300px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    display: none; flex-direction: column; gap: 10px;
+    transform: translateY(16px); opacity: 0;
+    transition: all .3s;
+  }
+  .pp-activity-prompt.show { display: flex; transform: translateY(0); opacity: 1; }
+  .pp-activity-prompt-title { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .pp-activity-prompt-body { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: -4px; }
+  .pp-activity-prompt-btns { display: flex; gap: 8px; }
+  .pp-activity-btn-yes {
+    flex: 1; background: #10B981; color: #fff; border: none; border-radius: 7px;
+    padding: 7px 0; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .pp-activity-btn-yes:hover { background: #059669; }
+  .pp-activity-btn-no {
+    flex: 1; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); border: none;
+    border-radius: 7px; padding: 7px 0; font-size: 12px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+  }
+  .pp-activity-btn-no:hover { background: rgba(255,255,255,0.2); }
+  </style>
 </head>
 <body>
 
@@ -122,11 +226,37 @@
         'gc_admin': 'GC Administrator',
         'qa_reviewer': 'QA Reviewer',
       } %}
-      <div class="nav-session-user">
-        <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% elif _r == 'gc_admin' %}ME{% elif _r == 'qa_reviewer' %}RC{% else %}??{% endif %}</div>
-        <div style="display:flex;flex-direction:column;gap:1px;">
+      <div class="nav-session-user" style="position:relative;" id="navUserBlock">
+        <div class="nav-avatar-wrap">
+          <div class="nav-user-avatar" title="{{ session.get('display_name', 'Demo User') }}">{% if _r == 'provider_md' %}SL{% elif _r == 'provider_rn' %}JM{% elif _r == 'provider_ma' %}MT{% elif _r == 'provider_np' %}MR{% elif _r == 'provider_gc' %}LP{% elif _r == 'provider_gca' %}PS{% elif _r == 'provider_doh' %}CV{% elif _r == 'provider_psr' %}MM{% elif _r == 'provider_manager' %}RP{% elif _r == 'scheduler' %}DN{% elif _r == 'care_team' %}AK{% elif _r == 'care_team_gaps' %}ML{% elif _r == 'patient' %}JR{% elif _r == 'admin' %}CN{% elif _r == 'manager' %}RB{% elif _r == 'gca' %}PS{% elif _r == 'gc_admin' %}ME{% elif _r == 'qa_reviewer' %}RC{% else %}??{% endif %}</div>
+          <div class="nav-status-badge offline" id="navStatusBadge"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
           <span style="color:rgba(255,255,255,0.95);font-size:12px;font-weight:600;white-space:nowrap;line-height:1.2;">{{ session.get('display_name', '') }}</span>
           {% if _role_titles.get(_r) %}<span style="color:rgba(255,255,255,0.55);font-size:10px;white-space:nowrap;line-height:1.2;">{{ _role_titles[_r] }}</span>{% endif %}
+          <div class="nav-status-chip" id="navStatusChip" onclick="toggleStatusDropdown(event)">
+            <div class="nav-status-chip-dot offline" id="navStatusChipDot"></div>
+            <span class="nav-status-chip-label" id="navStatusChipLabel">Offline</span>
+          </div>
+        </div>
+        <!-- Status dropdown -->
+        <div class="nav-status-dropdown" id="navStatusDropdown">
+          <div class="nav-status-dd-header">Set Status</div>
+          <div class="nav-status-dd-item" onclick="ppSetStatus('online', true)">
+            <div class="nav-status-dd-dot" style="background:#10B981;"></div>
+            Online
+            <span class="nav-status-dd-check" id="ddCheckOnline" style="display:none;">✓</span>
+          </div>
+          <div class="nav-status-dd-item" onclick="ppSetStatus('busy', true)">
+            <div class="nav-status-dd-dot" style="background:#F59E0B;"></div>
+            Busy — Do Not Disturb
+            <span class="nav-status-dd-check" id="ddCheckBusy" style="display:none;">✓</span>
+          </div>
+          <div class="nav-status-dd-item" onclick="ppSetStatus('offline', true)">
+            <div class="nav-status-dd-dot" style="background:#9CA3AF;"></div>
+            Offline
+            <span class="nav-status-dd-check" id="ddCheckOffline" style="display:none;">✓</span>
+          </div>
         </div>
       </div>
       {% endif %}
@@ -298,7 +428,114 @@
   </div>
   {% endif %}
 
+  <!-- Online Status Modal — shows on first login -->
+  <div class="pp-status-modal-overlay" id="ppStatusModal">
+    <div class="pp-status-modal">
+      <div class="pp-status-modal-wave">👋</div>
+      <div class="pp-status-modal-title">Show as Online?</div>
+      <div class="pp-status-modal-body">Let your team know you're available. Your status helps route queue assignments, forecasting, and workload distribution.</div>
+      <div class="pp-status-modal-btns">
+        <button class="pp-status-btn-yes" onclick="ppSetStatus('online', true); document.getElementById('ppStatusModal').classList.remove('open');">Yes, I'm Online</button>
+        <button class="pp-status-btn-no" onclick="ppDismissModal()">Not Right Now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity-detected prompt -->
+  <div class="pp-activity-prompt" id="ppActivityPrompt">
+    <div class="pp-activity-prompt-title">👀 We see you're active</div>
+    <div class="pp-activity-prompt-body">You're doing queue work but your status is Offline. Want to show as Online?</div>
+    <div class="pp-activity-prompt-btns">
+      <button class="pp-activity-btn-yes" onclick="ppSetStatus('online', true); ppDismissActivityPrompt();">Go Online</button>
+      <button class="pp-activity-btn-no" onclick="ppDismissActivityPrompt()">Stay Offline</button>
+    </div>
+  </div>
+
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+  // ─── Global Online Status Engine ─────────────────────────────────────
+  (function() {
+    var _status = localStorage.getItem('pp_user_status') || 'unknown';
+    var _modalShown = sessionStorage.getItem('pp_modal_shown');
+    var _activityPromptShown = false;
+
+    function _updateUI() {
+      var badge  = document.getElementById('navStatusBadge');
+      var dot    = document.getElementById('navStatusChipDot');
+      var label  = document.getElementById('navStatusChipLabel');
+      var checks = { online: document.getElementById('ddCheckOnline'), busy: document.getElementById('ddCheckBusy'), offline: document.getElementById('ddCheckOffline') };
+      var colorMap = { online: '#10B981', busy: '#F59E0B', offline: '#9CA3AF', unknown: '#9CA3AF' };
+      var labelMap = { online: 'Online', busy: 'Busy', offline: 'Offline', unknown: 'Set Status' };
+      var cls = _status === 'online' ? 'online' : _status === 'busy' ? 'busy' : 'offline';
+
+      if (badge)  { badge.className  = 'nav-status-badge ' + cls; }
+      if (dot)    { dot.className    = 'nav-status-chip-dot ' + cls; }
+      if (label)  { label.textContent = labelMap[_status] || 'Set Status'; }
+
+      // Update dropdown checkmarks
+      ['online','busy','offline'].forEach(function(k) {
+        if (checks[k]) checks[k].style.display = (k === _status) ? '' : 'none';
+      });
+
+      // Broadcast to any page-level listener
+      if (typeof window.ppOnStatusChange === 'function') window.ppOnStatusChange(_status);
+    }
+
+    window.ppSetStatus = function(status, persist) {
+      _status = status;
+      if (persist) localStorage.setItem('pp_user_status', status);
+      sessionStorage.setItem('pp_modal_shown', '1');
+      _activityPromptShown = false; // reset so it can fire again if they go offline
+      _updateUI();
+      document.getElementById('navStatusDropdown').classList.remove('open');
+    };
+
+    window.ppGetStatus = function() { return _status; };
+
+    // Called by any queue action — triggers activity prompt if offline
+    window.ppCheckActivity = function() {
+      if (_status === 'online' || _activityPromptShown) return;
+      _activityPromptShown = true;
+      var p = document.getElementById('ppActivityPrompt');
+      if (p) {
+        p.classList.add('show');
+        setTimeout(function() { if (p.classList.contains('show')) ppDismissActivityPrompt(); }, 10000);
+      }
+    };
+
+    window.ppDismissActivityPrompt = function() {
+      var p = document.getElementById('ppActivityPrompt');
+      if (p) p.classList.remove('show');
+    };
+
+    window.ppDismissModal = function() {
+      sessionStorage.setItem('pp_modal_shown', '1');
+      document.getElementById('ppStatusModal').classList.remove('open');
+    };
+
+    window.toggleStatusDropdown = function(e) {
+      if (e) e.stopPropagation();
+      document.getElementById('navStatusDropdown').classList.toggle('open');
+    };
+
+    // Show login prompt if status not set and modal hasn't shown this session
+    document.addEventListener('DOMContentLoaded', function() {
+      _updateUI();
+      var hasRole = document.getElementById('navUserBlock');
+      if (hasRole && _status === 'unknown' && !_modalShown) {
+        setTimeout(function() {
+          document.getElementById('ppStatusModal').classList.add('open');
+        }, 1400);
+      }
+      // Close dropdown on outside click
+      document.addEventListener('click', function(e) {
+        var dd = document.getElementById('navStatusDropdown');
+        if (dd && !dd.contains(e.target)) dd.classList.remove('open');
+      });
+    });
+  })();
+  // ─────────────────────────────────────────────────────────────────────
+  </script>
   <script>
   function openPhoenixHelp() {
     var overlay = document.getElementById('helpOverlay');
