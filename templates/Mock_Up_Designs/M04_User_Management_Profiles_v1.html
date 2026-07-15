@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Management — Profile-Based Permissions</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #F5F6FA; color: #1A2B45; min-width: 1440px; }
+  .top-header { background: #1F3864; color: #fff; padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 16px; font-weight: 700; }
+  .breadcrumb { font-size: 13px; color: #9BB5D8; }
+  .breadcrumb span { color: #fff; }
+  .user-info { font-size: 13px; color: #9BB5D8; display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #2E86AB; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+  .page-header { background: #fff; border-bottom: 1px solid #E2E6EF; padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .page-title { font-size: 18px; font-weight: 700; color: #1F3864; }
+  .tab-bar { background: #fff; border-bottom: 2px solid #E2E6EF; padding: 0 32px; display: flex; gap: 0; }
+  .tab { padding: 12px 20px; font-size: 14px; font-weight: 700; cursor: pointer; color: #8A97B1; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+  .tab.active { color: #2E86AB; border-bottom-color: #2E86AB; }
+  .tab:hover:not(.active) { color: #3A4A6B; }
+  .page-layout { display: flex; height: calc(100vh - 150px); }
+  .main-area { flex: 1; overflow-y: auto; padding: 24px 32px; }
+  .filter-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; }
+  .search-input { border: 1px solid #D0D7E6; border-radius: 6px; padding: 8px 14px; font-size: 13px; font-family: Arial, sans-serif; width: 280px; }
+  .filter-select { border: 1px solid #D0D7E6; border-radius: 6px; padding: 8px 12px; font-size: 13px; font-family: Arial, sans-serif; color: #3A4A6B; }
+  .btn-add { background: #2E86AB; color: #fff; border: none; border-radius: 6px; padding: 9px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; margin-left: auto; }
+  .table-card { background: #fff; border: 1px solid #E2E6EF; border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #F8F9FB; }
+  thead th { padding: 10px 16px; font-size: 11px; font-weight: 700; color: #8A97B1; text-transform: uppercase; letter-spacing: 0.6px; text-align: left; border-bottom: 1px solid #E2E6EF; }
+  tbody tr { border-bottom: 1px solid #F0F2F8; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #FAFBFD; }
+  tbody tr.selected-row { background: #EEF6FA; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: #1A2B45; vertical-align: middle; }
+  .user-name-cell { display: flex; align-items: center; gap: 10px; }
+  .user-initials { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .user-name { font-weight: 700; color: #1F3864; }
+  .profile-badge { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 700; white-space: nowrap; display: inline-block; }
+  .badge-provider { background: #EEF6FA; color: #2E86AB; }
+  .badge-care { background: #F0EEF8; color: #5C45B0; }
+  .badge-ma { background: #E8F5EE; color: #22A067; }
+  .badge-admin { background: #F0F2F8; color: #3A4A6B; }
+  .status-badge { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 700; }
+  .badge-active { background: #E8F5EE; color: #22A067; }
+  .badge-inactive { background: #FFF0F0; color: #C62828; }
+  .action-btn { background: none; border: 1px solid #E2E6EF; border-radius: 5px; padding: 4px 10px; font-size: 12px; cursor: pointer; font-family: Arial, sans-serif; color: #6B7A99; margin-right: 4px; }
+  .action-btn:hover { background: #F5F6FA; border-color: #C0C8D8; }
+  .detail-panel { width: 300px; background: #fff; border-left: 1px solid #E2E6EF; overflow-y: auto; flex-shrink: 0; }
+  .dp-header { padding: 16px; border-bottom: 1px solid #E2E6EF; }
+  .dp-user-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .dp-initials { width: 44px; height: 44px; border-radius: 50%; background: #2E86AB; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; }
+  .dp-name { font-size: 15px; font-weight: 700; color: #1F3864; }
+  .dp-email { font-size: 12px; color: #6B7A99; }
+  .dp-section { padding: 14px 16px; border-bottom: 1px solid #E2E6EF; }
+  .dp-section-label { font-size: 10px; font-weight: 700; color: #B0BBC8; text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 10px; }
+  .dp-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 13px; }
+  .dp-key { color: #6B7A99; }
+  .dp-val { color: #1A2B45; font-weight: 700; text-align: right; max-width: 160px; }
+  .rights-list { list-style: none; }
+  .rights-list li { font-size: 12px; color: #3A4A6B; padding: 4px 0; display: flex; align-items: center; gap: 6px; }
+  .rights-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #22A067; flex-shrink: 0; }
+  .override-empty { font-size: 12px; color: #B0BBC8; font-style: italic; padding: 8px 0; }
+  .dp-actions { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .dp-btn { border-radius: 6px; padding: 9px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; border: 1.5px solid; text-align: center; }
+  .dp-btn-primary { background: #2E86AB; color: #fff; border-color: #2E86AB; }
+  .dp-btn-outline { background: #fff; color: #2E86AB; border-color: #2E86AB; }
+</style>
+</head>
+<body>
+<div class="top-header">
+  <div class="brand">EverlyWell Admin Portal</div>
+  <div class="breadcrumb">Admin Portal &rsaquo; <span>User Management</span></div>
+  <div class="user-info"><div class="user-avatar">JW</div>Justin Woller</div>
+</div>
+<div class="page-header">
+  <div class="page-title">User Management — Profile-Based Permissions</div>
+  <span style="font-size:12px;color:#8A97B1;">48 total users &bull; 45 active &bull; 3 inactive</span>
+</div>
+<div class="tab-bar">
+  <div class="tab active">Users</div>
+  <div class="tab">Profiles</div>
+  <div class="tab">Permissions Matrix</div>
+</div>
+<div class="page-layout">
+  <div class="main-area">
+    <div class="filter-bar">
+      <input class="search-input" type="text" placeholder="&#128269; Search by name, email, or profile...">
+      <select class="filter-select"><option>All Roles</option><option>Provider - MD</option><option>Care Team - RN</option><option>Medical Assistant</option><option>System Admin</option></select>
+      <select class="filter-select"><option>All Statuses</option><option>Active</option><option>Inactive</option></select>
+      <select class="filter-select"><option>All Programs</option><option>Weight Management</option><option>Thyroid Care</option><option>Genetics</option></select>
+      <button class="btn-add">+ Add User</button>
+    </div>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:220px;">Name</th>
+            <th>Email</th>
+            <th style="width:170px;">Profile</th>
+            <th style="width:190px;">Assigned Programs</th>
+            <th style="width:120px;">Last Login</th>
+            <th style="width:80px;">Status</th>
+            <th style="width:110px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="selected-row">
+            <td><div class="user-name-cell"><div class="user-initials" style="background:#2E86AB;">SM</div><div><div class="user-name">Dr. Sarah Martinez</div></div></div></td>
+            <td style="color:#6B7A99;">smartinez@everlywell.com</td>
+            <td><span class="profile-badge badge-provider">Provider — MD</span></td>
+            <td style="font-size:12px;color:#3A4A6B;">Weight Mgmt, Thyroid Care</td>
+            <td style="font-size:12px;color:#22A067;">2 hours ago</td>
+            <td><span class="status-badge badge-active">Active</span></td>
+            <td><button class="action-btn">Edit</button><button class="action-btn">Deactivate</button></td>
+          </tr>
+          <tr>
+            <td><div class="user-name-cell"><div class="user-initials" style="background:#5C45B0;">JK</div><div><div class="user-name">Jessica Kim RN</div></div></div></td>
+            <td style="color:#6B7A99;">jkim@everlywell.com</td>
+            <td><span class="profile-badge badge-care">Care Team — RN</span></td>
+            <td style="font-size:12px;color:#3A4A6B;">All Programs</td>
+            <td style="font-size:12px;color:#3A4A6B;">1 day ago</td>
+            <td><span class="status-badge badge-active">Active</span></td>
+            <td><button class="action-btn">Edit</button><button class="action-btn">Deactivate</button></td>
+          </tr>
+          <tr>
+            <td><div class="user-name-cell"><div class="user-initials" style="background:#22A067;">MS</div><div><div class="user-name">Maria Santos MA</div></div></div></td>
+            <td style="color:#6B7A99;">msantos@everlywell.com</td>
+            <td><span class="profile-badge badge-ma">Medical Assistant</span></td>
+            <td style="font-size:12px;color:#3A4A6B;">Weight Management</td>
+            <td style="font-size:12px;color:#22A067;">Today</td>
+            <td><span class="status-badge badge-active">Active</span></td>
+            <td><button class="action-btn">Edit</button><button class="action-btn">Deactivate</button></td>
+          </tr>
+          <tr>
+            <td><div class="user-name-cell"><div class="user-initials" style="background:#3A4A6B;">AU</div><div><div class="user-name">Admin User</div></div></div></td>
+            <td style="color:#6B7A99;">admin@everlywell.com</td>
+            <td><span class="profile-badge badge-admin">System Admin</span></td>
+            <td style="font-size:12px;color:#3A4A6B;">All Programs</td>
+            <td style="font-size:12px;color:#22A067;">Today</td>
+            <td><span class="status-badge badge-active">Active</span></td>
+            <td><button class="action-btn">Edit</button><button class="action-btn" style="color:#B0BBC8;cursor:not-allowed;">Deactivate</button></td>
+          </tr>
+          <tr>
+            <td><div class="user-name-cell"><div class="user-initials" style="background:#8A97B1;">TC</div><div><div class="user-name">Dr. Thomas Chen</div></div></div></td>
+            <td style="color:#6B7A99;">tchen@everlywell.com</td>
+            <td><span class="profile-badge badge-provider">Provider — MD</span></td>
+            <td style="font-size:12px;color:#3A4A6B;">Genetics</td>
+            <td style="font-size:12px;color:#8A97B1;">3 days ago</td>
+            <td><span class="status-badge badge-inactive">Inactive</span></td>
+            <td><button class="action-btn">Edit</button><button class="action-btn" style="color:#22A067;border-color:#22A067;">Reactivate</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="detail-panel">
+    <div class="dp-header">
+      <div class="dp-user-row">
+        <div class="dp-initials">SM</div>
+        <div><div class="dp-name">Dr. Sarah Martinez</div><div class="dp-email">smartinez@everlywell.com</div></div>
+      </div>
+      <span class="status-badge badge-active">Active</span>
+    </div>
+    <div class="dp-section">
+      <div class="dp-section-label">Account Details</div>
+      <div class="dp-row"><span class="dp-key">Profile</span><span class="dp-val"><span class="profile-badge badge-provider">Provider — MD</span></span></div>
+      <div class="dp-row"><span class="dp-key">NPI Number</span><span class="dp-val">1234567890</span></div>
+      <div class="dp-row"><span class="dp-key">Licensed States</span><span class="dp-val">CA, TX, FL, NY</span></div>
+      <div class="dp-row"><span class="dp-key">Programs</span><span class="dp-val">Weight Mgmt, Thyroid Care</span></div>
+      <div class="dp-row"><span class="dp-key">Last Login</span><span class="dp-val" style="color:#22A067;">2 hours ago</span></div>
+      <div class="dp-row"><span class="dp-key">Created</span><span class="dp-val">Jan 10, 2026</span></div>
+    </div>
+    <div class="dp-section">
+      <div class="dp-section-label">Rights Granted by Profile</div>
+      <ul class="rights-list">
+        <li>View assigned patient queue</li>
+        <li>Access patient chart &amp; history</li>
+        <li>Write clinical notes</li>
+        <li>Order labs &amp; prescriptions</li>
+        <li>Complete/close consults</li>
+        <li>Send patient messages</li>
+        <li>View own schedule</li>
+      </ul>
+    </div>
+    <div class="dp-section">
+      <div class="dp-section-label">Individual Overrides</div>
+      <div class="override-empty">No individual overrides applied. Rights are inherited entirely from profile.</div>
+    </div>
+    <div class="dp-actions">
+      <button class="dp-btn dp-btn-primary">Edit Profile Assignment</button>
+      <button class="dp-btn dp-btn-outline">Override Individual Rights</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

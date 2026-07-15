@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Portal — Appointment Booking Flow</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #F5F6FA; color: #1A2B45; min-width: 1200px; }
+
+  /* Patient portal header — lighter/more patient-facing feel */
+  .portal-header { background: #1F3864; color: #fff; padding: 0 32px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+  .portal-brand { font-size: 16px; font-weight: 700; }
+  .portal-brand span { color: #2E86AB; }
+  .portal-user { font-size: 13px; color: #9BB5D8; display: flex; align-items: center; gap: 10px; }
+  .patient-avatar { width: 30px; height: 30px; border-radius: 50%; background: #5C45B0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+
+  /* Sub nav */
+  .portal-nav { background: #fff; border-bottom: 1px solid #E2E6EF; padding: 0 32px; display: flex; gap: 0; }
+  .nav-tab { padding: 12px 18px; font-size: 13px; font-weight: 700; color: #8A97B1; border-bottom: 2px solid transparent; cursor: pointer; }
+  .nav-tab.active { color: #2E86AB; border-bottom-color: #2E86AB; }
+  .nav-tab:hover:not(.active) { color: #3A4A6B; }
+
+  /* Main layout */
+  .page-wrap { max-width: 900px; margin: 40px auto; padding: 0 24px; }
+
+  /* Step indicator */
+  .step-indicator { display: flex; align-items: center; margin-bottom: 36px; }
+  .step-node { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 120px; }
+  .step-circle { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; border: 2px solid; }
+  .step-circle.done { background: #2E86AB; border-color: #2E86AB; color: #fff; }
+  .step-circle.active { background: #1F3864; border-color: #1F3864; color: #fff; }
+  .step-circle.pending { background: #fff; border-color: #D0D7E6; color: #8A97B1; }
+  .step-name { font-size: 12px; font-weight: 700; color: #8A97B1; white-space: nowrap; }
+  .step-circle.done ~ .step-name { color: #2E86AB; }
+  .step-circle.active ~ .step-name { color: #1F3864; }
+  .step-connector { flex: 1; height: 2px; background: #E2E6EF; margin: 0 8px; margin-bottom: 22px; }
+  .step-connector.done { background: #2E86AB; }
+
+  /* Content card */
+  .booking-card { background: #fff; border: 1px solid #E2E6EF; border-radius: 10px; padding: 32px; }
+  .card-title { font-size: 22px; font-weight: 700; color: #1F3864; margin-bottom: 4px; }
+  .card-subtitle { font-size: 14px; color: #6B7A99; margin-bottom: 28px; }
+
+  .product-banner { display: flex; align-items: center; gap: 14px; background: #EEF6FA; border: 1px solid #B8DDF0; border-radius: 8px; padding: 14px 18px; margin-bottom: 28px; }
+  .product-icon { width: 40px; height: 40px; border-radius: 8px; background: #2E86AB; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .product-name { font-size: 15px; font-weight: 700; color: #1F3864; }
+  .product-detail { font-size: 12px; color: #6B7A99; margin-top: 2px; }
+
+  /* Main two-column */
+  .booking-cols { display: grid; grid-template-columns: 260px 1fr; gap: 28px; }
+
+  /* Mini calendar */
+  .mini-cal { }
+  .cal-month-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .cal-month-name { font-size: 14px; font-weight: 700; color: #1F3864; }
+  .cal-nav-btn { background: none; border: 1px solid #E2E6EF; border-radius: 4px; width: 26px; height: 26px; cursor: pointer; font-size: 13px; color: #6B7A99; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-dow { font-size: 10px; font-weight: 700; color: #8A97B1; text-align: center; padding: 4px 0; text-transform: uppercase; }
+  .cal-date { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; margin: auto; }
+  .cal-date.available { color: #1F3864; }
+  .cal-date.available:hover { background: #EEF6FA; color: #2E86AB; }
+  .cal-date.selected { background: #2E86AB; color: #fff; font-weight: 700; }
+  .cal-date.today { color: #2E86AB; font-weight: 700; }
+  .cal-date.unavailable { color: #C0C8D8; cursor: default; }
+  .cal-date.past { color: #D0D7E6; cursor: default; }
+  .availability-dot { width: 4px; height: 4px; border-radius: 50%; background: #22A067; margin: 2px auto 0; }
+
+  /* Modality selector */
+  .modality-section { margin-top: 20px; }
+  .modality-label { font-size: 12px; font-weight: 700; color: #8A97B1; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+  .modality-options { display: flex; flex-direction: column; gap: 8px; }
+  .modality-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1.5px solid #E2E6EF; border-radius: 6px; cursor: pointer; }
+  .modality-option.selected { border-color: #2E86AB; background: #EEF6FA; }
+  .modality-option:hover:not(.selected) { border-color: #C0C8D8; }
+  .mod-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #D0D7E6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .mod-radio.checked { border-color: #2E86AB; }
+  .mod-radio.checked::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #2E86AB; }
+  .mod-label { font-size: 13px; font-weight: 700; color: #1A2B45; }
+  .mod-detail { font-size: 11px; color: #8A97B1; margin-top: 1px; }
+
+  /* Time slots */
+  .time-section { }
+  .time-date-heading { font-size: 15px; font-weight: 700; color: #1F3864; margin-bottom: 16px; }
+  .time-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .time-slot { padding: 12px 16px; border: 1.5px solid #E2E6EF; border-radius: 6px; cursor: pointer; text-align: center; }
+  .time-slot:hover:not(.selected) { border-color: #2E86AB; }
+  .time-slot.selected { background: #2E86AB; border-color: #2E86AB; }
+  .slot-time { font-size: 14px; font-weight: 700; color: #1F3864; }
+  .time-slot.selected .slot-time { color: #fff; }
+  .slot-avail { font-size: 11px; color: #22A067; margin-top: 2px; }
+  .time-slot.selected .slot-avail { color: rgba(255,255,255,0.8); }
+
+  .more-dates { font-size: 13px; color: #2E86AB; cursor: pointer; font-weight: 700; margin-top: 14px; display: block; }
+  .more-dates:hover { text-decoration: underline; }
+
+  .provider-note { display: flex; align-items: center; gap: 10px; background: #F8F9FB; border: 1px solid #E2E6EF; border-radius: 6px; padding: 10px 14px; margin-top: 20px; font-size: 12px; color: #6B7A99; }
+
+  /* Bottom action row */
+  .booking-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 24px; border-top: 1px solid #E2E6EF; margin-top: 28px; }
+  .btn-back { background: none; border: none; color: #6B7A99; font-size: 13px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; padding: 10px 0; }
+  .btn-back:hover { color: #2E86AB; }
+  .btn-continue { background: #2E86AB; color: #fff; border: none; border-radius: 6px; padding: 12px 28px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; }
+  .btn-continue:hover { background: #246E8E; }
+
+  /* Summary sidebar on right (progress) */
+  .summary-sidebar { background: #F8F9FB; border: 1px solid #E2E6EF; border-radius: 8px; padding: 16px; margin-top: 28px; }
+  .summary-title { font-size: 12px; font-weight: 700; color: #8A97B1; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid #ECEEF2; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-key { color: #6B7A99; }
+  .summary-val { color: #1A2B45; font-weight: 700; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- Patient Portal Header -->
+<div class="portal-header">
+  <div class="portal-brand">EverlyWell <span>Patient Portal</span></div>
+  <div class="portal-user">
+    <div class="patient-avatar">MC</div>
+    Michael Chen
+  </div>
+</div>
+
+<div class="portal-nav">
+  <div class="nav-tab">Dashboard</div>
+  <div class="nav-tab active">Book Appointment</div>
+  <div class="nav-tab">My Consults</div>
+  <div class="nav-tab">Messages</div>
+  <div class="nav-tab">Documents</div>
+</div>
+
+<div class="page-wrap">
+
+  <!-- Step Indicator -->
+  <div class="step-indicator">
+    <div class="step-node">
+      <div class="step-circle done">&#10003;</div>
+      <div class="step-name" style="color:#2E86AB;">1. Select Service</div>
+    </div>
+    <div class="step-connector done"></div>
+    <div class="step-node">
+      <div class="step-circle active">2</div>
+      <div class="step-name" style="color:#1F3864;">2. Choose Time</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-node">
+      <div class="step-circle pending">3</div>
+      <div class="step-name">3. Confirm</div>
+    </div>
+  </div>
+
+  <!-- Booking Card -->
+  <div class="booking-card">
+    <div class="card-title">Select your preferred appointment time</div>
+    <div class="card-subtitle">Choose a date and time that works for you. All times shown in your local timezone (Pacific Time).</div>
+
+    <div class="product-banner">
+      <div class="product-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="14" height="11" rx="2" stroke="#fff" stroke-width="1.8"/><path d="M16 8.5l4-2v9l-4-2V8.5z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="product-name">Weight Management — Video Consultation</div>
+        <div class="product-detail">30-minute video visit &bull; Covered by your Aetna PPO plan &bull; No copay</div>
+      </div>
+    </div>
+
+    <div class="booking-cols">
+
+      <!-- Left: Calendar + Modality -->
+      <div>
+        <div class="mini-cal">
+          <div class="cal-month-header">
+            <button class="cal-nav-btn">&#8592;</button>
+            <div class="cal-month-name">June 2026</div>
+            <button class="cal-nav-btn">&#8594;</button>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-dow">Su</div>
+            <div class="cal-dow">Mo</div>
+            <div class="cal-dow">Tu</div>
+            <div class="cal-dow">We</div>
+            <div class="cal-dow">Th</div>
+            <div class="cal-dow">Fr</div>
+            <div class="cal-dow">Sa</div>
+            <!-- Week 1 -->
+            <div></div>
+            <div><div class="cal-date past">2</div></div>
+            <div><div class="cal-date past">3</div></div>
+            <div><div class="cal-date past">4</div></div>
+            <div><div class="cal-date today">5</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">6</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date unavailable">7</div></div>
+            <!-- Week 2 -->
+            <div><div class="cal-date unavailable">8</div></div>
+            <div><div class="cal-date available">9</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">10</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">11</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date selected">12</div></div>
+            <div><div class="cal-date available">13</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date unavailable">14</div></div>
+            <!-- Week 3 -->
+            <div><div class="cal-date unavailable">15</div></div>
+            <div><div class="cal-date available">16</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">17</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">18</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">19</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">20</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date unavailable">21</div></div>
+            <!-- Week 4 -->
+            <div><div class="cal-date unavailable">22</div></div>
+            <div><div class="cal-date available">23</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">24</div><div class="availability-dot"></div></div>
+            <div><div class="cal-date available">25</div></div>
+            <div><div class="cal-date available">26</div></div>
+            <div><div class="cal-date available">27</div></div>
+            <div><div class="cal-date unavailable">28</div></div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:#8A97B1;display:flex;align-items:center;gap:5px;"><div class="availability-dot"></div> Available dates</div>
+        </div>
+
+        <div class="modality-section">
+          <div class="modality-label">Appointment Type</div>
+          <div class="modality-options">
+            <div class="modality-option">
+              <div class="mod-radio"></div>
+              <div>
+                <div class="mod-label">Phone Call</div>
+                <div class="mod-detail">Audio only — we call you</div>
+              </div>
+            </div>
+            <div class="modality-option selected">
+              <div class="mod-radio checked"></div>
+              <div>
+                <div class="mod-label">Video Call</div>
+                <div class="mod-detail">Video + audio via browser</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Time slots -->
+      <div class="time-section">
+        <div class="time-date-heading">Available Times — Thursday, June 12, 2026</div>
+
+        <div class="time-slots">
+          <div class="time-slot">
+            <div class="slot-time">9:00 AM</div>
+            <div class="slot-avail">&#10003; Available</div>
+          </div>
+          <div class="time-slot">
+            <div class="slot-time">9:30 AM</div>
+            <div class="slot-avail">&#10003; Available</div>
+          </div>
+          <div class="time-slot">
+            <div class="slot-time">10:00 AM</div>
+            <div class="slot-avail">&#10003; Available</div>
+          </div>
+          <div class="time-slot selected">
+            <div class="slot-time">11:00 AM</div>
+            <div class="slot-avail">&#10003; Selected</div>
+          </div>
+          <div class="time-slot">
+            <div class="slot-time">2:00 PM</div>
+            <div class="slot-avail">&#10003; Available</div>
+          </div>
+          <div class="time-slot">
+            <div class="slot-time">3:00 PM</div>
+            <div class="slot-avail">&#10003; Available</div>
+          </div>
+        </div>
+
+        <span class="more-dates">No times work for you? View more dates &#8594;</span>
+
+        <div class="provider-note">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="#2E86AB" stroke-width="1.5"/><circle cx="9" cy="6" r="1" fill="#2E86AB"/><path d="M9 9v4" stroke="#2E86AB" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span>Your appointment will be with an available Weight Management provider. Your preferred provider, Dr. Sarah Martinez, will be assigned if available.</span>
+        </div>
+
+        <!-- Appointment summary -->
+        <div class="summary-sidebar">
+          <div class="summary-title">Your Selection</div>
+          <div class="summary-row"><span class="summary-key">Service</span><span class="summary-val">Weight Management — Video</span></div>
+          <div class="summary-row"><span class="summary-key">Date</span><span class="summary-val">Thu, June 12, 2026</span></div>
+          <div class="summary-row"><span class="summary-key">Time</span><span class="summary-val" style="color:#2E86AB;">11:00 AM Pacific</span></div>
+          <div class="summary-row"><span class="summary-key">Duration</span><span class="summary-val">30 minutes</span></div>
+          <div class="summary-row"><span class="summary-key">Type</span><span class="summary-val">Video Call</span></div>
+          <div class="summary-row"><span class="summary-key">Cost</span><span class="summary-val" style="color:#22A067;">$0 — Insurance Covered</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="booking-footer">
+      <button class="btn-back">&#8592; Back</button>
+      <div style="font-size:12px;color:#8A97B1;">Step 2 of 3</div>
+      <button class="btn-continue">Continue &#8594;</button>
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

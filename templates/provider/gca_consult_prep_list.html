@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+{% block title %}GCA Consult Prep Queue{% endblock %}
+{% block head %}
+<style>
+:root { --purple:#6B21A8; --bg:#FAF7F2; --border:#E5E0D8; --green:#059669; --amber:#D97706; --red:#DC2626; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+
+.topbar { position:fixed; top:0; left:56px; right:0; height:56px; background:#6B21A8; display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar-title { color:white; font-weight:600; font-size:16px; }
+.topbar-subtitle { color:rgba(255,255,255,0.5); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#4C1D95; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:12px; }
+.topbar { top:60px !important; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+
+.page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.page-title { font-size:18px; font-weight:700; color:#111827; }
+.page-sub { font-size:13px; color:#6B7280; margin-top:2px; }
+
+.stat-grid { display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap; }
+.stat-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 18px; min-width:120px; }
+.stat-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; margin-bottom:4px; }
+.stat-val { font-size:24px; font-weight:800; }
+
+.filter-bar { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; }
+.filter-bar select, .filter-bar input { height:34px; border:1px solid var(--border); border-radius:6px; padding:0 10px; font-size:13px; background:#fff; color:#111827; }
+.filter-bar input { width:220px; }
+.filter-label { font-size:12px; font-weight:600; color:#6B7280; }
+
+.queue-table { width:100%; background:#fff; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.queue-table table { width:100%; border-collapse:collapse; }
+.queue-table th { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; padding:10px 14px; border-bottom:1px solid var(--border); text-align:left; }
+.queue-table td { font-size:13px; padding:12px 14px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+.queue-table tr:last-child td { border-bottom:none; }
+.queue-table tr:hover td { background:#FAFAFA; }
+
+.pt-id { font-family:monospace; font-size:11px; font-weight:700; color:#9CA3AF; }
+.pt-name { font-weight:600; color:#111827; font-size:14px; }
+.pt-meta { font-size:11px; color:#9CA3AF; margin-top:2px; }
+
+.badge { display:inline-block; padding:3px 8px; border-radius:20px; font-size:11px; font-weight:700; }
+.badge-purple { background:#F3E8FF; color:#6B21A8; }
+.badge-amber { background:#FEF3C7; color:#D97706; }
+.badge-green { background:#D1FAE5; color:#059669; }
+.badge-red { background:#FEE2E2; color:#DC2626; }
+.badge-gray { background:#F3F4F6; color:#6B7280; }
+
+.pri-dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; }
+.pri-high { background:#DC2626; }
+.pri-med  { background:#D97706; }
+.pri-low  { background:#6B7280; }
+
+.action-btn { padding:5px 12px; border-radius:6px; border:none; font-size:12px; font-weight:600; cursor:pointer; }
+.btn-purple { background:#6B21A8; color:white; }
+.btn-purple:hover { background:#581C87; }
+.btn-outline { background:#F3F4F6; color:#374151; border:1px solid var(--border); }
+.btn-outline:hover { background:#E5E7EB; }
+
+.empty-state { padding:48px; text-align:center; color:#9CA3AF; font-size:13px; }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:12px; padding:24px; width:440px; max-width:90vw; }
+.modal-title { font-size:15px; font-weight:700; color:#111827; margin-bottom:4px; }
+.modal-sub { font-size:12px; color:#9CA3AF; margin-bottom:16px; }
+.modal-section { margin-bottom:14px; }
+.modal-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; margin-bottom:6px; }
+.modal-field { font-size:13px; color:#111827; font-weight:600; }
+.modal-note { font-size:12px; color:#6B7280; margin-top:4px; }
+textarea.modal-input { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 10px; font-size:13px; resize:vertical; min-height:70px; }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:16px; }
+.btn-primary { padding:8px 18px; background:#6B21A8; color:white; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+.btn-cancel { padding:8px 18px; background:#F3F4F6; color:#374151; border:none; border-radius:7px; font-size:13px; font-weight:600; cursor:pointer; }
+
+.checklist-progress { display:flex; gap:6px; align-items:center; }
+.prog-bar { height:4px; border-radius:2px; background:#E5E0D8; flex:1; overflow:hidden; }
+.prog-fill { height:100%; background:#6B21A8; }
+.prog-label { font-size:11px; color:#9CA3AF; width:40px; text-align:right; }
+</style>
+{% endblock %}
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">Consult Prep Queue</div>
+    <div class="topbar-subtitle">GCA Workflow — Pending Pre-Consult Checklists</div>
+  </div>
+  <div class="topbar-right">
+    <span>Morgan Ellis, GCA</span>
+    <div class="avatar">ME</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-label">Total Queue</div>
+      <div class="stat-val" style="color:#6B21A8;">4</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Unassigned</div>
+      <div class="stat-val" style="color:#D97706;">2</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Due Today</div>
+      <div class="stat-val" style="color:#DC2626;">1</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Complete</div>
+      <div class="stat-val" style="color:#059669;">7</div>
+    </div>
+  </div>
+
+  <div class="filter-bar" style="margin-bottom:14px;">
+    <span class="filter-label">Status</span>
+    <select id="f-status" onchange="renderRows()">
+      <option value="">All</option>
+      <option value="Assigned">Assigned</option>
+      <option value="Unassigned">Unassigned</option>
+      <option value="In Progress">In Progress</option>
+    </select>
+    <span class="filter-label">Panel</span>
+    <select id="f-panel" onchange="renderRows()">
+      <option value="">All</option>
+      <option value="Hereditary Cancer">Hereditary Cancer</option>
+      <option value="Cardio">Cardio</option>
+      <option value="BRCA">BRCA</option>
+      <option value="Thyroid">Thyroid</option>
+    </select>
+    <input id="f-search" placeholder="Search patient name or ID…" oninput="renderRows()">
+  </div>
+
+  <div class="queue-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Panel / Test</th>
+          <th>Priority</th>
+          <th>Consult Date</th>
+          <th>Assigned To</th>
+          <th>Checklist</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="queue-body"></tbody>
+    </table>
+    <div class="empty-state" id="empty-state" style="display:none;">No patients match the current filters.</div>
+  </div>
+
+</div>
+
+<!-- View modal -->
+<div class="modal-overlay" id="viewModal">
+  <div class="modal">
+    <div class="modal-title" id="vm-name">—</div>
+    <div class="modal-sub" id="vm-id">—</div>
+    <div class="modal-section">
+      <div class="modal-label">Panel / Test</div>
+      <div class="modal-field" id="vm-panel">—</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Consult Date</div>
+      <div class="modal-field" id="vm-date">—</div>
+      <div class="modal-note" id="vm-note"></div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-label">Assigned To</div>
+      <div class="modal-field" id="vm-assigned">—</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('viewModal')">Close</button>
+      <button class="btn-primary" id="vm-open-btn" onclick="window.location.href='/provider/gca/consult-prep/detail'">Open Checklist →</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+var rows = [
+  {id:'PT-2026-00142', name:'Marcus Johnson', panel:'Hereditary Cancer Panel', dob:'08/14/1982', state:'TX', consult:'Jul 10, 2026', pri:'high', priLabel:'High', assigned:'Morgan Ellis', status:'In Progress', prog:2, progTotal:4},
+  {id:'PT-2026-00178', name:'Sandra Torres', panel:'BRCA 1/2 Analysis', dob:'03/22/1975', state:'CA', consult:'Jul 11, 2026', pri:'med', priLabel:'Medium', assigned:'Morgan Ellis', status:'Assigned', prog:0, progTotal:4},
+  {id:'PT-2026-00201', name:'Robert Chang', panel:'Cardio Gene Panel', dob:'11/05/1968', state:'NY', consult:'Jul 14, 2026', pri:'low', priLabel:'Low', assigned:'—', status:'Unassigned', prog:0, progTotal:4},
+  {id:'PT-2026-00215', name:'Aisha Patel', panel:'Thyroid Genetics Panel', dob:'06/18/1990', state:'TX', consult:'Jul 15, 2026', pri:'med', priLabel:'Medium', assigned:'—', status:'Unassigned', prog:0, progTotal:4},
+];
+
+function renderRows() {
+  var fs = document.getElementById('f-status').value;
+  var fp = document.getElementById('f-panel').value;
+  var fq = document.getElementById('f-search').value.toLowerCase();
+  var filtered = rows.filter(function(r) {
+    if (fs && r.status !== fs) return false;
+    if (fp && r.panel.indexOf(fp) === -1) return false;
+    if (fq && r.name.toLowerCase().indexOf(fq) === -1 && r.id.toLowerCase().indexOf(fq) === -1) return false;
+    return true;
+  });
+  var tbody = document.getElementById('queue-body');
+  document.getElementById('empty-state').style.display = filtered.length ? 'none' : 'block';
+  tbody.innerHTML = filtered.map(function(r) {
+    var priBadge = '<span class="pri-dot pri-' + r.pri + '"></span>' + r.priLabel;
+    var statusBadge = r.status === 'In Progress'
+      ? '<span class="badge badge-purple">In Progress</span>'
+      : r.status === 'Assigned'
+      ? '<span class="badge badge-green">Assigned</span>'
+      : '<span class="badge badge-amber">Unassigned</span>';
+    var pct = Math.round((r.prog / r.progTotal) * 100);
+    var progHtml = '<div class="checklist-progress"><div class="prog-bar"><div class="prog-fill" style="width:' + pct + '%"></div></div><div class="prog-label">' + r.prog + '/' + r.progTotal + '</div></div>';
+    var dueClass = r.id === 'PT-2026-00142' ? ' style="color:#DC2626;font-weight:600;"' : '';
+    return '<tr>'
+      + '<td><div class="pt-id">' + r.id + '</div><div class="pt-name">' + r.name + '</div><div class="pt-meta">' + r.state + ' &middot; DOB ' + r.dob + '</div></td>'
+      + '<td>' + r.panel + '</td>'
+      + '<td>' + priBadge + '</td>'
+      + '<td' + dueClass + '>' + r.consult + (r.id === 'PT-2026-00142' ? ' <span style="font-size:10px;background:#FEE2E2;color:#991B1B;padding:2px 5px;border-radius:4px;font-weight:700;">TODAY</span>' : '') + '</td>'
+      + '<td>' + r.assigned + '</td>'
+      + '<td>' + progHtml + '</td>'
+      + '<td>' + statusBadge + '</td>'
+      + '<td style="white-space:nowrap;">'
+        + (r.status === 'Unassigned' ? '<button class="action-btn btn-purple" onclick="takeTask(\'' + r.id + '\')" style="margin-right:4px;">Take</button>' : '')
+        + '<button class="action-btn btn-outline" onclick="openView(' + JSON.stringify(r).replace(/"/g, '&quot;') + ')">View</button>'
+        + '<button class="action-btn btn-purple" onclick="window.location.href=\'/provider/gca/consult-prep/detail\'" style="margin-left:3px;">Open →</button>'
+      + '</td>'
+      + '</tr>';
+  }).join('');
+}
+
+function takeTask(id) {
+  var r = rows.find(function(x) { return x.id === id; });
+  if (!r) return;
+  r.assigned = 'Morgan Ellis';
+  r.status = 'Assigned';
+  renderRows();
+  showToast('✓ ' + r.name + ' assigned to you.');
+}
+
+function openView(r) {
+  document.getElementById('vm-name').textContent = r.name;
+  document.getElementById('vm-id').textContent = r.id + ' · ' + r.state + ' · DOB ' + r.dob;
+  document.getElementById('vm-panel').textContent = r.panel;
+  document.getElementById('vm-date').textContent = r.consult;
+  document.getElementById('vm-note').textContent = r.id === 'PT-2026-00142' ? '⚠ Consult is today — checklist must be completed before session.' : '';
+  document.getElementById('vm-assigned').textContent = r.assigned;
+  document.getElementById('vm-open-btn').onclick = function() { window.location.href = '/provider/gca/consult-prep/detail'; };
+  document.getElementById('viewModal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#111827;color:white;padding:10px 16px;border-radius:8px;font-size:13px;z-index:999;font-weight:600;';
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 3000);
+}
+
+renderRows();
+</script>
+{% endraw %}
+{% endblock %}

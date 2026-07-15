@@ -112,6 +112,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
     <span class="topbar-badge">Care Management — Daily Review</span>
     <div class="topbar-right">
       <span style="font-size:12px;color:#6B7280;" id="topbarSub">18 due today &nbsp;·&nbsp; 8 need action</span>
+      <button style="background:#DC2626;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;" onclick="openUrgentPanel()">🚨 Urgent <span style="background:rgba(255,255,255,0.25);border-radius:10px;padding:1px 6px;">2</span></button>
       <button class="btn-secondary" onclick="window.location.href='/care-team/psr'">&#8592; Dashboard</button>
     </div>
   </div>
@@ -193,7 +194,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Same-day</span></td>
             <td><span class="badge badge-warn">B — follow-up</span></td>
             <td><span class="badge badge-gray" id="reviewed-0">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('PA44F','b',0)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('PA44F','b',0)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="D.L.">
@@ -206,7 +207,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">1-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-1">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('DL58M','a',1)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('DL58M','a',1)">Review</button></td>
           </tr>
 
           <tr class="row-c" data-scenario="c" data-name="T.R.">
@@ -219,7 +220,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Same-day</span></td>
             <td><span class="badge badge-blue">C — results ready</span></td>
             <td><span class="badge badge-gray" id="reviewed-2">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('TR61F','c',2)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('TR61F','c',2)">Review</button></td>
           </tr>
 
           <tr class="row-b" data-scenario="b" data-name="M.K.">
@@ -232,7 +233,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">2-week</span></td>
             <td><span class="badge badge-warn">B — follow-up</span></td>
             <td><span class="badge badge-gray" id="reviewed-3">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('MK52F','b',3)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('MK52F','b',3)">Review</button></td>
           </tr>
 
           <tr class="row-optout" data-scenario="optout" data-name="J.V.">
@@ -258,7 +259,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">1-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-5">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('CH39F','a',5)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('CH39F','a',5)">Review</button></td>
           </tr>
 
           <tr class="row-b" data-scenario="b" data-name="R.S.">
@@ -271,7 +272,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Same-day</span></td>
             <td><span class="badge badge-warn">B — follow-up</span></td>
             <td><span class="badge badge-gray" id="reviewed-6">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('RS55F','b',6)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('RS55F','b',6)">Review</button></td>
           </tr>
 
           <tr class="row-c" data-scenario="c" data-name="E.M.">
@@ -284,7 +285,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">2-week</span></td>
             <td><span class="badge badge-blue">C — results ready</span></td>
             <td><span class="badge badge-gray" id="reviewed-7">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('EM47F','c',7)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('EM47F','c',7)">Review</button></td>
           </tr>
 
           <tr class="row-optout" data-scenario="optout" data-name="B.W.">
@@ -310,7 +311,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Same-day</span></td>
             <td><span class="badge badge-warn">B — follow-up</span></td>
             <td><span class="badge badge-gray" id="reviewed-9">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('LT42F','b',9)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('LT42F','b',9)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="F.O.">
@@ -323,7 +324,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">1-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-10">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('FO71F','a',10)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('FO71F','a',10)">Review</button></td>
           </tr>
 
           <tr class="row-c" data-scenario="c" data-name="N.A.">
@@ -336,7 +337,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-warn">Same-day</span></td>
             <td><span class="badge badge-blue">C — results ready</span></td>
             <td><span class="badge badge-gray" id="reviewed-11">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('NA38F','c',11)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('NA38F','c',11)">Review</button></td>
           </tr>
 
           <tr class="row-optout" data-scenario="optout" data-name="G.P.">
@@ -362,7 +363,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">2-week</span></td>
             <td><span class="badge badge-warn">B — follow-up</span></td>
             <td><span class="badge badge-gray" id="reviewed-13">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('HB49F','b',13)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('HB49F','b',13)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="S.N.">
@@ -375,7 +376,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">1-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-14">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('SN34F','a',14)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('SN34F','a',14)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="W.C.">
@@ -388,7 +389,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">2-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-15">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('WC67M','a',15)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('WC67M','a',15)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="I.F.">
@@ -401,7 +402,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">1-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-16">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('IF53F','a',16)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('IF53F','a',16)">Review</button></td>
           </tr>
 
           <tr class="row-a" data-scenario="a" data-name="Q.D.">
@@ -414,7 +415,7 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
             <td><span class="badge badge-gray">2-week</span></td>
             <td><span class="badge badge-ok">A — no action</span></td>
             <td><span class="badge badge-gray" id="reviewed-17">Pending</span></td>
-            <td><button class="btn-primary" onclick="openModal('QD45M','a',17)">Review</button></td>
+            <td><button class="btn-primary" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();openModal('QD45M','a',17)">Review</button></td>
           </tr>
 
         </tbody>
@@ -616,6 +617,22 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
 
   </div>
 </div>
+
+<!-- Urgent Messages Panel (URG-MSG-001) -->
+<div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <span style="font-size:16px;">🚨</span>
+    <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
+    <span style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;border-radius:10px;padding:2px 8px;">2</span>
+    <button onclick="closeUrgentPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:4px;padding:2px 10px;margin-left:8px;">✕</button>
+  </div>
+  <div style="padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA;font-size:11px;color:#991B1B;flex-shrink:0;">
+    These messages require your immediate attention. Click any message to open it directly.
+    <span style="float:right;font-family:monospace;color:#FCA5A5;">URG-MSG-001</span>
+  </div>
+  <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+<div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
 
 {% endblock %}
 
@@ -980,5 +997,55 @@ function selectSlot(el, slot) {
 document.getElementById('scheduleOverlay').addEventListener('click', function(e) {
   if (e.target === this) closeScheduleModal();
 });
+
+// ── Urgent Messages (Thyroid Queue) ──────────────────────────────
+var THYROID_URGENT_MSGS = [
+  {
+    type: 'escalation',
+    initials: 'CT',
+    bg: '#D97706',
+    sender: 'CT Lead (Supervisor)',
+    patient: 'D.L. · 58M',
+    url: '/care-team/psr/thyroid-queue',
+    preview: '"D.L. is overdue for 1-week check-in — consult was Jul 2 and no follow-up logged yet. Please review before EOD."',
+    time: '15 min ago'
+  },
+  {
+    type: 'message',
+    initials: 'SL',
+    bg: '#6B21A8',
+    sender: 'Dr. Sarah Lee, MD',
+    patient: 'T.R. · 61F',
+    url: '/provider/messages',
+    preview: '"T.R. TSH results are critical — please verify patient has been contacted and action logged before next session."',
+    time: '34 min ago'
+  }
+];
+
+function openUrgentPanel() {
+  var body = document.getElementById('urgPanelBody');
+  body.innerHTML = THYROID_URGENT_MSGS.map(function(m) {
+    var typeLabel = m.type === 'escalation'
+      ? '<span style="font-size:10px;font-weight:700;color:#DC2626;background:#FEF2F2;border:1px solid #FECACA;border-radius:4px;padding:1px 6px;text-transform:uppercase;">Escalation</span>'
+      : '<span style="font-size:10px;font-weight:700;color:#0D9488;background:#F0FDFA;border:1px solid #99F6E4;border-radius:4px;padding:1px 6px;text-transform:uppercase;">Message</span>';
+    return '<a href="' + m.url + '" style="display:block;text-decoration:none;border-bottom:1px solid #F3F4F6;padding:16px 20px;transition:background .15s;" onmouseover="this.style.background=\'#FFFBEB\'" onmouseout="this.style.background=\'#fff\'">'
+      + '<div style="display:flex;align-items:flex-start;gap:12px;">'
+      + '<div style="width:38px;height:38px;border-radius:50%;background:' + m.bg + ';display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;">' + m.initials + '</div>'
+      + '<div style="flex:1;min-width:0;">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">' + typeLabel + '<span style="font-size:11px;color:#6B7280;margin-left:auto;">' + m.time + '</span></div>'
+      + '<div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:2px;">' + m.sender + '</div>'
+      + '<div style="font-size:11px;color:#6B7280;margin-bottom:6px;">Re: ' + m.patient + '</div>'
+      + '<div style="font-size:12px;color:#374151;line-height:1.5;white-space:normal;">' + m.preview + '</div>'
+      + '</div></div></a>';
+  }).join('');
+  var panel = document.getElementById('urgentPanel');
+  panel.style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
+}
+
+function closeUrgentPanel() {
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
+}
 </script>
 {% endblock %}

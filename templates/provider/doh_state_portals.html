@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% block title %}State DOH Portals — DOH Coordinator{% endblock %}
+{% block head %}
+<style>
+:root { --teal:#0F766E; --teal-light:#CCFBF1; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--teal); display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#0D5F58; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+
+.info-banner { display:flex; align-items:center; gap:10px; background:#F0FDFA; border:1px solid #99F6E4; border-radius:10px; padding:11px 16px; margin-bottom:24px; font-size:12px; color:#134E4A; }
+.info-banner a { color:var(--teal); font-weight:700; text-decoration:none; }
+
+.filter-bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:18px; }
+.filter-bar input, .filter-bar select { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.filter-bar input { min-width:200px; }
+.filter-bar input:focus, .filter-bar select:focus { border-color:var(--teal); }
+.count-label { font-size:12px; font-weight:600; color:#6B7280; margin-left:auto; }
+
+.portal-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
+
+.portal-card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:18px; display:flex; flex-direction:column; gap:12px; transition:border-color 0.12s; }
+.portal-card:hover { border-color:var(--teal); box-shadow:0 2px 12px rgba(15,118,110,0.08); }
+
+.card-header { display:flex; align-items:flex-start; gap:10px; }
+.state-badge { width:40px; height:40px; border-radius:10px; background:#F0FDFA; border:1px solid #99F6E4; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:var(--teal); flex-shrink:0; }
+.card-title { font-size:14px; font-weight:700; color:#111827; }
+.card-agency { font-size:11px; color:#6B7280; margin-top:2px; }
+
+.card-meta { display:flex; flex-direction:column; gap:5px; }
+.meta-row { display:flex; align-items:center; gap:6px; font-size:12px; color:#374151; }
+.meta-label { font-size:10px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:.06em; min-width:70px; }
+.type-chip { font-size:10px; font-weight:600; padding:2px 7px; border-radius:6px; }
+.type-web   { background:#DBEAFE; color:#1E40AF; }
+.type-elr   { background:#D1FAE5; color:#065F46; }
+.type-fax   { background:#FEF3C7; color:#92400E; }
+.type-email { background:#F3E8FF; color:#5B21B6; }
+
+.card-actions { display:flex; gap:8px; margin-top:4px; }
+.btn-portal { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; border:none; font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:5px; }
+.btn-go     { background:var(--teal); color:#fff; }
+.btn-go:hover { background:#0D5F58; }
+.btn-copy   { background:#fff; color:#374151; border:1px solid var(--border); }
+.btn-copy:hover { border-color:var(--teal); color:var(--teal); }
+
+.no-url-badge { font-size:11px; color:#9CA3AF; font-style:italic; }
+
+.ref-tag { font-size:10px; font-family:monospace; color:#9CA3AF; }
+
+/* Empty state */
+.empty-state { text-align:center; padding:60px 20px; color:#9CA3AF; }
+.empty-state .icon { font-size:40px; margin-bottom:10px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">State DOH Portals</div>
+    <div class="topbar-sub">Mandatory Reporting — State Submission Portals</div>
+  </div>
+  <div class="topbar-right">
+    <span>Crystal Veliz, DOH Coordinator</span>
+    <div class="avatar">CV</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-title">State DOH Portals <span class="ref-tag">STATE-PORTAL-001</span></div>
+  <div class="page-sub">Quick access to each state's mandatory reporting submission portal. URLs are configured by administrators in the <a href="/admin/doh-config" style="color:var(--teal);font-weight:600;text-decoration:none;">DOH Admin Config</a>.</div>
+
+  <div class="info-banner">
+    <span>🔐</span>
+    <span>Portal URLs are pulled from the admin configuration and managed by your DOH Admin team. If a URL is missing or incorrect, <a href="/admin/doh-config">update it in Admin Settings →</a></span>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="portalSearch" placeholder="Search state, agency, or portal name…" oninput="filterPortals()">
+    <select id="typeFilter" onchange="filterPortals()">
+      <option value="">All Submission Types</option>
+      <option value="web">Web Portal</option>
+      <option value="elr">ELR (Electronic)</option>
+      <option value="fax">Fax</option>
+      <option value="email">Email</option>
+    </select>
+    <span class="count-label" id="cardCount">Showing 8 of 8</span>
+  </div>
+
+  <div class="portal-grid" id="portalGrid">
+
+    <div class="portal-card" data-state="FL" data-type="web" data-name="Florida Merlin">
+      <div class="card-header">
+        <div class="state-badge">FL</div>
+        <div>
+          <div class="card-title">Merlin — Morbidity, Epidemiology &amp; Lab</div>
+          <div class="card-agency">Florida Department of Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-web">Web Portal</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://www.merlinweb.com</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, Lead, TB</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://www.merlinweb.com" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://www.merlinweb.com', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="TX" data-type="elr" data-name="Texas DSHS ELR">
+      <div class="card-header">
+        <div class="state-badge">TX</div>
+        <div>
+          <div class="card-title">DSHS — Electronic Lab Reporting</div>
+          <div class="card-agency">Texas Department of State Health Services</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-elr">ELR (Electronic)</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://www.dshs.texas.gov/elr</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, TB, Lyme</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://www.dshs.texas.gov/elr" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://www.dshs.texas.gov/elr', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="CA" data-type="web" data-name="California CalREDIE">
+      <div class="card-header">
+        <div class="state-badge">CA</div>
+        <div>
+          <div class="card-title">CalREDIE — Reportable Disease Investigation</div>
+          <div class="card-agency">California Department of Public Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-web">Web Portal</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://www.cdph.ca.gov/calredie</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, TB, Lead, Lyme</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://www.cdph.ca.gov/calredie" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://www.cdph.ca.gov/calredie', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="NY" data-type="web" data-name="New York NYSIIS">
+      <div class="card-header">
+        <div class="state-badge">NY</div>
+        <div>
+          <div class="card-title">NYSIIS — Integrated Information System</div>
+          <div class="card-agency">New York State Department of Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-web">Web Portal</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://www.health.ny.gov/nysiis</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, TB</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://www.health.ny.gov/nysiis" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://www.health.ny.gov/nysiis', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="GA" data-type="web" data-name="Georgia SendSS">
+      <div class="card-header">
+        <div class="state-badge">GA</div>
+        <div>
+          <div class="card-title">SendSS — Disease Reporting System</div>
+          <div class="card-agency">Georgia Department of Public Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-web">Web Portal</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://sendss.state.ga.us</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, Lyme</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://sendss.state.ga.us" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://sendss.state.ga.us', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="VA" data-type="email" data-name="Virginia VDH Email">
+      <div class="card-header">
+        <div class="state-badge">VA</div>
+        <div>
+          <div class="card-title">VDH — Email Reporting</div>
+          <div class="card-agency">Virginia Department of Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-email">Email</span></div>
+        <div class="meta-row"><span class="meta-label">Email</span><span style="font-size:11px;color:#0F766E;font-weight:600;">vdh-reports@vdh.virginia.gov</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">Lyme, STI</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="mailto:vdh-reports@vdh.virginia.gov" class="btn-portal btn-go">Open Email ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('vdh-reports@vdh.virginia.gov', this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="MI" data-type="web" data-name="Michigan MDSS">
+      <div class="card-header">
+        <div class="state-badge">MI</div>
+        <div>
+          <div class="card-title">MDSS — Michigan Disease Surveillance</div>
+          <div class="card-agency">Michigan Department of Health &amp; Human Services</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-web">Web Portal</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://www.michigan.gov/mdss</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, HIV, Lead, TB</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://www.michigan.gov/mdss" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://www.michigan.gov/mdss', this)">Copy URL</button>
+      </div>
+    </div>
+
+    <div class="portal-card" data-state="WA" data-type="elr" data-name="Washington WDRS">
+      <div class="card-header">
+        <div class="state-badge">WA</div>
+        <div>
+          <div class="card-title">WDRS — Disease Reporting System</div>
+          <div class="card-agency">Washington State Department of Health</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div class="meta-row"><span class="meta-label">Type</span><span class="type-chip type-elr">ELR (Electronic)</span></div>
+        <div class="meta-row"><span class="meta-label">URL</span><span style="font-size:11px;color:#0F766E;font-weight:600;word-break:break-all;">https://doh.wa.gov/wdrs</span></div>
+        <div class="meta-row"><span class="meta-label">Conditions</span><span style="font-size:11px;color:#374151;">STI, Lyme, HIV</span></div>
+        <div class="meta-row"><span class="meta-label">SLA</span><span style="font-size:11px;color:#374151;">24h from positive result</span></div>
+      </div>
+      <div class="card-actions">
+        <a href="https://doh.wa.gov/wdrs" target="_blank" class="btn-portal btn-go">Open Portal ↗</a>
+        <button class="btn-portal btn-copy" onclick="copyUrl('https://doh.wa.gov/wdrs', this)">Copy URL</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <div class="icon">🔍</div>
+    <div style="font-size:14px;font-weight:600;color:#374151;margin-bottom:4px;">No portals match your filter</div>
+    <div style="font-size:12px;">Try clearing the search or changing the type filter.</div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+function filterPortals() {
+  var search = document.getElementById('portalSearch').value.toLowerCase();
+  var type   = document.getElementById('typeFilter').value;
+  var cards  = document.querySelectorAll('.portal-card');
+  var visible = 0;
+  cards.forEach(function(card) {
+    var name    = (card.dataset.name || '').toLowerCase();
+    var state   = (card.dataset.state || '').toLowerCase();
+    var ctype   = card.dataset.type || '';
+    var text    = card.textContent.toLowerCase();
+    var ok = (!search || text.includes(search) || state.includes(search) || name.includes(search))
+          && (!type   || ctype === type);
+    card.style.display = ok ? '' : 'none';
+    if (ok) visible++;
+  });
+  document.getElementById('cardCount').textContent = 'Showing ' + visible + ' of ' + cards.length;
+  document.getElementById('emptyState').style.display = visible === 0 ? '' : 'none';
+}
+
+function copyUrl(url, btn) {
+  navigator.clipboard.writeText(url).then(function() {
+    var orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    btn.style.background = '#D1FAE5';
+    btn.style.color = '#065F46';
+    setTimeout(function() {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 1800);
+  }).catch(function() {
+    alert('URL: ' + url);
+  });
+}
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Integration Health{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; white-space: nowrap; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; background: #fff; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #FAF7F2; }
+  .status-ok { font-weight: 600; color: #059669; }
+  .status-warn { font-weight: 600; color: #D97706; }
+  .action-link { color: #7C3AED; font-size: 12px; font-weight: 600; text-decoration: none; margin-right: 8px; }
+  .action-link:hover { text-decoration: underline; }
+  .action-link.danger { color: #EF4444; }
+  .degraded-row td { background: #FEF3C7 !important; }
+</style>
+{% endblock %}
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding: 8px 0; flex: 1;">
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/users" class="nav-item"><span class="nav-icon">👥</span> User Management</a>
+    <a href="/admin/role-config" class="nav-item"><span class="nav-icon">🔐</span> Role Configuration</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
+    <a href="/admin/integrations" class="nav-item active"><span class="nav-icon">🔌</span> Integrations</a>
+    <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Config</a>
+    <a href="/admin/doh-config" class="nav-item"><span class="nav-icon">🏥</span> DOH Configuration</a>
+    <a href="/admin/notifications" class="nav-item"><span class="nav-icon">🔔</span> Notification Templates</a>
+    <a href="/admin/audit-log" class="nav-item"><span class="nav-icon">📋</span> Audit Log</a>
+    <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Integration Health</div>
+    <span style="font-size:12px;color:#6B7280;">Last checked: Jun 13, 2026 09:30 AM</span>
+    <button onclick="this.textContent='Refreshing…';var b=this;setTimeout(function(){b.textContent='Refresh';},1500);" style="background:#fff;border:1px solid #E5E0D8;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#374151;">Refresh</button>
+  </div>
+  <div class="content">
+    <div class="widget">
+      <table>
+        <thead>
+          <tr>
+            <th>Integration</th>
+            <th>Status</th>
+            <th>Last Sync</th>
+            <th>Latency</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600">Athena EHR</td>
+            <td><span class="status-ok">🟢 Connected</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 09:30 AM</td>
+            <td style="font-family:monospace;font-size:12px;">142ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Verifiable (Licensing)</td>
+            <td><span class="status-ok">🟢 Connected</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 08:00 AM</td>
+            <td style="font-family:monospace;font-size:12px;">89ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Lab Partner (Quest)</td>
+            <td><span class="status-ok">🟢 Connected</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 07:45 AM</td>
+            <td style="font-family:monospace;font-size:12px;">203ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Notification Engine</td>
+            <td><span class="status-ok">🟢 Connected</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 09:29 AM</td>
+            <td style="font-family:monospace;font-size:12px;">31ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a></td>
+          </tr>
+          <tr class="degraded-row">
+            <td style="font-weight:600">Billing Platform</td>
+            <td><span class="status-warn">🟡 Degraded</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 06:00 AM</td>
+            <td style="font-family:monospace;font-size:12px;color:#D97706;">1,240ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a><a href="#" class="action-link danger" onclick="alert('Alert sent to on-call engineer.');return false;">Alert</a></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600">Video (Zoom Health)</td>
+            <td><span class="status-ok">🟢 Connected</span></td>
+            <td style="color:#6B7280;font-size:12px;">Jun 13, 2026 09:15 AM</td>
+            <td style="font-family:monospace;font-size:12px;">55ms</td>
+            <td><a href="#" class="action-link" onclick="return false;">View Logs</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SLA Engine — Stage Timer and Escalation Flow v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #fff; color: #1F3864; min-width: 900px; }
+h1 { background: #1F3864; color: #fff; padding: 18px 32px; font-size: 20px; letter-spacing: 0.5px; }
+.subtitle { background: #2c4a7c; color: #cce0ff; padding: 6px 32px; font-size: 13px; }
+.notes { background: #fff3cd; border-left: 4px solid #F39C12; padding: 10px 24px; font-size: 12px; color: #444; }
+.notes p { margin: 3px 0; }
+.diagram-wrap { overflow-x: auto; }
+svg text { font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>SLA Engine — Stage Timer and Escalation Flow</h1>
+<div class="subtitle">M06 SLA Configuration &nbsp;|&nbsp; Telehealth &nbsp;|&nbsp; v2</div>
+<div class="notes">
+  <p><strong>Key Rule:</strong> SLA clock continues through provider reassignment — does not reset. Original provider flagged as SLA miss owner regardless of reassignment.</p>
+</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 1400 1600" xmlns="http://www.w3.org/2000/svg" width="1400" height="1600">
+<defs>
+  <marker id="arr"   markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#555"/></marker>
+  <marker id="arr-g" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#27AE60"/></marker>
+  <marker id="arr-r" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#E74C3C"/></marker>
+  <marker id="arr-o" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#F39C12"/></marker>
+</defs>
+
+<!-- LANE BACKGROUNDS -->
+<rect x="0"    y="60" width="350" height="1510" fill="#EEF4FF" stroke="#C5D4F0" stroke-width="1"/>
+<rect x="350"  y="60" width="350" height="1510" fill="#E8F6F2" stroke="#C5D4F0" stroke-width="1"/>
+<rect x="700"  y="60" width="350" height="1510" fill="#FFF9F0" stroke="#C5D4F0" stroke-width="1"/>
+<rect x="1050" y="60" width="350" height="1510" fill="#F5EEFF" stroke="#C5D4F0" stroke-width="1"/>
+
+<!-- LANE HEADERS -->
+<rect x="0"    y="0" width="350" height="60" fill="#1F3864"/>
+<rect x="350"  y="0" width="350" height="60" fill="#1F3864"/>
+<rect x="700"  y="0" width="350" height="60" fill="#1F3864"/>
+<rect x="1050" y="0" width="350" height="60" fill="#1F3864"/>
+<text x="175"  y="30" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">System (SLA Engine)</text>
+<text x="175"  y="48" text-anchor="middle" fill="#AAC" font-size="11" font-family="Arial">Core timer logic</text>
+<text x="525"  y="30" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">Provider / User</text>
+<text x="525"  y="48" text-anchor="middle" fill="#AAC" font-size="11" font-family="Arial">Assigned provider actions</text>
+<text x="875"  y="30" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">Patient</text>
+<text x="875"  y="48" text-anchor="middle" fill="#AAC" font-size="11" font-family="Arial">Inactivity &amp; notifications</text>
+<text x="1225" y="30" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">Care Team</text>
+<text x="1225" y="48" text-anchor="middle" fill="#AAC" font-size="11" font-family="Arial">Escalations &amp; SLA misses</text>
+
+<!-- ============================================================ -->
+<!-- MAIN FLOW -->
+<!-- ============================================================ -->
+
+<!-- Consult enters stage -->
+<rect x="30" y="88" width="290" height="42" rx="21" fill="#1F3864"/>
+<text x="175" y="114" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial">Consult Enters Stage</text>
+<line x1="175" y1="130" x2="175" y2="152" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- SLA clock starts -->
+<rect x="30" y="154" width="290" height="44" rx="6" fill="#2E86AB"/>
+<text x="175" y="172" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">⏱ SLA Clock Starts</text>
+<text x="175" y="188" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Timer begins for this stage</text>
+<line x1="175" y1="198" x2="175" y2="228" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Decision: Waiting on Patient? — more vertical space -->
+<polygon points="175,230 275,272 175,314 75,272" fill="#F39C12"/>
+<text x="175" y="266" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Waiting on</text>
+<text x="175" y="282" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Patient Flag?</text>
+
+<!-- YES label ABOVE the arrow line, clearly separated -->
+<text x="500" y="255" text-anchor="middle" fill="#F39C12" font-size="12" font-weight="bold" font-family="Arial">YES</text>
+<!-- YES arrow: from diamond right point to patient lane -->
+<line x1="275" y1="272" x2="710" y2="272" stroke="#F39C12" stroke-width="1.5" stroke-dasharray="7,3" marker-end="url(#arr-o)"/>
+
+<!-- NO label on left side of diamond, clearly outside -->
+<text x="42" y="262" text-anchor="middle" fill="#555" font-size="12" font-weight="bold" font-family="Arial">NO</text>
+<!-- NO path: left from diamond then down -->
+<line x1="75"  y1="272" x2="22" y2="272" stroke="#555" stroke-width="1.5"/>
+<line x1="22"  y1="272" x2="22" y2="680" stroke="#555" stroke-width="1.5"/>
+<line x1="22"  y1="680" x2="30" y2="680" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- SLA PAUSES (below diamond, YES path) -->
+<rect x="30" y="326" width="290" height="44" rx="6" fill="#F39C12"/>
+<text x="175" y="344" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">⏸ SLA Clock PAUSES</text>
+<text x="175" y="360" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Waiting on patient flag set</text>
+
+<!-- Patient inactivity timer starts -->
+<rect x="712" y="252" width="276" height="44" rx="6" fill="#2E86AB"/>
+<text x="850" y="270" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Patient Inactivity Timer Starts</text>
+<text x="850" y="286" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Countdown begins</text>
+<line x1="850" y1="296" x2="850" y2="326" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Decision: Patient responds? -->
+<polygon points="850,328 940,368 850,408 760,368" fill="#F39C12"/>
+<text x="850" y="362" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Patient</text>
+<text x="850" y="378" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Responds?</text>
+
+<!-- YES responds — label above the arrow -->
+<text x="580" y="352" text-anchor="middle" fill="#27AE60" font-size="12" font-weight="bold" font-family="Arial">YES</text>
+<line x1="760" y1="368" x2="650" y2="368" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+<!-- SLA resumes box in Provider lane -->
+<rect x="370" y="348" width="278" height="44" rx="6" fill="#27AE60"/>
+<text x="509" y="366" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">▶ SLA Resumes</text>
+<text x="509" y="382" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Inactivity timer stops</text>
+
+<!-- NO responds — label to right of decision, clearly below YES -->
+<text x="862" y="420" fill="#E74C3C" font-size="12" font-weight="bold" font-family="Arial">NO</text>
+<line x1="850" y1="408" x2="850" y2="440" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+<!-- Follow-up notification -->
+<rect x="712" y="442" width="276" height="52" rx="6" fill="#2E86AB"/>
+<text x="850" y="462" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Send Automated Follow-Up</text>
+<text x="850" y="478" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Notification to patient</text>
+<text x="850" y="492" text-anchor="middle" fill="white" font-size="10" font-family="Arial">After follow-up days threshold</text>
+<line x1="850" y1="494" x2="850" y2="524" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Auto-close -->
+<rect x="712" y="526" width="276" height="52" rx="6" fill="#E74C3C"/>
+<text x="850" y="546" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">System Auto-Closes Consult</text>
+<text x="850" y="562" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Reason: patient non-response</text>
+<text x="850" y="576" text-anchor="middle" fill="white" font-size="10" font-family="Arial">After auto-close days threshold</text>
+
+<!-- ============================================================ -->
+<!-- DIVIDER: SLA running continuously section -->
+<!-- ============================================================ -->
+<line x1="0" y1="640" x2="1400" y2="640" stroke="#CCC" stroke-width="1" stroke-dasharray="4,4"/>
+<text x="175" y="660" text-anchor="middle" fill="#1F3864" font-size="11" font-style="italic" font-family="Arial">SLA running continuously — not waiting on patient</text>
+
+<!-- SLA running box (arrived via NO path) -->
+<rect x="30" y="668" width="290" height="44" rx="6" fill="#2E86AB"/>
+<text x="175" y="686" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">⏱ SLA Clock Running</text>
+<text x="175" y="702" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Standard flow — no pause</text>
+<line x1="175" y1="712" x2="175" y2="742" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Warning threshold -->
+<rect x="30" y="744" width="290" height="52" rx="6" fill="#F39C12"/>
+<text x="175" y="762" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">⚠ Warning Threshold Reached</text>
+<text x="175" y="778" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Yellow indicator on queue item</text>
+<text x="175" y="792" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Warning notification → assigned user</text>
+<line x1="175" y1="796" x2="175" y2="826" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- SLA time limit reached -->
+<rect x="30" y="828" width="290" height="52" rx="6" fill="#E74C3C"/>
+<text x="175" y="848" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">🔴 SLA Time Limit Reached</text>
+<text x="175" y="864" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Red indicator on queue item</text>
+<text x="175" y="878" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Auto-route to Care Team / MA Queue</text>
+
+<!-- Auto-route arrow to Care Team — label ABOVE the line -->
+<text x="690" y="848" text-anchor="middle" fill="#E74C3C" font-size="11" font-weight="bold" font-family="Arial">Auto-route to Care Team</text>
+<line x1="320" y1="858" x2="1060" y2="858" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-r)"/>
+
+<!-- Log SLA miss -->
+<line x1="175" y1="880" x2="175" y2="910" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="912" width="290" height="52" rx="6" fill="#E74C3C"/>
+<text x="175" y="932" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Log SLA Miss</text>
+<text x="175" y="948" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Original provider flagged as miss owner</text>
+<text x="175" y="962" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Feeds M13 SLA compliance report</text>
+
+<!-- Care Team receives in Care Team lane -->
+<rect x="1062" y="832" width="276" height="52" rx="6" fill="#1F3864"/>
+<text x="1200" y="852" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Care Team Receives</text>
+<text x="1200" y="868" text-anchor="middle" fill="white" font-size="11" font-family="Arial">SLA Escalation Item</text>
+<text x="1200" y="882" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Resolves consult manually</text>
+
+<!-- ============================================================ -->
+<!-- CLINICAL ESCALATION SECTION -->
+<!-- ============================================================ -->
+<line x1="0" y1="1020" x2="1400" y2="1020" stroke="#E74C3C" stroke-width="2" stroke-dasharray="8,4"/>
+<rect x="10" y="1028" width="380" height="26" rx="4" fill="#E74C3C"/>
+<text x="200" y="1046" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">SPECIAL PATH — Clinical Escalation (bypasses SLA)</text>
+
+<!-- Provider flags in Provider lane -->
+<rect x="362" y="1068" width="276" height="44" rx="6" fill="#1F3864"/>
+<text x="500" y="1086" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Provider Flags Clinical Escalation</text>
+<text x="500" y="1102" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Can occur at any time in workflow</text>
+
+<!-- Bypasses SLA — label ABOVE dashed arrow -->
+<text x="246" y="1062" text-anchor="middle" fill="#E74C3C" font-size="10" font-style="italic" font-family="Arial">bypasses SLA routing</text>
+<line x1="362" y1="1090" x2="320" y2="1090" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#arr-r)"/>
+
+<!-- SLA Bypassed box in System lane -->
+<rect x="30" y="1068" width="290" height="44" rx="6" fill="#E74C3C"/>
+<text x="175" y="1086" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">SLA Routing BYPASSED</text>
+<text x="175" y="1102" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Clinical path takes priority</text>
+
+<!-- Arrow from Provider to Patient lane — label above -->
+<text x="750" y="1062" text-anchor="middle" fill="#E74C3C" font-size="10" font-style="italic" font-family="Arial">immediate escalation</text>
+<line x1="638" y1="1090" x2="712" y2="1090" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+<!-- Critical flag box in Patient/System lane -->
+<rect x="714" y="1068" width="276" height="44" rx="6" fill="#E74C3C"/>
+<text x="852" y="1086" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">CRITICAL Flag — Care Team Queue</text>
+<text x="852" y="1102" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Immediate escalation, bypasses queue order</text>
+
+<!-- Arrow to Care Team lane -->
+<line x1="990" y1="1090" x2="1060" y2="1090" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+<!-- Logged in audit trail -->
+<rect x="1062" y="1068" width="276" height="44" rx="6" fill="#1F3864"/>
+<text x="1200" y="1086" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Logged in Audit Trail</text>
+<text x="1200" y="1102" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Separate from SLA reporting</text>
+
+<!-- ============================================================ -->
+<!-- LEGEND -->
+<!-- ============================================================ -->
+<rect x="1060" y="1180" width="320" height="260" rx="8" fill="#F9F9F9" stroke="#CCC" stroke-width="1"/>
+<text x="1220" y="1206" text-anchor="middle" fill="#1F3864" font-size="13" font-weight="bold" font-family="Arial">LEGEND</text>
+<rect x="1078" y="1220" width="26" height="16" rx="4" fill="#2E86AB"/>
+<text x="1118" y="1233" fill="#333" font-size="12" font-family="Arial">System Action</text>
+<rect x="1078" y="1248" width="26" height="16" rx="4" fill="#1F3864"/>
+<text x="1118" y="1261" fill="#333" font-size="12" font-family="Arial">User / Admin Action</text>
+<rect x="1078" y="1276" width="26" height="16" rx="4" fill="#27AE60"/>
+<text x="1118" y="1289" fill="#333" font-size="12" font-family="Arial">Success / Completion</text>
+<rect x="1078" y="1304" width="26" height="16" rx="4" fill="#E74C3C"/>
+<text x="1118" y="1317" fill="#333" font-size="12" font-family="Arial">Error / Escalation</text>
+<polygon points="1091,1332 1111,1346 1091,1360 1071,1346" fill="#F39C12"/>
+<text x="1118" y="1351" fill="#333" font-size="12" font-family="Arial">Decision / SLA Pause Point</text>
+<line x1="1078" y1="1382" x2="1104" y2="1382" stroke="#555" stroke-width="2" marker-end="url(#arr)"/>
+<text x="1118" y="1387" fill="#333" font-size="12" font-family="Arial">Flow Direction</text>
+<line x1="1078" y1="1410" x2="1104" y2="1410" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3"/>
+<text x="1118" y="1415" fill="#333" font-size="12" font-family="Arial">Bypass / Critical Path</text>
+
+</svg>
+</div>
+</body>
+</html>

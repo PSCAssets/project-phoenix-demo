@@ -1,0 +1,868 @@
+#!/usr/bin/env python3
+"""
+Project Phoenix — Demo Update: 6-Step Book Appointment Modal
+Adds member lookup + full scheduling modal to templates/scheduler/search_patient.html.
+
+Screenshots reference:
+  Step 2: Register Patient — state/timezone/consent
+  Step 3: Appointment Types — EverlyCare Treat Visit
+  Step 4: Providers — Next Available + 5 named providers
+  Step 5: Available Dates — June 2026 calendar + evening slots
+  Step 6: Confirmation
+  Background: Member ID H61755723 / Member Facing ID H6175572300
+
+Files modified:
+  templates/scheduler/search_patient.html
+"""
+
+import os
+
+BASE = '/Users/justin.woller/Documents/project-phoenix-demo'
+changes = []
+
+# ─────────────────────────────────────────────────────────────────────────────
+# New search_patient.html with Member Lookup tab + 6-step modal
+# ─────────────────────────────────────────────────────────────────────────────
+search_path = os.path.join(BASE, 'templates', 'scheduler', 'search_patient.html')
+
+with open(search_path, 'r') as f:
+    original = f.read()
+
+if 'book-appt-modal' in original:
+    print('  SKIP — Book Appointment modal already present')
+    changes.append('templates/scheduler/search_patient.html: SKIP — already patched')
+else:
+    new_html = '''{% extends "base.html" %}
+{% block title %}Patient &amp; Member Search — Scheduler{% endblock %}
+
+{% block head %}
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; margin: 0; }
+
+/* ── Page Shell ── */
+.sch-shell { max-width: 1050px; margin: 80px auto 0; padding: 28px 24px 60px; }
+.page-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: #6B7280; margin-bottom: 22px; }
+
+/* ── Tabs ── */
+.tab-bar { display: flex; border-bottom: 2px solid #E5E0D8; margin-bottom: 24px; }
+.sch-tab { padding: 10px 22px; font-size: 13px; font-weight: 600; color: #6B7280; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.sch-tab.active { color: #059669; border-bottom-color: #059669; }
+.sch-tab:hover:not(.active) { color: #374151; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── Search Bar ── */
+.search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-input { flex: 1; padding: 10px 16px; border: 1.5px solid #D1D5DB; border-radius: 8px; font-size: 14px; outline: none; }
+.search-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.1); }
+.search-btn { padding: 10px 22px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.search-btn:hover { background: #047857; }
+
+/* ── Results Table ── */
+.results-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.results-header { padding: 12px 20px; background: #F0FDF4; border-bottom: 1px solid #E5E0D8; font-size: 12px; font-weight: 700; color: #065F46; text-transform: uppercase; letter-spacing: 0.06em; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F9F5EE; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+.p-name { font-weight: 600; color: #111827; }
+.p-id { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+.status-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; }
+.status-active { background: #D1FAE5; color: #065F46; }
+.status-eligible { background: #CFFAFE; color: #164E63; }
+.action-link { font-size: 12px; font-weight: 600; color: #059669; cursor: pointer; margin-right: 14px; text-decoration: none; }
+.action-link:hover { color: #047857; text-decoration: underline; }
+.book-btn { padding: 6px 16px; background: #059669; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.book-btn:hover { background: #047857; }
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL OVERLAY
+═══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.45);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  width: 700px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  position: relative;
+}
+
+/* ── Member header strip (mimics screenshot background) ── */
+.member-strip {
+  background: #F0FDF4;
+  border-bottom: 1px solid #BBF7D0;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.member-strip-label { font-size: 10px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; }
+.member-strip-value { font-size: 13px; font-weight: 700; color: #111827; }
+.member-strip-item { display: flex; flex-direction: column; gap: 2px; }
+.modal-close {
+  position: absolute; top: 10px; right: 14px;
+  font-size: 20px; color: #9CA3AF; cursor: pointer;
+  background: none; border: none; line-height: 1;
+}
+.modal-close:hover { color: #374151; }
+
+/* ── Step Stepper ── */
+.stepper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid #E5E0D8;
+}
+.step-item { display: flex; align-items: center; gap: 0; }
+.step-circle {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  border: 2px solid #D1D5DB; color: #9CA3AF; background: #fff;
+  flex-shrink: 0; position: relative;
+  transition: all .2s;
+}
+.step-circle.done   { background: #059669; border-color: #059669; color: #fff; }
+.step-circle.active { background: #059669; border-color: #059669; color: #fff; box-shadow: 0 0 0 3px rgba(5,150,105,.2); }
+.step-label { font-size: 10px; color: #9CA3AF; margin-top: 4px; text-align: center; white-space: nowrap; }
+.step-label.active { color: #059669; font-weight: 700; }
+.step-label.done   { color: #059669; }
+.step-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.step-line { width: 36px; height: 2px; background: #E5E0D8; margin-bottom: 14px; flex-shrink: 0; }
+.step-line.done { background: #059669; }
+
+/* ── Modal Body ── */
+.modal-body { padding: 24px 28px; min-height: 340px; }
+.modal-section-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 6px; }
+.modal-section-sub { font-size: 13px; color: #6B7280; margin-bottom: 22px; }
+
+/* ── Form Elements ── */
+.form-row { display: flex; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
+.form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 180px; }
+.form-label { font-size: 12px; font-weight: 600; color: #374151; }
+.form-label .req { color: #DC2626; }
+.form-select, .form-input {
+  padding: 9px 12px; border: 1.5px solid #D1D5DB; border-radius: 8px;
+  font-size: 13px; color: #111827; background: #fff; outline: none;
+}
+.form-select:focus, .form-input:focus { border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.1); }
+
+.consent-group { margin-bottom: 18px; }
+.consent-label-main { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 8px; }
+.radio-row { display: flex; gap: 24px; }
+.radio-opt { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 13px; color: #374151; }
+.radio-opt input[type=radio] { accent-color: #059669; width: 16px; height: 16px; }
+
+/* ── Appointment Type Step ── */
+.appt-option {
+  border: 2px solid #E5E0D8; border-radius: 10px; padding: 14px 16px;
+  margin-bottom: 10px; cursor: pointer; display: flex; align-items: flex-start; gap: 12px;
+  transition: border-color .15s, background .15s;
+}
+.appt-option:hover { border-color: #059669; background: #F0FDF4; }
+.appt-option.selected { border-color: #059669; background: #F0FDF4; }
+.appt-option input[type=radio] { accent-color: #059669; margin-top: 2px; flex-shrink: 0; }
+.appt-option-name { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 2px; }
+.appt-option-desc { font-size: 12px; color: #6B7280; }
+
+/* ── Provider Step ── */
+.provider-option {
+  border: 2px solid #E5E0D8; border-radius: 10px; padding: 12px 16px;
+  margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px;
+  transition: border-color .15s;
+}
+.provider-option:hover { border-color: #059669; }
+.provider-option.selected { border-color: #059669; background: #F0FDF4; }
+.provider-option input[type=radio] { accent-color: #059669; flex-shrink: 0; }
+.provider-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #D1FAE5;
+  color: #065F46; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.provider-name { font-size: 13px; font-weight: 700; color: #111827; }
+.provider-cred { font-size: 11px; color: #6B7280; }
+.next-available-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px;
+  background: #D1FAE5; color: #065F46; margin-left: 8px;
+}
+
+/* ── Calendar Step ── */
+.calendar-wrap { display: flex; gap: 24px; flex-wrap: wrap; }
+.calendar-box { flex: 1; min-width: 260px; }
+.cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cal-month { font-size: 15px; font-weight: 700; color: #111827; }
+.cal-nav { width: 28px; height: 28px; border: 1.5px solid #E5E0D8; border-radius: 6px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6B7280; }
+.cal-nav:hover { background: #F0FDF4; border-color: #059669; color: #059669; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-dow { text-align: center; font-size: 10px; font-weight: 600; color: #9CA3AF; padding: 4px 0; }
+.cal-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; border-radius: 50%; cursor: default; color: #9CA3AF;
+}
+.cal-day.available { color: #059669; font-weight: 700; cursor: pointer; }
+.cal-day.available:hover { background: #D1FAE5; }
+.cal-day.selected { background: #059669; color: #fff !important; font-weight: 700; }
+.cal-day.today { font-weight: 700; color: #374151; }
+
+.time-box { flex: 1; min-width: 180px; }
+.time-section-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.time-slot {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border: 1.5px solid #E5E0D8; border-radius: 8px; margin-bottom: 8px;
+  cursor: pointer; transition: border-color .15s;
+}
+.time-slot:hover { border-color: #059669; background: #F0FDF4; }
+.time-slot.selected { border-color: #059669; background: #F0FDF4; }
+.time-dot { width: 8px; height: 8px; border-radius: 50%; background: #059669; flex-shrink: 0; }
+.time-text { font-size: 13px; font-weight: 600; color: #111827; }
+.tz-note { font-size: 11px; color: #6B7280; margin-top: 10px; }
+
+/* ── Confirmation Step ── */
+.confirm-card {
+  background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 12px;
+  padding: 20px 22px; margin-bottom: 16px;
+}
+.confirm-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.confirm-label { font-size: 12px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; width: 160px; flex-shrink: 0; }
+.confirm-value { font-size: 13px; font-weight: 600; color: #111827; }
+.confirm-icon { font-size: 40px; text-align: center; margin-bottom: 10px; }
+
+/* ── Modal Footer ── */
+.modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #E5E0D8;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-step-indicator { font-size: 12px; color: #9CA3AF; }
+.footer-btns { display: flex; gap: 10px; }
+.btn-secondary { padding: 9px 22px; border: 1.5px solid #D1D5DB; border-radius: 8px; font-size: 13px; font-weight: 600; color: #374151; background: #fff; cursor: pointer; }
+.btn-secondary:hover { background: #F9F5EE; }
+.btn-primary { padding: 9px 26px; background: #059669; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { background: #047857; }
+.btn-primary:disabled { background: #9CA3AF; cursor: not-allowed; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sch-shell">
+  <div class="page-title">Patient &amp; Member Search</div>
+  <div class="page-sub">Search for existing patients or look up health plan members to schedule a new consult.</div>
+
+  <div class="tab-bar">
+    <div class="sch-tab active" onclick="switchTab('patient')">Patient Search</div>
+    <div class="sch-tab" onclick="switchTab('member')">Member Lookup</div>
+  </div>
+
+  <!-- ── Patient Search Panel ── -->
+  <div class="panel active" id="panelPatient">
+    <div class="search-row">
+      <input class="search-input" type="text" placeholder="Search by name, patient ID, or date of birth…" oninput="filterPatients(this.value)">
+      <button class="search-btn">Search</button>
+    </div>
+    <div class="results-card">
+      <div class="results-header">Patient Records</div>
+      <table>
+        <thead><tr><th>Patient</th><th>DOB</th><th>Phone</th><th>Last Consult</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="patientTbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Member Lookup Panel ── -->
+  <div class="panel" id="panelMember">
+    <div class="search-row">
+      <input class="search-input" type="text" id="memberSearchInput" placeholder="Search by Member ID, Member Facing ID, or name…" oninput="filterMembers(this.value)">
+      <button class="search-btn" onclick="filterMembers(document.getElementById('memberSearchInput').value)">Search</button>
+    </div>
+    <div class="results-card">
+      <div class="results-header">Health Plan Members — Eligibility DB</div>
+      <table>
+        <thead><tr><th>Member</th><th>Member ID</th><th>Member Facing ID</th><th>Health Plan</th><th>Eligibility</th><th>Prior Consults</th><th>Actions</th></tr></thead>
+        <tbody id="memberTbody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+  6-STEP BOOK APPOINTMENT MODAL
+═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="book-appt-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">×</button>
+
+    <!-- Member header strip -->
+    <div class="member-strip" id="memberStrip">
+      <div class="member-strip-item">
+        <div class="member-strip-label">Member</div>
+        <div class="member-strip-value" id="stripMemberName">—</div>
+      </div>
+      <div class="member-strip-item">
+        <div class="member-strip-label">Member ID</div>
+        <div class="member-strip-value" id="stripMemberId">—</div>
+      </div>
+      <div class="member-strip-item">
+        <div class="member-strip-label">Member Facing ID</div>
+        <div class="member-strip-value" id="stripFacingId">—</div>
+      </div>
+      <div class="member-strip-item">
+        <div class="member-strip-label">Health Plan</div>
+        <div class="member-strip-value" id="stripPlan">—</div>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div class="stepper" id="stepper">
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle done" id="sc1">✓</div>
+          <div class="step-label done" id="sl1">Demographics</div>
+        </div>
+        <div class="step-line done" id="line1"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle" id="sc2">2</div>
+          <div class="step-label" id="sl2">Register</div>
+        </div>
+        <div class="step-line" id="line2"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle" id="sc3">3</div>
+          <div class="step-label" id="sl3">Appt Type</div>
+        </div>
+        <div class="step-line" id="line3"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle" id="sc4">4</div>
+          <div class="step-label" id="sl4">Provider</div>
+        </div>
+        <div class="step-line" id="line4"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle" id="sc5">5</div>
+          <div class="step-label" id="sl5">Dates</div>
+        </div>
+        <div class="step-line" id="line5"></div>
+      </div>
+      <div class="step-item">
+        <div class="step-wrap">
+          <div class="step-circle" id="sc6">6</div>
+          <div class="step-label" id="sl6">Confirm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Demographics (auto-complete, shown briefly) -->
+    <div class="modal-body" id="step1">
+      <div class="modal-section-title">Demographics</div>
+      <div class="modal-section-sub">Confirming member demographics from health plan eligibility record.</div>
+      <div style="background:#F0FDF4;border:1.5px solid #BBF7D0;border-radius:10px;padding:18px 20px;margin-bottom:16px;">
+        <div style="display:flex;flex-wrap:wrap;gap:20px;">
+          <div><div class="form-label" style="margin-bottom:4px;">First Name</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoFirst">—</div></div>
+          <div><div class="form-label" style="margin-bottom:4px;">Last Name</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoLast">—</div></div>
+          <div><div class="form-label" style="margin-bottom:4px;">Date of Birth</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoDob">—</div></div>
+          <div><div class="form-label" style="margin-bottom:4px;">State</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoState">—</div></div>
+          <div><div class="form-label" style="margin-bottom:4px;">Phone</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoPhone">—</div></div>
+          <div><div class="form-label" style="margin-bottom:4px;">Email</div><div style="font-size:14px;font-weight:600;color:#111827;" id="demoEmail">—</div></div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6B7280;">Demographics pre-populated from health plan eligibility record. Member confirmed eligible as of today.</div>
+    </div>
+
+    <!-- Step 2: Register Patient -->
+    <div class="modal-body" id="step2" style="display:none">
+      <div class="modal-section-title">Register Patient</div>
+      <div class="modal-section-sub">Confirm visit state, timezone, and consent before scheduling.</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Where are you at the time of the visit? <span class="req">*</span></label>
+          <select class="form-select" id="visitState" onchange="checkStep2()">
+            <option value="">Select a state…</option>
+            <option value="FL" selected>Florida</option>
+            <option value="TX">Texas</option>
+            <option value="CA">California</option>
+            <option value="NY">New York</option>
+            <option value="WA">Washington</option>
+            <option value="CO">Colorado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Timezone <span class="req">*</span></label>
+          <select class="form-select" id="visitTz" onchange="checkStep2()">
+            <option value="">Select a timezone…</option>
+            <option value="ET">Eastern Time (US &amp; Canada)</option>
+            <option value="CT">Central Time (US &amp; Canada)</option>
+            <option value="MT">Mountain Time (US &amp; Canada)</option>
+            <option value="PT">Pacific Time (US &amp; Canada)</option>
+          </select>
+        </div>
+      </div>
+      <div class="consent-group">
+        <div class="consent-label-main">Consent to call <span class="req">*</span></div>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="consentCall" value="yes" onchange="checkStep2()"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="consentCall" value="no" onchange="checkStep2()"> No</label>
+        </div>
+      </div>
+      <div class="consent-group">
+        <div class="consent-label-main">Consent to text <span class="req">*</span></div>
+        <div class="radio-row">
+          <label class="radio-opt"><input type="radio" name="consentText" value="yes" onchange="checkStep2()"> Yes</label>
+          <label class="radio-opt"><input type="radio" name="consentText" value="no" onchange="checkStep2()"> No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Appointment Types -->
+    <div class="modal-body" id="step3" style="display:none">
+      <div class="modal-section-title">Appointment Types</div>
+      <div class="modal-section-sub">Select the type of consultation to schedule.</div>
+      <div class="appt-option selected" onclick="selectApptType(this,'EverlyCare Treat Visit')">
+        <input type="radio" name="apptType" value="EverlyCare Treat Visit" checked>
+        <div>
+          <div class="appt-option-name">EverlyCare Treat Visit</div>
+          <div class="appt-option-desc">Standard telehealth consultation — 30 minutes</div>
+        </div>
+      </div>
+      <div class="appt-option" onclick="selectApptType(this,'Genetic Counseling — Pre-Test')">
+        <input type="radio" name="apptType" value="Genetic Counseling — Pre-Test">
+        <div>
+          <div class="appt-option-name">Genetic Counseling — Pre-Test</div>
+          <div class="appt-option-desc">Pre-test genetic counseling session — 45 minutes</div>
+        </div>
+      </div>
+      <div class="appt-option" onclick="selectApptType(this,'Genetic Counseling — Post-Test')">
+        <input type="radio" name="apptType" value="Genetic Counseling — Post-Test">
+        <div>
+          <div class="appt-option-name">Genetic Counseling — Post-Test</div>
+          <div class="appt-option-desc">Results disclosure and counseling — 45 minutes</div>
+        </div>
+      </div>
+      <div class="appt-option" onclick="selectApptType(this,'Follow-Up Visit')">
+        <input type="radio" name="apptType" value="Follow-Up Visit">
+        <div>
+          <div class="appt-option-name">Follow-Up Visit</div>
+          <div class="appt-option-desc">Medication follow-up or ongoing care — 15 minutes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Providers -->
+    <div class="modal-body" id="step4" style="display:none">
+      <div class="modal-section-title">Choose a Provider</div>
+      <div class="modal-section-sub">Select a specific provider or let the system assign the first available.</div>
+      <div class="provider-option selected" onclick="selectProvider(this,'next_available','Next Available Provider','')">
+        <input type="radio" name="provider" value="next_available" checked>
+        <div class="provider-avatar" style="background:#D1FAE5;color:#065F46;">★</div>
+        <div>
+          <div class="provider-name">Next Available Provider <span class="next-available-badge">Recommended</span></div>
+          <div class="provider-cred">Earliest available slot across all licensed providers</div>
+        </div>
+      </div>
+      <div class="provider-option" onclick="selectProvider(this,'ia','Isabel Alencar','MS, CGC')">
+        <input type="radio" name="provider" value="ia">
+        <div class="provider-avatar">IA</div>
+        <div>
+          <div class="provider-name">Isabel Alencar</div>
+          <div class="provider-cred">MS, CGC — Genetic Counselor</div>
+        </div>
+      </div>
+      <div class="provider-option" onclick="selectProvider(this,'acm','Angel Colon-Molero','MS, CGC')">
+        <input type="radio" name="provider" value="acm">
+        <div class="provider-avatar">AC</div>
+        <div>
+          <div class="provider-name">Angel Colon-Molero</div>
+          <div class="provider-cred">MS, CGC — Genetic Counselor</div>
+        </div>
+      </div>
+      <div class="provider-option" onclick="selectProvider(this,'lg','Lissa Goldstein','MS, CGC')">
+        <input type="radio" name="provider" value="lg">
+        <div class="provider-avatar">LG</div>
+        <div>
+          <div class="provider-name">Lissa Goldstein</div>
+          <div class="provider-cred">MS, CGC — Genetic Counselor</div>
+        </div>
+      </div>
+      <div class="provider-option" onclick="selectProvider(this,'em','Eric Marshall','MD')">
+        <input type="radio" name="provider" value="em">
+        <div class="provider-avatar">EM</div>
+        <div>
+          <div class="provider-name">Eric Marshall</div>
+          <div class="provider-cred">MD — Internal Medicine</div>
+        </div>
+      </div>
+      <div class="provider-option" onclick="selectProvider(this,'ar','Akayla Robinson','NP')">
+        <input type="radio" name="provider" value="ar">
+        <div class="provider-avatar">AR</div>
+        <div>
+          <div class="provider-name">Akayla Robinson</div>
+          <div class="provider-cred">NP — Nurse Practitioner</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Available Dates -->
+    <div class="modal-body" id="step5" style="display:none">
+      <div class="modal-section-title">Available Dates &amp; Times</div>
+      <div class="modal-section-sub">Select a date and time slot for the appointment.</div>
+      <div class="calendar-wrap">
+        <!-- Calendar -->
+        <div class="calendar-box">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="prevMonth()">‹</button>
+            <div class="cal-month" id="calMonthLabel">June 2026</div>
+            <button class="cal-nav" onclick="nextMonth()">›</button>
+          </div>
+          <div class="cal-grid" id="calGrid">
+          </div>
+        </div>
+        <!-- Time Slots -->
+        <div class="time-box">
+          <div class="time-section-label">Evening</div>
+          <div class="time-slot" onclick="selectTime(this,'6:00 PM')">
+            <div class="time-dot"></div><div class="time-text">6:00 PM</div>
+          </div>
+          <div class="time-slot" onclick="selectTime(this,'6:30 PM')">
+            <div class="time-dot"></div><div class="time-text">6:30 PM</div>
+          </div>
+          <div class="time-slot" onclick="selectTime(this,'7:00 PM')">
+            <div class="time-dot"></div><div class="time-text">7:00 PM</div>
+          </div>
+          <div class="time-slot" onclick="selectTime(this,'7:30 PM')">
+            <div class="time-dot"></div><div class="time-text">7:30 PM</div>
+          </div>
+          <div class="tz-note">Timezone: <strong id="selectedTzDisplay">—</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6: Confirmation -->
+    <div class="modal-body" id="step6" style="display:none">
+      <div class="confirm-icon">✅</div>
+      <div class="modal-section-title" style="text-align:center;">Appointment Confirmed</div>
+      <div class="modal-section-sub" style="text-align:center;">Review the details below. Click "Book Appointment" to finalize.</div>
+      <div class="confirm-card">
+        <div class="confirm-row"><div class="confirm-label">Member</div><div class="confirm-value" id="cfMember">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Member ID</div><div class="confirm-value" id="cfMemberId">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Appointment Type</div><div class="confirm-value" id="cfApptType">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Provider</div><div class="confirm-value" id="cfProvider">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Date &amp; Time</div><div class="confirm-value" id="cfDateTime">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Timezone</div><div class="confirm-value" id="cfTz">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Visit State</div><div class="confirm-value" id="cfState">—</div></div>
+        <div class="confirm-row"><div class="confirm-label">Consent to Call</div><div class="confirm-value" id="cfConsentCall">—</div></div>
+        <div class="confirm-row" style="margin-bottom:0"><div class="confirm-label">Consent to Text</div><div class="confirm-value" id="cfConsentText">—</div></div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <div class="modal-step-indicator" id="stepIndicator">Step 1 of 6</div>
+      <div class="footer-btns">
+        <button class="btn-secondary" id="btnPrev" onclick="prevStep()" style="display:none">← Previous</button>
+        <button class="btn-primary" id="btnNext" onclick="nextStep()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% raw %}
+<script>
+// ─── DATA ───
+const PATIENTS = [
+  { id:'PT-2026-00201', first:'Marcus',  last:'Johnson', dob:'1985-04-12', phone:'(512) 555-0102', email:'marcus.j@email.com', lastConsult:'Jun 12, 2026', status:'Active' },
+  { id:'PT-2026-00188', first:'Amanda',  last:'Rivera',  dob:'1991-08-22', phone:'(310) 555-0188', email:'a.rivera@email.com',  lastConsult:'Jun 10, 2026', status:'Active' },
+  { id:'PT-2026-00174', first:'James',   last:'Park',    dob:'1978-11-05', phone:'(312) 555-0174', email:'j.park@email.com',    lastConsult:'May 28, 2026', status:'Active' },
+  { id:'PT-2026-00155', first:'Sandra',  last:'Nguyen',  dob:'2000-03-17', phone:'(206) 555-0155', email:'s.nguyen@email.com',  lastConsult:'May 14, 2026', status:'Active' },
+  { id:'PT-2026-00140', first:'Robert',  last:'Chen',    dob:'1965-07-30', phone:'(415) 555-0140', email:'r.chen@email.com',    lastConsult:'Apr 29, 2026', status:'Active' },
+];
+
+const MEMBERS = [
+  { id:'MBR-001', memberId:'H61755723', facingId:'H6175572300', first:'Sarah', last:'Thompson', dob:'1988-02-14', phone:'(813) 555-0723', email:'s.thompson@email.com', plan:'Blue Cross Blue Shield FL', eligibility:'Active', priorConsults:0 },
+  { id:'MBR-002', memberId:'H61755724', facingId:'H6175572400', first:'Michael', last:'Davis',   dob:'1975-09-22', phone:'(407) 555-0724', email:'m.davis@email.com',    plan:'UnitedHealthcare', eligibility:'Active', priorConsults:0 },
+  { id:'MBR-003', memberId:'H61755725', facingId:'H6175572500', first:'Jennifer', last:'Wilson', dob:'1993-06-11', phone:'(954) 555-0725', email:'j.wilson@email.com',   plan:'Aetna Florida', eligibility:'Active', priorConsults:0 },
+  { id:'MBR-004', memberId:'H61755726', facingId:'H6175572600', first:'David', last:'Martinez',  dob:'1981-12-30', phone:'(305) 555-0726', email:'d.martinez@email.com', plan:'Cigna', eligibility:'Inactive', priorConsults:1 },
+];
+
+// ─── BOOKING STATE ───
+let state = {
+  step: 1,
+  member: null,
+  apptType: 'EverlyCare Treat Visit',
+  provider: { id:'next_available', name:'Next Available Provider' },
+  date: null,
+  time: null,
+  tz: null,
+  visitState: null,
+  consentCall: null,
+  consentText: null,
+};
+
+// ─── RENDER PATIENT TABLE ───
+function renderPatients(data) {
+  const tbody = document.getElementById('patientTbody');
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><div class="p-name">${p.first} ${p.last}</div><div class="p-id">${p.id}</div></td>
+      <td>${p.dob}</td>
+      <td>${p.phone}</td>
+      <td>${p.lastConsult}</td>
+      <td><span class="status-pill status-active">${p.status}</span></td>
+      <td>
+        <a class="action-link" href="/scheduler/schedule">Reschedule</a>
+        <a class="action-link" href="#">View Appts</a>
+      </td>
+    </tr>`).join('');
+}
+
+function filterPatients(q) {
+  const lq = q.toLowerCase();
+  renderPatients(PATIENTS.filter(p =>
+    (p.first+' '+p.last+' '+p.id+' '+p.dob).toLowerCase().includes(lq)
+  ));
+}
+
+// ─── RENDER MEMBER TABLE ───
+function renderMembers(data) {
+  const tbody = document.getElementById('memberTbody');
+  tbody.innerHTML = data.map(m => `
+    <tr>
+      <td><div class="p-name">${m.first} ${m.last}</div><div class="p-id">DOB: ${m.dob}</div></td>
+      <td>${m.memberId}</td>
+      <td>${m.facingId}</td>
+      <td style="font-size:12px;">${m.plan}</td>
+      <td><span class="status-pill ${m.eligibility==='Active'?'status-eligible':'status-pill'}" style="${m.eligibility!=='Active'?'background:#FEE2E2;color:#B91C1C;':''}">${m.eligibility}</span></td>
+      <td style="text-align:center;color:#6B7280;">${m.priorConsults === 0 ? '<span style="font-size:11px;color:#9CA3AF;">New</span>' : m.priorConsults}</td>
+      <td>
+        ${m.eligibility === 'Active'
+          ? `<button class="book-btn" onclick="openBookModal('${m.id}')">Book Appointment</button>`
+          : `<span style="font-size:11px;color:#9CA3AF;">Ineligible</span>`}
+      </td>
+    </tr>`).join('');
+}
+
+function filterMembers(q) {
+  const lq = q.toLowerCase();
+  renderMembers(MEMBERS.filter(m =>
+    (m.first+' '+m.last+' '+m.memberId+' '+m.facingId).toLowerCase().includes(lq)
+  ));
+}
+
+// ─── TABS ───
+function switchTab(tab) {
+  document.querySelectorAll('.sch-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  if (tab === 'patient') {
+    document.querySelectorAll('.sch-tab')[0].classList.add('active');
+    document.getElementById('panelPatient').classList.add('active');
+  } else {
+    document.querySelectorAll('.sch-tab')[1].classList.add('active');
+    document.getElementById('panelMember').classList.add('active');
+  }
+}
+
+// ─── OPEN MODAL ───
+function openBookModal(memberId) {
+  const m = MEMBERS.find(x => x.id === memberId);
+  if (!m) return;
+  state = { step:1, member:m, apptType:'EverlyCare Treat Visit',
+    provider:{id:'next_available',name:'Next Available Provider'},
+    date:null, time:null, tz:null, visitState:null, consentCall:null, consentText:null };
+
+  // Set member strip
+  document.getElementById('stripMemberName').textContent = m.first + ' ' + m.last;
+  document.getElementById('stripMemberId').textContent = m.memberId;
+  document.getElementById('stripFacingId').textContent = m.facingId;
+  document.getElementById('stripPlan').textContent = m.plan;
+
+  // Set demographics
+  document.getElementById('demoFirst').textContent = m.first;
+  document.getElementById('demoLast').textContent = m.last;
+  document.getElementById('demoDob').textContent = m.dob;
+  document.getElementById('demoState').textContent = 'Florida';
+  document.getElementById('demoPhone').textContent = m.phone;
+  document.getElementById('demoEmail').textContent = m.email;
+
+  renderCalendar();
+  showStep(1);
+  document.getElementById('book-appt-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('book-appt-modal').classList.remove('open');
+}
+
+// ─── STEP NAVIGATION ───
+function showStep(n) {
+  for (let i=1; i<=6; i++) {
+    document.getElementById('step'+i).style.display = (i===n)?'block':'none';
+    const sc = document.getElementById('sc'+i);
+    const sl = document.getElementById('sl'+i);
+    sc.className = 'step-circle' + (i<n?' done':(i===n?' active':''));
+    sc.textContent = i<n ? '✓' : i;
+    sl.className = 'step-label' + (i<n?' done':(i===n?' active':''));
+    if (i<6) {
+      const line = document.getElementById('line'+i);
+      line.className = 'step-line' + (i<n?' done':'');
+    }
+  }
+  state.step = n;
+  document.getElementById('stepIndicator').textContent = 'Step '+n+' of 6';
+  document.getElementById('btnPrev').style.display = n>1 ? 'inline-block' : 'none';
+  const btnNext = document.getElementById('btnNext');
+  if (n === 6) {
+    btnNext.textContent = 'Book Appointment ✓';
+  } else {
+    btnNext.textContent = 'Next →';
+  }
+  if (n === 2) checkStep2(); else btnNext.disabled = false;
+  if (n === 6) populateConfirmation();
+}
+
+function nextStep() {
+  if (state.step === 6) { confirmBooking(); return; }
+  showStep(state.step + 1);
+}
+function prevStep() {
+  if (state.step > 1) showStep(state.step - 1);
+}
+
+// ─── STEP 2 VALIDATION ───
+function checkStep2() {
+  const s = document.getElementById('visitState').value;
+  const t = document.getElementById('visitTz').value;
+  const cc = document.querySelector('input[name=consentCall]:checked');
+  const ct = document.querySelector('input[name=consentText]:checked');
+  if (s) state.visitState = s;
+  if (t) { state.tz = t; document.getElementById('selectedTzDisplay').textContent = t === 'ET' ? 'Eastern Time (US & Canada)' : t === 'CT' ? 'Central Time' : t === 'MT' ? 'Mountain Time' : 'Pacific Time'; }
+  if (cc) state.consentCall = cc.value;
+  if (ct) state.consentText = ct.value;
+  const ok = s && t && cc && ct;
+  document.getElementById('btnNext').disabled = !ok;
+}
+
+// ─── STEP 3 ───
+function selectApptType(el, val) {
+  document.querySelectorAll('.appt-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked = true;
+  state.apptType = val;
+}
+
+// ─── STEP 4 ───
+function selectProvider(el, id, name, cred) {
+  document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked = true;
+  state.provider = { id, name: name + (cred ? ', '+cred : '') };
+}
+
+// ─── STEP 5: CALENDAR ───
+const AVAILABLE_DAYS = [18,19,22,23,24,25,26,29,30];
+let calYear = 2026, calMonth = 5; // 0-indexed: 5 = June
+
+function renderCalendar() {
+  const grid = document.getElementById('calGrid');
+  const dows = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calMonthLabel').textContent = months[calMonth] + ' ' + calYear;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+
+  let html = dows.map(d => `<div class="cal-dow">${d}</div>`).join('');
+  for (let i=0; i<firstDay; i++) html += '<div></div>';
+  for (let d=1; d<=daysInMonth; d++) {
+    const avail = (calYear===2026 && calMonth===5) ? AVAILABLE_DAYS.includes(d) : d%3===0;
+    const sel = state.date === d && calYear===2026 && calMonth===5;
+    html += `<div class="cal-day${avail?' available':''}${sel?' selected':''}" onclick="${avail?`selectDate(${d})`:''}">`;
+    html += d + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectDate(d) {
+  state.date = d;
+  renderCalendar();
+}
+function prevMonth() { calMonth--; if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function nextMonth() { calMonth++; if(calMonth>11){calMonth=0;calYear++;} renderCalendar(); }
+
+function selectTime(el, t) {
+  document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+  state.time = t;
+}
+
+// ─── STEP 6 ───
+const TZ_LABELS = { ET:'Eastern Time (US & Canada)', CT:'Central Time (US & Canada)', MT:'Mountain Time (US & Canada)', PT:'Pacific Time (US & Canada)' };
+const STATE_LABELS = { FL:'Florida', TX:'Texas', CA:'California', NY:'New York', WA:'Washington', CO:'Colorado' };
+const MONTH_LABELS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+function populateConfirmation() {
+  const m = state.member;
+  document.getElementById('cfMember').textContent = m.first + ' ' + m.last;
+  document.getElementById('cfMemberId').textContent = m.memberId;
+  document.getElementById('cfApptType').textContent = state.apptType;
+  document.getElementById('cfProvider').textContent = state.provider.name;
+  const dateStr = state.date ? MONTH_LABELS[calMonth] + ' ' + state.date + ', ' + calYear : '—';
+  document.getElementById('cfDateTime').textContent = dateStr + (state.time ? ' at ' + state.time : '');
+  document.getElementById('cfTz').textContent = TZ_LABELS[state.tz] || state.tz || '—';
+  document.getElementById('cfState').textContent = STATE_LABELS[state.visitState] || state.visitState || '—';
+  document.getElementById('cfConsentCall').textContent = state.consentCall ? (state.consentCall === 'yes' ? 'Yes' : 'No') : '—';
+  document.getElementById('cfConsentText').textContent = state.consentText ? (state.consentText === 'yes' ? 'Yes' : 'No') : '—';
+}
+
+function confirmBooking() {
+  alert('✅ Appointment booked!\n\nMember: ' + state.member.first + ' ' + state.member.last +
+    '\nProvider: ' + state.provider.name +
+    '\nType: ' + state.apptType +
+    '\nDate: ' + (state.date ? MONTH_LABELS[calMonth]+' '+state.date+', '+calYear : '—') +
+    (state.time ? ' at '+state.time : '') +
+    '\n\nThe member has been registered as a patient and an intake notification has been sent.');
+  closeModal();
+}
+
+// ─── CLOSE ON BACKDROP CLICK ───
+document.getElementById('book-appt-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── INIT ───
+renderPatients(PATIENTS);
+renderMembers(MEMBERS);
+</script>
+{% endraw %}
+{% endblock %}
+'''
+    with open(search_path, 'w') as f:
+        f.write(new_html)
+    changes.append('templates/scheduler/search_patient.html: replaced with Member Lookup + 6-step modal')
+
+print('\n── apply_book_appointment_modal_v1.py ──')
+for c in changes:
+    print('  ' + c)
+print(f'\n  {len(changes)} operation(s) complete.\n')

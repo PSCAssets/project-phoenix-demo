@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Portal — Messages (with Thread Close)</title>
+<style>
+  :root {
+    --navy: #002855; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4; --green-xlight: #E8F5F0;
+    --white: #FFFFFF; --bg: #F4F8F6; --border: #D4E4DC;
+    --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
+    --amber: #D97706; --amber-bg: #FFFBEB;
+    --red: #DC2626; --red-bg: #FEF2F2;
+    --blue: #2563EB; --blue-bg: #EFF6FF;
+    --purple: #7C3AED; --purple-bg: #EDE9FE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: var(--navy); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-prog { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-switcher { margin: 0 12px 8px; padding: 6px 10px; background: rgba(255,255,255,0.08); border-radius: 6px; font-size: 11px; color: rgba(255,255,255,0.6); cursor: pointer; }
+  .nav-section { padding: 12px 12px 4px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(62,129,104,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--green); border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+  .topbar-title { font-size: 20px; font-weight: 700; color: var(--navy); flex: 1; }
+  .notif-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--gray-light); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; position: relative; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid #fff; }
+  .btn-primary { background: var(--green); color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-secondary { background: transparent; color: var(--navy); border: 1.5px solid var(--border); border-radius: 7px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-secondary:hover { border-color: var(--navy); }
+  .msg-container { display: flex; flex: 1; overflow: hidden; }
+
+  /* THREAD LIST */
+  .thread-list { width: 320px; border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--white); flex-shrink: 0; overflow: hidden; }
+  .thread-list-header { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .thread-search { display: flex; align-items: center; gap: 8px; background: var(--gray-light); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; }
+  .thread-search input { border: none; background: transparent; font-size: 13px; color: var(--text); outline: none; width: 100%; }
+  .thread-filters { display: flex; gap: 6px; }
+  .filter-chip { padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 600; border: 1.5px solid var(--border); color: var(--gray); cursor: pointer; background: transparent; }
+  .filter-chip.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .thread-items { flex: 1; overflow-y: auto; }
+  .thread-item { padding: 12px 16px; border-bottom: 1px solid var(--gray-light); cursor: pointer; position: relative; }
+  .thread-item:hover { background: var(--gray-light); }
+  .thread-item.active { background: var(--green-xlight); border-left: 3px solid var(--green); padding-left: 13px; }
+  .thread-item.unread { border-left: 3px solid var(--navy); padding-left: 13px; }
+  .thread-item.closed { opacity: 0.65; }
+  .thread-item-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+  .thread-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .thread-avatar.green { background: var(--green); }
+  .thread-avatar.gray { background: #94A3B8; }
+  .thread-meta { flex: 1; min-width: 0; }
+  .thread-sender { font-size: 13px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .thread-time { font-size: 11px; color: var(--gray); margin-left: auto; font-weight: 400; }
+  .thread-subject { font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+  .thread-preview { font-size: 12px; color: var(--gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread-item.unread .thread-preview { font-weight: 600; color: var(--text); }
+  .thread-tags { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+  .tag { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .tag.clinical { background: var(--green-light); color: var(--green-dark); }
+  .tag.program { background: #EEF4FB; color: var(--navy); }
+  .tag.billing { background: var(--gray-light); color: var(--gray); }
+  .tag.closed-tag { background: var(--gray-light); color: var(--gray); display: flex; align-items: center; gap: 3px; }
+  .unread-dot { width: 8px; height: 8px; background: var(--navy); border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+
+  /* THREAD VIEW */
+  .thread-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+  .thread-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 14px 20px; }
+  .thread-header-row1 { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .thread-header-info { flex: 1; }
+  .thread-header-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+  .thread-header-meta { font-size: 12px; color: var(--gray); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .thread-header-tag { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+  .thread-header-tag.clinical { background: var(--green-light); color: var(--green-dark); }
+  .thread-header-tag.program { background: #EEF4FB; color: var(--navy); }
+  .thread-header-tag.closed { background: var(--gray-light); color: var(--gray); }
+
+  /* CLOSED BANNER */
+  .closed-banner { background: var(--gray-light); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; margin: 0 20px 0; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--gray); }
+  .closed-banner strong { color: var(--text); }
+  .reopen-link { margin-left: auto; font-size: 12px; color: var(--green); font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+  /* THREAD MESSAGES */
+  .thread-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .msg-bubble { max-width: 75%; }
+  .msg-bubble.patient { align-self: flex-end; }
+  .msg-bubble.provider { align-self: flex-start; }
+  .msg-sender { font-size: 11px; color: var(--gray); margin-bottom: 4px; padding: 0 4px; }
+  .msg-bubble.patient .msg-sender { text-align: right; }
+  .msg-content { padding: 12px 14px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .msg-bubble.patient .msg-content { background: var(--green); color: #fff; border-radius: 14px 14px 4px 14px; }
+  .msg-bubble.provider .msg-content { background: var(--white); color: var(--text); border: 1px solid var(--border); border-radius: 14px 14px 14px 4px; }
+  .msg-time { font-size: 11px; color: var(--gray); margin-top: 4px; padding: 0 4px; }
+  .msg-bubble.patient .msg-time { text-align: right; }
+  .sla-indicator { align-self: center; background: var(--green-xlight); border: 1px solid var(--green-light); border-radius: 8px; padding: 8px 14px; font-size: 12px; color: var(--green-dark); text-align: center; max-width: 320px; }
+
+  /* CLOSED RESOLVED EVENT */
+  .thread-event { align-self: center; display: flex; align-items: center; gap: 8px; background: var(--gray-light); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; font-size: 11px; color: var(--gray); }
+  .thread-event.resolved { background: #F0FDF4; border-color: var(--green-light); color: var(--green-dark); }
+
+  /* COMPOSE - CLOSED STATE */
+  .thread-compose { background: var(--white); border-top: 1px solid var(--border); padding: 14px 20px; }
+  .compose-row { display: flex; gap: 10px; align-items: flex-end; }
+  .compose-input { flex: 1; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 14px; font-size: 13px; font-family: inherit; resize: none; outline: none; min-height: 44px; max-height: 120px; }
+  .compose-input:focus { border-color: var(--green); }
+  .compose-input.disabled { background: var(--gray-light); color: var(--gray); cursor: not-allowed; }
+  .send-btn { width: 40px; height: 40px; background: var(--green); border: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; flex-shrink: 0; color: #fff; }
+  .send-btn.disabled { background: var(--border); cursor: not-allowed; }
+  .disclaimer { font-size: 11px; color: var(--gray); margin-top: 6px; text-align: center; }
+  .disclaimer a { color: var(--red); font-weight: 600; }
+  .closed-compose { background: var(--gray-light); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--gray); text-align: center; }
+  .closed-compose a { color: var(--green); font-weight: 600; cursor: pointer; }
+
+  /* COMPOSE PANEL */
+  .compose-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 440px; background: var(--white); border-left: 1px solid var(--border); z-index: 200; display: flex; flex-direction: column; box-shadow: -4px 0 24px rgba(0,0,0,0.12); }
+  .compose-header { padding: 18px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .compose-title { font-size: 16px; font-weight: 700; color: var(--navy); flex: 1; }
+  .compose-close { font-size: 20px; color: var(--gray); cursor: pointer; }
+  .compose-body { padding: 20px; flex: 1; overflow-y: auto; }
+  .compose-step { margin-bottom: 20px; }
+  .step-label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .step-num { width: 18px; height: 18px; border-radius: 50%; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: #fff; }
+  .step-num.done { background: var(--green); }
+  .step-num.current { background: var(--navy); }
+  .step-num.inactive { background: var(--border); color: var(--gray); }
+  .program-select { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .prog-option { border: 2px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; }
+  .prog-option.selected { border-color: var(--green); background: var(--green-xlight); }
+  .prog-option-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .prog-option-sub { font-size: 11px; color: var(--gray); }
+  .prog-option-not-sure { border: 2px solid var(--border); border-radius: 10px; padding: 10px 12px; cursor: pointer; text-align: center; color: var(--gray); font-size: 13px; margin-top: 6px; }
+  .msg-type-grid { display: flex; flex-direction: column; gap: 6px; }
+  .msg-type-btn { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; }
+  .msg-type-btn:hover { border-color: var(--green); background: var(--green-xlight); }
+  .msg-type-btn.selected { border-color: var(--green); background: var(--green-xlight); }
+  .msg-type-btn.urgent { border-color: #FCA5A5; background: var(--red-bg); }
+  .msg-type-icon { font-size: 18px; width: 30px; text-align: center; }
+  .msg-type-info { flex: 1; }
+  .msg-type-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .msg-type-name.urgent { color: var(--red); }
+  .msg-type-desc { font-size: 11px; color: var(--gray); margin-top: 1px; }
+  .compose-area { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px; font-size: 13px; font-family: inherit; color: var(--text); resize: vertical; min-height: 100px; outline: none; }
+  .compose-area:focus { border-color: var(--green); }
+  .emergency-disclaimer { font-size: 11px; color: var(--red); background: var(--red-bg); border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+  .compose-footer { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+</style>
+</head>
+<body>
+
+<!-- LEFT NAV -->
+<nav class="sidenav">
+  <div class="nav-logo"><div style="font-size:18px;font-weight:700;color:#fff;">Everlywell</div><div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;">Patient Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar">SJ</div>
+    <div><div class="nav-user-name">Sarah Johnson</div><div class="nav-user-prog">2 active programs</div></div>
+  </div>
+  <div class="nav-switcher">👤 Manage care for: Sarah</div>
+  <div class="nav-section">My Care</div>
+  <a class="nav-item" href="M03_Patient_Dashboard_Mockup_v1.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <a class="nav-item active"><span class="nav-icon">💬</span> Messages <span class="nav-badge">2</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">📅</span> Appointments</a>
+  <a class="nav-item" href="#"><span class="nav-icon">👥</span> Care Team</a>
+  <div class="nav-section">Health</div>
+  <a class="nav-item" href="M03_Patient_Health_Profile_Mockup_v1.html"><span class="nav-icon">❤️</span> Health Profile <span style="margin-left:auto;color:var(--amber);font-size:13px;">!</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">🧪</span> Labs &amp; Imaging <span class="nav-badge">1</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">💊</span> Medications</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="#"><span class="nav-icon">📄</span> Documents</a>
+  <a class="nav-item" href="#"><span class="nav-icon">🏥</span> Pharmacy</a>
+  <a class="nav-item" href="#"><span class="nav-icon">⚙️</span> Account Settings</a>
+  <div class="nav-bottom"><a class="nav-item" href="#"><span class="nav-icon">🚪</span> Sign Out</a></div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Messages</div>
+    <button class="btn-primary" onclick="document.getElementById('composePanel').style.display='flex'">+ New Message</button>
+    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+  </div>
+
+  <div class="msg-container">
+    <!-- THREAD LIST -->
+    <div class="thread-list">
+      <div class="thread-list-header">
+        <div class="thread-search"><span>🔍</span><input type="text" placeholder="Search messages…"></div>
+        <div class="thread-filters">
+          <button class="filter-chip active">All</button>
+          <button class="filter-chip">Unread</button>
+          <button class="filter-chip">Open</button>
+          <button class="filter-chip">Resolved</button>
+        </div>
+      </div>
+      <div class="thread-items">
+
+        <!-- OPEN UNREAD -->
+        <div class="thread-item unread" onclick="showClosed(false)">
+          <div class="thread-item-top">
+            <div class="thread-avatar">EC</div>
+            <div class="thread-meta">
+              <div class="thread-sender">Dr. Emily Chen, MD <div class="unread-dot"></div><span class="thread-time">9:42 AM</span></div>
+              <div class="thread-subject">Follow-up: Medication concern</div>
+              <div class="thread-preview">Hi Sarah, I wanted to check in about the side effect…</div>
+            </div>
+          </div>
+          <div class="thread-tags"><span class="tag clinical">Clinical</span><span class="tag program">A1C Management</span></div>
+        </div>
+
+        <!-- OPEN UNREAD -->
+        <div class="thread-item unread" onclick="showClosed(false)">
+          <div class="thread-item-top">
+            <div class="thread-avatar green">RN</div>
+            <div class="thread-meta">
+              <div class="thread-sender">Care Team (RN) <div class="unread-dot"></div><span class="thread-time">Yesterday</span></div>
+              <div class="thread-subject">Your A1C results are ready</div>
+              <div class="thread-preview">Your most recent lab results have been reviewed…</div>
+            </div>
+          </div>
+          <div class="thread-tags"><span class="tag clinical">Lab Results</span><span class="tag program">A1C Management</span></div>
+        </div>
+
+        <!-- RESOLVED THREAD -->
+        <div class="thread-item closed active" onclick="showClosed(true)">
+          <div class="thread-item-top">
+            <div class="thread-avatar">EC</div>
+            <div class="thread-meta">
+              <div class="thread-sender">Dr. Emily Chen, MD <span class="thread-time">May 25</span></div>
+              <div class="thread-subject">Hormone therapy check-in</div>
+              <div class="thread-preview">Everything looks on track with your current regimen…</div>
+            </div>
+          </div>
+          <div class="thread-tags"><span class="tag clinical">Clinical</span><span class="tag program">Hormone Therapy</span><span class="tag closed-tag">✓ Resolved</span></div>
+        </div>
+
+        <!-- CS THREAD -->
+        <div class="thread-item" onclick="showClosed(false)">
+          <div class="thread-item-top">
+            <div class="thread-avatar green">CS</div>
+            <div class="thread-meta">
+              <div class="thread-sender">Support Team <span class="thread-time">May 20</span></div>
+              <div class="thread-subject">Re: Billing question — April invoice</div>
+              <div class="thread-preview">Thank you for reaching out. Your April invoice…</div>
+            </div>
+          </div>
+          <div class="thread-tags"><span class="tag billing">Billing / Support</span></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- THREAD VIEW — RESOLVED STATE -->
+    <div class="thread-view" id="threadView">
+      <div class="thread-header">
+        <div class="thread-header-row1">
+          <div class="thread-header-info">
+            <div class="thread-header-title">Hormone therapy check-in</div>
+            <div class="thread-header-meta">
+              Dr. Marcus Williams, MD · Hormone Therapy
+              <span class="thread-header-tag clinical">Clinical</span>
+              <span class="thread-header-tag program">Hormone Therapy</span>
+              <span class="thread-header-tag closed">✓ Resolved</span>
+            </div>
+          </div>
+        </div>
+        <!-- CLOSED BANNER -->
+        <div class="closed-banner" id="closedBanner">
+          <span>🔒</span>
+          <div><strong>This conversation has been resolved.</strong> Your care team has closed this thread. If you have additional questions, please start a new message.</div>
+          <span class="reopen-link" onclick="alert('A request to reopen this thread has been sent to your care team.')">Request to reopen →</span>
+        </div>
+      </div>
+
+      <div class="thread-messages">
+        <div class="msg-bubble patient">
+          <div class="msg-sender">You · May 24, 2026 at 2:10 PM</div>
+          <div class="msg-content">Hi Dr. Williams, I wanted to check in on my hormone therapy progress. I've been on the current dose for 6 weeks now and am feeling much better overall. Are there any adjustments needed based on my latest labs?</div>
+          <div class="msg-time">2:10 PM · Read</div>
+        </div>
+
+        <div class="sla-indicator">✓ Message sent — our team typically responds within 24 hours during business hours.</div>
+
+        <div class="msg-bubble provider">
+          <div class="msg-sender">Dr. Marcus Williams, MD · May 25, 2026 at 10:30 AM</div>
+          <div class="msg-content">Hi Sarah, great to hear you're feeling better! I reviewed your latest hormone panel and everything looks on track. Your estradiol levels are within the therapeutic range. I'd like to keep the current dose for another 6 weeks and then reassess. Your next lab order will be coming up in about 5 weeks — please collect the specimen and we'll review at your June check-in. Keep up the great work! 🌟</div>
+          <div class="msg-time">10:30 AM</div>
+        </div>
+
+        <div class="msg-bubble patient">
+          <div class="msg-sender">You · May 25, 2026 at 11:15 AM</div>
+          <div class="msg-content">Thank you so much, Dr. Williams! That's really reassuring to hear. I'll make sure to get the lab done on time. See you at the June check-in!</div>
+          <div class="msg-time">11:15 AM · Read</div>
+        </div>
+
+        <!-- RESOLVED EVENT -->
+        <div class="thread-event resolved">
+          ✓ Dr. Marcus Williams resolved this conversation · May 25 at 11:20 AM
+        </div>
+      </div>
+
+      <!-- CLOSED COMPOSE STATE -->
+      <div class="thread-compose">
+        <div class="closed-compose">
+          🔒 This conversation has been resolved and is now read-only.<br>
+          <a onclick="document.getElementById('composePanel').style.display='flex'">Start a new message</a> if you have additional questions.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPOSE PANEL -->
+<div id="composePanel" class="compose-panel" style="display:none;">
+  <div class="compose-header">
+    <div class="compose-title">New Message</div>
+    <span class="compose-close" onclick="document.getElementById('composePanel').style.display='none'">×</span>
+  </div>
+  <div class="compose-body">
+    <div class="compose-step">
+      <div class="step-label"><span class="step-num done">1</span> Select your care program</div>
+      <div class="program-select">
+        <div class="prog-option selected"><div class="prog-option-name">A1C Management</div><div class="prog-option-sub">Dr. Emily Chen, MD</div></div>
+        <div class="prog-option"><div class="prog-option-name">Hormone Therapy</div><div class="prog-option-sub">Dr. Marcus Williams, MD</div></div>
+      </div>
+      <div class="prog-option-not-sure">🤷 General / Not Sure — route to care team</div>
+    </div>
+    <div class="compose-step">
+      <div class="step-label"><span class="step-num current">2</span> What type of message is this?</div>
+      <div class="msg-type-grid">
+        <div class="msg-type-btn selected"><div class="msg-type-icon">💬</div><div class="msg-type-info"><div class="msg-type-name">General Message</div><div class="msg-type-desc">General question for your provider</div></div></div>
+        <div class="msg-type-btn"><div class="msg-type-icon">💊</div><div class="msg-type-info"><div class="msg-type-name">Prescription Question</div><div class="msg-type-desc">Questions about your medication</div></div></div>
+        <div class="msg-type-btn"><div class="msg-type-icon">🧪</div><div class="msg-type-info"><div class="msg-type-name">Lab Question</div><div class="msg-type-desc">Questions about results or orders</div></div></div>
+        <div class="msg-type-btn"><div class="msg-type-icon">📚</div><div class="msg-type-info"><div class="msg-type-name">Education Question</div><div class="msg-type-desc">Questions about your care program</div></div></div>
+        <div class="msg-type-btn urgent"><div class="msg-type-icon">🚨</div><div class="msg-type-info"><div class="msg-type-name urgent">Adverse Effect</div><div class="msg-type-desc">Urgent — symptoms or reactions</div></div></div>
+      </div>
+    </div>
+    <div class="compose-step">
+      <div class="step-label"><span class="step-num inactive">3</span> Write your message</div>
+      <textarea class="compose-area" placeholder="Describe your question or concern…"></textarea>
+      <div class="emergency-disclaimer">🚨 If you are experiencing a medical emergency, call 911 immediately. Do not use this form for emergencies.</div>
+    </div>
+  </div>
+  <div class="compose-footer">
+    <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('composePanel').style.display='none'">Cancel</button>
+    <button class="btn-primary" style="flex:2;">Send Message →</button>
+  </div>
+</div>
+
+<script>
+function showClosed(closed) {
+  const banner = document.getElementById('closedBanner');
+  const compose = document.querySelector('.thread-compose');
+  if (closed) {
+    banner.style.display = 'flex';
+    compose.querySelector('.closed-compose').style.display = 'block';
+    compose.querySelector('.compose-row') && (compose.querySelector('.compose-row').style.display = 'none');
+  }
+}
+</script>
+</body>
+</html>

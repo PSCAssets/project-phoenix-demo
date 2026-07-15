@@ -1,92 +1,98 @@
 {% extends "base.html" %}
-{% block title %}Care Team Queue — Telehealth{% endblock %}
+{% block title %}Care Team Queue — PSS{% endblock %}
+
 {% block head %}
 <style>
-:root { --psr:#059669;--psr-dark:#047857;--psr-light:#ECFDF5;--psr-border:#6EE7B7;--amber:#D97706;--amber-bg:#FFFBEB;--red:#DC2626;--red-bg:#FEF2F2;--sidebar-w:220px; }
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;font-size:13px;background:#FAF7F2;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
-main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:hidden;min-height:0;}
-.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
-.topbar{height:56px;background:#fff;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;}
-.topbar-title{font-size:16px;font-weight:800;color:#111827;}
-.topbar-badge{background:var(--psr-light);color:var(--psr);font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;border:1px solid var(--psr-border);}
-.topbar-right{margin-left:auto;display:flex;gap:10px;align-items:center;}
-.body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+  :root {
+    --psr: #059669;
+    --psr-light: #ECFDF5;
+    --psr-border: #6EE7B7;
+    --navy: #6B21A8;
+    --blue-light: #F2EDE4;
+    --amber: #D97706;
+    --amber-light: #FEF3C7;
+    --red: #DC2626;
+    --red-light: #FEF2F2;
+    --bg: #FAF7F2;
+    --border: #E5E0D8;
+    --white: #FFFFFF;
+    --ct-green: #059669;
+    --ct-green-light: #D1FAE5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; font-size: 13px; background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  main.main-content { margin-left: 56px; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
 
-/* Filter bar */
-.filter-bar{background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.filter-label{font-size:11px;font-weight:700;color:#6B7280;}
-.filter-btn{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid #E5E0D8;background:#fff;color:#374151;cursor:pointer;transition:all .15s;}
-.filter-btn.active{border-color:var(--psr);background:var(--psr-light);color:var(--psr);}
-.filter-select{border:1px solid #E5E0D8;border-radius:8px;padding:5px 10px;font-size:12px;color:#374151;}
-.filter-count{margin-left:auto;font-size:12px;color:#6B7280;font-weight:600;}
+  /* Topbar */
+  .topbar { height: 56px; background: #fff; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; }
+  .topbar-title { font-size: 16px; font-weight: 800; color: #111827; }
+  .topbar-badge { background: var(--psr-light); color: var(--psr); font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; border: 1px solid var(--psr-border); }
+  .topbar-right { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+  .btn-secondary { background: #fff; border: 1.5px solid var(--border); border-radius: 7px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #374151; cursor: pointer; font-family: inherit; }
+  .btn-secondary:hover { border-color: var(--navy); color: var(--navy); }
 
-/* Table */
-.section{background:#fff;border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;}
-.q-table{width:100%;border-collapse:collapse;}
-.q-table th{padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;background:#F9FAFB;border-bottom:1px solid #E5E0D8;white-space:nowrap;}
-.q-table td{padding:11px 14px;font-size:13px;color:#374151;border-bottom:1px solid #E5E0D8;vertical-align:middle;}
-.q-table tr:last-child td{border-bottom:none;}
-.q-table tr.priority-hi{background:#FFFBEB;}
-.q-table tr.exhausted-row{opacity:.6;background:#F9FAFB;}
-.q-table tr.closed-row{opacity:.4;}
+  /* Body */
+  .body { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 
-/* Badges */
-.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;}
-.badge-err{background:var(--red-bg);color:var(--red);border:1px solid #FCA5A5;}
-.badge-warn{background:var(--amber-bg);color:var(--amber);border:1px solid #FCD34D;}
-.badge-ok{background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;}
-.badge-gray{background:#F3F4F6;color:#6B7280;border:1px solid #D1D5DB;}
-.badge-hipaa{background:#EDE9FE;color:#5B21B6;border:1px solid #C4B5FD;font-size:10px;}
-.badge-psr{background:var(--psr-light);color:var(--psr);border:1px solid var(--psr-border);}
+  /* Page desc */
+  .page-desc { font-size: 13px; color: #6B7280; line-height: 1.5; }
 
-/* Attempt indicators */
-.attempt-dots{display:flex;gap:4px;align-items:center;}
-.dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
-.dot-done{background:var(--psr);}
-.dot-miss{background:#D1D5DB;}
-.dot-fail{background:var(--red);}
+  /* Toolbar */
+  .queue-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 300px; }
+  .search-wrap input { width: 100%; padding: 7px 10px 7px 32px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 13px; background: #fff; outline: none; }
+  .search-wrap input:focus { border-color: var(--navy); }
+  .search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); pointer-events: none; }
+  .filter-select { border: 1.5px solid var(--border); border-radius: 7px; padding: 6px 10px; font-size: 13px; color: #374151; background: #fff; cursor: pointer; outline: none; }
+  .filter-select:focus { border-color: var(--navy); }
 
-/* Buttons */
-.btn-primary{background:var(--psr);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;}
-.btn-primary:hover{background:var(--psr-dark);}
-.btn-secondary{background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer;}
-.btn-secondary:hover{background:#F9FAFB;}
-.btn-close{background:#EF4444;color:#fff;border:none;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;}
+  /* Widget */
+  .widget { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .widget-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .widget-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .chip-red { background: var(--red-light); color: var(--red); }
+  .sort-hint { font-size: 11px; color: #6B7280; margin-left: auto; font-weight: 400; }
 
-/* Modal */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center;}
-.overlay.open{display:flex;}
-.modal{background:#fff;border-radius:12px;width:540px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.18);}
-.modal-header{padding:18px 22px 14px;border-bottom:1px solid #E5E0D8;display:flex;align-items:flex-start;gap:12px;}
-.modal-title{font-size:15px;font-weight:700;color:#111827;}
-.modal-sub{font-size:12px;color:#6B7280;margin-top:2px;}
-.modal-close{margin-left:auto;background:none;border:none;font-size:20px;color:#9CA3AF;cursor:pointer;}
-.modal-body{padding:18px 22px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
-.modal-footer{padding:14px 22px;border-top:1px solid #E5E0D8;display:flex;gap:10px;justify-content:flex-end;}
-.form-group{display:flex;flex-direction:column;gap:5px;}
-.form-label{font-size:11px;font-weight:700;color:#374151;}
-.form-select,.form-input{border:1px solid #E5E0D8;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:#111827;background:#fff;}
-.form-select:focus,.form-input:focus{outline:none;border-color:var(--psr);box-shadow:0 0 0 2px rgba(5,150,105,.1);}
-.hipaa-check{background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px 16px;}
-.hipaa-title{font-size:12px;font-weight:700;color:#92400E;margin-bottom:10px;}
-.hipaa-item{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;}
-.hipaa-item input{accent-color:var(--psr);width:15px;height:15px;}
-.warn-box{background:var(--red-bg);border:1px solid #FCA5A5;border-radius:8px;padding:11px 14px;font-size:12px;color:#7F1D1D;line-height:1.6;}
-.info-box{background:var(--psr-light);border:1px solid var(--psr-border);border-radius:8px;padding:11px 14px;font-size:12px;color:#065F46;line-height:1.6;}
+  /* Table */
+  .queue-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 9px 12px; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; background: #FAF7F2; border-bottom: 1px solid var(--border); white-space: nowrap; user-select: none; cursor: pointer; }
+  thead th:hover { background: #F2EDE4; }
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+  tbody tr { border-bottom: 1px solid #F5F0EA; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #FAF7F2; }
+  tbody td { padding: 10px 12px; vertical-align: middle; }
+  .pri-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .pri-critical { background: #DC2626; }
+  .pri-high { background: #D97706; }
+  .pri-normal { background: var(--ct-green); }
+  .urgency-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .urg-critical { background: var(--red-light); color: var(--red); }
+  .urg-high { background: var(--amber-light); color: var(--amber); }
+  .urg-normal { background: var(--ct-green-light); color: var(--ct-green); }
+  .action-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #6B21A8; background: transparent; color: #6B21A8; white-space: nowrap; }
+  .action-btn:hover { background: #6B21A8; color: #fff; }
+  .action-btn.green-btn { border-color: var(--ct-green); color: var(--ct-green); }
+  .action-btn.green-btn:hover { background: var(--ct-green); color: #fff; }
+  .cat-tag { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .cat-followup { background: var(--amber-light); color: #92400E; }
+  .cat-coord   { background: #F3E8FF; color: #6D28D9; }
+  .cat-edu     { background: var(--blue-light); color: var(--navy); }
+  .cat-async   { background: var(--ct-green-light); color: var(--ct-green); }
+  .patient-name { font-weight: 500; }
+  .consult-id { font-size: 11px; color: #6B7280; }
+  .empty-state { padding: 48px 24px; text-align: center; color: #6B7280; font-size: 14px; }
 
-.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:600;opacity:0;transform:translateY(10px);transition:all .3s;z-index:2000;pointer-events:none;}
-.toast.show{opacity:1;transform:translateY(0);}
-.badge-self-sched{background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;}
-.timing-card{flex:1;border:2px solid #E5E0D8;border-radius:8px;padding:12px;cursor:pointer;text-align:center;transition:all .15s;background:#fff;}
-.timing-card:hover{border-color:#6EE7B7;background:#F0FDF4;}
-.timing-card.selected{border-color:#059669;background:#F0FDF4;}
-.sched-slot{display:inline-block;padding:4px 10px;border:1.5px solid #E5E0D8;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;margin:2px;background:#fff;color:#374151;}
-.sched-slot:hover{border-color:#059669;color:#059669;}
-.sched-slot.slot-sel{border-color:#059669;background:#059669;color:#fff;}
-.sched-slot.slot-busy{opacity:.4;cursor:default;color:#9CA3AF;text-decoration:line-through;}
+  /* Toast */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #111827; color: #fff; border-radius: 10px; padding: 12px 18px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all .3s; z-index: 2000; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
 </style>
 {% endblock %}
+
 {% block content %}
 
 <div class="main">
@@ -94,553 +100,312 @@ main.main-content{margin-left:56px;display:flex;flex-direction:column;overflow:h
     <div class="topbar-title">Care Team Queue</div>
     <span class="topbar-badge">PSS — EverlyCare + DXS</span>
     <div class="topbar-right">
-      <span style="font-size:12px;color:#6B7280;"><span id="pendingCount">14</span> pending · <span id="exhaustedCount">3</span> exhausted</span>
+      <button style="background:#DC2626;color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;" onclick="openUrgentPanel()">🚨 Urgent <span style="background:rgba(255,255,255,0.25);border-radius:8px;padding:1px 6px;">2</span></button>
       <button class="btn-secondary" onclick="window.location.href='/care-team/psr'">← Dashboard</button>
     </div>
   </div>
 
   <div class="body">
-    <!-- Search + Filter bar -->
-    <div class="filter-bar" style="flex-wrap:wrap;gap:10px;">
-      <input class="form-input" id="queueSearch" placeholder="🔍  Search patient, client, or ID…" style="width:220px;padding:6px 10px;font-size:12px;" oninput="applyAllFilters()">
-      <div style="width:1px;background:#E5E0D8;height:24px;flex-shrink:0;"></div>
-      <span class="filter-label">Status:</span>
-      <button class="filter-btn active" onclick="applyFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="applyFilter('pending',this)">Pending</button>
-      <button class="filter-btn" onclick="applyFilter('attempt2',this)">2nd Attempt</button>
-      <button class="filter-btn" onclick="applyFilter('attempt3',this)">3rd Attempt</button>
-      <button class="filter-btn" onclick="applyFilter('exhausted',this)" style="color:var(--red);border-color:#FCA5A5;">Exhausted</button>
-      <button class="filter-btn" onclick="applyFilter('selfschedule',this)" style="color:#92400E;border-color:#FCD34D;">⏳ Self-Schedule</button>
-      <button class="filter-btn" onclick="applyFilter('closed',this)">Closed Today</button>
-      <div style="width:1px;background:#E5E0D8;height:24px;flex-shrink:0;"></div>
-      <select class="filter-select" id="filterClient" onchange="applyAllFilters()">
-        <option value="">All clients</option>
-        <option>Humana / EverlyCare</option>
-        <option>Quest / EW</option>
-        <option>Grail / Elevance</option>
-        <option>Everlywell Direct</option>
-        <option>Fulgent Genetics</option>
+
+    <p class="page-desc">All unassigned tasks across the care team. Pull any task directly or route it to a specific team member. Tasks assigned to you also appear on <a href="/care-team/psr" style="color:#6B21A8;font-weight:600;">PSS Dashboard</a>.</p>
+
+    <!-- Toolbar -->
+    <div class="queue-toolbar">
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="queueSearch" placeholder="Search patient, ID, care product…" oninput="filterQueue()" />
+      </div>
+      <select class="filter-select" id="urgencyFilter" onchange="filterQueue()">
+        <option value="">All Urgencies</option>
+        <option value="CRITICAL">Critical</option>
+        <option value="HIGH">High</option>
+        <option value="NORMAL">Normal</option>
       </select>
-      <select class="filter-select" id="filterState" onchange="applyAllFilters()">
-        <option value="">All states</option>
-        <option>CA</option><option>FL</option><option>GA</option><option>IL</option>
-        <option>MA</option><option>NY</option><option>NJ</option><option>PA</option>
-        <option>TX</option><option>VA</option><option>WA</option>
+      <select class="filter-select" id="categoryFilter" onchange="filterQueue()">
+        <option value="">All Task Types</option>
+        <option value="No Show">No Show</option>
+        <option value="Reschedule">Reschedule Appointment</option>
+        <option value="Pharmacy">Pharmacy Question</option>
+        <option value="Billing">Billing Issue</option>
+        <option value="Product">Product Question</option>
       </select>
-      <select class="filter-select" id="filterResult" onchange="applyAllFilters()">
-        <option value="">All result types</option>
-        <option>Abnormal</option>
-        <option>Borderline</option>
-        <option>Normal</option>
+      <select class="filter-select" id="sourceFilter" onchange="filterQueue()">
+        <option value="">All Sources</option>
+        <option value="auto">⚡ Auto-Generated</option>
+        <option value="manual">Manual</option>
       </select>
-      <span class="filter-count" id="filterCount" style="margin-left:auto;">Showing 14 records</span>
     </div>
 
-    <!-- Queue Table -->
-    <div class="section">
-      <table class="q-table" id="queueTable">
-        <thead>
-          <tr>
-            <th>Patient</th>
-            <th>Care Product</th>
-            <th>Result Type</th>
-            <th>Client</th>
-            <th>State</th>
-            <th>HIPAA</th>
-            <th>Attempts</th>
-            <th>Last Attempt</th>
-            <th>Days Open</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="queueTbody">
-          <!-- Pending / New -->
-          <tr class="priority-hi" data-status="pending">
-            <td>M.J. · 45F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td>
-            <td><span class="badge badge-warn">Pending</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('M.J., 45F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('M.J., 45F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',0,null)">View</button></td>
-          </tr>
-          <tr data-status="pending">
-            <td>A.K. · 38F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>CA</td>
-            <td><span class="badge badge-warn">Pending</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('A.K., 38F','STI Panel','Abnormal','EW Direct','CA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('A.K., 38F','STI Panel','Abnormal','EW Direct','CA',0,null)">View</button></td>
-          </tr>
-          <tr data-status="pending">
-            <td>C.L. · 29F</td><td>A1C Management</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>NY</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>—</td><td>0</td><td><span class="badge badge-err">New</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('C.L., 29F','A1C Management','Borderline','Humana / EW','NY',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('C.L., 29F','A1C Management','Borderline','Humana / EW','NY',0,null)">View</button></td>
-          </tr>
-          <!-- 2nd Attempt -->
-          <tr class="priority-hi" data-status="attempt2">
-            <td>R.S. · 62M</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>FL</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>Today 8:12 AM</td><td>1</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('R.S., 62M','Galleri Multi-Cancer','Abnormal','Grail / Elevance','FL',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('R.S., 62M','Galleri Multi-Cancer','Abnormal','Grail / Elevance','FL',1,'CST-2026-10847 · Video Call · Pending Scheduling')">View</button></td>
-          </tr>
-          <tr data-status="attempt2">
-            <td>P.W. · 71F</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>TX</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>Yesterday 3:41 PM</td><td>2</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('P.W., 71F','Annual Wellness Visit','Borderline','Humana / EW','TX',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('P.W., 71F','Annual Wellness Visit','Borderline','Humana / EW','TX',1,null)">View</button></td>
-          </tr>
-          <tr data-status="attempt2">
-            <td>G.R. · 54M</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>NJ</td>
-            <td><span class="badge badge-warn">Pending</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>Today 9:05 AM</td><td>1</td><td><span class="badge badge-warn">Attempt 2</span></td>
-            <td><button class="btn-primary" onclick="openCallModal('G.R., 54M','STI Panel','Abnormal','EW Direct','NJ',1)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('G.R., 54M','STI Panel','Abnormal','EW Direct','NJ',1,null)">View</button></td>
-          </tr>
-          <!-- 3rd Attempt -->
-          <tr class="priority-hi" data-status="attempt3">
-            <td>T.B. · 51M</td><td>Thyroid Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Humana / EW</td><td>TX</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td>
-            <td>Today 8:50 AM</td><td>3</td><td><span class="badge" style="background:#FEF2F2;color:#7F1D1D;border:1px solid #FCA5A5;">Final Attempt</span></td>
-            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('T.B., 51M','Thyroid Panel','Abnormal','Humana / EW','TX',2)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('T.B., 51M','Thyroid Panel','Abnormal','Humana / EW','TX',2,null)">View</button></td>
-          </tr>
-          <tr data-status="attempt3">
-            <td>D.N. · 43F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>IL</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td>
-            <td>Yesterday 2:00 PM</td><td>4</td><td><span class="badge" style="background:#FEF2F2;color:#7F1D1D;border:1px solid #FCA5A5;">Final Attempt</span></td>
-            <td><button class="btn-primary" style="background:var(--red);" onclick="openCallModal('D.N., 43F','Hereditary Cancer Panel','Abnormal','Quest / EW','IL',2)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('D.N., 43F','Hereditary Cancer Panel','Abnormal','Quest / EW','IL',2,null)">View</button></td>
-          </tr>
-          <!-- More pending -->
-          <tr data-status="pending"><td>H.O. · 36F</td><td>A1C Management</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>GA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('H.O., 36F','A1C Management','Borderline','Humana / EW','GA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('H.O., 36F','A1C Management','Borderline','Humana / EW','GA',0,null)">View</button></td></tr>
-          <tr data-status="pending"><td>E.T. · 59M</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>VA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('E.T., 59M','Annual Wellness Visit','Borderline','Humana / EW','VA',0,null)">View</button></td></tr>
-          <tr data-status="pending"><td>F.M. · 47F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>WA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('F.M., 47F','STI Panel','Abnormal','EW Direct','WA',0,null)">View</button></td></tr>
-          <tr data-status="pending"><td>J.V. · 44M</td><td>Thyroid Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>MA</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-miss"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>—</td><td>0</td><td><span class="badge badge-err">New</span></td><td><button class="btn-primary" onclick="openCallModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0)">Log Call</button> <button class="btn-secondary" onclick="openPatientModal('J.V., 44M','Thyroid Panel','Abnormal','EW Direct','MA',0,null)">View</button></td></tr>
-          <!-- Pending Self-Schedule (ticket open, 1 BD follow-up) -->
-          <tr data-status="selfschedule" style="background:#FFFBEB;">
-            <td>L.P. · 42F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>Today 9:15 AM</td><td>1</td>
-            <td><span class="badge badge-self-sched">⏳ Self-Schedule</span><br><span style="font-size:10px;color:#92400E;margin-top:2px;display:block;">Follow-up: Jul 15</span></td>
-            <td><button class="btn-secondary" onclick="openPatientModal('L.P., 42F','Hereditary Cancer Panel','Abnormal','Quest / EW','NY',1,'selfschedule')">View</button></td>
-          </tr>
-          <tr data-status="selfschedule" style="background:#FFFBEB;">
-            <td>V.R. · 55F</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>NJ</td>
-            <td><span class="badge badge-hipaa">✓ Verified</span></td>
-            <td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td>
-            <td>Yesterday 4:02 PM</td><td>2</td>
-            <td><span class="badge badge-self-sched">⏳ Self-Schedule</span><br><span style="font-size:10px;color:#DC2626;font-weight:700;margin-top:2px;display:block;">⚠ Overdue: Jul 14</span></td>
-            <td><button class="btn-primary" style="background:var(--amber);" onclick="openCallModal('V.R., 55F','Galleri Multi-Cancer','Abnormal','Grail / Elevance','NJ',1)">Follow Up</button> <button class="btn-secondary" onclick="openPatientModal('V.R., 55F','Galleri Multi-Cancer','Abnormal','Grail / Elevance','NJ',1,'selfschedule')">View</button></td>
-          </tr>
-          <!-- Exhausted -->
-          <tr class="exhausted-row" data-status="exhausted"><td>S.L. · 67F</td><td>Hereditary Cancer Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>Quest / EW</td><td>NY</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>2 days ago</td><td>5</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 25')">Letter Sent ✓</button></td></tr>
-          <tr class="exhausted-row" data-status="exhausted"><td>B.W. · 78M</td><td>Galleri Multi-Cancer</td><td><span class="badge badge-err">Abnormal</span></td><td>Grail / Elevance</td><td>FL</td><td><span class="badge badge-warn">Pending</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>3 days ago</td><td>6</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 24')">Letter Sent ✓</button></td></tr>
-          <tr class="exhausted-row" data-status="exhausted"><td>N.A. · 52F</td><td>Annual Wellness Visit</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>CA</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-fail"></div><div class="dot dot-fail"></div><div class="dot dot-fail"></div></div></td><td>1 day ago</td><td>4</td><td><span class="badge badge-gray">Exhausted</span></td><td><button class="btn-secondary" onclick="showToast('Certified letter sent Jun 26')">Letter Sent ✓</button></td></tr>
-          <!-- Closed -->
-          <tr class="closed-row" data-status="closed"><td>K.P. · 34F</td><td>STI Panel</td><td><span class="badge badge-err">Abnormal</span></td><td>EW Direct</td><td>NY</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-miss"></div><div class="dot dot-miss"></div></div></td><td>Today 8:03 AM</td><td>1</td><td><span class="badge badge-ok">Consult Scheduled</span></td><td><span style="font-size:12px;color:#6B7280;">Closed</span></td></tr>
-          <tr class="closed-row" data-status="closed"><td>O.M. · 49M</td><td>Thyroid Panel</td><td><span class="badge badge-warn">Borderline</span></td><td>Humana / EW</td><td>TX</td><td><span class="badge badge-hipaa">✓ Verified</span></td><td><div class="attempt-dots"><div class="dot dot-done"></div><div class="dot dot-done"></div><div class="dot dot-miss"></div></div></td><td>Today 7:55 AM</td><td>2</td><td><span class="badge badge-ok">Reached — Declined</span></td><td><span style="font-size:12px;color:#6B7280;">Closed</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+    <div class="widget">
+      <div class="widget-header">
+        <h2 class="widget-title">Unassigned Tasks</h2>
+        <span class="chip chip-red" id="queueCount">5 items</span>
+        <span class="sort-hint">Click headers to sort · SLA timer shows time in queue</span>
+      </div>
+      <div class="queue-table-wrap">
+        <table id="ctUnassignedTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable('ctUnassignedTable',0)">Pri <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',1)">Patient <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',2)">Consult ID <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',3)">Category <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',4)">Task Type <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',5)">Care Product <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',6)">Urgency <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctUnassignedTable',7)">Wait <span class="sort-arrow">↕</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="queueBody">
 
-<!-- Patient Detail Modal -->
-<div class="overlay" id="patientModal">
-  <div class="modal" style="width:580px;">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="ptModalName">Patient Record</div>
-        <div class="modal-sub" id="ptModalSub"></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('patientModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <!-- Demographics -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
-          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">CLIENT / PARTNER</div>
-          <div style="font-size:13px;font-weight:600;color:#111827;" id="ptClient">—</div>
-        </div>
-        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
-          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">STATE</div>
-          <div style="font-size:13px;font-weight:600;color:#111827;" id="ptState">—</div>
-        </div>
-        <div style="background:#F9FAFB;border:1px solid #E5E0D8;border-radius:8px;padding:10px;">
-          <div style="font-size:10px;font-weight:700;color:#6B7280;margin-bottom:4px;">RESULT STATUS</div>
-          <div style="font-size:13px;font-weight:600;" id="ptResult">—</div>
-        </div>
-      </div>
-      <!-- Test Info -->
-      <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
-        <div style="background:#F3F4F6;padding:9px 14px;font-size:11px;font-weight:700;color:#374151;border-bottom:1px solid #E5E0D8;">TEST &amp; RESULT DETAILS</div>
-        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;">
-          <div style="display:flex;justify-content:space-between;font-size:12px;">
-            <span style="color:#6B7280;">Care Product</span>
-            <span style="font-weight:600;color:#111827;" id="ptProduct">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;">
-            <span style="color:#6B7280;">Lab Resulted</span>
-            <span style="font-weight:600;color:#111827;" id="ptLabDate">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;">
-            <span style="color:#6B7280;">Ordering Provider</span>
-            <span style="font-weight:600;color:#111827;" id="ptProvider">—</span>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:12px;">
-            <span style="color:#6B7280;">SLA Deadline</span>
-            <span style="font-weight:600;" id="ptSla">—</span>
-          </div>
-        </div>
-      </div>
-      <!-- Call History -->
-      <div style="border:1px solid #E5E0D8;border-radius:8px;overflow:hidden;">
-        <div style="background:#F3F4F6;padding:9px 14px;font-size:11px;font-weight:700;color:#374151;border-bottom:1px solid #E5E0D8;">OUTBOUND CALL HISTORY</div>
-        <div id="ptCallHistory" style="padding:12px 14px;font-size:12px;color:#374151;line-height:1.8;">—</div>
-      </div>
-      <!-- Consult Status -->
-      <div id="ptConsultSection" style="border-radius:8px;padding:12px 14px;font-size:12px;display:none;">
-        <div style="font-weight:700;margin-bottom:4px;" id="ptConsultTitle">📋 Active Consult Request</div>
-        <div id="ptConsultDetail">—</div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('patientModal')">Close</button>
-      <button class="btn-primary" id="ptLogCallBtn">📞 Log Call for This Patient</button>
-    </div>
-  </div>
-</div>
+            <!-- No Show — CRITICAL -->
+            <tr data-urgency="CRITICAL" data-category="No Show" data-source="manual" data-task="CT001">
+              <td><span class="pri-dot pri-critical"></span></td>
+              <td><span class="patient-name">S.R.</span></td>
+              <td><span class="consult-id">CST-2026-10871</span></td>
+              <td><span class="cat-tag cat-followup">No Show</span></td>
+              <td>No Show</td>
+              <td>Thyroid Program</td>
+              <td><span class="urgency-tag urg-critical">CRITICAL</span></td>
+              <td>1h 12m</td>
+              <td>
+                <button class="action-btn green-btn" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();takeTask(this,'CT001')">Take</button>
+                <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+                <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();viewTask('CT001')">View</button>
+              </td>
+            </tr>
 
-<!-- Log Call Modal -->
-<div class="overlay" id="callModal">
-  <div class="modal">
-    <div class="modal-header">
-      <div>
-        <div class="modal-title" id="callModalTitle">Log Call</div>
-        <div class="modal-sub" id="callModalSub"></div>
-      </div>
-      <button class="modal-close" onclick="closeModal('callModal')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="hipaa-check" id="hipaaSection">
-        <div class="hipaa-title">⚠️ HIPAA 3-Point Verification — Required Before Sharing Results</div>
-        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
-          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv1"> Full legal name confirmed</span>
-          <span id="hvName" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
-        </label>
-        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
-          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv2"> Date of birth confirmed</span>
-          <span id="hvDOB" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
-        </label>
-        <label class="hipaa-item" style="justify-content:space-between;align-items:center;">
-          <span style="display:flex;align-items:center;gap:8px;"><input type="checkbox" id="hv3"> ZIP code or last 4 SSN confirmed</span>
-          <span id="hvZIP" style="font-size:12px;font-weight:700;color:#1F2937;background:#FEF9EE;border:1px solid #FDE68A;border-radius:5px;padding:2px 8px;white-space:nowrap;">—</span>
-        </label>
-        <p style="font-size:11px;color:#92400E;margin-top:8px;">If unable to verify, select "Unable to Verify Identity" and do not share result details.</p>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Call Outcome <span style="color:#EF4444">*</span></label>
-        <select class="form-select" id="callOutcome" onchange="outcomeChanged()">
-          <option value="">— Select outcome —</option>
-          <option value="reached">Reached — Patient Answered</option>
-          <option value="voicemail">Left Voicemail</option>
-          <option value="no_answer">No Answer</option>
-          <option value="wrong_number">Wrong Number</option>
-          <option value="no_verify">Unable to Verify Identity (HIPAA)</option>
-          <option value="declined">Patient Declined Consult Offer</option>
-          <option value="portal_notified">Reached — Patient Directed to Portal</option>
-        </select>
-      </div>
-      <div id="schedulingSection" style="display:none;">
-        <!-- Patient Portal — Next Steps -->
-        <div class="form-group">
-          <label class="form-label">Patient Portal — Next Steps</label>
-          <div style="display:flex;flex-direction:column;gap:7px;">
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="directed"> Patient directed to portal to select consult type</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="confirmed"> Patient confirmed portal access &amp; will log in</label>
-            <label style="display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;"><input type="radio" name="portalNextStep" value="escalate"> Patient needs portal registration assistance — escalate</label>
-          </div>
-        </div>
-        <!-- Initiate Consult — On Demand / Scheduled cards -->
-        <div class="form-group">
-          <label class="form-label">Initiate Consult</label>
-          <div style="display:flex;gap:10px;">
-            <div id="psrCardOD" onclick="selectConsultType('ondemand')" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .15s;text-align:center;background:#fff;">
-              <div style="font-size:24px;margin-bottom:6px;">⚡</div>
-              <div style="font-size:13px;font-weight:700;color:#059669;">On Demand</div>
-              <div style="font-size:10px;color:#6B7280;margin-top:4px;line-height:1.5;">Immediate connection<br>Portal link sent to patient</div>
-            </div>
-            <div id="psrCardSched" onclick="selectConsultType('scheduled')" style="flex:1;border:2px solid #E5E7EB;border-radius:10px;padding:16px 12px;cursor:pointer;transition:all .15s;text-align:center;background:#fff;">
-              <div style="font-size:24px;margin-bottom:6px;">📅</div>
-              <div style="font-size:13px;font-weight:700;color:#7C3AED;">Scheduled</div>
-              <div style="font-size:10px;color:#6B7280;margin-top:4px;line-height:1.5;">Opens scheduling wizard<br>State-filtered provider slots</div>
-            </div>
-          </div>
-        </div>
+            <!-- Reschedule — HIGH -->
+            <tr data-urgency="HIGH" data-category="Reschedule" data-source="manual" data-task="CT002">
+              <td><span class="pri-dot pri-high"></span></td>
+              <td><span class="patient-name">D.M.</span></td>
+              <td><span class="consult-id">CST-2026-10864</span></td>
+              <td><span class="cat-tag cat-coord">Reschedule</span></td>
+              <td>Reschedule Appointment</td>
+              <td>Metabolic Health</td>
+              <td><span class="urgency-tag urg-high">HIGH</span></td>
+              <td>38m</td>
+              <td>
+                <button class="action-btn green-btn" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();takeTask(this,'CT002')">Take</button>
+                <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+                <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();viewTask('CT002')">View</button>
+              </td>
+            </tr>
 
-        <!-- On Demand panel — state check + portal link notice -->
-        <div id="onDemandConsultPanel" style="display:none;background:#ECFDF5;border:1px solid #6EE7B7;border-radius:8px;padding:14px;">
-          <div style="font-size:11px;font-weight:700;color:#065F46;margin-bottom:10px;">⚡ On Demand — Verify &amp; Confirm</div>
-          <div style="display:flex;gap:10px;margin-bottom:10px;">
-            <div style="flex:1;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:8px 10px;">
-              <div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:2px;">Patient State on File</div>
-              <div style="font-size:13px;font-weight:700;color:#059669;" id="odStateDisplay">—</div>
-            </div>
-            <div style="flex:1;background:#fff;border:1px solid #D1FAE5;border-radius:6px;padding:8px 10px;">
-              <div style="font-size:10px;font-weight:700;color:#6B7280;text-transform:uppercase;margin-bottom:2px;">Provider Coverage</div>
-              <div style="font-size:12px;font-weight:700;color:#059669;" id="odCoverageDisplay">Verified ✓</div>
-            </div>
-          </div>
-          <div style="font-size:12px;color:#065F46;line-height:1.6;background:#D1FAE5;border-radius:6px;padding:10px;">
-            A portal access link will be sent to <strong id="odPatientNameDisplay">the patient</strong> to create or log into their Everlywell patient portal. They will be connected with an available provider in their state.
-          </div>
+            <!-- Pharmacy — HIGH -->
+            <tr data-urgency="HIGH" data-category="Pharmacy" data-source="manual" data-task="CT003">
+              <td><span class="pri-dot pri-high"></span></td>
+              <td><span class="patient-name">L.C.</span></td>
+              <td><span class="consult-id">CST-2026-10869</span></td>
+              <td><span class="cat-tag cat-async">Pharmacy</span></td>
+              <td>Pharmacy Question</td>
+              <td>Weight Management</td>
+              <td><span class="urgency-tag urg-high">HIGH</span></td>
+              <td>55m</td>
+              <td>
+                <button class="action-btn green-btn" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();takeTask(this,'CT003')">Take</button>
+                <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+                <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();viewTask('CT003')">View</button>
+              </td>
+            </tr>
+
+            <!-- Billing — NORMAL -->
+            <tr data-urgency="NORMAL" data-category="Billing" data-source="manual" data-task="CT004">
+              <td><span class="pri-dot pri-normal"></span></td>
+              <td><span class="patient-name">T.W.</span></td>
+              <td><span class="consult-id">CST-2026-10858</span></td>
+              <td><span class="cat-tag cat-edu">Billing</span></td>
+              <td>Billing Issue</td>
+              <td>Annual Wellness</td>
+              <td><span class="urgency-tag urg-normal">NORMAL</span></td>
+              <td>2h 3m</td>
+              <td>
+                <button class="action-btn green-btn" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();takeTask(this,'CT004')">Take</button>
+                <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+                <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();viewTask('CT004')">View</button>
+              </td>
+            </tr>
+
+            <!-- Product Question — NORMAL -->
+            <tr data-urgency="NORMAL" data-category="Product" data-source="manual" data-task="CT005">
+              <td><span class="pri-dot pri-normal"></span></td>
+              <td><span class="patient-name">P.K.</span></td>
+              <td><span class="consult-id">CST-2026-10861</span></td>
+              <td><span class="cat-tag cat-coord">Product</span></td>
+              <td>Product Question</td>
+              <td>Testosterone</td>
+              <td><span class="urgency-tag urg-normal">NORMAL</span></td>
+              <td>1h 47m</td>
+              <td>
+                <button class="action-btn green-btn" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();takeTask(this,'CT005')">Take</button>
+                <button class="action-btn" style="background:#EFF6FF;color:#1D4ED8;" onclick="routeTask(this)">Route</button>
+                <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="if(typeof ppCheckActivity==='function')ppCheckActivity();viewTask('CT005')">View</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <div id="emptyState" style="display:none;" class="empty-state">
+          No unassigned tasks match your filters.
         </div>
-        <!-- Escalation options -->
-        <div class="form-group" style="margin-top:2px;">
-          <label class="form-label">Escalation Needed?</label>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" onclick="escalate('nurse')" style="background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">🩺 Escalate to Nurse</button>
-            <button type="button" onclick="escalate('md')" style="background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">🚨 Notify MD</button>
-            <button type="button" onclick="escalate('none')" style="background:#F9FAFB;color:#6B7280;border:1px solid #E5E7EB;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;">None needed</button>
-          </div>
-          <div id="escalateConfirm" style="display:none;margin-top:6px;font-size:11px;color:#374151;"></div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes (optional)</label>
-        <textarea class="form-input" rows="2" id="callNotes" placeholder="Optional call notes..."></textarea>
-      </div>
-      <div class="warn-box" id="attemptWarning" style="display:none;">
-        <strong>⚠️ Final Attempt:</strong> This is attempt 3. If unsuccessful, the record is marked exhausted and an automated certified letter is generated immediately.
       </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('callModal')">Cancel</button>
-      <button class="btn-primary" id="logCallBtn" onclick="logCall()">Log Call</button>
-    </div>
-  </div>
-</div>
+
+  </div><!-- /body -->
+</div><!-- /main -->
 
 <div class="toast" id="toast"></div>
+
+<!-- Urgent Messages Panel (URG-MSG-001) -->
+<div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <span style="font-size:16px;">🚨</span>
+    <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
+    <span style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;border-radius:10px;padding:2px 8px;">2</span>
+    <button onclick="closeUrgentPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:4px;padding:2px 10px;margin-left:8px;">✕</button>
+  </div>
+  <div style="padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA;font-size:11px;color:#991B1B;flex-shrink:0;">
+    These messages require your immediate attention. Click any message to open it directly.
+  </div>
+  <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+<div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+
+<!-- Route modal -->
+<div id="routeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;width:400px;padding:24px;box-shadow:0 16px 48px rgba(0,0,0,0.18);">
+    <h3 style="font-size:15px;font-weight:700;color:#111827;margin-bottom:16px;">Route Task</h3>
+    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Assign to team member</label>
+    <select id="routeSelect" style="width:100%;padding:8px 10px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:13px;margin-bottom:16px;">
+      <option value="">— Select team member —</option>
+      <option value="AK">Alex Kim</option>
+      <option value="JD">Jordan Davis</option>
+      <option value="ML">Maria Lopez</option>
+      <option value="SB">Sam Brooks</option>
+    </select>
+    <label style="font-size:12px;font-weight:600;color:#374151;display:block;margin-bottom:6px;">Note (optional)</label>
+    <textarea id="routeNote" rows="3" style="width:100%;padding:8px 10px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:13px;resize:vertical;" placeholder="Add context for the assignee…"></textarea>
+    <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end;">
+      <button onclick="closeRouteModal()" style="padding:7px 16px;border:1.5px solid #E5E0D8;border-radius:7px;font-size:13px;font-weight:600;background:#fff;color:#6B7280;cursor:pointer;">Cancel</button>
+      <button onclick="confirmRoute()" style="padding:7px 16px;background:#6B21A8;border:none;border-radius:7px;font-size:13px;font-weight:600;color:#fff;cursor:pointer;">Assign</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
-{% block scripts %}
-{% raw %}
+{% block scripts %}{% raw %}
 <script>
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+var sortState = {};
+var _routeRow = null;
 
-var PATIENT_DATA = {
-  'M.J., 45F': { name:'Margaret J. Collins',  dob:'03/22/1979', zip:'ZIP: 10012' },
-  'A.K., 38F': { name:'Alicia K. Torres',      dob:'11/14/1986', zip:'ZIP: 90210' },
-  'C.L., 29F': { name:'Claire L. Beaumont',    dob:'09/03/1995', zip:'ZIP: 10011' },
-  'R.S., 62M': { name:'Robert S. Harmon',      dob:'07/08/1962', zip:'ZIP: 33101' },
-  'P.W., 71F': { name:'Patricia W. Nguyen',    dob:'02/14/1953', zip:'ZIP: 75001' },
-  'G.R., 54M': { name:'Gerald R. Okonkwo',     dob:'10/30/1970', zip:'ZIP: 07030' },
-  'T.B., 51M': { name:'Thomas B. Whitfield',   dob:'05/30/1973', zip:'ZIP: 75201' },
-  'D.N., 43F': { name:'Diana N. Petersen',     dob:'04/11/1981', zip:'ZIP: 60614' },
-  'H.O., 36F': { name:'Hannah O. Fitzgerald',  dob:'08/22/1988', zip:'ZIP: 30301' },
-  'E.T., 59M': { name:'Edwin T. Morrison',     dob:'12/05/1965', zip:'ZIP: 22030' },
-  'F.M., 47F': { name:'Frances M. Delacroix',  dob:'06/18/1977', zip:'ZIP: 98101' },
-  'J.V., 44M': { name:'James V. Callahan',     dob:'03/27/1980', zip:'ZIP: 02101' },
-  'L.P., 42F': { name:'Linda P. Osei',         dob:'04/05/1984', zip:'ZIP: 10003' },
-  'V.R., 55F': { name:'Victoria R. Hammond',   dob:'09/17/1970', zip:'ZIP: 07302' },
-};
-
-var _currentProduct = '';
-function openCallModal(patient, product, result, client, state, attempts) {
-  _currentProduct = product;
-  document.getElementById('callModalTitle').textContent = 'Log Call — ' + patient;
-  document.getElementById('callModalSub').textContent = product + ' · ' + result + ' · ' + client + ' · ' + state;
-  document.getElementById('callOutcome').value = '';
-  document.getElementById('schedulingSection').style.display = 'none';
-  document.getElementById('escalateConfirm').style.display = 'none';
-  document.getElementById('onDemandConsultPanel').style.display = 'none';
-  document.getElementById('attemptWarning').style.display = attempts >= 2 ? '' : 'none';
-  document.querySelectorAll('input[name="portalNextStep"]').forEach(function(r){ r.checked = false; });
-  selectedConsultType = null;
-  ['psrCardOD','psrCardSched'].forEach(function(id){ var el = document.getElementById(id); if(el){ el.style.border = '2px solid #E5E7EB'; el.style.background = '#fff'; } });
-  ['hv1','hv2','hv3'].forEach(function(id){ document.getElementById(id).checked = false; });
-
-  // Populate inline HIPAA verification values
-  var pd = PATIENT_DATA[patient] || { name:'—', dob:'—', zip:'—' };
-  document.getElementById('hvName').textContent = pd.name;
-  document.getElementById('hvDOB').textContent  = pd.dob;
-  document.getElementById('hvZIP').textContent  = pd.zip;
-
-  // Pre-populate On Demand panel with state + patient name
-  document.getElementById('odStateDisplay').textContent = state + ' ✓';
-  document.getElementById('odCoverageDisplay').textContent = 'Provider available in ' + state;
-  document.getElementById('odPatientNameDisplay').textContent = pd.name !== '—' ? pd.name : patient;
-
-  document.getElementById('callModal').classList.add('open');
+// ── Urgent Messages ───────────────────────────────────────────────
+var PSR_URGENT_MSGS = [
+  { type:'escalation', initials:'CT', bg:'#6B21A8', sender:'CT Lead (Supervisor)', patient:'S.R. · CT001', url:'/care-team/psr/queue', preview:'"S.R. no-show is now over 1 hour — this is CRITICAL priority. Please take or route before EOD today."', time:'12 min ago' },
+  { type:'message', initials:'JM', bg:'#0D9488', sender:'Jennifer M., RN', patient:'R.S. · 62M', url:'/provider/messages', preview:'"R.S. critical result follow-up — patient has called back twice. Needs immediate outreach before the scheduled disclosure window closes today."', time:'28 min ago' }
+];
+function openUrgentPanel() {
+  var body = document.getElementById('urgPanelBody');
+  if (!body) return;
+  body.innerHTML = PSR_URGENT_MSGS.map(function(m) {
+    var patChip = m.patient ? '<span style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;font-weight:600;">📋 '+m.patient+'</span>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
+    var actionLabel = m.type==='escalation' ? '→ Open Queue' : '→ Open Message';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
+  }).join('');
+  document.getElementById('urgentPanel').style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
+}
+function closeUrgentPanel() {
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
 }
 
-function outcomeChanged() {
-  var v = document.getElementById('callOutcome').value;
-  document.getElementById('schedulingSection').style.display = (v === 'reached' || v === 'portal_notified') ? '' : 'none';
-}
-
-var selectedConsultType = null;
-function selectConsultType(type) {
-  selectedConsultType = type;
-  // Reset card styles
-  document.getElementById('psrCardOD').style.border = '2px solid #E5E7EB';
-  document.getElementById('psrCardOD').style.background = '#fff';
-  document.getElementById('psrCardSched').style.border = '2px solid #E5E7EB';
-  document.getElementById('psrCardSched').style.background = '#fff';
-
-  if (type === 'ondemand') {
-    document.getElementById('psrCardOD').style.border = '2px solid #059669';
-    document.getElementById('psrCardOD').style.background = '#F0FDF4';
-    document.getElementById('onDemandConsultPanel').style.display = '';
-  } else {
-    document.getElementById('onDemandConsultPanel').style.display = 'none';
-    // Scheduled: log and launch wizard immediately
-    closeModal('callModal');
-    showToast('Call logged — Launching scheduling wizard...');
-    setTimeout(function(){ window.location = '/scheduler/search-patient?tab=patient'; }, 800);
-  }
-}
-
-function launchSchedulingWizard() {
-  closeModal('callModal');
-  window.location = '/scheduler/search-patient?tab=patient';
-}
-
-function escalate(type) {
-  var el = document.getElementById('escalateConfirm');
-  if (type === 'nurse') el.textContent = '✓ Escalated to nursing team — RN on-call notified';
-  else if (type === 'md') el.textContent = '🚨 MD notified — urgent flag sent to Dr. Sarah Lee';
-  else el.textContent = 'No escalation needed — noted';
-  el.style.display = '';
-}
-
-// Lookup table for demo call history per patient
-var _callHistory = {
-  'M.J., 45F': 'No prior attempts.',
-  'A.K., 38F': 'No prior attempts.',
-  'C.L., 29F': 'No prior attempts.',
-  'R.S., 62M': 'Jun 30 8:12 AM — Attempt 1 · No Answer · Voicemail left.',
-  'P.W., 71F': 'Jun 29 3:41 PM — Attempt 1 · No Answer.\nJun 30 9:00 AM — Attempt 2 · Left Voicemail.',
-  'G.R., 54M': 'Jun 30 9:05 AM — Attempt 1 · No Answer.',
-  'T.B., 51M': 'Jun 28 8:50 AM — Attempt 1 · No Answer.\nJun 29 11:00 AM — Attempt 2 · Left Voicemail.',
-  'D.N., 43F': 'Jun 28 2:00 PM — Attempt 1 · No Answer.\nJun 29 10:30 AM — Attempt 2 · No Answer.',
-  'H.O., 36F': 'No prior attempts.',
-  'E.T., 59M': 'No prior attempts.',
-  'F.M., 47F': 'No prior attempts.',
-  'J.V., 44M': 'No prior attempts.',
-  'L.P., 42F': 'Jul 14 9:15 AM — Reached · Patient confirmed interest in consult.\n⏳ Patient elected to self-schedule via portal. Follow-up due: Jul 15, 2026 by 5:00 PM.',
-  'V.R., 55F': 'Jul 13 4:02 PM — Reached · Patient confirmed interest in consult.\n⏳ Patient elected to self-schedule via portal. Follow-up due: Jul 14, 2026 by 5:00 PM.\n⚠ No appointment booked — follow-up required.'
-};
-
-var _labDates = {
-  'M.J., 45F':'Jun 26, 2026','A.K., 38F':'Jun 27, 2026','C.L., 29F':'Jun 25, 2026',
-  'R.S., 62M':'Jun 28, 2026','P.W., 71F':'Jun 27, 2026','G.R., 54M':'Jun 29, 2026',
-  'T.B., 51M':'Jun 27, 2026','D.N., 43F':'Jun 28, 2026','H.O., 36F':'Jun 26, 2026',
-  'E.T., 59M':'Jun 25, 2026','F.M., 47F':'Jun 28, 2026','J.V., 44M':'Jun 27, 2026',
-  'L.P., 42F':'Jul 10, 2026','V.R., 55F':'Jul 9, 2026'
-};
-
-var _ptCallModalArgs = null;
-
-function openPatientModal(patient, product, result, client, state, attempts, consultstatus) {
-  _ptCallModalArgs = {patient:patient, product:product, result:result, client:client, state:state, attempts:attempts};
-  document.getElementById('ptModalName').textContent = 'Patient Record — ' + patient;
-  document.getElementById('ptModalSub').textContent = product + ' · ' + result;
-  document.getElementById('ptClient').textContent = client;
-  document.getElementById('ptState').textContent = state;
-  var resEl = document.getElementById('ptResult');
-  resEl.textContent = result;
-  resEl.style.color = result === 'Abnormal' ? '#DC2626' : '#D97706';
-  document.getElementById('ptProduct').textContent = product;
-  document.getElementById('ptLabDate').textContent = _labDates[patient] || '—';
-  document.getElementById('ptProvider').textContent = 'Dr. Sarah Lee, MD';
-  var slaEl = document.getElementById('ptSla');
-  slaEl.textContent = attempts >= 2 ? 'OVERDUE — Final Attempt Required' : 'Jul 5, 2026 (3 business days)';
-  slaEl.style.color = attempts >= 2 ? '#DC2626' : '#374151';
-  var hist = (_callHistory[patient] || 'No prior attempts.').replace(/\n/g,'<br>');
-  document.getElementById('ptCallHistory').innerHTML = hist;
-  var csEl = document.getElementById('ptConsultSection');
-  var cdEl = document.getElementById('ptConsultDetail');
-  var ctEl = document.getElementById('ptConsultTitle');
-  if (consultstatus === 'selfschedule') {
-    csEl.style.display = '';
-    csEl.style.background = '#FFFBEB';
-    csEl.style.border = '1px solid #FCD34D';
-    csEl.style.color = '#78350F';
-    ctEl.textContent = '⏳ Pending Patient Self-Schedule';
-    var overdue = (patient === 'V.R., 55F');
-    cdEl.innerHTML = (overdue ? '<span style="color:#DC2626;font-weight:700;">⚠ Overdue — patient has not scheduled.</span><br>' : '') +
-      'Patient was reached and agreed to schedule their consult via the Everlywell portal.<br>' +
-      '<strong>Portal link sent:</strong> ' + (overdue ? 'Jul 13' : 'Jul 14') + ', 2026<br>' +
-      '<strong>Follow-up due:</strong> ' + (overdue ? '<span style="color:#DC2626;font-weight:700;">Jul 14, 2026 by 5:00 PM — PAST DUE</span>' : 'Jul 15, 2026 by 5:00 PM') + '<br>' +
-      '<strong>Action:</strong> ' + (overdue ? 'Call patient to confirm scheduling or determine if they need assistance.' : 'Monitor portal — no action needed unless deadline passes.');
-  } else if (consultstatus && consultstatus !== 'selfschedule') {
-    csEl.style.display = '';
-    csEl.style.background = '#EFF6FF';
-    csEl.style.border = '1px solid #BFDBFE';
-    csEl.style.color = '#1E40AF';
-    ctEl.textContent = '📋 Active Consult Request';
-    cdEl.textContent = consultstatus;
-  } else {
-    csEl.style.display = 'none';
-  }
-  document.getElementById('ptLogCallBtn').onclick = function() {
-    closeModal('patientModal');
-    openCallModal(_ptCallModalArgs.patient,_ptCallModalArgs.product,_ptCallModalArgs.result,_ptCallModalArgs.client,_ptCallModalArgs.state,_ptCallModalArgs.attempts);
-  };
-  document.getElementById('patientModal').classList.add('open');
-}
-
-function logCall() {
-  if (selectedConsultType === 'ondemand' || selectedConsultType === 'scheduled') {
-    closeModal('callModal');
-    showToast('Call logged — ' + (selectedConsultType === 'ondemand' ? 'On Demand' : 'Scheduled') + ' preference recorded');
-  } else {
-    closeModal('callModal');
-    showToast('Call logged successfully');
-  }
-}
-
-var _activeStatus = 'all';
-
-function applyFilter(status, btn) {
-  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
-  btn.classList.add('active');
-  _activeStatus = status;
-  applyAllFilters();
-}
-
-function applyAllFilters() {
-  var search  = (document.getElementById('queueSearch').value || '').toLowerCase();
-  var client  = document.getElementById('filterClient').value;
-  var state   = document.getElementById('filterState').value;
-  var result  = document.getElementById('filterResult').value;
-  var rows    = document.querySelectorAll('#queueTbody tr');
-  var count   = 0;
-  rows.forEach(function(r){
-    var statusMatch = _activeStatus === 'all' || r.dataset.status === _activeStatus;
-    var text = r.textContent.toLowerCase();
-    var searchMatch = !search || text.includes(search);
-    var clientMatch = !client || (r.cells[3] && r.cells[3].textContent.includes(client));
-    var stateMatch  = !state  || (r.cells[4] && r.cells[4].textContent.trim() === state);
-    var resultMatch = !result || (r.cells[2] && r.cells[2].textContent.includes(result));
-    var show = statusMatch && searchMatch && clientMatch && stateMatch && resultMatch;
-    r.style.display = show ? '' : 'none';
-    if (show) count++;
+// ── Table sort / filter ───────────────────────────────────────────
+function sortTable(tableId, colIndex) {
+  var table = document.getElementById(tableId);
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var ths = table.querySelectorAll('thead th');
+  var key = tableId + '_' + colIndex;
+  var asc = sortState[key] !== true;
+  sortState[key] = asc;
+  ths.forEach(function(th) { th.classList.remove('sorted'); var a = th.querySelector('.sort-arrow'); if(a) a.textContent = '↕'; });
+  ths[colIndex].classList.add('sorted');
+  var sa = ths[colIndex].querySelector('.sort-arrow');
+  if (sa) sa.textContent = asc ? '↑' : '↓';
+  rows.sort(function(a, b) {
+    var cA = a.querySelectorAll('td')[colIndex], cB = b.querySelectorAll('td')[colIndex];
+    var vA = cA ? cA.innerText.trim().toLowerCase() : '', vB = cB ? cB.innerText.trim().toLowerCase() : '';
+    return asc ? vA.localeCompare(vB) : vB.localeCompare(vA);
   });
-  document.getElementById('filterCount').textContent = 'Showing ' + count + ' records';
+  rows.forEach(function(r) { tbody.appendChild(r); });
 }
+
+function filterQueue() {
+  var search   = document.getElementById('queueSearch').value.toLowerCase();
+  var urgency  = document.getElementById('urgencyFilter').value;
+  var category = document.getElementById('categoryFilter').value;
+  var source   = document.getElementById('sourceFilter').value;
+  var rows = document.querySelectorAll('#queueBody tr');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var match = (!search   || row.innerText.toLowerCase().includes(search)) &&
+                (!urgency  || row.getAttribute('data-urgency')  === urgency) &&
+                (!category || row.getAttribute('data-category') === category) &&
+                (!source   || row.getAttribute('data-source')   === source);
+    row.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('queueCount').textContent = visible + ' item' + (visible !== 1 ? 's' : '');
+  document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+}
+
+function takeTask(btn, taskId) {
+  var row = btn.closest('tr');
+  var patient = row.querySelectorAll('td')[1].innerText.trim();
+  if (!confirm('Take task for ' + patient + '?\n\nThis assigns the task to you and opens the task detail.')) return;
+  row.remove();
+  updateCount();
+  window.location.href = '/care-team/task/' + (taskId || 'CT001');
+}
+
+function routeTask(btn) {
+  _routeRow = btn.closest('tr');
+  document.getElementById('routeModal').style.display = 'flex';
+  document.getElementById('routeSelect').value = '';
+  document.getElementById('routeNote').value = '';
+}
+
+function closeRouteModal() {
+  document.getElementById('routeModal').style.display = 'none';
+  _routeRow = null;
+}
+
+function confirmRoute() {
+  var sel = document.getElementById('routeSelect').value;
+  if (!sel) { showToast('Please select a team member.'); return; }
+  if (_routeRow) _routeRow.remove();
+  closeRouteModal();
+  updateCount();
+  showToast('Task routed successfully.');
+}
+
+function updateCount() {
+  var visible = document.querySelectorAll('#queueBody tr:not([style*="display: none"])').length;
+  document.getElementById('queueCount').textContent = visible + ' item' + (visible !== 1 ? 's' : '');
+  document.getElementById('emptyState').style.display = visible === 0 ? 'block' : 'none';
+}
+
+function viewTask(taskId) { window.location.href = '/care-team/task/' + taskId; }
 
 function showToast(msg) {
   var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
+
+document.getElementById('routeModal').addEventListener('click', function(e) {
+  if (e.target === this) closeRouteModal();
+});
 </script>
-{% endraw %}
-{% endblock %}
+{% endraw %}{% endblock %}

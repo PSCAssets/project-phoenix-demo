@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% block title %}DOH Report Queue{% endblock %}
+{% block head %}
+<style>
+:root { --teal:#0F766E; --teal-light:#CCFBF1; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--teal); display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#0D5F58; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+
+/* Workflow trigger banner */
+.trigger-banner { display:flex; align-items:center; gap:10px; background:#F0FDFA; border:1px solid #99F6E4; border-radius:10px; padding:11px 16px; margin-bottom:20px; font-size:12px; color:#134E4A; }
+.stage-pill { background:var(--teal); color:#fff; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:700; white-space:nowrap; }
+
+/* Filter / bulk action bar */
+.action-bar { display:flex; gap:8px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+.action-bar select, .action-bar input { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.action-bar input { min-width:180px; }
+.action-bar select:focus, .action-bar input:focus { border-color:var(--teal); }
+.btn-bulk { background:var(--teal); color:#fff; border:none; border-radius:7px; padding:7px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-bulk:hover { background:#0D5F58; }
+.btn-bulk:disabled { background:#9CA3AF; cursor:not-allowed; }
+.row-count { font-size:12px; font-weight:600; color:#6B7280; margin-left:auto; }
+
+/* Table */
+.table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+thead th.sortable { cursor:pointer; user-select:none; }
+thead th.sortable:hover { color:var(--teal); background:#EDFAF8; }
+thead th.sort-asc::after { content:' ↑'; color:var(--teal); }
+thead th.sort-desc::after { content:' ↓'; color:var(--teal); }
+thead th:first-child { width:36px; }
+tbody td { padding:11px 12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F0FDFA; }
+tbody tr.overdue-row { background:#FFF7F7; }
+tbody tr.selected-row { background:#F0FDFA; }
+
+.rec-id { font-family:monospace; font-size:12px; font-weight:700; color:var(--teal); }
+.condition-chip { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+.cond-sti  { background:#EDE9FE; color:#5B21B6; }
+.cond-hiv  { background:#FEE2E2; color:#991B1B; }
+.cond-tb   { background:#FEF3C7; color:#92400E; }
+.cond-lyme { background:#D1FAE5; color:#065F46; }
+.cond-lead { background:var(--teal-light); color:#134E4A; }
+
+.status-chip { display:inline-flex; padding:3px 8px; border-radius:10px; font-size:11px; font-weight:600; }
+.s-new   { background:#F3F4F6; color:#374151; }
+.s-prog  { background:#DBEAFE; color:#1E40AF; }
+.s-sub   { background:#D1FAE5; color:#065F46; }
+.s-over  { background:#FEE2E2; color:#991B1B; }
+
+.minor-flag { font-size:11px; font-weight:700; color:var(--amber); }
+.dest-type { font-size:11px; color:#6B7280; }
+.days-open { font-size:12px; font-weight:700; }
+.days-ok   { color:#6B7280; }
+.days-warn { color:var(--amber); }
+.days-over { color:var(--red); }
+
+.btn-open { border:1px solid var(--border); background:#fff; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; text-decoration:none; display:inline-block; }
+.btn-open:hover { border-color:var(--teal); color:var(--teal); }
+
+input[type=checkbox] { width:15px; height:15px; cursor:pointer; accent-color:var(--teal); }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">DOH Report Queue</div>
+    <div class="topbar-sub">All open mandatory reporting records</div>
+  </div>
+  <div class="topbar-right">
+    <span>Crystal Veliz, DOH Coordinator</span>
+    <div class="avatar">CV</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-title">Report Queue</div>
+  <div class="page-sub">Records are auto-created when a lab result triggers a configured DOH reporting rule.</div>
+
+  <div class="trigger-banner">
+    <span class="stage-pill">Auto-Triggered</span>
+    <span>All records below were generated automatically by the <strong>DOH Reporting Rule Engine</strong>. No manual ticket creation. Lab results and patient demographics are pre-populated on each record.</span>
+    <a href="/admin/doh-config" style="font-size:11px;font-weight:700;color:var(--teal);text-decoration:none;margin-left:auto;white-space:nowrap;">Admin Config &#8599;</a>
+  </div>
+
+  <div class="action-bar">
+    <input type="text" id="searchInput" placeholder="Search record ID, state, or condition…" oninput="filterQueue()">
+    <select id="filterState" onchange="filterQueue()">
+      <option value="">All States</option>
+      <option>FL</option><option>CA</option><option>TX</option><option>NY</option>
+      <option>GA</option><option>VA</option><option>WA</option><option>MI</option>
+      <option>NM</option><option>UT</option>
+    </select>
+    <select id="filterCondition" onchange="filterQueue()">
+      <option value="">All Conditions</option>
+      <option>STI</option><option>HIV</option><option>TB</option><option>Lyme</option><option>Lead</option>
+    </select>
+    <select id="filterStatus" onchange="filterQueue()">
+      <option value="">All Statuses</option>
+      <option value="new">New</option>
+      <option value="in-progress">In Progress</option>
+      <option value="overdue">Overdue</option>
+    </select>
+    <select id="filterDays" onchange="filterQueue()">
+      <option value="">All SLA Ages</option>
+      <option value="current">Current (&lt; 1 day)</option>
+      <option value="warning">Warning (1 day)</option>
+      <option value="overdue">Overdue (2+ days)</option>
+    </select>
+    <button class="btn-bulk" id="bulkBtn" disabled onclick="bulkSubmit()">Bulk Fax Selected (0)</button>
+    <span class="row-count" id="rowCount">Showing 12 of 12</span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="queueTable">
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+          <th>Record ID</th>
+          <th>Patient</th>
+          <th>Condition</th>
+          <th>State</th>
+          <th>County</th>
+          <th>Destination</th>
+          <th>Minor</th>
+          <th>Created</th>
+          <th class="sortable" onclick="sortByCol('days')" id="thDays" title="Sort by Days Open">Days Open</th>
+          <th class="sortable" onclick="sortByCol('status')" id="thStatus" title="Sort by SLA Status">SLA Status <span style="font-size:9px;font-family:monospace;color:#9CA3AF;font-weight:400;">DOH-SORT-001</span></th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="queueBody">
+
+        <tr class="overdue-row" data-status="overdue" data-state="FL" data-condition="STI" data-days="3">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0431</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0142</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><strong>FL</strong></td>
+          <td style="font-size:12px;">Miami-Dade</td>
+          <td><span class="dest-type">&#128231; Fax · (305) 555-0182</span></td>
+          <td><span class="minor-flag">&#9679; Minor</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 23</td>
+          <td><span class="days-open days-over">3d</span></td>
+          <td><span class="status-chip s-over">Overdue</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0431" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr class="overdue-row" data-status="overdue" data-state="TX" data-condition="STI" data-days="2">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0433</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0198</td>
+          <td><span class="condition-chip cond-sti">Syphilis</span></td>
+          <td><strong>TX</strong></td>
+          <td style="font-size:12px;">Harris County</td>
+          <td><span class="dest-type">&#128231; Fax · (713) 555-0291</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 24</td>
+          <td><span class="days-open days-over">2d</span></td>
+          <td><span class="status-chip s-over">Overdue</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0433" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="FL" data-condition="STI" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0442</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0071</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><strong>FL</strong></td>
+          <td style="font-size:12px;">Broward</td>
+          <td><span class="dest-type">&#128231; Fax · (954) 555-0144</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0442" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="CA" data-condition="HIV" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0443</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0211</td>
+          <td><span class="condition-chip cond-hiv">HIV</span></td>
+          <td><strong>CA</strong></td>
+          <td style="font-size:12px;">Los Angeles</td>
+          <td><span class="dest-type">&#9993; Email · la-dph@cdph.ca.gov</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0443" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="in-progress" data-state="NY" data-condition="TB" data-days="1">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0438</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0089</td>
+          <td><span class="condition-chip cond-tb">Tuberculosis</span></td>
+          <td><strong>NY</strong></td>
+          <td style="font-size:12px;">Kings County</td>
+          <td><span class="dest-type">&#128231; Fax · (718) 555-0377</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25</td>
+          <td><span class="days-open days-warn">1d</span></td>
+          <td><span class="status-chip s-prog">In Progress</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0438" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="CA" data-condition="STI" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0444</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0033</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><strong>CA</strong></td>
+          <td style="font-size:12px;">San Francisco</td>
+          <td><span class="dest-type">&#128231; Fax · (415) 555-0201</span></td>
+          <td><span class="minor-flag">&#9679; Minor</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0444" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr class="overdue-row" data-status="overdue" data-state="MI" data-condition="Lead" data-days="3">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0429</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0114</td>
+          <td><span class="condition-chip cond-lead">Lead (7.1 μg/dL)</span></td>
+          <td><strong>MI</strong></td>
+          <td style="font-size:12px;">Wayne County</td>
+          <td><span class="dest-type">&#128231; Fax · (313) 555-0429</span></td>
+          <td><span class="minor-flag">&#9679; Minor</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 23</td>
+          <td><span class="days-open days-over">3d</span></td>
+          <td><span class="status-chip s-over">Overdue</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0429" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="GA" data-condition="STI" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0445</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0156</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><strong>GA</strong></td>
+          <td style="font-size:12px;">Fulton County</td>
+          <td><span class="dest-type">&#128231; Fax · (404) 555-0188</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0445" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="VA" data-condition="Lyme" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0446</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0177</td>
+          <td><span class="condition-chip cond-lyme">Lyme Disease</span></td>
+          <td><strong>VA</strong></td>
+          <td style="font-size:12px;">Fairfax County</td>
+          <td><span class="dest-type">&#9993; Email · vdh-reports@vdh.virginia.gov</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0446" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="WA" data-condition="STI" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0447</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0199</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><strong>WA</strong></td>
+          <td style="font-size:12px;">King County</td>
+          <td><span class="dest-type">&#128231; Fax · (206) 555-0312</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0447" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="in-progress" data-state="TX" data-condition="STI" data-days="1">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0435</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0204</td>
+          <td><span class="condition-chip cond-sti">Syphilis</span></td>
+          <td><strong>TX</strong></td>
+          <td style="font-size:12px;">Dallas County</td>
+          <td><span class="dest-type">&#128231; Fax · (214) 555-0188</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25</td>
+          <td><span class="days-open days-warn">1d</span></td>
+          <td><span class="status-chip s-prog">In Progress</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0435" class="btn-open">Open</a></td>
+        </tr>
+
+        <tr data-status="new" data-state="NM" data-condition="STI" data-days="0">
+          <td><input type="checkbox" class="row-cb" onchange="updateBulk()"></td>
+          <td><span class="rec-id">DOH-2026-0448</span></td>
+          <td style="font-size:12px;color:#6B7280;">PT-••••-0221</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><strong>NM</strong></td>
+          <td style="font-size:12px;">Bernalillo</td>
+          <td><span class="dest-type">&#128231; Fax · (505) 555-0267</span></td>
+          <td>—</td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26</td>
+          <td><span class="days-open days-ok">0d</span></td>
+          <td><span class="status-chip s-new">New</span></td>
+          <td><a href="/provider/doh/report/DOH-2026-0448" class="btn-open">Open</a></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var selectedIds = new Set();
+
+function filterQueue() {
+  var search    = document.getElementById('searchInput').value.toLowerCase();
+  var state     = document.getElementById('filterState').value;
+  var condition = document.getElementById('filterCondition').value;
+  var status    = document.getElementById('filterStatus').value;
+  var daysFilter = document.getElementById('filterDays').value;
+  var rows = document.querySelectorAll('#queueBody tr');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text    = row.textContent.toLowerCase();
+    var rState  = row.dataset.state || '';
+    var rCond   = row.dataset.condition || '';
+    var rStatus = row.dataset.status || '';
+    var rDays   = parseInt(row.dataset.days || '0');
+    var daysOk  = true;
+    if (daysFilter === 'current')  daysOk = rDays < 1;
+    if (daysFilter === 'warning')  daysOk = rDays === 1;
+    if (daysFilter === 'overdue')  daysOk = rDays >= 2;
+    var ok = (!search    || text.includes(search))
+          && (!state     || rState === state)
+          && (!condition || rCond === condition)
+          && (!status    || rStatus === status)
+          && daysOk;
+    row.style.display = ok ? '' : 'none';
+    if (ok) visible++;
+  });
+  document.getElementById('rowCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
+}
+
+var sortState = { col: null, dir: 1 };
+function sortByCol(col) {
+  var tbody = document.getElementById('queueBody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var thDays   = document.getElementById('thDays');
+  var thStatus = document.getElementById('thStatus');
+  // Toggle direction if same col
+  if (sortState.col === col) { sortState.dir *= -1; } else { sortState.dir = 1; sortState.col = col; }
+  // Update header classes
+  [thDays, thStatus].forEach(function(th) { th.classList.remove('sort-asc','sort-desc'); });
+  var activeTh = col === 'days' ? thDays : thStatus;
+  activeTh.classList.add(sortState.dir === 1 ? 'sort-asc' : 'sort-desc');
+  // Status rank: overdue=3, in-progress=2, new=1, submitted=0
+  var statusRank = { overdue:3, 'in-progress':2, new:1, submitted:0 };
+  rows.sort(function(a, b) {
+    var aVal, bVal;
+    if (col === 'days') {
+      aVal = parseInt(a.dataset.days || '0');
+      bVal = parseInt(b.dataset.days || '0');
+    } else {
+      aVal = statusRank[a.dataset.status] || 0;
+      bVal = statusRank[b.dataset.status] || 0;
+    }
+    return (aVal - bVal) * sortState.dir;
+  });
+  rows.forEach(function(r) { tbody.appendChild(r); });
+}
+
+function toggleAll(master) {
+  document.querySelectorAll('.row-cb').forEach(function(cb) {
+    var row = cb.closest('tr');
+    if (row.style.display !== 'none') { cb.checked = master.checked; }
+  });
+  updateBulk();
+}
+
+function updateBulk() {
+  var checked = document.querySelectorAll('.row-cb:checked').length;
+  var btn = document.getElementById('bulkBtn');
+  btn.disabled = checked === 0;
+  btn.textContent = 'Bulk Fax Selected (' + checked + ')';
+}
+
+function bulkSubmit() {
+  var checked = document.querySelectorAll('.row-cb:checked').length;
+  if (!confirm('Send ' + checked + ' DOH reports via fax?\n\nEach report will be sent to the pre-configured state/county fax number. All submissions will be logged in the audit trail.')) return;
+  document.querySelectorAll('.row-cb:checked').forEach(function(cb) {
+    var row = cb.closest('tr');
+    var chip = row.querySelector('.status-chip');
+    chip.className = 'status-chip s-sub';
+    chip.textContent = 'Submitted';
+    row.dataset.status = 'submitted';
+    cb.checked = false;
+    cb.disabled = true;
+  });
+  document.getElementById('selectAll').checked = false;
+  updateBulk();
+  alert('✓ ' + checked + ' reports submitted via fax.\n\nAll submissions logged in the audit trail. Submitted records will move to History.');
+}
+</script>
+{% endblock %}

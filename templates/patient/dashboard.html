@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — Everlywell{% endblock %}
+{% block head %}
+<style>
+  :root {
+    --navy: #1A3D2B; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4;
+    --white: #FFFFFF; --bg: #F7F9F7; --border: #D4E4DC;
+    --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
+    --amber: #D97706; --amber-bg: #FFFBEB; --blue: #1A3D2B; --blue-bg: #EFF7F2;
+    --sidebar-bg: #FFFFFF; --sidebar-border: #E2EBE6;
+    --nav-text: #374151; --nav-active-bg: #E8F5EE; --nav-active-text: #1A3D2B;
+    --nav-hover-bg: #F4FAF6;
+  }
+  /* ── Humana theme overrides (applied via .theme-humana on body) ── */
+  .theme-humana { --navy: #2C6B30; --green: #4CAF50; --green-dark: #388E3C; --green-light: #E8F5E9; --border: #C8E6C9; --bg: #F9FBF9; --blue: #2C6B30; --blue-bg: #E8F5E9; --sidebar-bg: #FFFFFF; --sidebar-border: #C8E6C9; --nav-text: #1B5E20; --nav-active-bg: #E8F5E9; --nav-active-text: #1B5E20; --nav-hover-bg: #F1F8E9; }
+  .theme-humana .sidenav { background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); }
+  .theme-humana .nav-item { color: var(--nav-text); }
+  .theme-humana .nav-item:hover { background: var(--nav-hover-bg); color: var(--nav-active-text); }
+  .theme-humana .nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-text); }
+  .theme-humana .nav-item.active::before { background: #4CAF50; }
+  .theme-humana .nav-logo-text { color: #2C6B30; }
+  .theme-humana .nav-logo-sub { color: #6B9E6E; }
+  .theme-humana .nav-user-name { color: #1B5E20; }
+  .theme-humana .nav-user-prog { color: #6B9E6E; }
+  .theme-humana .topbar { background: #ffffff; border-bottom-color: #C8E6C9; }
+  .theme-humana .topbar-title { color: #2C6B30; }
+  .theme-humana .nav-logo { border-bottom-color: #C8E6C9; }
+  .theme-humana .nav-user { border-bottom-color: #C8E6C9; }
+  .theme-humana .nav-bottom { border-top-color: #C8E6C9; }
+
+  /* Care product selector chip */
+  .cp-selector-wrap { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 20px; background: #fff; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--navy); white-space: nowrap; position: relative; }
+  .cp-selector-wrap:hover { border-color: var(--green); }
+  .cp-selector-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .cp-dropdown { position: absolute; top: calc(100% + 6px); right: 0; min-width: 240px; background: #fff; border: 1.5px solid #E5E0D8; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.12); z-index: 200; overflow: hidden; display: none; }
+  .cp-dropdown.open { display: block; }
+  .cp-option { display: flex; align-items: center; gap: 10px; padding: 11px 14px; font-size: 13px; color: #374151; cursor: pointer; border-bottom: 1px solid #F3F4F6; }
+  .cp-option:last-child { border-bottom: none; }
+  .cp-option:hover { background: #F9FAFB; }
+  .cp-option.active { background: var(--nav-active-bg); color: var(--nav-active-text); font-weight: 700; }
+  .cp-option-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .cp-option-label { flex: 1; }
+  .cp-option-sub { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: var(--sidebar-bg); border-right: 1px solid var(--sidebar-border); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--sidebar-border); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .nav-logo-sub { font-size: 11px; color: #6B8E7A; margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid var(--sidebar-border); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .nav-user-prog { font-size: 11px; color: #6B8E7A; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: var(--nav-text); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: var(--nav-hover-bg); color: var(--nav-active-text); }
+  .nav-item.active { background: var(--nav-active-bg); color: var(--nav-active-text); font-weight: 600; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--green); border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: #EF4444; color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid var(--sidebar-border); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid var(--border); padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: var(--navy); flex: 1; }
+  .content { padding: 24px 28px; max-width: 1100px; }
+  .msg-banner { background: var(--blue-bg); border: 1px solid #C8DCC8; border-radius: 8px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 24px; font-size: 13px; color: #1A3B1B; }
+  .msg-banner a { color: #2D5C2E; font-weight: 600; text-decoration: none; margin-left: auto; }
+  .msg-banner a:hover { text-decoration: underline; }
+  /* Checklist widget */
+  .widget { background: #fff; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; overflow: hidden; }
+  .widget-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .widget-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .progress-bar-wrap { height: 8px; background: #E5E0D8; border-radius: 4px; margin: 4px 0; }
+  .progress-bar-fill { height: 8px; border-radius: 4px; background: var(--green); transition: width 0.4s; }
+  .progress-label { font-size: 12px; color: var(--gray); }
+  .checklist { padding: 4px 0; }
+  .check-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #F5F0EA; }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon { font-size: 18px; flex-shrink: 0; }
+  .check-text { flex: 1; font-size: 13px; color: var(--text); }
+  .check-text.done { color: #2D5C2E; }
+  .cp-consult-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #F2EDE4;
+    color: #6B7280;
+    border: 1px solid #E5E0D8;
+  }
+  .check-btn { background: var(--blue-bg); color: var(--blue); border: 1px solid #C8DCC8; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  /* Product cards */
+  .cards-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .product-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .product-card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+  .product-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .product-name { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.2; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 12px; display: inline-block; margin-top: 4px; }
+  .s-active { background: #D1FAE5; color: #065F46; }
+  .s-pending { background: #FEF3C7; color: #92400E; }
+  .product-row { display: flex; gap: 6px; font-size: 12px; color: var(--gray); margin-bottom: 6px; align-items: center; }
+  .product-row strong { color: var(--text); }
+  .appt-block { background: var(--blue-bg); border: 1px solid #C8DCC8; border-radius: 8px; padding: 10px 12px; margin: 12px 0; font-size: 12px; color: #1A3B1B; }
+  .product-btn { display: block; text-align: center; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; border: none; margin-top: 12px; }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: var(--green-dark); }
+  .btn-outline { background: #fff; color: var(--green); border: 1px solid var(--green); }
+  .btn-outline:hover { background: var(--green-light); }
+  /* Activity feed */
+  .activity-list { padding: 0; }
+  .activity-item { display: flex; align-items: center; gap: 14px; padding: 13px 20px; border-bottom: 1px solid #F5F0EA; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+  .activity-text { flex: 1; font-size: 13px; color: var(--text); }
+  .activity-time { font-size: 12px; color: var(--gray); white-space: nowrap; }
+</style>
+{% endblock %}
+{% block content %}
+  <aside class="sidenav">
+    <div class="nav-logo" id="sideNavLogo">
+      <div class="nav-logo-text" id="logoMain">Everlywell</div>
+      <div class="nav-logo-sub" id="logoSub">Patient Portal</div>
+    </div>
+    <div class="nav-user">
+      <div class="nav-avatar" style="background:#0EA5E9">JR</div>
+      <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
+    </div>
+    <nav style="padding: 8px 0; flex: 1;">
+      <a href="/patient/" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="/patient/consultations" class="nav-item"><span class="nav-icon">💬</span> My Consultations</a>
+      <a href="/patient/appointments" class="nav-item"><span class="nav-icon">📅</span> Appointments</a>
+      <a href="/patient/messages" class="nav-item"><span class="nav-icon">✉️</span> Messages <span class="nav-badge">2</span></a>
+      <a href="/patient/labs" class="nav-item"><span class="nav-icon">🧪</span> Lab Results</a>
+      <a href="/patient/health-profile" class="nav-item"><span class="nav-icon">👤</span> Health Profile</a>
+      <a href="/patient/documents" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+      <a href="/patient/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="nav-bottom">
+      <a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Dashboard</div>
+      <span style="font-size:13px;color:var(--gray)">Good morning, Jamie 👋</span>
+      <!-- Care Product Selector -->
+      <div style="position:relative;margin-left:auto;" id="cpSelectorWrap">
+        <div class="cp-selector-wrap" onclick="toggleCpDropdown(event)" id="cpSelectorChip">
+          <span class="cp-selector-dot" id="cpSelectorDot"></span>
+          <span id="cpSelectorLabel">Everlywell 360</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="cp-dropdown" id="cpDropdown">
+          <div style="padding:8px 14px 6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#9CA3AF;">Switch Care Product</div>
+          <div class="cp-option active" onclick="selectCareProduct('awv')" id="cpOpt-awv">
+            <span class="cp-option-dot" style="background:#D97706;"></span>
+            <div class="cp-option-label">
+              <div>Everlywell 360</div>
+              <div class="cp-option-sub">Everlywell · Pending</div>
+            </div>
+            <span style="font-size:11px;color:#D97706;">✓</span>
+          </div>
+          <div class="cp-option" onclick="selectCareProduct('humana')" id="cpOpt-humana">
+            <span class="cp-option-dot" style="background:#43863D;"></span>
+            <div class="cp-option-label">
+              <div>Humana A1C</div>
+              <div class="cp-option-sub">Humana · Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <!-- Message Banner -->
+      <div class="msg-banner">
+        <span>📬</span>
+        <span>You have <strong>2 unread messages</strong> from your care team.</span>
+        <a href="/patient/messages">View messages →</a>
+      </div>
+      <!-- Care Journey Tracker -->
+      <div style="background:#fff;border:1px solid #E5E0D8;border-radius:12px;padding:20px;margin-bottom:20px;">
+        <div style="font-size:15px;font-weight:700;color:#111827;margin-bottom:16px;">Your Care Journey</div>
+
+        <!-- Stage tracker -->
+        <div style="display:flex;align-items:flex-start;gap:0;margin-bottom:16px;">
+          <!-- Stage 1: Order Placed (complete) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">✓</div>
+            <div style="font-size:11px;color:#6B7280;text-align:center;white-space:nowrap;">Order<br>Placed</div>
+          </div>
+          <div style="flex:1;height:2px;background:#6B21A8;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 2: Consultation Complete (complete) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:#6B21A8;color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;">✓</div>
+            <div style="font-size:11px;color:#6B7280;text-align:center;white-space:nowrap;">Consultation<br>Complete</div>
+          </div>
+          <div style="flex:1;height:2px;background:#6B21A8;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 3: Provider Review (active) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #6B21A8;background:#fff;color:#6B21A8;font-size:13px;display:flex;align-items:center;justify-content:center;animation:journey-pulse 2s ease-in-out infinite;">⏱</div>
+            <div style="font-size:11px;color:#6B21A8;font-weight:700;text-align:center;white-space:nowrap;">Provider<br>Review</div>
+          </div>
+          <div style="flex:1;height:0;border-top:2px dashed #D1D5DB;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 4: Prescription Sent (upcoming) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;color:#9CA3AF;font-size:11px;display:flex;align-items:center;justify-content:center;"></div>
+            <div style="font-size:11px;color:#9CA3AF;text-align:center;white-space:nowrap;">Prescription<br>Sent</div>
+          </div>
+          <div style="flex:1;height:0;border-top:2px dashed #D1D5DB;margin-top:14px;min-width:16px;"></div>
+          <!-- Stage 5: Complete (upcoming) -->
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;border:2px solid #D1D5DB;background:#fff;color:#9CA3AF;font-size:11px;display:flex;align-items:center;justify-content:center;"></div>
+            <div style="font-size:11px;color:#9CA3AF;text-align:center;white-space:nowrap;">Complete</div>
+          </div>
+        </div>
+
+        <!-- Status card -->
+        <div style="background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:12px 16px;font-size:13px;color:#5B21B6;margin-bottom:12px;">
+          ⏱ <strong>Provider Review in Progress</strong> — Dr. Sarah Lee is reviewing your consultation notes. Estimated completion: within 4 hours.
+        </div>
+
+        <!-- SLA progress bar -->
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#6B7280;margin-bottom:4px;">
+            <span>SLA: 4 hrs</span>
+            <span>2h 24m remaining</span>
+          </div>
+          <div style="height:6px;background:#FEF3C7;border-radius:3px;overflow:hidden;">
+            <div style="width:60%;height:100%;background:#F59E0B;border-radius:3px;"></div>
+          </div>
+        </div>
+      </div>
+      <style>
+      @keyframes journey-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(107,33,168,0.3); }
+        50% { box-shadow: 0 0 0 6px rgba(107,33,168,0); }
+      }
+      </style>
+      <!-- Getting Started Checklist -->
+      <div class="widget">
+        <div class="widget-header">
+          <div style="flex:1">
+            <div class="widget-title">Getting Started — Testosterone Care Product</div>
+            <div style="margin-top:8px">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                <div class="progress-bar-wrap" style="flex:1"><div class="progress-bar-fill" style="width:80%"></div></div>
+                <span class="progress-label">4 of 5 complete</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done">Account created</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done">Health questionnaire completed</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done">ID verification submitted</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text">Lab results uploaded</span><button class="check-btn" onclick="window.location.href='/patient/labs'">Upload Labs</button></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done">Clinician consultation scheduled</span></div>
+        </div>
+      </div>
+      <!-- Product Cards -->
+      <div class="cards-row">
+        <div class="product-card">
+          <div class="product-card-header">
+            <div class="product-icon">🧬</div>
+            <div><div class="product-name">Testosterone Care Product</div><span class="status-pill s-active">Active</span></div>
+          </div>
+          <div class="product-row"><span>Clinician:</span><strong>Dr. Sarah Lee, MD</strong></div>
+          <div class="product-row"><span>Next action:</span><strong>Awaiting lab results</strong></div>
+          <div class="product-row"><span>Consult type:</span><strong>Video Consult</strong></div>
+          <div class="appt-block">📅 Jun 18, 2026 · 2:00 PM CST · Video Consult</div>
+          <span class="cp-consult-badge">Video</span>
+          <a href="/patient/care-plan" class="product-btn btn-primary">View Care Plan</a>
+        </div>
+        <div class="product-card">
+          <div class="product-card-header">
+            <div class="product-icon">⚖️</div>
+            <div><div class="product-name">Weight Management</div><span class="status-pill s-pending">Pending</span></div>
+          </div>
+          <div class="product-row"><span>Clinician:</span><strong>Not yet assigned</strong></div>
+          <div class="product-row"><span>Consult type:</span><strong>Async Consult</strong></div>
+          <div class="product-row"><span>Status:</span><strong style="color:#D97706;">Pending — Complete intake to begin</strong></div>
+          <span class="cp-consult-badge">Async</span>
+          <a href="/patient/appointments" class="product-btn btn-outline" style="margin-top:12px">View Appointment</a>
+        </div>
+      </div>
+      <!-- Recent Activity -->
+      <div class="widget">
+        <div class="widget-header"><div class="widget-title">Recent Activity</div></div>
+        <div class="activity-list">
+          <div class="activity-item"><div class="activity-dot"></div><div class="activity-text">Lab results uploaded — Testosterone panel</div><div class="activity-time">2 days ago</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#2D5C2E"></div><div class="activity-text">Message from Dr. Sarah Lee</div><div class="activity-time">3 days ago</div></div>
+          <div class="activity-item"><div class="activity-dot"></div><div class="activity-text">Consultation completed — Async · Testosterone</div><div class="activity-time">5 days ago</div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:#9CA3AF"></div><div class="activity-text">Account verified</div><div class="activity-time">Jun 1, 2026</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+var CARE_PRODUCTS = {
+  awv: {
+    label: 'Everlywell 360',
+    dotColor: '#D97706',
+    theme: null,
+    logoMain: 'Everlywell',
+    logoSub: 'Patient Portal',
+    greeting: 'Good morning, Jamie 👋',
+  },
+  humana: {
+    label: 'Humana A1C',
+    dotColor: '#43863D',
+    theme: 'humana',
+    logoMain: 'Humana',
+    logoSub: 'Powered by Everlywell',
+    greeting: 'Good morning, Jamie 👋',
+  },
+};
+
+var _activeCp = 'awv';
+
+function selectCareProduct(key) {
+  _activeCp = key;
+  var cp = CARE_PRODUCTS[key];
+  if (!cp) return;
+
+  // Update selector chip
+  document.getElementById('cpSelectorLabel').textContent = cp.label;
+  document.getElementById('cpSelectorDot').style.background = cp.dotColor;
+
+  // Update active state in dropdown
+  ['awv','humana'].forEach(function(k) {
+    var opt = document.getElementById('cpOpt-' + k);
+    if (!opt) return;
+    opt.classList.toggle('active', k === key);
+    var tick = opt.querySelector('span:last-child');
+    if (tick) tick.style.display = (k === key) ? '' : 'none';
+  });
+
+  // Apply / remove body theme class
+  document.body.classList.remove('theme-humana');
+  if (cp.theme) document.body.classList.add('theme-' + cp.theme);
+
+  // Update sidebar logo
+  var logoMain = document.getElementById('logoMain');
+  var logoSub  = document.getElementById('logoSub');
+  if (logoMain) logoMain.textContent = cp.logoMain;
+  if (logoSub)  logoSub.textContent  = cp.logoSub;
+
+  closeCpDropdown();
+}
+
+function toggleCpDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('cpDropdown').classList.toggle('open');
+}
+function closeCpDropdown() {
+  document.getElementById('cpDropdown').classList.remove('open');
+}
+document.addEventListener('click', closeCpDropdown);
+
+// Init — hide tick on non-active option
+document.addEventListener('DOMContentLoaded', function() {
+  var humOpt = document.getElementById('cpOpt-humana');
+  if (humOpt) {
+    var tick = humOpt.querySelector('span:last-child');
+    if (tick) tick.style.display = 'none';
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+{% block title %}Manager Dashboard — Riley Perrone{% endblock %}
+{% block head %}
+<style>
+:root {
+  --purple: #6B21A8;
+  --purple-light: #EDE9FE;
+  --bg: #FAF7F2;
+  --border: #E5E0D8;
+  --green: #059669;
+  --amber: #D97706;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; }
+
+.topbar {
+  position: fixed; top: 0; left: 56px; right: 0; height: 56px;
+  background: #6B21A8; display: flex; align-items: center;
+  padding: 0 24px; z-index: 99;
+}
+.topbar-title { color: white; font-weight: 600; font-size: 16px; }
+.topbar-subtitle { color: rgba(255,255,255,0.5); font-size: 12px; margin-top: 1px; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.85); font-size: 13px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: #4C1D95; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 12px; }
+
+.main { margin-left: 56px; margin-top: 56px; padding: 28px; }
+
+/* demo nav offset */
+.topbar { top: 60px !important; }
+.main { margin-top: 116px !important; }
+/* sidebar offset handled by base.html g-sidebar */
+
+.stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 20px; }
+.queue-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+.queue-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 18px 20px; cursor: pointer; text-decoration: none; display: block; transition: border-color 0.15s; }
+.queue-card:hover { border-color: var(--purple); }
+.queue-card .q-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #9CA3AF; margin-bottom: 6px; }
+.queue-card .q-count { font-size: 32px; font-weight: 800; line-height: 1; }
+.queue-card .q-sub { font-size: 11px; color: #9CA3AF; margin-top: 4px; }
+.queue-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #9CA3AF; margin-bottom: 10px; }
+.stat-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 20px 22px; position: relative; overflow: hidden; }
+.stat-card .accent { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; border-radius: 12px 0 0 12px; }
+.stat-label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 8px; padding-left: 10px; }
+.stat-val { font-size: 30px; font-weight: 800; padding-left: 10px; line-height: 1; }
+.stat-sub { font-size: 11px; color: #9CA3AF; padding-left: 10px; margin-top: 4px; }
+
+.widget { background: #fff; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px; overflow: hidden; }
+.widget-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.widget-title { font-size: 15px; font-weight: 700; color: #111827; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+.badge-amber { background: #FEF3C7; color: #92400E; }
+.badge-green { background: #D1FAE5; color: #065F46; }
+.badge-purple { background: #EDE9FE; color: #5B21B6; }
+.btn-sm { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: #fff; cursor: pointer; color: #374151; font-family: inherit; }
+.btn-sm:hover { border-color: var(--purple); color: var(--purple); }
+.btn-sm.primary { background: var(--purple); color: #fff; border-color: var(--purple); }
+.btn-sm.primary:hover { background: #5B1898; }
+.btn-sm.approve { background: #D1FAE5; color: #065F46; border-color: #6EE7B7; }
+.btn-sm.return { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: #FAF7F2; padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); }
+tbody td { padding: 12px 16px; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: #FAF7F2; }
+
+.chip { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; }
+.chip-ma { background: #EDE9FE; color: #5B21B6; }
+.chip-rn { background: #D1FAE5; color: #065F46; }
+.chip-ct { background: #DBEAFE; color: #1E40AF; }
+.chip-pending { background: #FEF3C7; color: #92400E; }
+.chip-approved { background: #D1FAE5; color: #065F46; }
+.chip-open { background: #F3F4F6; color: #374151; }
+
+.section-link { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--purple); text-decoration: none; }
+.section-link:hover { text-decoration: underline; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">Manager Dashboard</div>
+    <div class="topbar-subtitle">MA / RN Team Lead &mdash; Clinical Operations</div>
+  </div>
+  <div class="topbar-right">
+    <span>Riley Perrone, Team Manager</span>
+    <div class="avatar">RP</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- Stats -->
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
+  <div class="stat-grid">
+    <div class="stat-card" style="cursor:pointer;" onclick="openUrgentPanel()">
+      <div class="accent" style="background:#DC2626;"></div>
+      <div class="stat-label">Urgent Messages</div>
+      <div class="stat-val" style="color:#DC2626;">3</div>
+      <div class="stat-sub">require immediate action</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent" style="background:#6B21A8;"></div>
+      <div class="stat-label">Team Members</div>
+      <div class="stat-val">12</div>
+      <div class="stat-sub">6 MA · 4 RN · 2 CT</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;">
+      <div class="accent" style="background:#D97706;"></div>
+      <div class="stat-label">Timesheets Pending</div>
+      <div class="stat-val" style="color:#D97706;">4</div>
+      <div class="stat-sub">awaiting approval</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent" style="background:#059669;"></div>
+      <div class="stat-label">Clocked In Now</div>
+      <div class="stat-val" style="color:#059669;">8</div>
+      <div class="stat-sub">of 12 scheduled</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;">
+      <div class="accent" style="background:#1D4ED8;"></div>
+      <div class="stat-label">Open Shifts</div>
+      <div class="stat-val" style="color:#1D4ED8;">2</div>
+      <div class="stat-sub">no clock-out recorded</div>
+    </div>
+  </div>
+
+  <!-- Critical Alert Stats -->
+  <div class="queue-section-label" style="color:#DC2626;">⚠ Critical Alerts — Requires Attention</div>
+  <div class="queue-grid" style="margin-bottom:12px;">
+    <a class="queue-card" href="/provider/rn/queue" style="border-color:#FCA5A5;">
+      <div class="q-label" style="color:#DC2626;">RN — Critical Results</div>
+      <div class="q-count" style="color:#DC2626;">2</div>
+      <div class="q-sub">abnormal results · uncontacted · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/ma/queue" style="border-color:#FCD34D;">
+      <div class="q-label" style="color:#D97706;">MA — Unassigned P1</div>
+      <div class="q-count" style="color:#D97706;">8</div>
+      <div class="q-sub">unassigned high-priority tasks · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/ma/queue" style="border-color:#FCA5A5;">
+      <div class="q-label" style="color:#DC2626;">MA — Prior Auth Critical</div>
+      <div class="q-count" style="color:#DC2626;">1</div>
+      <div class="q-sub">CRITICAL urgency · 92m wait · view →</div>
+    </a>
+  </div>
+
+  <!-- Queue Stats -->
+  <div class="queue-section-label">Live Queue Status — Read Access</div>
+  <div class="queue-grid">
+    <a class="queue-card" href="/provider/ma/queue">
+      <div class="q-label">MA Queue</div>
+      <div class="q-count" style="color:#6B21A8;">28</div>
+      <div class="q-sub">open tasks · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/rn/queue">
+      <div class="q-label">RN Queue</div>
+      <div class="q-count" style="color:#1D4ED8;">3</div>
+      <div class="q-sub">open tasks · view →</div>
+    </a>
+    <a class="queue-card" href="/provider/queue">
+      <div class="q-label">Patient Queue</div>
+      <div class="q-count" style="color:#059669;">14</div>
+      <div class="q-sub">active consults · view →</div>
+    </a>
+  </div>
+
+  <!-- Team Workload — Open Items by Category -->
+  <div class="widget">
+    <div class="widget-header">
+      <div class="widget-title">Team — Open Items by Category</div>
+      <span class="badge badge-green">Jun 30, 2026</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>PCP F/U</th>
+          <th>Referral Tracker</th>
+          <th>Titer Queue</th>
+          <th>DXS Audit</th>
+          <th>RN Queue</th>
+          <th>Total Open</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;">Michael Torres</td>
+          <td><span class="chip chip-ma">MA</span></td>
+          <td>4</td>
+          <td>3</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td style="font-weight:600;">7</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Jennifer Martinez</td>
+          <td><span class="chip chip-rn">RN</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>3</td>
+          <td>2</td>
+          <td>2</td>
+          <td style="font-weight:600;">7</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Carla Ruiz</td>
+          <td><span class="chip chip-ma">MA</span></td>
+          <td>2</td>
+          <td>2</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td style="font-weight:600;">4</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">David Park</td>
+          <td><span class="chip chip-rn">RN</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>2</td>
+          <td>1</td>
+          <td>1</td>
+          <td style="font-weight:600;">4</td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Ana Morales</td>
+          <td><span class="chip chip-ma">MA</span></td>
+          <td>1</td>
+          <td>2</td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+          <td style="font-weight:600;">3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Timesheet Approval Queue -->
+  <div class="widget">
+    <div class="widget-header" id="mgr-timesheets">
+      <div class="widget-title">Timesheet Approvals</div>
+      <span class="badge badge-amber">4 pending</span>
+      <span style="font-size:10px;color:#9CA3AF;font-family:monospace;margin-left:4px;">MGR-TS-001</span>
+      <a href="/provider/manager/timekeeping" class="section-link">View All &rarr;</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Team Member</th>
+          <th>Role</th>
+          <th>Week</th>
+          <th>Total Hours</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="font-weight:600;">Michael Torres</td>
+          <td><span class="chip chip-ma">MA</span></td>
+          <td>Jun 16 – Jun 22</td>
+          <td>40.5h</td>
+          <td>Jun 22, 5:12 PM</td>
+          <td><button class="btn-sm approve" onclick="approveTs(this,'Michael Torres')">Approve</button> <button class="btn-sm return" onclick="returnTs(this)">Return</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Jennifer Martinez</td>
+          <td><span class="chip chip-rn">RN</span></td>
+          <td>Jun 16 – Jun 22</td>
+          <td>38.0h</td>
+          <td>Jun 22, 4:58 PM</td>
+          <td><button class="btn-sm approve" onclick="approveTs(this,'Jennifer Martinez')">Approve</button> <button class="btn-sm return" onclick="returnTs(this)">Return</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">Carla Ruiz</td>
+          <td><span class="chip chip-ma">MA</span></td>
+          <td>Jun 16 – Jun 22</td>
+          <td>37.5h</td>
+          <td>Jun 23, 8:01 AM</td>
+          <td><button class="btn-sm approve" onclick="approveTs(this,'Carla Ruiz')">Approve</button> <button class="btn-sm return" onclick="returnTs(this)">Return</button></td>
+        </tr>
+        <tr>
+          <td style="font-weight:600;">David Park</td>
+          <td><span class="chip chip-rn">RN</span></td>
+          <td>Jun 16 – Jun 22</td>
+          <td>42.0h</td>
+          <td>Jun 23, 9:15 AM</td>
+          <td><button class="btn-sm approve" onclick="approveTs(this,'David Park')">Approve</button> <button class="btn-sm return" onclick="returnTs(this)">Return</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+</main>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function approveTs(btn, name) {
+  if (!confirm('Approve timesheet for ' + name + '?')) return;
+  var row = btn.closest('tr');
+  row.querySelector('td:last-child').innerHTML = '<span style="font-size:12px;font-weight:600;color:#059669;">&#10003; Approved</span>';
+  // Update pending badge
+  var badge = document.querySelector('.badge-amber');
+  var n = parseInt(badge.textContent) - 1;
+  badge.textContent = n + ' pending';
+}
+
+function returnTs(btn) {
+  var reason = prompt('Enter a reason to return this timesheet:');
+  if (!reason) return;
+  var row = btn.closest('tr');
+  row.querySelector('td:last-child').innerHTML = '<span style="font-size:12px;font-weight:600;color:#D97706;">&#8617; Returned</span>';
+  var badge = document.querySelector('.badge-amber');
+  var n = parseInt(badge.textContent) - 1;
+  badge.textContent = n + ' pending';
+}
+
+
+
+var URGENT_MSGS = [
+  { type:'message', initials:'JM', bg:'#7C3AED', sender:'Jennifer Martinez, RN', patient:null, url:'/provider/messages', preview:'"Need you to call back the Johnson family before end of shift — they're asking about the results and I don't have authority to discuss."', time:'12 min ago' },
+  { type:'chart',   initials:'PS', bg:'#0891B2', sender:'Priya Sharma, MA',       patient:'Marcus J. \u00b7 CST-2026-10849', url:'/provider/chart/1', preview:'"Critical lab result returned — testosterone panel flagged outside normal range. Please review before closing chart."', time:'28 min ago' },
+  { type:'chart',   initials:'KP', bg:'#059669', sender:'Kim Patel, NP',           patient:'D.R. \u00b7 C-20260601-022',     url:'/provider/chart/1?product=awv', dept:'\u2192 Physician (MD)', preview:'"AWV patient presenting with new chest tightness complaint — outside my scope, needs MD review today."', time:'41 min ago' }
+];
+function openUrgentPanel() {
+  var body = document.getElementById('urgPanelBody');
+  if (!body) return;
+  body.innerHTML = URGENT_MSGS.map(function(m) {
+    var patChip = m.patient ? '<a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;text-decoration:none;font-weight:600;">\ud83d\udccb '+m.patient+'</a>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
+    var deptChip = m.dept ? '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">'+m.dept+'</span>' : '';
+    var actionLabel = m.type==='chart' ? '\u2192 Open Chart' : '\u2192 Open Message';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+deptChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
+  }).join('');
+  document.getElementById('urgentPanel').style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
+}
+function closeUrgentPanel() {
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
+}
+</script>
+
+  <!-- Urgent Messages Panel (URG-MSG-001) -->
+  <div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+    <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      <span style="font-size:16px;">🚨</span>
+      <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
+      <span id="urgPanelCount" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;border-radius:10px;padding:2px 8px;">3</span>
+      <button onclick="closeUrgentPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:4px;padding:2px 10px;margin-left:8px;">✕</button>
+    </div>
+    <div style="padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA;font-size:11px;color:#991B1B;flex-shrink:0;">
+      These messages require your immediate attention. Click any message to open it directly.
+      <span style="float:right;font-family:monospace;color:#FCA5A5;">URG-MSG-001</span>
+    </div>
+    <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
+  </div>
+  <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+
+{% endblock %}

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telehealth — Requirements Review</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F3F4F6;
+      color: #111827;
+      font-size: 14px;
+    }
+
+    /* Header */
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-badge {
+      background: #1D4ED8;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .header-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: #6B7280;
+      margin-top: 1px;
+    }
+    .header-count {
+      font-size: 13px;
+      color: #6B7280;
+    }
+    .header-count strong {
+      color: #111827;
+      font-weight: 600;
+    }
+
+    /* Filters bar */
+    .filters {
+      background: #fff;
+      border-bottom: 1px solid #E5E7EB;
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6B7280;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .filters input[type="text"],
+    .filters select {
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 13px;
+      color: #111827;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .filters input[type="text"] { width: 260px; }
+    .filters input[type="text"]:focus,
+    .filters select:focus { border-color: #1D4ED8; }
+    .filters select { cursor: pointer; }
+    .filter-reset {
+      background: none;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #6B7280;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .filter-reset:hover { border-color: #9CA3AF; color: #374151; }
+    .filter-sep { width: 1px; height: 20px; background: #E5E7EB; }
+    .result-counter {
+      margin-left: auto;
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .result-counter strong { color: #111827; }
+
+    /* Table */
+    .table-wrap {
+      padding: 24px 32px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #E5E7EB;
+      overflow: hidden;
+    }
+    thead tr {
+      background: #F9FAFB;
+      border-bottom: 2px solid #E5E7EB;
+    }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6B7280;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { color: #374151; }
+    thead th.sort-asc::after { content: ' ↑'; }
+    thead th.sort-desc::after { content: ' ↓'; }
+
+    tbody tr {
+      border-bottom: 1px solid #F3F4F6;
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9FAFB; cursor: pointer; }
+    tbody tr.expanded { background: #EFF6FF; }
+    tbody tr.expanded:hover { background: #DBEAFE; }
+
+    td {
+      padding: 10px 14px;
+      vertical-align: top;
+    }
+
+    .td-id {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1D4ED8;
+      white-space: nowrap;
+      width: 100px;
+    }
+    .td-module {
+      font-size: 12px;
+      color: #374151;
+      width: 170px;
+      white-space: nowrap;
+    }
+    .td-section {
+      font-size: 12px;
+      color: #6B7280;
+      width: 140px;
+    }
+    .td-req {
+      font-size: 13px;
+      color: #111827;
+      line-height: 1.5;
+      max-width: 480px;
+    }
+    .td-req.truncate {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Priority pills */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-critical { background: #FEE2E2; color: #991B1B; }
+    .pill-high     { background: #FEF3C7; color: #92400E; }
+    .pill-medium   { background: #DBEAFE; color: #1E40AF; }
+    .pill-low      { background: #F3F4F6; color: #6B7280; }
+    .pill-musthave { background: #D1FAE5; color: #065F46; }
+    .pill-p0       { background: #FEE2E2; color: #991B1B; }
+    .pill-p1       { background: #FEF3C7; color: #92400E; }
+    .pill-v2       { background: #EDE9FE; color: #5B21B6; }
+    .pill-default  { background: #F3F4F6; color: #6B7280; }
+
+    /* Status pills */
+    .status-approved    { background: #D1FAE5; color: #065F46; }
+    .status-draft       { background: #FEF3C7; color: #92400E; }
+    .status-open        { background: #DBEAFE; color: #1E40AF; }
+    .status-deprecated  { background: #F3F4F6; color: #9CA3AF; }
+    .status-v2          { background: #EDE9FE; color: #5B21B6; }
+    .status-notstarted  { background: #F3F4F6; color: #6B7280; }
+
+    /* Expanded detail row */
+    .detail-row td {
+      padding: 0;
+      background: #EFF6FF;
+      border-bottom: 1px solid #BFDBFE;
+    }
+    .detail-inner {
+      padding: 16px 14px 16px 114px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .detail-block { }
+    .detail-block.full { grid-column: 1 / -1; }
+    .detail-key {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #1D4ED8;
+      margin-bottom: 4px;
+    }
+    .detail-val {
+      font-size: 13px;
+      color: #1E3A5F;
+      line-height: 1.6;
+    }
+    .detail-val.empty { color: #9CA3AF; font-style: italic; }
+
+    /* No results */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #9CA3AF;
+    }
+    .no-results-icon { font-size: 36px; margin-bottom: 8px; }
+    .no-results-msg { font-size: 14px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-badge">Telehealth</div>
+    <div>
+      <div class="header-title">Requirements Browser</div>
+      <div class="header-sub">Read-only · Internal review</div>
+    </div>
+  </div>
+  <div class="header-count">
+    <strong id="totalCount">{{ requirements|length }}</strong> total requirements
+  </div>
+</div>
+
+<div class="filters">
+  <span class="filter-label">Filter</span>
+  <input type="text" id="searchInput" placeholder="Search requirements…" oninput="applyFilters()">
+  <div class="filter-sep"></div>
+  <select id="moduleFilter" onchange="applyFilters()">
+    <option value="">All Modules</option>
+    {% for m in modules %}
+    <option value="{{ m }}">{{ m }}</option>
+    {% endfor %}
+  </select>
+  <select id="statusFilter" onchange="applyFilters()">
+    <option value="">All Statuses</option>
+    {% for s in statuses %}
+    <option value="{{ s }}">{{ s }}</option>
+    {% endfor %}
+  </select>
+  <select id="priorityFilter" onchange="applyFilters()">
+    <option value="">All Priorities</option>
+    {% for p in priorities %}
+    <option value="{{ p }}">{{ p }}</option>
+    {% endfor %}
+  </select>
+  <button class="filter-reset" onclick="resetFilters()">Reset</button>
+  <span class="result-counter"><strong id="visibleCount">{{ requirements|length }}</strong> showing</span>
+</div>
+
+<div class="table-wrap">
+  <table id="reqTable">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">Req ID</th>
+        <th onclick="sortTable(1)">Module</th>
+        <th onclick="sortTable(2)">Section</th>
+        <th onclick="sortTable(3)">Requirement</th>
+        <th onclick="sortTable(4)">Priority</th>
+        <th onclick="sortTable(5)">Status</th>
+      </tr>
+    </thead>
+    <tbody id="reqBody">
+      {% for r in requirements %}
+      <tr class="req-row"
+          data-module="{{ r.module_id or '' }}"
+          data-status="{{ r.status or '' }}"
+          data-priority="{{ r.priority or '' }}"
+          data-search="{{ ((r.req_id or '') + ' ' + (r.module_id or '') + ' ' + (r.section or '') + ' ' + (r.requirement or '') + ' ' + (r.user_story or '') + ' ' + (r.rule or ''))|lower }}"
+          onclick="toggleDetail(this, '{{ loop.index0 }}')">
+        <td class="td-id">{{ r.req_id or '—' }}</td>
+        <td class="td-module">{{ r.module_id or '—' }}</td>
+        <td class="td-section">{{ r.section or '—' }}</td>
+        <td class="td-req truncate">{{ r.requirement or '—' }}</td>
+        <td>
+          {% set p = (r.priority or 'default')|lower|replace(' ', '') %}
+          <span class="pill pill-{{ p }}">{{ r.priority or '—' }}</span>
+        </td>
+        <td>
+          {% set s = (r.status or 'default')|lower|replace(' ', '') %}
+          <span class="pill status-{{ s }}">{{ r.status or '—' }}</span>
+        </td>
+      </tr>
+      <tr class="detail-row hidden" id="detail-{{ loop.index0 }}">
+        <td colspan="6">
+          <div class="detail-inner">
+            {% if r.user_story %}
+            <div class="detail-block full">
+              <div class="detail-key">User Story</div>
+              <div class="detail-val">{{ r.user_story }}</div>
+            </div>
+            {% endif %}
+            {% if r.requirement %}
+            <div class="detail-block full">
+              <div class="detail-key">Full Requirement</div>
+              <div class="detail-val">{{ r.requirement }}</div>
+            </div>
+            {% endif %}
+            {% if r.rule %}
+            <div class="detail-block">
+              <div class="detail-key">Business Rule</div>
+              <div class="detail-val">{{ r.rule }}</div>
+            </div>
+            {% endif %}
+            {% if r.acceptance %}
+            <div class="detail-block">
+              <div class="detail-key">Acceptance Criteria</div>
+              <div class="detail-val">{{ r.acceptance }}</div>
+            </div>
+            {% endif %}
+            {% if r.edge_cases %}
+            <div class="detail-block full">
+              <div class="detail-key">Edge Cases</div>
+              <div class="detail-val">{{ r.edge_cases }}</div>
+            </div>
+            {% endif %}
+            <div class="detail-block">
+              <div class="detail-key">Source</div>
+              <div class="detail-val {% if not r.source %}empty{% endif %}">{{ r.source or 'Not specified' }}</div>
+            </div>
+            {% if r.owner %}
+            <div class="detail-block">
+              <div class="detail-key">Owner</div>
+              <div class="detail-val">{{ r.owner }}</div>
+            </div>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="no-results hidden" id="noResults">
+    <div class="no-results-icon">🔍</div>
+    <div class="no-results-msg">No requirements match your filters.</div>
+  </div>
+</div>
+
+<script>
+  function applyFilters() {
+    const search   = document.getElementById('searchInput').value.toLowerCase().trim();
+    const module   = document.getElementById('moduleFilter').value;
+    const status   = document.getElementById('statusFilter').value;
+    const priority = document.getElementById('priorityFilter').value;
+
+    const rows = document.querySelectorAll('.req-row');
+    let visible = 0;
+
+    rows.forEach(row => {
+      const detailRow = row.nextElementSibling;
+      const matchSearch   = !search   || row.dataset.search.includes(search);
+      const matchModule   = !module   || row.dataset.module === module;
+      const matchStatus   = !status   || row.dataset.status === status;
+      const matchPriority = !priority || row.dataset.priority === priority;
+
+      const show = matchSearch && matchModule && matchStatus && matchPriority;
+      row.classList.toggle('hidden', !show);
+      if (detailRow && detailRow.classList.contains('detail-row')) {
+        if (!show) detailRow.classList.add('hidden');
+        // keep expanded state if row is visible
+      }
+      if (show) visible++;
+    });
+
+    document.getElementById('visibleCount').textContent = visible;
+    document.getElementById('noResults').classList.toggle('hidden', visible > 0);
+  }
+
+  function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('moduleFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('priorityFilter').value = '';
+    applyFilters();
+  }
+
+  function toggleDetail(row, idx) {
+    const detail = document.getElementById('detail-' + idx);
+    const isOpen = !detail.classList.contains('hidden');
+    detail.classList.toggle('hidden', isOpen);
+    row.classList.toggle('expanded', !isOpen);
+  }
+
+  // Simple column sort
+  let sortCol = -1, sortDir = 1;
+  function sortTable(col) {
+    const tbody = document.getElementById('reqBody');
+    const rowPairs = [];
+    const allRows = Array.from(tbody.querySelectorAll('.req-row'));
+    allRows.forEach(r => {
+      const detail = r.nextElementSibling;
+      rowPairs.push([r, detail]);
+    });
+
+    if (sortCol === col) sortDir *= -1;
+    else { sortCol = col; sortDir = 1; }
+
+    document.querySelectorAll('thead th').forEach((th, i) => {
+      th.classList.remove('sort-asc', 'sort-desc');
+      if (i === col) th.classList.add(sortDir === 1 ? 'sort-asc' : 'sort-desc');
+    });
+
+    rowPairs.sort((a, b) => {
+      const ta = a[0].cells[col].textContent.trim().toLowerCase();
+      const tb = b[0].cells[col].textContent.trim().toLowerCase();
+      return ta < tb ? -sortDir : ta > tb ? sortDir : 0;
+    });
+
+    rowPairs.forEach(([r, d]) => { tbody.appendChild(r); if (d) tbody.appendChild(d); });
+  }
+</script>
+
+</body>
+</html>

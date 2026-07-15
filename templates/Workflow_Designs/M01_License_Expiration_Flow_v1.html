@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>M01 — License Expiration & Provider Reassignment Flow</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #222; }
+  .diagram-title { font-size: 15px; font-weight: bold; color: #1F3864; border-left: 4px solid #1F3864; padding-left: 10px; margin-bottom: 4px; }
+  .diagram-sub { font-size: 11px; color: #666; margin-bottom: 24px; font-style: italic; }
+  svg { display: block; max-width: 1100px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+</style>
+</head>
+<body>
+<div class="diagram-title">Workflow — License Expiration & Provider Reassignment · M01-LIC-001 / M14-SUP-002</div>
+<div class="diagram-sub">Real-time Verifiable push triggers immediate state removal, open item flagging, and admin-driven reassignment workflow.</div>
+
+<svg viewBox="0 0 1060 860" xmlns="http://www.w3.org/2000/svg" font-family="Arial" font-size="12">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1F3864"/></marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#C0392B"/></marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1F7A4A"/></marker>
+    <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#B8730A"/></marker>
+  </defs>
+
+  <!-- Header -->
+  <rect x="10" y="10" width="1040" height="24" rx="4" fill="#1F3864"/>
+  <text x="530" y="26" text-anchor="middle" font-size="12" font-weight="bold" fill="white">LICENSE EXPIRATION &amp; PROVIDER REASSIGNMENT FLOW</text>
+
+  <!-- Legend -->
+  <rect x="20" y="44" width="12" height="12" rx="2" fill="#0D6EFD" opacity="0.8"/>
+  <text x="38" y="54" font-size="11" fill="#333">Verifiable (real-time push)</text>
+  <rect x="220" y="44" width="12" height="12" rx="2" fill="#1F7A4A"/>
+  <text x="238" y="54" font-size="11" fill="#333">System automated</text>
+  <rect x="380" y="44" width="12" height="12" rx="2" fill="#1F3864"/>
+  <text x="398" y="54" font-size="11" fill="#333">Admin action</text>
+  <rect x="500" y="44" width="12" height="12" rx="2" fill="#C0392B"/>
+  <text x="518" y="54" font-size="11" fill="#333">Blocked state</text>
+
+  <!-- TRIGGER -->
+  <rect x="360" y="76" width="340" height="52" rx="8" fill="#DBEAFE" stroke="#0D6EFD" stroke-width="1.5" opacity="0.9"/>
+  <text x="530" y="98" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Verifiable Push: License Event</text>
+  <text x="530" y="114" text-anchor="middle" font-size="11" fill="#555">Expiration, suspension, or revocation detected in real time</text>
+  <line x1="530" y1="128" x2="530" y2="150" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- SYSTEM: Immediate state removal -->
+  <rect x="340" y="150" width="380" height="64" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="530" y="172" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Immediate State Scope Removal</text>
+  <text x="530" y="188" text-anchor="middle" font-size="11" fill="#333">Provider's affected state removed from authorization scope</text>
+  <text x="530" y="203" text-anchor="middle" font-size="11" fill="#333">New patients in that state no longer routed to this provider</text>
+  <line x1="530" y1="214" x2="530" y2="236" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- DECISION: Open items? -->
+  <polygon points="530,236 700,274 530,312 360,274" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="530" y="268" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Open Consults /</text>
+  <text x="530" y="284" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Pending Items?</text>
+
+  <!-- No — right -->
+  <line x1="700" y1="274" x2="860" y2="274" stroke="#1F7A4A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="776" y="266" text-anchor="middle" font-size="11" fill="#1F7A4A" font-weight="bold">No</text>
+  <rect x="860" y="248" width="160" height="52" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="940" y="270" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">State Removed</text>
+  <text x="940" y="286" text-anchor="middle" font-size="11" fill="#555">No further action.</text>
+  <text x="940" y="298" text-anchor="middle" font-size="11" fill="#555">Audit logged.</text>
+
+  <!-- Yes — down -->
+  <line x1="530" y1="312" x2="530" y2="334" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="545" y="328" font-size="11" fill="#C0392B" font-weight="bold">Yes</text>
+
+  <!-- SYSTEM: Flag open items -->
+  <rect x="320" y="334" width="420" height="64" rx="8" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="530" y="356" text-anchor="middle" font-size="12" font-weight="bold" fill="#C0392B">Flag Open Items — Hold, Not Delete</text>
+  <text x="530" y="372" text-anchor="middle" font-size="11" fill="#555">Open consults, pending co-signs, lab auth queue items flagged</text>
+  <text x="530" y="387" text-anchor="middle" font-size="11" fill="#555">Supervised providers in affected state blocked from new submissions</text>
+  <line x1="530" y1="398" x2="530" y2="420" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- SYSTEM: Alert admin -->
+  <rect x="340" y="420" width="380" height="52" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="530" y="442" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Critical Alert → System Admin / Platform Admin</text>
+  <text x="530" y="458" text-anchor="middle" font-size="11" fill="#333">Reassignment task created in Admin queue with provider name + state</text>
+  <line x1="530" y1="472" x2="530" y2="494" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- ADMIN: Reassignment tool -->
+  <rect x="340" y="494" width="380" height="64" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="530" y="516" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Admin Uses Reassignment Tool</text>
+  <text x="530" y="532" text-anchor="middle" font-size="11" fill="#555">Assigns open consults to new licensed provider in that state</text>
+  <text x="530" y="547" text-anchor="middle" font-size="11" fill="#555">For supervised providers: assigns new supervising physician (M14-SUP-002)</text>
+  <line x1="530" y1="558" x2="530" y2="580" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- DECISION: Replacement available? -->
+  <polygon points="530,580 700,614 530,648 360,614" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="530" y="608" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Licensed Replacement</text>
+  <text x="530" y="624" text-anchor="middle" font-size="12" font-weight="bold" fill="#6E4C00">Available in State?</text>
+
+  <!-- No — left -->
+  <line x1="360" y1="614" x2="160" y2="614" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="256" y="606" text-anchor="middle" font-size="11" fill="#C0392B" font-weight="bold">No</text>
+  <rect x="20" y="588" width="140" height="52" rx="8" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="90" y="610" text-anchor="middle" font-size="12" font-weight="bold" fill="#C0392B">State Suspended</text>
+  <text x="90" y="626" text-anchor="middle" font-size="11" fill="#555">Care Team alerts</text>
+  <text x="90" y="638" text-anchor="middle" font-size="11" fill="#555">affected patients</text>
+
+  <!-- Yes — down -->
+  <line x1="530" y1="648" x2="530" y2="670" stroke="#1F7A4A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="545" y="664" font-size="11" fill="#1F7A4A" font-weight="bold">Yes</text>
+
+  <!-- STEP: Transfer and unblock -->
+  <rect x="340" y="670" width="380" height="64" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="530" y="692" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Transfer &amp; Unblock</text>
+  <text x="530" y="708" text-anchor="middle" font-size="11" fill="#333">Open items transferred to replacement provider</text>
+  <text x="530" y="723" text-anchor="middle" font-size="11" fill="#333">Supervised providers unblocked for new submissions in state</text>
+  <line x1="530" y1="734" x2="530" y2="756" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- FINAL: Audit -->
+  <rect x="380" y="756" width="300" height="52" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="530" y="778" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Reassignment Logged</text>
+  <text x="530" y="794" text-anchor="middle" font-size="11" fill="#555">Actor, timestamp, old provider, new provider — M12 Audit</text>
+
+  <!-- M13 reporting note -->
+  <rect x="750" y="670" width="180" height="52" rx="6" fill="#F5F5F5" stroke="#CCC" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="840" y="691" text-anchor="middle" font-size="11" fill="#666">Single-supervisor states</text>
+  <text x="840" y="705" text-anchor="middle" font-size="11" fill="#666">flagged as risk in</text>
+  <text x="840" y="719" text-anchor="middle" font-size="11" fill="#666">M13 Reports</text>
+</svg>
+</body>
+</html>

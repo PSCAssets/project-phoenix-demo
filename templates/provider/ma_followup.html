@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+{% block title %}PCP Follow-Up Tasks{% endblock %}
+{% block head %}
+<style>
+:root { --purple:#6B21A8; --bg:#FAF7F2; --border:#E5E0D8; --green:#059669; --amber:#D97706; --red:#DC2626; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+
+.page-wrap { padding:32px 28px; margin-left:56px; }
+.page-title { font-size:22px; font-weight:800; color:#111827; }
+.page-sub   { font-size:13px; color:#6B7280; margin-top:3px; margin-bottom:6px; }
+
+/* Workflow origin banner */
+.workflow-banner { display:flex; align-items:center; gap:10px; background:#EDE9FE; border:1px solid #DDD6FE; border-radius:10px; padding:11px 16px; margin-bottom:22px; font-size:12px; color:#5B21B6; }
+.workflow-banner strong { font-weight:700; }
+.stage-pill { background:#6B21A8; color:#fff; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:700; }
+
+/* Summary cards */
+.summary-row { display:flex; gap:14px; margin-bottom:24px; flex-wrap:wrap; }
+.sum-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 20px; min-width:120px; }
+.sum-label { font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px; }
+.sum-val { font-size:26px; font-weight:800; color:#111827; }
+.sum-val.amber { color:var(--amber); }
+.sum-val.red   { color:var(--red); }
+.sum-val.green { color:var(--green); }
+
+/* Filter bar */
+.filter-bar { display:flex; gap:8px; margin-bottom:16px; align-items:center; flex-wrap:wrap; }
+.filter-bar select, .filter-bar input { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.filter-bar input { min-width:200px; }
+.filter-bar select:focus, .filter-bar input:focus { border-color:var(--purple); }
+.filter-label { font-size:12px; font-weight:600; color:#6B7280; margin-left:auto; }
+
+/* Table */
+.table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+tbody td { padding:12px 14px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#FAF7F2; }
+tbody tr.overdue { background:#FFF7ED; }
+tbody tr.critical { background:#FEF2F2; }
+
+.patient-id { font-weight:700; color:#111827; font-family:monospace; font-size:12px; }
+.program-chip { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+.prog-a1c   { background:#DBEAFE; color:#1E40AF; }
+.prog-wm    { background:#D1FAE5; color:#065F46; }
+.prog-tc    { background:#EDE9FE; color:#5B21B6; }
+
+.attempts-bar { display:flex; gap:3px; align-items:center; }
+.attempt-dot { width:10px; height:10px; border-radius:50%; }
+.dot-done   { background:#6B21A8; }
+.dot-empty  { background:#E5E7EB; border:1px solid #D1D5DB; }
+
+.status-chip { display:inline-flex; padding:3px 9px; border-radius:10px; font-size:11px; font-weight:600; }
+.s-open        { background:#F3F4F6; color:#374151; }
+.s-attempted   { background:#FEF3C7; color:#92400E; }
+.s-noncompliant { background:#FEE2E2; color:#991B1B; }
+.s-complete    { background:#D1FAE5; color:#065F46; }
+
+.overdue-tag { font-size:10px; font-weight:700; color:var(--red); margin-left:5px; }
+
+.btn-action { border:1px solid var(--border); background:#fff; border-radius:6px; padding:5px 11px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; margin-right:4px; white-space:nowrap; }
+.btn-action:hover { border-color:var(--purple); color:var(--purple); background:#F5F3FF; }
+.btn-action.danger:hover { border-color:var(--red); color:var(--red); background:#FEF2F2; }
+.btn-action.success { background:var(--green); color:#fff; border-color:var(--green); }
+.btn-action.success:hover { background:#047857; }
+
+/* Attempt modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:1000; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal-box { background:#fff; border-radius:14px; padding:26px; width:480px; max-width:95vw; box-shadow:0 20px 60px rgba(0,0,0,0.18); }
+.modal-title { font-size:16px; font-weight:800; color:#111827; margin-bottom:3px; }
+.modal-sub { font-size:12px; color:#9CA3AF; margin-bottom:20px; }
+.modal-field { margin-bottom:14px; }
+.modal-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#6B7280; margin-bottom:5px; }
+.modal-input, .modal-select, .modal-textarea { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 11px; font-size:13px; font-family:inherit; outline:none; color:#374151; background:#fff; }
+.modal-input:focus, .modal-select:focus, .modal-textarea:focus { border-color:var(--purple); }
+.modal-textarea { resize:vertical; min-height:80px; }
+.modal-readonly { background:#F9FAFB; color:#6B7280; font-size:13px; padding:8px 11px; border:1px solid var(--border); border-radius:7px; }
+.modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+.btn-cancel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; }
+.btn-primary { background:var(--purple); color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-primary:hover { background:#5B1898; }
+.btn-danger  { background:var(--red); color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-danger:hover { background:#B91C1C; }
+
+.section-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9CA3AF; margin-bottom:10px; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-wrap">
+
+  <div class="page-title">PCP Follow-Up Tasks</div>
+  <div class="page-sub">Michael Torres, MA &mdash; Week of Jun 23, 2026</div>
+
+  <!-- Workflow origin banner -->
+  <div class="workflow-banner">
+    <span class="stage-pill">Workflow Stage</span>
+    <span>Tasks in this view are automatically created when a provider order reaches the <strong>PCP Referral Follow-Up</strong> stage in the workflow configuration. No manual entry required.</span>
+    <a href="/admin/workflow" style="font-size:11px;font-weight:700;color:#6B21A8;text-decoration:none;margin-left:auto;white-space:nowrap;">View Workflow Config &#8599;</a>
+  </div>
+
+  <!-- Summary stats -->
+  <div class="summary-row">
+    <div class="sum-card">
+      <div class="sum-label">Open</div>
+      <div class="sum-val amber" id="statOpen">5</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Overdue</div>
+      <div class="sum-val red" id="statOverdue">2</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Completed This Week</div>
+      <div class="sum-val green">4</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Non-Compliant</div>
+      <div class="sum-val red">1</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">Avg Attempts</div>
+      <div class="sum-val">1.8</div>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search patient ID or program…" oninput="filterTable()">
+    <select id="filterStatus" onchange="filterTable()">
+      <option value="">All Statuses</option>
+      <option value="open">Open</option>
+      <option value="attempted">Attempted</option>
+      <option value="noncompliant">Non-Compliant</option>
+      <option value="complete">Complete</option>
+    </select>
+    <select id="filterProgram" onchange="filterTable()">
+      <option value="">All Programs</option>
+      <option value="A1C">A1C Management</option>
+      <option value="Weight">Weight Management</option>
+      <option value="Testosterone">Testosterone Care</option>
+    </select>
+    <span class="filter-label" id="rowCount">Showing 5 of 5</span>
+  </div>
+
+  <!-- Open follow-up tasks -->
+  <div class="section-label">Open &amp; In-Progress</div>
+  <div class="table-wrap">
+    <table id="followupTable">
+      <thead>
+        <tr>
+          <th>Patient ID</th>
+          <th>Care Program</th>
+          <th>Order Date</th>
+          <th>Target Date</th>
+          <th>Attempts</th>
+          <th>Last Contact</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="followupBody">
+
+        <tr class="overdue" data-status="attempted" data-program="A1C">
+          <td>
+            <a href="/provider/chart/1?type=async&product=a1c" style="text-decoration:none;">
+              <div class="patient-id" style="color:#6B21A8;cursor:pointer;">PT-2026-00142</div>
+            </a>
+          </td>
+          <td><span class="program-chip prog-a1c">A1C Management</span></td>
+          <td>Jun 9, 2026</td>
+          <td>Jun 23, 2026 <span class="overdue-tag">OVERDUE</span></td>
+          <td>
+            <div class="attempts-bar" title="2 of 3 attempts used">
+              <div class="attempt-dot dot-done"></div>
+              <div class="attempt-dot dot-done"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <span style="font-size:11px;color:#6B7280;margin-left:4px;">2/3</span>
+            </div>
+          </td>
+          <td>Jun 20, 2026</td>
+          <td><span class="status-chip s-attempted">Attempted</span></td>
+          <td>
+            <button class="btn-action" onclick="openAttemptModal('PT-2026-00142','A1C Management','Jun 9, 2026','Jun 23, 2026',2,'r1')">Log Attempt</button>
+            <button class="btn-action success" onclick="markComplete(this,'r1')">Complete</button>
+            <button class="btn-action danger" onclick="openCloseModal('PT-2026-00142','r1')">Non-Compliant</button>
+          </td>
+        </tr>
+
+        <tr class="overdue" data-status="open" data-program="Weight">
+          <td>
+            <a href="/provider/chart/2?type=async&product=a1c" style="text-decoration:none;">
+              <div class="patient-id" style="color:#6B21A8;cursor:pointer;">PT-2026-00198</div>
+            </a>
+          </td>
+          <td><span class="program-chip prog-wm">Weight Management</span></td>
+          <td>Jun 10, 2026</td>
+          <td>Jun 24, 2026 <span class="overdue-tag">OVERDUE</span></td>
+          <td>
+            <div class="attempts-bar" title="1 of 3 attempts used">
+              <div class="attempt-dot dot-done"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <span style="font-size:11px;color:#6B7280;margin-left:4px;">1/3</span>
+            </div>
+          </td>
+          <td>Jun 18, 2026</td>
+          <td><span class="status-chip s-attempted">Attempted</span></td>
+          <td>
+            <button class="btn-action" onclick="openAttemptModal('PT-2026-00198','Weight Management','Jun 10, 2026','Jun 24, 2026',1,'r2')">Log Attempt</button>
+            <button class="btn-action success" onclick="markComplete(this,'r2')">Complete</button>
+            <button class="btn-action danger" onclick="openCloseModal('PT-2026-00198','r2')">Non-Compliant</button>
+          </td>
+        </tr>
+
+        <tr data-status="open" data-program="A1C">
+          <td>
+            <a href="/provider/chart/3?type=async&product=a1c" style="text-decoration:none;">
+              <div class="patient-id" style="color:#6B21A8;cursor:pointer;">PT-2026-00071</div>
+            </a>
+          </td>
+          <td><span class="program-chip prog-a1c">A1C Management</span></td>
+          <td>Jun 13, 2026</td>
+          <td>Jun 27, 2026</td>
+          <td>
+            <div class="attempts-bar" title="0 of 3 attempts used">
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <span style="font-size:11px;color:#6B7280;margin-left:4px;">0/3</span>
+            </div>
+          </td>
+          <td>—</td>
+          <td><span class="status-chip s-open">Open</span></td>
+          <td>
+            <button class="btn-action" onclick="openAttemptModal('PT-2026-00071','A1C Management','Jun 13, 2026','Jun 27, 2026',0,'r3')">Log Attempt</button>
+            <button class="btn-action success" onclick="markComplete(this,'r3')">Complete</button>
+            <button class="btn-action danger" onclick="openCloseModal('PT-2026-00071','r3')">Non-Compliant</button>
+          </td>
+        </tr>
+
+        <tr data-status="open" data-program="Testosterone">
+          <td>
+            <a href="/provider/chart/4?type=async&product=a1c" style="text-decoration:none;">
+              <div class="patient-id" style="color:#6B21A8;cursor:pointer;">PT-2026-00211</div>
+            </a>
+          </td>
+          <td><span class="program-chip prog-tc">Testosterone Care</span></td>
+          <td>Jun 14, 2026</td>
+          <td>Jun 28, 2026</td>
+          <td>
+            <div class="attempts-bar" title="0 of 3 attempts used">
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <span style="font-size:11px;color:#6B7280;margin-left:4px;">0/3</span>
+            </div>
+          </td>
+          <td>—</td>
+          <td><span class="status-chip s-open">Open</span></td>
+          <td>
+            <button class="btn-action" onclick="openAttemptModal('PT-2026-00211','Testosterone Care','Jun 14, 2026','Jun 28, 2026',0,'r4')">Log Attempt</button>
+            <button class="btn-action success" onclick="markComplete(this,'r4')">Complete</button>
+            <button class="btn-action danger" onclick="openCloseModal('PT-2026-00211','r4')">Non-Compliant</button>
+          </td>
+        </tr>
+
+        <tr data-status="open" data-program="Weight">
+          <td>
+            <a href="/provider/chart/5?type=async&product=a1c" style="text-decoration:none;">
+              <div class="patient-id" style="color:#6B21A8;cursor:pointer;">PT-2026-00089</div>
+            </a>
+          </td>
+          <td><span class="program-chip prog-wm">Weight Management</span></td>
+          <td>Jun 16, 2026</td>
+          <td>Jun 30, 2026</td>
+          <td>
+            <div class="attempts-bar" title="0 of 3 attempts used">
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <div class="attempt-dot dot-empty"></div>
+              <span style="font-size:11px;color:#6B7280;margin-left:4px;">0/3</span>
+            </div>
+          </td>
+          <td>—</td>
+          <td><span class="status-chip s-open">Open</span></td>
+          <td>
+            <button class="btn-action" onclick="openAttemptModal('PT-2026-00089','Weight Management','Jun 16, 2026','Jun 30, 2026',0,'r5')">Log Attempt</button>
+            <button class="btn-action success" onclick="markComplete(this,'r5')">Complete</button>
+            <button class="btn-action danger" onclick="openCloseModal('PT-2026-00089','r5')">Non-Compliant</button>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Closed this week -->
+  <div class="section-label">Closed This Week</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Patient ID</th>
+          <th>Care Program</th>
+          <th>Order Date</th>
+          <th>Closed Date</th>
+          <th>Attempts</th>
+          <th>PCP Appt Scheduled</th>
+          <th>Outcome</th>
+          <th>Athena</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="patient-id">PT-2026-00033</div></td>
+          <td><span class="program-chip prog-a1c">A1C Management</span></td>
+          <td>Jun 2, 2026</td>
+          <td>Jun 19, 2026</td>
+          <td>1</td>
+          <td>Jun 28, 2026 (confirmed)</td>
+          <td><span class="status-chip s-complete">Complete</span></td>
+          <td><span style="font-size:11px;color:#059669;font-weight:600;">&#10003; Sent</span></td>
+        </tr>
+        <tr>
+          <td><div class="patient-id">PT-2026-00114</div></td>
+          <td><span class="program-chip prog-wm">Weight Management</span></td>
+          <td>Jun 4, 2026</td>
+          <td>Jun 21, 2026</td>
+          <td>2</td>
+          <td>Jul 3, 2026 (confirmed)</td>
+          <td><span class="status-chip s-complete">Complete</span></td>
+          <td><span style="font-size:11px;color:#059669;font-weight:600;">&#10003; Sent</span></td>
+        </tr>
+        <tr>
+          <td><div class="patient-id">PT-2026-00156</div></td>
+          <td><span class="program-chip prog-tc">Testosterone Care</span></td>
+          <td>Jun 5, 2026</td>
+          <td>Jun 22, 2026</td>
+          <td>1</td>
+          <td>Jun 30, 2026 (confirmed)</td>
+          <td><span class="status-chip s-complete">Complete</span></td>
+          <td><span style="font-size:11px;color:#059669;font-weight:600;">&#10003; Sent</span></td>
+        </tr>
+        <tr>
+          <td><div class="patient-id">PT-2026-00177</div></td>
+          <td><span class="program-chip prog-a1c">A1C Management</span></td>
+          <td>Jun 6, 2026</td>
+          <td>Jun 24, 2026</td>
+          <td>3</td>
+          <td>—</td>
+          <td><span class="status-chip s-noncompliant">Non-Compliant</span></td>
+          <td><span style="font-size:11px;color:#059669;font-weight:600;">&#10003; Sent</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Log Attempt Modal -->
+<div class="modal-overlay" id="attemptModal">
+  <div class="modal-box">
+    <div class="modal-title">Log Contact Attempt</div>
+    <div class="modal-sub" id="attemptModalSub">—</div>
+
+    <div class="modal-field">
+      <div class="modal-label">Patient</div>
+      <div class="modal-readonly" id="attemptPatient">—</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Attempt Number</div>
+      <div class="modal-readonly" id="attemptNum">—</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Contact Method</div>
+      <select class="modal-select" id="attemptMethod">
+        <option value="">— Select —</option>
+        <option>Phone Call</option>
+        <option>Voicemail Left</option>
+        <option>SMS Sent</option>
+        <option>Patient Portal Message</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Patient Response</div>
+      <select class="modal-select" id="attemptResponse">
+        <option value="">— Select —</option>
+        <option>No Answer</option>
+        <option>Voicemail Full</option>
+        <option>Spoke with Patient — No Appointment Yet</option>
+        <option>Spoke with Patient — Appointment Scheduled</option>
+        <option>Wrong Number</option>
+      </select>
+    </div>
+    <div class="modal-field" id="apptDateField" style="display:none;">
+      <div class="modal-label">Scheduled PCP Appointment Date</div>
+      <input class="modal-input" type="date" id="apptDate">
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Notes</div>
+      <textarea class="modal-textarea" id="attemptNotes" placeholder="Optional — additional context…"></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-primary" onclick="saveAttempt()">Save Attempt</button>
+    </div>
+  </div>
+</div>
+
+<!-- Non-Compliant Close Modal -->
+<div class="modal-overlay" id="closeModal">
+  <div class="modal-box">
+    <div class="modal-title">Close as Non-Compliant</div>
+    <div class="modal-sub" id="closeModalSub">This action will close the follow-up task and add the patient to the exclusion list for this follow-up cycle.</div>
+
+    <div class="modal-field">
+      <div class="modal-label">Patient</div>
+      <div class="modal-readonly" id="closePatient">—</div>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Closure Reason</div>
+      <select class="modal-select" id="closeReason">
+        <option value="">— Select —</option>
+        <option>Maximum attempts reached — no response</option>
+        <option>Patient declined follow-up</option>
+        <option>Patient unreachable — invalid contact info</option>
+        <option>Patient stated they will not schedule</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <div class="modal-label">Notes (required)</div>
+      <textarea class="modal-textarea" id="closeNotes" placeholder="Describe the attempts made and why this case is being closed…"></textarea>
+    </div>
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:10px 12px;font-size:12px;color:#991B1B;margin-bottom:4px;">
+      &#9888; This closure will be logged in the patient chart and transmitted to Athena as a structured follow-up outcome.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+      <button class="btn-danger" onclick="saveClose()">Close as Non-Compliant</button>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var currentRow = null;
+var currentPatient = '';
+
+function filterTable() {
+  var search = document.getElementById('searchInput').value.toLowerCase();
+  var status = document.getElementById('filterStatus').value;
+  var program = document.getElementById('filterProgram').value;
+  var rows = document.querySelectorAll('#followupBody tr');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    var rowStatus = row.dataset.status || '';
+    var rowProg   = row.dataset.program || '';
+    var ok = (!search || text.includes(search))
+          && (!status  || rowStatus === status)
+          && (!program || rowProg.includes(program));
+    row.style.display = ok ? '' : 'none';
+    if (ok) visible++;
+  });
+  document.getElementById('rowCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
+}
+
+function openAttemptModal(patientId, program, orderDate, targetDate, attempts, rowId) {
+  currentRow = rowId;
+  currentPatient = patientId;
+  document.getElementById('attemptModalSub').textContent = program + ' · Order: ' + orderDate + ' · Target: ' + targetDate;
+  document.getElementById('attemptPatient').textContent = patientId;
+  document.getElementById('attemptNum').textContent = 'Attempt ' + (attempts + 1) + ' of 3';
+  document.getElementById('attemptMethod').value = '';
+  document.getElementById('attemptResponse').value = '';
+  document.getElementById('attemptNotes').value = '';
+  document.getElementById('apptDateField').style.display = 'none';
+  document.getElementById('apptDate').value = '';
+  document.getElementById('attemptModal').classList.add('open');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('attemptResponse').addEventListener('change', function() {
+    var show = this.value === 'Spoke with Patient — Appointment Scheduled';
+    document.getElementById('apptDateField').style.display = show ? 'block' : 'none';
+  });
+});
+
+function saveAttempt() {
+  var method   = document.getElementById('attemptMethod').value;
+  var response = document.getElementById('attemptResponse').value;
+  if (!method)   { alert('Please select a contact method.'); return; }
+  if (!response) { alert('Please select a patient response.'); return; }
+
+  var apptDate = document.getElementById('apptDate').value;
+  var isComplete = response === 'Spoke with Patient — Appointment Scheduled' && apptDate;
+
+  closeModals();
+
+  if (isComplete) {
+    // Mark row complete
+    var row = document.getElementById(currentRow) || findRow(currentPatient);
+    if (row) markCompleteRow(row);
+    alert('✓ Attempt logged.\n\nPatient confirmed PCP appointment on ' + apptDate + '.\n\nTask marked Complete — structured data sent to Athena.');
+  } else {
+    // Update attempt dots
+    var row = findRow(currentPatient);
+    if (row) {
+      var dots = row.querySelectorAll('.attempt-dot.dot-empty');
+      if (dots.length > 0) { dots[0].className = 'attempt-dot dot-done'; }
+      var allDots = row.querySelectorAll('.attempt-dot');
+      var done = row.querySelectorAll('.attempt-dot.dot-done').length;
+      row.querySelector('.attempts-bar span').textContent = done + '/3';
+      row.querySelector('.status-chip').className = 'status-chip s-attempted';
+      row.querySelector('.status-chip').textContent = 'Attempted';
+      row.dataset.status = 'attempted';
+    }
+    alert('✓ Attempt logged — ' + method + '. Response: ' + response + '\n\nPatient activity recorded in chart timeline.');
+  }
+}
+
+function openCloseModal(patientId, rowId) {
+  currentRow = rowId;
+  currentPatient = patientId;
+  document.getElementById('closePatient').textContent = patientId;
+  document.getElementById('closeReason').value = '';
+  document.getElementById('closeNotes').value = '';
+  document.getElementById('closeModal').classList.add('open');
+}
+
+function saveClose() {
+  var reason = document.getElementById('closeReason').value;
+  var notes  = document.getElementById('closeNotes').value.trim();
+  if (!reason) { alert('Please select a closure reason.'); return; }
+  if (!notes)  { alert('Notes are required to close as non-compliant.'); return; }
+
+  var row = findRow(currentPatient);
+  if (row) {
+    row.querySelector('.status-chip').className = 'status-chip s-noncompliant';
+    row.querySelector('.status-chip').textContent = 'Non-Compliant';
+    row.dataset.status = 'noncompliant';
+    row.querySelectorAll('.btn-action').forEach(function(b) { b.style.display='none'; });
+    row.querySelector('td:last-child').innerHTML += '<span style="font-size:11px;color:#DC2626;font-weight:600;">Closed · Athena notified</span>';
+    row.classList.remove('overdue');
+  }
+
+  var statOpen = document.getElementById('statOpen');
+  statOpen.textContent = Math.max(0, parseInt(statOpen.textContent) - 1);
+
+  closeModals();
+  alert('✓ Task closed as Non-Compliant.\n\nReason: ' + reason + '\n\nPatient added to exclusion list. Closure logged in chart and transmitted to Athena.');
+}
+
+function markComplete(btn, rowId) {
+  if (!confirm('Mark this follow-up as Complete?\n\nThis will log a successful PCP follow-up in the patient chart and send structured data to Athena.')) return;
+  var row = btn.closest('tr');
+  markCompleteRow(row);
+  alert('✓ Follow-up marked Complete. Structured data sent to Athena.');
+}
+
+function markCompleteRow(row) {
+  row.querySelector('.status-chip').className = 'status-chip s-complete';
+  row.querySelector('.status-chip').textContent = 'Complete';
+  row.dataset.status = 'complete';
+  row.querySelectorAll('.btn-action').forEach(function(b) { b.style.display='none'; });
+  row.querySelector('td:last-child').innerHTML += '<span style="font-size:11px;color:#059669;font-weight:600;">&#10003; Complete · Athena notified</span>';
+  row.classList.remove('overdue','critical');
+  var statOpen = document.getElementById('statOpen');
+  statOpen.textContent = Math.max(0, parseInt(statOpen.textContent) - 1);
+}
+
+function findRow(patientId) {
+  var rows = document.querySelectorAll('#followupBody tr');
+  for (var i=0; i<rows.length; i++) {
+    if (rows[i].textContent.includes(patientId)) return rows[i];
+  }
+  return null;
+}
+
+function closeModals() {
+  document.querySelectorAll('.modal-overlay').forEach(function(m) { m.classList.remove('open'); });
+}
+
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) { if (e.target === this) closeModals(); });
+});
+</script>
+{% endblock %}

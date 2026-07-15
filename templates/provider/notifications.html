@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block head %}
+<style>
+  :root { --ew-green: #00A67E; --sidebar-w: 56px; }
+  .sidebar {
+    position: fixed; top: 60px; left: 0; width: 56px; height: calc(100vh - 60px);
+    background: #F2EDE4; display: flex; flex-direction: column;
+    align-items: center; padding: 12px 0; z-index: 200; border-right: 1px solid #E5E0D8;
+    transition: width 0.22s ease; overflow: hidden;
+  }
+.sidebar-logo { margin-bottom: 20px; padding: 8px; flex-shrink: 0; }
+  .sidebar-logo svg { width: 32px; height: 32px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; width: 100%; padding: 0 6px; overflow: hidden; }
+  .nav-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; padding: 9px 4px; border-radius: 8px; cursor: pointer;
+    color: #6B7280; font-size: 9px; font-weight: 500; text-align: center;
+    transition: background .15s, color .15s; position: relative; white-space: nowrap;
+  }
+  .nav-item:hover { background: rgba(107,33,168,0.08); }
+  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+  .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; }
+  .nav-badge {
+    position: absolute; top: 6px; right: 8px; background: #EF4444;
+    color: #fff; font-size: 9px; font-weight: 700; border-radius: 9px;
+    padding: 1px 5px; min-width: 16px; text-align: center;
+  }
+  .nav-label { font-size: 9px; font-weight: 500; text-align: center; line-height: 1; color: inherit; }
+
+.sidebar-footer { padding: 10px 6px; border-top: 1px solid #E5E0D8; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .provider-avatar { width: 32px; height: 32px; border-radius: 50%; background: #00A67E; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 12px; }
+
+
+.notif-page { margin-left: 56px; padding: 28px 32px; max-width: 860px; }
+  .notif-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .notif-header h1 { font-size: 22px; font-weight: 700; color: #111827; }
+  .notif-count-badge { background: #EF4444; color: #fff; font-size: 13px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .filter-tabs { display: flex; gap: 0; border-bottom: 2px solid #E5E0D8; margin-bottom: 20px; overflow-x: auto; }
+  .ftab { padding: 9px 16px; background: none; border: none; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+  .ftab:hover { color: #111827; }
+  .ftab.active { color: #6B21A8; border-bottom-color: #6B21A8; font-weight: 700; }
+  .ftab-badge { font-size: 11px; font-weight: 700; background: #F3F4F6; color: #374151; padding: 1px 6px; border-radius: 10px; }
+  .ftab.active .ftab-badge { background: #EDE9FE; color: #6B21A8; }
+  .notif-row { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 14px 16px; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+  .notif-row.unread { background: #F9F7FF; }
+  .notif-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-unread { background: #EF4444; }
+  .dot-read { background: #D1D5DB; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-title { font-size: 14px; color: #111827; margin-bottom: 3px; }
+  .notif-row.unread .notif-title { font-weight: 700; }
+  .notif-msg { font-size: 13px; color: #374151; line-height: 1.5; margin-bottom: 6px; }
+  .notif-footer { display: flex; align-items: center; gap: 14px; }
+  .notif-time { font-size: 11px; color: #9CA3AF; }
+  .notif-action { font-size: 12px; font-weight: 600; color: #6B21A8; background: none; border: none; cursor: pointer; padding: 0; text-decoration: none; }
+  .notif-action:hover { text-decoration: underline; }
+  .notif-type-tag { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 8px; display: inline-block; }
+  .nt-sla { background: #FEE2E2; color: #DC2626; }
+  .nt-lab { background: #D1FAE5; color: #065F46; }
+  .nt-refill { background: #EDE9FE; color: #5B21B6; }
+  .nt-msg { background: #DBEAFE; color: #1D4ED8; }
+  .nt-system { background: #F3F4F6; color: #374151; }
+  .mark-all { font-size: 13px; font-weight: 600; color: #6B21A8; background: none; border: none; cursor: pointer; margin-left: auto; }
+  .mark-all:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="notif-page">
+  <div class="notif-header">
+    <h1>Notifications</h1>
+    <span class="notif-count-badge">4 unread</span>
+    <button class="mark-all" onclick="markAllRead()">Mark all read</button>
+  </div>
+  <div class="filter-tabs" id="filterTabs">
+    <button class="ftab active" onclick="filterTab(this,'all')">All <span class="ftab-badge">12</span></button>
+    <button class="ftab" onclick="filterTab(this,'unread')">Unread <span class="ftab-badge">4</span></button>
+    <button class="ftab" onclick="filterTab(this,'sla')">SLA Alerts <span class="ftab-badge">2</span></button>
+    <button class="ftab" onclick="filterTab(this,'labs')">Labs <span class="ftab-badge">3</span></button>
+    <button class="ftab" onclick="filterTab(this,'refills')">Refills <span class="ftab-badge">2</span></button>
+    <button class="ftab" onclick="filterTab(this,'messages')">Messages <span class="ftab-badge">1</span></button>
+    <button class="ftab" onclick="filterTab(this,'system')">System <span class="ftab-badge">1</span></button>
+  </div>
+
+  <!-- Unread notifications -->
+  {% if session.get('role') == 'provider_rn' %}
+  <!-- RN-specific notifications -->
+  <div class="notif-row unread" data-type="sla">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Vital Signs Review — Marcus Johnson <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+      <div class="notif-msg">Pre-visit vitals for Marcus Johnson have been recorded. MD review of BP 142/88 flagged for attention before consult.</div>
+      <div class="notif-footer">
+        <span class="notif-time">10 min ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=async">Open Chart &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="labs">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Lab Collection Task — Thomas Chen <span class="notif-type-tag nt-lab">Lab</span></div>
+      <div class="notif-msg">Dr. Lee ordered a metabolic panel for Thomas Chen. Specimen collection required before 12:00 PM. Patient checked in at front desk.</div>
+      <div class="notif-footer">
+        <span class="notif-time">45 min ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=lab">View Order &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="messages">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Care Coordination — Rosa Lopez <span class="notif-type-tag nt-msg">Message</span></div>
+      <div class="notif-msg">Dr. Lee requests follow-up coordination for Rosa Lopez post-consult. Ensure medication instructions have been communicated to patient.</div>
+      <div class="notif-footer">
+        <span class="notif-time">2h ago</span>
+        <a class="notif-action" href="/provider/messages">View Task &#8594;</a>
+      </div>
+    </div>
+  </div>
+  <div class="notif-row unread" data-type="refills">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Patient Education — David Kim <span class="notif-type-tag nt-refill">Task</span></div>
+      <div class="notif-msg">Semaglutide injection technique education session scheduled for David Kim. Review materials and confirm patient readiness for self-administration.</div>
+      <div class="notif-footer">
+        <span class="notif-time">3h ago</span>
+        <a class="notif-action" href="/provider/queue">View Schedule &#8594;</a>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- MD/NP/default notifications -->
+
+  <div class="notif-row unread" data-type="sla">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">SLA Breach — Thomas Chen <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+      <div class="notif-msg">Consult C-20260613-009 has exceeded the 2-hour SLA threshold. Immediate review required to avoid escalation.</div>
+      <div class="notif-footer">
+        <span class="notif-time">5 min ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=async">View Consult &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row unread" data-type="labs">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">New Lab Result Ready — Jamie Rivera <span class="notif-type-tag nt-lab">Lab</span></div>
+      <div class="notif-msg">Testosterone panel results are ready for review. All values within normal range. Awaiting provider sign-off.</div>
+      <div class="notif-footer">
+        <span class="notif-time">1h ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=lab">View Labs &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row unread" data-type="refills">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">Refill Request — Marcus Johnson <span class="notif-type-tag nt-refill">Refill</span></div>
+      <div class="notif-msg">Patient requests a 30-day testosterone refill. Last prescription filled Apr 30. Clinical review required before approval.</div>
+      <div class="notif-footer">
+        <span class="notif-time">2h ago</span>
+        <a class="notif-action" href="/provider/chart/1?type=async">Review &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row unread" data-type="messages">
+    <div class="notif-dot dot-unread"></div>
+    <div class="notif-body">
+      <div class="notif-title">New Patient Message — Lisa Chen <span class="notif-type-tag nt-msg">Message</span></div>
+      <div class="notif-msg">Lisa Chen sent a message about new symptoms she has been experiencing over the past week. Requesting guidance.</div>
+      <div class="notif-footer">
+        <span class="notif-time">3h ago</span>
+        <a class="notif-action" href="/provider/messages">Reply &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+  <!-- Read notifications -->
+  <div class="notif-row" data-type="labs">
+    <div class="notif-dot dot-read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Lab Result — Emily Torres <span class="notif-type-tag nt-lab">Lab</span></div>
+      <div class="notif-msg">Weight management baseline labs returned normal. Metabolic panel within expected range. No immediate action required.</div>
+      <div class="notif-footer">
+        <span class="notif-time">4h ago</span>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row" data-type="sla">
+    <div class="notif-dot dot-read"></div>
+    <div class="notif-body">
+      <div class="notif-title">SLA Warning — Consult C-20260613-003 <span class="notif-type-tag nt-sla">SLA Alert</span></div>
+      <div class="notif-msg">Consult C-20260613-003 is approaching the 20-hour mark. SLA limit is 24 hours. Review recommended to avoid breach.</div>
+      <div class="notif-footer">
+        <span class="notif-time">6h ago</span>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row" data-type="refills">
+    <div class="notif-dot dot-read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Refill Approved — David Kim <span class="notif-type-tag nt-refill">Refill</span></div>
+      <div class="notif-msg">Semaglutide 0.5mg refill for David Kim has been approved by Maria Rodriguez, NP and sent to pharmacy.</div>
+      <div class="notif-footer">
+        <span class="notif-time">Yesterday</span>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row" data-type="system">
+    <div class="notif-dot dot-read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Weekly Performance Report Ready <span class="notif-type-tag nt-system">System</span></div>
+      <div class="notif-msg">Your weekly provider performance report for June 1–7 is ready. Includes SLA compliance, consult volume, and patient satisfaction scores.</div>
+      <div class="notif-footer">
+        <span class="notif-time">Yesterday</span>
+        <a class="notif-action" href="/provider/settings">Download &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="notif-row" data-type="labs">
+    <div class="notif-dot dot-read"></div>
+    <div class="notif-body">
+      <div class="notif-title">Lab Result — Alex Kim <span class="notif-type-tag nt-lab">Lab</span></div>
+      <div class="notif-msg">HbA1c panel results for Alex Kim are available. Results reviewed and released to patient portal.</div>
+      <div class="notif-footer">
+        <span class="notif-time">2d ago</span>
+        <a class="notif-action" href="/provider/queue">View &#8594;</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  var dn = "{{ session.get('display_name', 'Sarah Lee') }}";
+  var parts = dn.split(',')[0].split(' ').filter(function(w){ return w.length > 2; });
+  if (!parts.length) parts = dn.split(',')[0].split(' ');
+  var init = (parts[0]||'S')[0] + (parts.length > 1 ? (parts[parts.length-1]||'L')[0] : '');
+  var el = document.getElementById('provAvatarInit');
+  if (el) el.textContent = init.toUpperCase();
+})();
+</script>
+{% raw %}
+<script>
+function filterTab(el, type) {
+  document.querySelectorAll('.ftab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+  var rows = document.querySelectorAll('.notif-row');
+  rows.forEach(function(row) {
+    if (type === 'all') { row.style.display = ''; }
+    else if (type === 'unread') { row.style.display = row.classList.contains('unread') ? '' : 'none'; }
+    else { row.style.display = (row.getAttribute('data-type') === type) ? '' : 'none'; }
+  });
+}
+function markAllRead() {
+  document.querySelectorAll('.notif-dot.dot-unread').forEach(function(d) { d.className = 'notif-dot dot-read'; });
+  document.querySelectorAll('.notif-row.unread').forEach(function(r) { r.classList.remove('unread'); });
+  document.querySelector('.notif-count-badge').textContent = '0 unread';
+}
+</script>
+{% endraw %}
+{% endblock %}

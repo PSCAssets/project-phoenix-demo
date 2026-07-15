@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% block title %}Health Profile — Everlywell{% endblock %}
+{% block head %}
+<style>
+  :root{--navy:#2D5C2E;--green:#3E8168;--green-dark:#2D5F4E;--green-light:#F0FDF4;--white:#FFFFFF;--bg:#FAF7F2;--border:#D4E4DC;--gray:#64748B;--text:#1E293B;--blue:#2D5C2E;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);display:flex;min-height:100vh;}
+  .sidenav{width:240px;background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:fixed;top: 60px;left: 0;bottom:0;z-index:100;}
+  .nav-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .nav-logo-text{font-size:18px;font-weight:700;color:#fff;}
+  .nav-logo-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .nav-user{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .nav-user-name{font-size:13px;font-weight:600;color:#fff;}
+  .nav-user-prog{font-size:11px;color:rgba(255,255,255,0.5);}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:rgba(255,255,255,0.7);border-radius:6px;margin:1px 8px;position:relative;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-item.active{background:rgba(62,129,104,0.25);color:#fff;}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--green);border-radius:0 2px 2px 0;margin-left:8px;}
+  .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .nav-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1);}
+  .main{margin-left: 240px;flex:1;min-height:100vh;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;position:sticky;top:0;z-index:50;}
+  .topbar-title{font-size:18px;font-weight:700;color:var(--navy);}
+  .content{padding:24px 28px;max-width:860px;}
+  .profile-card{background:#fff;border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .profile-card-hd{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .profile-card-icon{font-size:18px;}
+  .profile-card-title{font-size:14px;font-weight:700;color:var(--text);}
+  .edit-link{margin-left:auto;font-size:12px;color:var(--blue);text-decoration:none;font-weight:600;}
+  .edit-link:hover{text-decoration:underline;}
+  .profile-rows{padding:4px 0;}
+  .profile-row{display:flex;padding:11px 20px;border-bottom:1px solid #F5F0EA;font-size:13px;}
+  .profile-row:last-child{border-bottom:none;}
+  .row-label{width:180px;color:var(--gray);flex-shrink:0;font-weight:500;}
+  .row-value{color:var(--text);}
+  .accordion-hd { display:flex; align-items:center; gap:10px; padding:14px 20px; cursor:pointer; border-bottom:1px solid var(--border); }
+  .accordion-hd:last-of-type { border-bottom:none; }
+  .accordion-body { display:none; padding:0; }
+  .accordion-body.open { display:block; }
+  .acc-chevron { margin-left:auto; font-size:12px; color:var(--gray); transition:transform 0.2s; }
+  .acc-chevron.open { transform:rotate(90deg); }
+  /* New accordion sections */
+  .acc-section { background: #fff; border: 1px solid #E5E0D8; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .acc-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; background: #F2EDE4; }
+  .acc-header:hover { background: #EDE8DF; }
+  .acc-title { font-size: 14px; font-weight: 700; color: #1F2937; }
+  .acc-chevron-svg { transition: transform 0.2s; color: #6B7280; flex-shrink: 0; }
+  .acc-chevron-svg.collapsed { transform: rotate(180deg); }
+  .acc-body { padding: 16px 18px; }
+  .acc-field { margin-bottom: 12px; }
+  .acc-label { font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .acc-value { font-size: 13px; color: #1F2937; }
+  .acc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .acc-table th { padding: 7px 12px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; }
+  .acc-table td { padding: 10px 12px; border-bottom: 1px solid #F2EDE4; color: #1F2937; background: #fff; }
+  .acc-table tr:last-child td { border-bottom: none; }
+</style>
+{% endblock %}
+{% block content %}
+  <aside class="sidenav">
+    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Patient Portal</div></div>
+    <div class="nav-user">
+      <div class="nav-avatar" style="background:#0EA5E9">JR</div>
+      <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
+    </div>
+    <nav style="padding:8px 0;flex:1;">
+      <a href="/patient/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="/patient/consultations" class="nav-item"><span class="nav-icon">💬</span> My Consultations</a>
+      <a href="/patient/appointments" class="nav-item"><span class="nav-icon">📅</span> Appointments</a>
+      <a href="/patient/messages" class="nav-item"><span class="nav-icon">✉️</span> Messages <span class="nav-badge">2</span></a>
+      <a href="/patient/labs" class="nav-item"><span class="nav-icon">🧪</span> Lab Results</a>
+      <a href="/patient/health-profile" class="nav-item active"><span class="nav-icon">👤</span> Health Profile</a>
+      <a href="/patient/documents" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+      <a href="/patient/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+  </aside>
+  <div class="main">
+    <div class="topbar"><div class="topbar-title">Health Profile</div></div>
+    <div class="content">
+
+      <div class="profile-card">
+        <div class="profile-card-hd"><span class="profile-card-icon">👤</span><span class="profile-card-title">Personal Information</span><a href="#" class="edit-link">Edit</a></div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="row-label">Full Name</span><span class="row-value">Jamie Rivera</span></div>
+          <div class="profile-row"><span class="row-label">Date of Birth</span><span class="row-value">March 15, 1988</span></div>
+          <div class="profile-row"><span class="row-label">Sex</span><span class="row-value">Male</span></div>
+          <div class="profile-row"><span class="row-label">State</span><span class="row-value">Texas (TX)</span></div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-hd"><span class="profile-card-icon">💊</span><span class="profile-card-title">Medications</span><a href="#" class="edit-link">Edit</a></div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="row-label">Testosterone Cypionate</span><span class="row-value">200mg/2mL · Weekly injection · Started April 2026</span></div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-hd"><span class="profile-card-icon">⚠️</span><span class="profile-card-title">Allergies</span><a href="#" class="edit-link">Edit</a></div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="row-label">Drug Allergies</span><span class="row-value" style="color:var(--gray)">No known drug allergies</span></div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-hd"><span class="profile-card-icon">🩺</span><span class="profile-card-title">Conditions</span><a href="#" class="edit-link">Edit</a></div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="row-label">Reported Conditions</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+        <div class="profile-card-hd"><span class="profile-card-icon">📏</span><span class="profile-card-title">Measurements</span><a href="#" class="edit-link">Edit</a></div>
+        <div class="profile-rows">
+          <div class="profile-row"><span class="row-label">Height</span><span class="row-value">5'11"</span></div>
+          <div class="profile-row"><span class="row-label">Weight</span><span class="row-value">185 lbs</span></div>
+          <div class="profile-row"><span class="row-label">BMI</span><span class="row-value">25.8</span></div>
+          <div class="profile-row"><span class="row-label">Recorded</span><span class="row-value">June 1, 2026</span></div>
+        </div>
+      </div>
+
+      <!-- Past Medical History -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('pastmedhistory')" style="cursor:pointer"><span class="profile-card-icon">🏥</span><span class="profile-card-title">Past Medical History</span><span id="pastmedhistory_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="pastmedhistory">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Past Surgeries</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+            <div class="profile-row"><span class="row-label">Hospitalizations</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+            <div class="profile-row"><span class="row-label">Prior Diagnoses</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Problem List -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('currentproblems')" style="cursor:pointer"><span class="profile-card-icon">📋</span><span class="profile-card-title">Current Problem List</span><span id="currentproblems_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="currentproblems">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Active Conditions</span><span class="row-value">Pre-diabetes, Overweight (BMI 25.8)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Family History -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('famhist')" style="cursor:pointer"><span class="profile-card-icon">👨‍👩‍👧</span><span class="profile-card-title">Family History</span><span id="famhist_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="famhist">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Diabetes</span><span class="row-value">Yes — Father (Type 2)</span></div>
+            <div class="profile-row"><span class="row-label">Heart Disease</span><span class="row-value" style="color:var(--gray)">Unknown</span></div>
+            <div class="profile-row"><span class="row-label">Cancer</span><span class="row-value" style="color:var(--gray)">None reported</span></div>
+            <div class="profile-row"><span class="row-label">Hypertension</span><span class="row-value">Yes — Mother</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social History -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('socialhist')" style="cursor:pointer"><span class="profile-card-icon">🏃</span><span class="profile-card-title">Social History</span><span id="socialhist_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="socialhist">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Smoking</span><span class="row-value">Never smoker</span></div>
+            <div class="profile-row"><span class="row-label">Alcohol</span><span class="row-value">Occasional (1–2 drinks/week)</span></div>
+            <div class="profile-row"><span class="row-label">Exercise</span><span class="row-value">Light (1–2 days/week)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vitals History -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('vitals')" style="cursor:pointer"><span class="profile-card-icon">❤️</span><span class="profile-card-title">Vitals History</span><span id="vitals_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="vitals">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Blood Pressure</span><span class="row-value">128/82 mmHg</span></div>
+            <div class="profile-row"><span class="row-label">Heart Rate</span><span class="row-value">72 bpm</span></div>
+            <div class="profile-row"><span class="row-label">Temperature</span><span class="row-value">98.6°F</span></div>
+            <div class="profile-row"><span class="row-label">Recorded</span><span class="row-value">June 8, 2026</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferred Pharmacy -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('pharmacy')" style="cursor:pointer"><span class="profile-card-icon">💊</span><span class="profile-card-title">Preferred Pharmacy</span><a href="#" class="edit-link" onclick="event.stopPropagation()">Edit</a><span id="pharmacy_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="pharmacy">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Pharmacy</span><span class="row-value">CVS Pharmacy #4821</span></div>
+            <div class="profile-row"><span class="row-label">Address</span><span class="row-value">1234 Main St, Austin TX 78701</span></div>
+            <div class="profile-row"><span class="row-label">Phone</span><span class="row-value">(512) 555-0198</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Contact -->
+      <div class="profile-card">
+        <div class="profile-card-hd" onclick="toggleAccordion('emergency')" style="cursor:pointer"><span class="profile-card-icon">🆘</span><span class="profile-card-title">Emergency Contact</span><a href="#" class="edit-link" onclick="event.stopPropagation()">Edit</a><span id="emergency_chev" class="acc-chevron">▸</span></div>
+        <div class="accordion-body" id="emergency">
+          <div class="profile-rows">
+            <div class="profile-row"><span class="row-label">Name</span><span class="row-value">Maria Rivera</span></div>
+            <div class="profile-row"><span class="row-label">Relationship</span><span class="row-value">Spouse</span></div>
+            <div class="profile-row"><span class="row-label">Phone</span><span class="row-value">(512) 555-0142</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 1: Medical History (new accordion) -->
+      <div class="acc-section" id="accMedHistory">
+        <div class="acc-header" onclick="toggleAcc('accMedHistory')">
+          <span class="acc-title">Medical History</span>
+          <svg class="acc-chevron-svg" id="chevronaccMedHistory" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccMedHistory">
+          <div class="acc-field"><div class="acc-label">Active Conditions</div><div class="acc-value">Prediabetes · Obesity (BMI 31.2)</div></div>
+          <div class="acc-field"><div class="acc-label">Past Surgeries</div><div class="acc-value">None reported</div></div>
+          <div class="acc-field"><div class="acc-label">Hospitalizations</div><div class="acc-value">None reported</div></div>
+        </div>
+      </div>
+
+      <!-- Section 2: Current Medications (new accordion) -->
+      <div class="acc-section" id="accMeds">
+        <div class="acc-header" onclick="toggleAcc('accMeds')">
+          <span class="acc-title">Current Medications</span>
+          <svg class="acc-chevron-svg" id="chevronaccMeds" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccMeds" style="padding:0 0 0 0;">
+          <table class="acc-table">
+            <thead><tr><th>Medication</th><th>Dose</th><th>Frequency</th><th>Prescriber</th></tr></thead>
+            <tbody>
+              <tr><td>Metformin</td><td>500mg</td><td>Once daily</td><td>Maria Rodriguez, NP</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 3: Allergies (new accordion) -->
+      <div class="acc-section" id="accAllergies">
+        <div class="acc-header" onclick="toggleAcc('accAllergies')">
+          <span class="acc-title">Allergies</span>
+          <svg class="acc-chevron-svg" id="chevronaccAllergies" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccAllergies">
+          <div class="acc-field"><div class="acc-label">Drug Allergies</div><div class="acc-value">Penicillin — Hives</div></div>
+          <div class="acc-field"><div class="acc-label">Food Allergies</div><div class="acc-value">None known</div></div>
+          <div class="acc-field"><div class="acc-label">Environmental</div><div class="acc-value">Pollen</div></div>
+        </div>
+      </div>
+
+      <!-- Section 4: Family History (new accordion) -->
+      <div class="acc-section" id="accFamilyHx">
+        <div class="acc-header" onclick="toggleAcc('accFamilyHx')">
+          <span class="acc-title">Family History</span>
+          <svg class="acc-chevron-svg" id="chevronaccFamilyHx" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccFamilyHx" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div class="acc-field"><div class="acc-label">Diabetes</div><div class="acc-value" style="color:#DC2626;">Yes</div></div>
+          <div class="acc-field"><div class="acc-label">Heart Disease</div><div class="acc-value" style="color:#6B7280;">Unknown</div></div>
+          <div class="acc-field"><div class="acc-label">Cancer</div><div class="acc-value" style="color:#059669;">No</div></div>
+          <div class="acc-field"><div class="acc-label">Hypertension</div><div class="acc-value" style="color:#DC2626;">Yes</div></div>
+        </div>
+      </div>
+
+      <!-- Section 5: Social History (new accordion) -->
+      <div class="acc-section" id="accSocial">
+        <div class="acc-header" onclick="toggleAcc('accSocial')">
+          <span class="acc-title">Social History</span>
+          <svg class="acc-chevron-svg" id="chevronaccSocial" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccSocial" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="acc-field"><div class="acc-label">Smoking</div><div class="acc-value">Non-smoker</div></div>
+          <div class="acc-field"><div class="acc-label">Alcohol</div><div class="acc-value">Occasional</div></div>
+          <div class="acc-field"><div class="acc-label">Exercise</div><div class="acc-value">2× / week</div></div>
+        </div>
+      </div>
+
+      <!-- Section 6: Vitals History (new accordion) -->
+      <div class="acc-section" id="accVitals">
+        <div class="acc-header" onclick="toggleAcc('accVitals')">
+          <span class="acc-title">Vitals History</span>
+          <svg class="acc-chevron-svg" id="chevronaccVitals" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccVitals" style="padding:0;">
+          <table class="acc-table">
+            <thead><tr><th>Blood Pressure</th><th>Heart Rate</th><th>Temperature</th><th>Date</th></tr></thead>
+            <tbody>
+              <tr><td>124/82 mmHg</td><td>76 bpm</td><td>98.4°F</td><td>Jun 3, 2026</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Section 7: Preferred Pharmacy (new accordion) -->
+      <div class="acc-section" id="accPharmacy">
+        <div class="acc-header" onclick="toggleAcc('accPharmacy')">
+          <span class="acc-title">Preferred Pharmacy</span>
+          <svg class="acc-chevron-svg" id="chevronaccPharmacy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccPharmacy" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="acc-field"><div class="acc-label">Name</div><div class="acc-value">CVS Pharmacy</div></div>
+          <div class="acc-field"><div class="acc-label">Address</div><div class="acc-value">1234 Main St, Austin TX</div></div>
+          <div class="acc-field"><div class="acc-label">Phone</div><div class="acc-value">(512) 555-0199</div></div>
+        </div>
+      </div>
+
+      <!-- Section 8: Emergency Contact (new accordion) -->
+      <div class="acc-section" id="accEmergency">
+        <div class="acc-header" onclick="toggleAcc('accEmergency')">
+          <span class="acc-title">Emergency Contact</span>
+          <svg class="acc-chevron-svg" id="chevronaccEmergency" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="acc-body" id="bodyaccEmergency" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div class="acc-field"><div class="acc-label">Name</div><div class="acc-value">Jennifer Johnson</div></div>
+          <div class="acc-field"><div class="acc-label">Relationship</div><div class="acc-value">Spouse</div></div>
+          <div class="acc-field"><div class="acc-label">Phone</div><div class="acc-value">(512) 555-0147</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+function toggleAccordion(id) {
+  const body = document.getElementById(id);
+  const chev = document.getElementById(id+'_chev');
+  const open = body.classList.toggle('open');
+  if(chev) chev.classList.toggle('open', open);
+  if(chev) chev.textContent = open ? '▾' : '▸';
+}
+function toggleAcc(id) {
+  var body = document.getElementById('body' + id);
+  var chevron = document.getElementById('chevron' + id);
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  chevron.classList.toggle('collapsed', open);
+}
+</script>
+{% endblock %}

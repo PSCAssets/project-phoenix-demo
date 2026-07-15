@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Portal — Health Profile</title>
+<style>
+  :root {
+    --navy: #002855; --green: #3E8168; --green-dark: #2D5F4E; --green-light: #F0FDF4; --green-xlight: #E8F5F0;
+    --white: #FFFFFF; --bg: #F4F8F6; --border: #D4E4DC;
+    --gray: #64748B; --gray-light: #F1F5F9; --text: #1E293B;
+    --amber: #D97706; --amber-bg: #FFFBEB;
+    --red: #DC2626; --red-bg: #FEF2F2;
+    --blue: #2563EB; --blue-bg: #EFF6FF;
+    --purple: #7C3AED; --purple-bg: #EDE9FE;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); display: flex; min-height: 100vh; }
+
+  /* NAV */
+  .sidenav { width: 240px; background: var(--navy); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-prog { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-switcher { margin: 0 12px 8px; padding: 6px 10px; background: rgba(255,255,255,0.08); border-radius: 6px; font-size: 11px; color: rgba(255,255,255,0.6); cursor: pointer; }
+  .nav-section { padding: 12px 12px 4px; font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.1em; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(62,129,104,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: var(--green); border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--red); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+  .nav-badge.green { background: var(--green); }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+
+  /* MAIN */
+  .main { margin-left: 240px; flex: 1; }
+  .topbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 20px; font-weight: 700; color: var(--navy); flex: 1; }
+  .notif-btn { width: 36px; height: 36px; border-radius: 8px; background: var(--gray-light); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; position: relative; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid #fff; }
+  .btn-primary { background: var(--green); color: #fff; border: none; border-radius: 7px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-secondary { background: transparent; color: var(--navy); border: 1.5px solid var(--border); border-radius: 7px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  .content { display: flex; gap: 0; height: calc(100vh - 60px); overflow: hidden; }
+
+  /* SECTION NAV */
+  .profile-nav { width: 220px; background: var(--white); border-right: 1px solid var(--border); padding: 16px 0; overflow-y: auto; flex-shrink: 0; }
+  .profile-nav-title { padding: 4px 16px 12px; font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.08em; }
+  .profile-nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 16px; font-size: 13px; color: var(--gray); cursor: pointer; position: relative; }
+  .profile-nav-item:hover { background: var(--gray-light); color: var(--text); }
+  .profile-nav-item.active { background: var(--green-xlight); color: var(--green-dark); font-weight: 600; }
+  .profile-nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 18px; background: var(--green); border-radius: 0 2px 2px 0; }
+  .profile-nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .required-dot { margin-left: auto; font-size: 13px; color: var(--amber); line-height: 1; }
+  .complete-dot { display: none; }
+
+  /* PROFILE CONTENT */
+  .profile-content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+  .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 2px solid var(--border); }
+  .section-icon-lg { width: 44px; height: 44px; border-radius: 12px; background: var(--green-xlight); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .section-title-lg { font-size: 20px; font-weight: 700; color: var(--navy); }
+  .section-subtitle { font-size: 13px; color: var(--gray); margin-top: 2px; }
+  .required-banner { background: var(--amber-bg); border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--amber); display: flex; align-items: center; gap: 8px; }
+
+  /* MEDICATION LIST */
+  .med-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .med-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; }
+  .med-card:hover { border-color: var(--green-dark); }
+  .med-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .med-icon.self { background: var(--gray-light); }
+  .med-icon.prescribed { background: var(--green-xlight); }
+  .med-icon.provider { background: var(--blue-bg); }
+  .med-info { flex: 1; }
+  .med-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+  .med-details { font-size: 12px; color: var(--gray); margin-bottom: 6px; }
+  .med-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .source-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .source-badge.self { background: var(--gray-light); color: var(--gray); }
+  .source-badge.prescribed { background: var(--green-light); color: var(--green-dark); }
+  .source-badge.provider { background: var(--blue-bg); color: var(--blue); }
+  .status-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+  .status-chip.active { background: var(--green-light); color: var(--green-dark); }
+  .status-chip.inactive { background: var(--gray-light); color: var(--gray); }
+  .med-actions { display: flex; gap: 6px; flex-direction: column; align-items: flex-end; }
+  .icon-btn { font-size: 14px; background: transparent; border: 1px solid var(--border); border-radius: 6px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .icon-btn:hover { border-color: var(--green); background: var(--green-xlight); }
+  .icon-btn.flag { color: var(--amber); border-color: #FDE68A; }
+  .med-updated { font-size: 10px; color: var(--gray); margin-top: 2px; }
+
+  /* MEASUREMENTS */
+  .measurements-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .measurement-card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .meas-label { font-size: 11px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+  .meas-value { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; }
+  .meas-unit { font-size: 13px; font-weight: 400; color: var(--gray); margin-left: 2px; }
+  .meas-trend { font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+  .meas-trend.up { color: var(--amber); }
+  .meas-trend.down { color: var(--green); }
+  .meas-trend.stable { color: var(--gray); }
+  .meas-date { font-size: 11px; color: var(--gray); margin-top: 6px; }
+  .meas-source { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 4px; display: inline-block; }
+  .meas-source.patient { background: var(--gray-light); color: var(--gray); }
+  .meas-source.lab { background: var(--green-light); color: var(--green-dark); }
+
+  /* ALLERGIES */
+  .allergy-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .allergy-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .allergy-sev { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 4px; min-width: 60px; text-align: center; }
+  .allergy-sev.severe { background: var(--red-bg); color: var(--red); }
+  .allergy-sev.moderate { background: var(--amber-bg); color: var(--amber); }
+  .allergy-sev.mild { background: var(--blue-bg); color: var(--blue); }
+  .allergy-info { flex: 1; }
+  .allergy-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .allergy-reaction { font-size: 12px; color: var(--gray); margin-top: 1px; }
+
+  /* ADD BUTTON */
+  .add-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 1.5px dashed var(--border); border-radius: 10px; background: transparent; color: var(--green); font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 20px; }
+  .add-btn:hover { border-color: var(--green); background: var(--green-xlight); }
+
+  /* CONFLICT WARNING */
+  .conflict-warning { background: var(--amber-bg); border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px; color: var(--amber); display: flex; align-items: flex-start; gap: 8px; }
+</style>
+</head>
+<body>
+
+<!-- LEFT NAV -->
+<nav class="sidenav">
+  <div class="nav-logo">
+    <div class="nav-logo-text">Everlywell</div>
+    <div class="nav-logo-sub">Patient Portal</div>
+  </div>
+  <div class="nav-user">
+    <div class="nav-avatar">SJ</div>
+    <div style="flex:1;min-width:0;">
+      <div class="nav-user-name">Sarah Johnson</div>
+      <div class="nav-user-prog">2 active programs</div>
+    </div>
+  </div>
+  <div class="nav-switcher">👤 Manage care for: Sarah</div>
+  <div class="nav-section">My Care</div>
+  <a class="nav-item" href="M03_Patient_Dashboard_Mockup_v1.html"><span class="nav-icon">🏠</span> Dashboard</a>
+  <a class="nav-item" href="M03_Patient_Messages_Mockup_v1.html"><span class="nav-icon">💬</span> Messages <span class="nav-badge">3</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">📅</span> Appointments</a>
+  <a class="nav-item" href="#"><span class="nav-icon">👥</span> Care Team</a>
+  <div class="nav-section">Health</div>
+  <a class="nav-item active" href="M03_Patient_Health_Profile_Mockup_v1.html"><span class="nav-icon">❤️</span> Health Profile <span class="nav-badge green">!</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">🧪</span> Labs &amp; Imaging <span class="nav-badge">1</span></a>
+  <a class="nav-item" href="#"><span class="nav-icon">💊</span> Medications</a>
+  <div class="nav-section">Account</div>
+  <a class="nav-item" href="#"><span class="nav-icon">📄</span> Documents</a>
+  <a class="nav-item" href="#"><span class="nav-icon">🏥</span> Pharmacy</a>
+  <a class="nav-item" href="#"><span class="nav-icon">⚙️</span> Account Settings</a>
+  <div class="nav-bottom">
+    <a class="nav-item" href="#"><span class="nav-icon">🚪</span> Sign Out</a>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Health Profile</div>
+    <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+  </div>
+
+  <div class="content">
+
+    <!-- Section Nav -->
+    <div class="profile-nav">
+      <div class="profile-nav-title">Sections</div>
+      <div class="profile-nav-item active"><span class="profile-nav-icon">💊</span> Medications</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">⚠️</span> Allergies</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">🏥</span> Conditions <span class="required-dot" title="Required — action needed">!</span></div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">🔧</span> Procedures</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">📏</span> Measurements</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">🌸</span> Reproductive Health <span class="required-dot" title="Required — action needed">!</span></div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">🧠</span> Behavioral Health</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">👤</span> Social History</div>
+      <div class="profile-nav-item"><span class="profile-nav-icon">👨‍👩‍👧</span> Family History</div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-content">
+
+      <div class="section-header">
+        <div class="section-icon-lg">💊</div>
+        <div>
+          <div class="section-title-lg">Medications</div>
+          <div class="section-subtitle">Your complete medication list — self-reported and provider-managed</div>
+        </div>
+        <button class="btn-primary" style="margin-left:auto;">+ Add Medication</button>
+      </div>
+
+      <div class="conflict-warning">
+        ⚠️ <div><strong>Possible interaction detected:</strong> Metformin and Ibuprofen may interact. <a href="#" style="color:var(--amber);font-weight:700;">View details</a> or <a href="#" style="color:var(--amber);font-weight:700;">message your care team</a>.</div>
+      </div>
+
+      <!-- Medications -->
+      <div class="med-list">
+
+        <div class="med-card">
+          <div class="med-icon prescribed">💊</div>
+          <div class="med-info">
+            <div class="med-name">Metformin HCl 500mg</div>
+            <div class="med-details">Twice daily · Take with food · Started May 20, 2026</div>
+            <div class="med-tags">
+              <span class="source-badge prescribed">Prescribed by Everlywell</span>
+              <span class="status-chip active">Active</span>
+            </div>
+            <div class="med-updated">Last updated by Dr. Emily Chen, MD · May 20, 2026</div>
+          </div>
+          <div class="med-actions">
+            <span class="icon-btn flag" title="Report discrepancy">🚩</span>
+          </div>
+        </div>
+
+        <div class="med-card">
+          <div class="med-icon provider">💊</div>
+          <div class="med-info">
+            <div class="med-name">Estradiol 1mg</div>
+            <div class="med-details">Once daily · As directed · Started Apr 3, 2026</div>
+            <div class="med-tags">
+              <span class="source-badge provider">Provider-added</span>
+              <span class="status-chip active">Active</span>
+            </div>
+            <div class="med-updated">Last updated by Dr. Marcus Williams, MD · Apr 3, 2026</div>
+          </div>
+          <div class="med-actions">
+            <span class="icon-btn flag" title="Report discrepancy">🚩</span>
+          </div>
+        </div>
+
+        <div class="med-card">
+          <div class="med-icon self">💊</div>
+          <div class="med-info">
+            <div class="med-name">Ibuprofen 200mg</div>
+            <div class="med-details">As needed · For pain relief</div>
+            <div class="med-tags">
+              <span class="source-badge self">Self-reported</span>
+              <span class="status-chip active">Active</span>
+            </div>
+            <div class="med-updated">Added by you · May 10, 2026</div>
+          </div>
+          <div class="med-actions">
+            <span class="icon-btn" title="Edit">✏️</span>
+            <span class="icon-btn" title="Delete" style="color:var(--red);">🗑️</span>
+          </div>
+        </div>
+
+        <div class="med-card">
+          <div class="med-icon self">💊</div>
+          <div class="med-info">
+            <div class="med-name">Vitamin D3 2000 IU</div>
+            <div class="med-details">Once daily · Supplement</div>
+            <div class="med-tags">
+              <span class="source-badge self">Self-reported</span>
+              <span class="status-chip active">Active</span>
+            </div>
+            <div class="med-updated">Added by you · Mar 1, 2026</div>
+          </div>
+          <div class="med-actions">
+            <span class="icon-btn" title="Edit">✏️</span>
+            <span class="icon-btn" title="Delete" style="color:var(--red);">🗑️</span>
+          </div>
+        </div>
+
+        <!-- Inactive -->
+        <div class="med-card" style="opacity:0.65;">
+          <div class="med-icon self">💊</div>
+          <div class="med-info">
+            <div class="med-name">Lisinopril 5mg</div>
+            <div class="med-details">Once daily · Discontinued</div>
+            <div class="med-tags">
+              <span class="source-badge self">Self-reported</span>
+              <span class="status-chip inactive">Inactive</span>
+            </div>
+            <div class="med-updated">Added by you · Jan 12, 2026</div>
+          </div>
+          <div class="med-actions">
+            <span class="icon-btn" title="Edit">✏️</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="add-btn">+ Add self-reported medication</button>
+
+      <!-- ALLERGIES SECTION -->
+      <div class="section-header" style="margin-top:8px;">
+        <div class="section-icon-lg">⚠️</div>
+        <div>
+          <div class="section-title-lg">Allergies</div>
+          <div class="section-subtitle">Known allergies and reactions</div>
+        </div>
+        <button class="btn-primary" style="margin-left:auto;">+ Add Allergy</button>
+      </div>
+
+      <div class="allergy-list">
+        <div class="allergy-card">
+          <span class="allergy-sev severe">Severe</span>
+          <div class="allergy-info">
+            <div class="allergy-name">Penicillin</div>
+            <div class="allergy-reaction">Anaphylaxis · Added by you · Mar 2023</div>
+          </div>
+          <span class="source-badge self" style="font-size:10px;">Self-reported</span>
+          <span class="icon-btn" title="Edit">✏️</span>
+        </div>
+        <div class="allergy-card">
+          <span class="allergy-sev moderate">Moderate</span>
+          <div class="allergy-info">
+            <div class="allergy-name">Sulfa Drugs</div>
+            <div class="allergy-reaction">Rash, Hives · Added by Dr. Chen · Apr 2026</div>
+          </div>
+          <span class="source-badge provider" style="font-size:10px;">Provider-added</span>
+          <span class="icon-btn flag" title="Report discrepancy">🚩</span>
+        </div>
+        <div class="allergy-card">
+          <span class="allergy-sev mild">Mild</span>
+          <div class="allergy-info">
+            <div class="allergy-name">Latex</div>
+            <div class="allergy-reaction">Contact dermatitis · Added by you · Jan 2024</div>
+          </div>
+          <span class="source-badge self" style="font-size:10px;">Self-reported</span>
+          <span class="icon-btn" title="Edit">✏️</span>
+        </div>
+      </div>
+
+      <button class="add-btn">+ Add self-reported allergy</button>
+
+      <!-- MEASUREMENTS SECTION -->
+      <div class="section-header" style="margin-top:8px;">
+        <div class="section-icon-lg">📏</div>
+        <div>
+          <div class="section-title-lg">Measurements</div>
+          <div class="section-subtitle">Biometrics and lab-sourced values</div>
+        </div>
+        <button class="btn-primary" style="margin-left:auto;">+ Log Measurement</button>
+      </div>
+
+      <div class="measurements-grid">
+        <div class="measurement-card">
+          <div class="meas-label">Weight</div>
+          <div class="meas-value">164 <span class="meas-unit">lbs</span></div>
+          <div class="meas-trend down">↓ 3 lbs since March</div>
+          <div class="meas-date">Logged May 20, 2026</div>
+          <span class="meas-source patient">Self-reported</span>
+        </div>
+        <div class="measurement-card">
+          <div class="meas-label">BMI</div>
+          <div class="meas-value">26.4</div>
+          <div class="meas-trend down">↓ from 26.9</div>
+          <div class="meas-date">Auto-calculated</div>
+          <span class="meas-source patient">Self-reported</span>
+        </div>
+        <div class="measurement-card">
+          <div class="meas-label">Blood Pressure</div>
+          <div class="meas-value">118<span class="meas-unit">/76</span></div>
+          <div class="meas-trend stable">→ Stable</div>
+          <div class="meas-date">Logged May 18, 2026</div>
+          <span class="meas-source patient">Self-reported</span>
+        </div>
+        <div class="measurement-card">
+          <div class="meas-label">HbA1c</div>
+          <div class="meas-value">6.4<span class="meas-unit">%</span></div>
+          <div class="meas-trend down">↓ from 7.1% (Jan)</div>
+          <div class="meas-date">Lab result · May 15, 2026</div>
+          <span class="meas-source lab">Lab Verified</span>
+        </div>
+        <div class="measurement-card">
+          <div class="meas-label">Height</div>
+          <div class="meas-value">5'<span class="meas-unit">6"</span></div>
+          <div class="meas-trend stable">→ Unchanged</div>
+          <div class="meas-date">Logged Jan 10, 2026</div>
+          <span class="meas-source patient">Self-reported</span>
+        </div>
+        <div class="measurement-card">
+          <div class="meas-label">Cholesterol (Total)</div>
+          <div class="meas-value">192<span class="meas-unit"> mg/dL</span></div>
+          <div class="meas-trend stable">→ Normal range</div>
+          <div class="meas-date">Lab result · May 15, 2026</div>
+          <span class="meas-source lab">Lab Verified</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

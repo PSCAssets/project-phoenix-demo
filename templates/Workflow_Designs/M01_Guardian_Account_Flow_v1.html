@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>M01 — Guardian & Minor Account Management Flow</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #222; }
+  .diagram-title { font-size: 15px; font-weight: bold; color: #1F3864; border-left: 4px solid #1F3864; padding-left: 10px; margin-bottom: 4px; }
+  .diagram-sub { font-size: 11px; color: #666; margin-bottom: 24px; font-style: italic; }
+  .open-badge { display: inline-block; background: #FFF3CD; border: 1px solid #B8730A; border-radius: 4px; padding: 4px 10px; font-size: 11px; color: #6E4C00; font-weight: bold; margin-bottom: 16px; }
+  svg { display: block; max-width: 1100px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+</style>
+</head>
+<body>
+<div class="diagram-title">Workflow — Guardian & Minor Account Management · M01-GRD-001 through M01-GRD-004</div>
+<div class="diagram-sub">Guardian account linking, minor access management, and confidentiality enforcement. Minor confidentiality rules (GRD-004) pending Legal resolution.</div>
+<div class="open-badge">⚠ M01-GRD-004 OPEN — Minor confidentiality enforcement rules pending Legal review (Jessica Wheeler). Flow shown reflects current design intent only.</div>
+
+<svg viewBox="0 0 1060 900" xmlns="http://www.w3.org/2000/svg" font-family="Arial" font-size="12">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1F3864"/></marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#C0392B"/></marker>
+    <marker id="arr-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#1F7A4A"/></marker>
+    <marker id="arr-orange" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,8 3,0 6" fill="#B8730A"/></marker>
+  </defs>
+
+  <!-- Header -->
+  <rect x="10" y="10" width="1040" height="24" rx="4" fill="#1F3864"/>
+  <text x="530" y="26" text-anchor="middle" font-size="12" font-weight="bold" fill="white">GUARDIAN &amp; MINOR ACCOUNT MANAGEMENT FLOW</text>
+
+  <!-- PART A LABEL -->
+  <rect x="10" y="44" width="500" height="18" rx="3" fill="#EEF3FB"/>
+  <text x="260" y="56" text-anchor="middle" font-size="11" font-weight="bold" fill="#1F3864">PART A — Guardian Account Linking</text>
+  <rect x="550" y="44" width="500" height="18" rx="3" fill="#FFF8E6"/>
+  <text x="800" y="56" text-anchor="middle" font-size="11" font-weight="bold" fill="#B8730A">PART B — Minor Confidentiality (⚠ Pending Legal)</text>
+
+  <!-- ===== PART A ===== -->
+
+  <!-- Step 1: Guardian requests access -->
+  <rect x="60" y="76" width="260" height="52" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="190" y="98" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Guardian Requests Account Access</text>
+  <text x="190" y="114" text-anchor="middle" font-size="11" fill="#555">Contacts Care Team with proof of guardianship</text>
+  <line x1="190" y1="128" x2="190" y2="150" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Decision: Legal guardianship? -->
+  <polygon points="190,150 330,184 190,218 50,184" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="190" y="178" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">Legal Guardian</text>
+  <text x="190" y="194" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">Verified?</text>
+
+  <!-- No — left -->
+  <line x1="50" y1="184" x2="20" y2="184" stroke="#C0392B" stroke-width="1.5"/>
+  <line x1="20" y1="184" x2="20" y2="260" stroke="#C0392B" stroke-width="1.5"/>
+  <line x1="20" y1="260" x2="60" y2="260" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="8" y="222" font-size="11" fill="#C0392B" font-weight="bold" transform="rotate(-90,8,222)">No</text>
+  <rect x="60" y="234" width="140" height="40" rx="6" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="130" y="252" text-anchor="middle" font-size="11" font-weight="bold" fill="#C0392B">Access Denied</text>
+  <text x="130" y="265" text-anchor="middle" font-size="11" fill="#555">Guardian notified</text>
+
+  <!-- Yes — down -->
+  <line x1="190" y1="218" x2="190" y2="240" stroke="#1F7A4A" stroke-width="1.5" marker-end="url(#arr-green)"/>
+  <text x="204" y="234" font-size="11" fill="#1F7A4A" font-weight="bold">Yes</text>
+
+  <!-- Admin creates guardian account -->
+  <rect x="60" y="240" width="260" height="52" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="190" y="262" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Admin Creates Guardian Account</text>
+  <text x="190" y="278" text-anchor="middle" font-size="11" fill="#555">Linked to minor patient UUID. Guardian receives</text>
+
+  <line x1="190" y1="292" x2="190" y2="314" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Guardian access scope -->
+  <rect x="40" y="314" width="300" height="64" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5"/>
+  <text x="190" y="336" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">Guardian Gets Full Portal Access</text>
+  <text x="190" y="352" text-anchor="middle" font-size="11" fill="#333">View appointments, results, messages</text>
+  <text x="190" y="367" text-anchor="middle" font-size="11" fill="#333">Cannot edit clinical data. Logs with guardian ID.</text>
+
+  <line x1="190" y1="378" x2="190" y2="400" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Minor turns 18 -->
+  <polygon points="190,400 330,430 190,460 50,430" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5"/>
+  <text x="190" y="424" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">Minor Turns 18</text>
+  <text x="190" y="440" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">or Access Revoked?</text>
+
+  <!-- No — stays same -->
+  <line x1="50" y1="430" x2="20" y2="430" stroke="#888" stroke-width="1.5"/>
+  <line x1="20" y1="430" x2="20" y2="490" stroke="#888" stroke-width="1.5"/>
+  <text x="8" y="460" font-size="11" fill="#888" transform="rotate(-90,8,460)">No</text>
+  <text x="30" y="510" font-size="11" fill="#888">Access</text>
+  <text x="24" y="524" font-size="11" fill="#888">continues</text>
+
+  <!-- Yes — revoke -->
+  <line x1="190" y1="460" x2="190" y2="482" stroke="#C0392B" stroke-width="1.5" marker-end="url(#arr-red)"/>
+  <text x="204" y="476" font-size="11" fill="#C0392B" font-weight="bold">Yes</text>
+
+  <rect x="60" y="482" width="260" height="52" rx="8" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5"/>
+  <text x="190" y="504" text-anchor="middle" font-size="12" font-weight="bold" fill="#C0392B">Guardian Access Revoked</text>
+  <text x="190" y="520" text-anchor="middle" font-size="11" fill="#555">Account deactivated immediately. Patient</text>
+
+  <line x1="190" y1="534" x2="190" y2="556" stroke="#1F3864" stroke-width="1.5" marker-end="url(#arr)"/>
+  <rect x="60" y="556" width="260" height="40" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5"/>
+  <text x="190" y="572" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Patient Converts to Independent Account</text>
+  <text x="190" y="585" text-anchor="middle" font-size="11" fill="#555">Historic records obligation — pending Legal (GRD-004 Q5)</text>
+
+  <!-- ===== PART B: Minor Confidentiality ===== -->
+  <!-- Open items warning box -->
+  <rect x="570" y="76" width="460" height="200" rx="8" fill="#FFF8E6" stroke="#B8730A" stroke-width="2" stroke-dasharray="6,4"/>
+  <text x="800" y="100" text-anchor="middle" font-size="13" font-weight="bold" fill="#B8730A">⚠  OPEN ITEM — PENDING LEGAL (M01-GRD-004)</text>
+  <text x="800" y="122" text-anchor="middle" font-size="11" fill="#555">The following confidentiality rules CANNOT be built until</text>
+  <text x="800" y="138" text-anchor="middle" font-size="11" fill="#555">Jessica Wheeler (Legal) resolves the 5 open questions.</text>
+
+  <text x="590" y="162" font-size="11" fill="#6E4C00" font-weight="bold">Questions blocking build:</text>
+  <text x="590" y="178" font-size="11" fill="#555">Q1: Which states + age thresholds for minor confidentiality rights?</text>
+  <text x="590" y="194" font-size="11" fill="#555">Q2: Which care types trigger confidentiality (STI, MH, SUD, reproductive)?</text>
+  <text x="590" y="210" font-size="11" fill="#555">Q3: Must we hide confidential orders from guardian even if guardian = account holder?</text>
+  <text x="590" y="226" font-size="11" fill="#555">Q4: Can minor purchase DTC with guardian payment method on file?</text>
+  <text x="590" y="242" font-size="11" fill="#555">Q5: What are obligations for confidential records when minor turns 18?</text>
+
+  <!-- Placeholder flow for post-legal -->
+  <rect x="570" y="294" width="460" height="24" rx="4" fill="#F5F5F5" stroke="#CCC"/>
+  <text x="800" y="310" text-anchor="middle" font-size="11" fill="#888" font-style="italic">Flow below shows intended design — subject to change based on Legal guidance</text>
+
+  <!-- Minor orders confidential service -->
+  <rect x="620" y="328" width="360" height="52" rx="8" fill="#EEF3FB" stroke="#1F3864" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="800" y="350" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F3864">Minor Orders Confidential Service</text>
+  <text x="800" y="366" text-anchor="middle" font-size="11" fill="#555">Care type flagged as confidential per Legal-defined list</text>
+  <line x1="800" y1="380" x2="800" y2="402" stroke="#1F3864" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- System check: state + age -->
+  <rect x="600" y="402" width="400" height="52" rx="8" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="800" y="424" text-anchor="middle" font-size="12" font-weight="bold" fill="#1F7A4A">System Checks State + Minor Age Threshold</text>
+  <text x="800" y="440" text-anchor="middle" font-size="11" fill="#333">Confirms patient age and state trigger confidentiality rules</text>
+  <line x1="800" y1="454" x2="800" y2="476" stroke="#1F3864" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+
+  <!-- Decision -->
+  <polygon points="800,476 940,510 800,544 660,510" fill="#FFF8E6" stroke="#B8730A" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="800" y="504" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">Confidentiality</text>
+  <text x="800" y="520" text-anchor="middle" font-size="11" font-weight="bold" fill="#6E4C00">Required?</text>
+
+  <!-- Yes -->
+  <line x1="800" y1="544" x2="800" y2="566" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-red)"/>
+  <text x="814" y="560" font-size="11" fill="#C0392B" font-weight="bold">Yes</text>
+  <rect x="620" y="566" width="360" height="52" rx="8" fill="#FDECEA" stroke="#C0392B" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="800" y="588" text-anchor="middle" font-size="12" font-weight="bold" fill="#C0392B">Hide Order &amp; Result from Guardian</text>
+  <text x="800" y="604" text-anchor="middle" font-size="11" fill="#555">Guardian account cannot see this order, result, or associated notes</text>
+
+  <!-- No -->
+  <line x1="940" y1="510" x2="1010" y2="510" stroke="#1F7A4A" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="1010" y1="510" x2="1010" y2="566" stroke="#1F7A4A" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-green)"/>
+  <text x="952" y="503" font-size="11" fill="#1F7A4A" font-weight="bold">No</text>
+  <rect x="980" y="566" width="60" height="40" rx="6" fill="#D6F0E0" stroke="#1F7A4A" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="1010" y="584" text-anchor="middle" font-size="11" fill="#1F7A4A">Visible</text>
+  <text x="1010" y="598" text-anchor="middle" font-size="11" fill="#1F7A4A">to all</text>
+
+  <!-- Legal doc note -->
+  <rect x="600" y="648" width="420" height="52" rx="6" fill="#F5F5F5" stroke="#CCC" stroke-width="1"/>
+  <text x="810" y="669" text-anchor="middle" font-size="11" fill="#666" font-style="italic">Exact implementation depends on Legal document</text>
+  <text x="810" y="684" text-anchor="middle" font-size="11" fill="#666" font-style="italic">describing current Everlywell operational practices (requested 2026-06-09)</text>
+</svg>
+</body>
+</html>

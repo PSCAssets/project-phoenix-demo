@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+{% block title %}Scheduling Tool — Telehealth{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+
+/* demo-nav-offset */
+.tool-shell { margin-top: 60px; margin-left: 56px; display: flex; flex-direction: column; height: calc(100vh - 60px); overflow: hidden; }
+
+.tool-topbar {
+  background: #6B21A8; color: #fff; padding: 0 24px; height: 52px;
+  display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+}
+.tool-topbar-title { font-size: 16px; font-weight: 700; }
+.tool-topbar-back { font-size: 12px; color: #8B9BB4; text-decoration: none; display: flex; align-items: center; gap: 4px; }
+.tool-topbar-back:hover { color: #fff; }
+.tool-topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.tool-btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid rgba(255,255,255,0.25); color: #fff; background: transparent; transition: background 0.12s; }
+.tool-btn:hover { background: rgba(255,255,255,0.1); }
+.tool-btn.primary { background: #6B21A8; border-color: #6B21A8; }
+.tool-btn.primary:hover { background: #5B1898; }
+
+/* Tab bar */
+.tool-tabs { background: #fff; border-bottom: 1px solid #E5E0D8; display: flex; padding: 0 24px; flex-shrink: 0; }
+.tool-tab { padding: 13px 20px; font-size: 13px; font-weight: 500; color: #6B7280; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color 0.12s; }
+.tool-tab:hover { color: #374151; }
+.tool-tab.active { color: #6B21A8; border-bottom-color: #6B21A8; font-weight: 600; }
+
+/* Filter bar */
+.filter-bar { background: #F2EDE4; border-bottom: 1px solid #E5E0D8; padding: 10px 24px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; flex-wrap: wrap; }
+.filter-bar label { font-size: 11px; font-weight: 600; color: #6B7280; margin-right: -8px; }
+.filter-select { font-size: 12px; padding: 6px 10px; border: 1px solid #E5E0D8; border-radius: 6px; background: #fff; color: #374151; outline: none; min-width: 140px; }
+.filter-select:focus { border-color: #6B21A8; }
+.filter-input { font-size: 12px; padding: 6px 10px; border: 1px solid #E5E0D8; border-radius: 6px; background: #fff; color: #374151; outline: none; }
+.filter-input:focus { border-color: #6B21A8; }
+.filter-clear { font-size: 12px; color: #6B7280; cursor: pointer; text-decoration: underline; }
+.filter-clear:hover { color: #374151; }
+
+/* Main area */
+.tool-body { flex: 1; overflow-y: auto; padding: 24px; display: flex; gap: 20px; }
+.tool-panel { flex: 1; }
+.tool-panel.hidden { display: none; }
+
+/* Search section */
+.search-section { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+.search-section-title { font-size: 13px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+.search-row { display: flex; gap: 10px; }
+.search-input-wrap { flex: 1; position: relative; }
+.search-input { width: 100%; padding: 9px 12px 9px 34px; border: 1px solid #E5E0D8; border-radius: 8px; font-size: 13px; outline: none; }
+.search-input:focus { border-color: #6B21A8; box-shadow: 0 0 0 2px rgba(107,33,168,0.1); }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+.search-btn { padding: 9px 18px; background: #6B21A8; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.search-btn:hover { background: #5B1898; }
+
+/* Results table */
+.results-table { width: 100%; border-collapse: collapse; }
+.results-table thead th { padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; }
+.results-table tbody td { padding: 11px 12px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+.results-table tbody tr:last-child td { border-bottom: none; }
+.results-table tbody tr:hover td { background: #FAF7F2; cursor: pointer; }
+.patient-name { font-weight: 600; color: #111827; }
+.sub-text { font-size: 11px; color: #9CA3AF; }
+.cp-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EDE9FE; color: #5B21B6; margin-right: 3px; }
+.avail-pill { display: inline-block; font-size: 11px; font-weight: 600; color: #059669; background: #D1FAE5; padding: 2px 8px; border-radius: 12px; }
+.action-link { color: #6B21A8; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.action-link:hover { text-decoration: underline; }
+.selected-row td { background: #F5F0FB !important; }
+
+/* Provider calendar mini view */
+.provider-calendar { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 20px; margin-top: 16px; display: none; }
+.provider-calendar.show { display: block; }
+.cal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.cal-header h3 { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+.cal-nav-btn { background: none; border: 1px solid #E5E0D8; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 13px; color: #374151; }
+.cal-nav-btn:hover { background: #F2EDE4; }
+.cal-week { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.cal-day { background: #FAF7F2; border: 1px solid #E5E0D8; border-radius: 8px; padding: 10px 8px; min-height: 80px; }
+.cal-day-header { font-size: 11px; font-weight: 600; color: #6B7280; text-align: center; margin-bottom: 8px; }
+.cal-slot { font-size: 10px; font-weight: 600; text-align: center; padding: 3px 4px; border-radius: 4px; margin-bottom: 4px; cursor: pointer; background: #D1FAE5; color: #065F46; }
+.cal-slot:hover { background: #059669; color: #fff; }
+.cal-slot.busy { background: #F3F4F6; color: #9CA3AF; cursor: default; }
+
+/* Slot pills for Tab C */
+.provider-slot-group { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+.provider-slot-group-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.provider-slot-name { font-size: 14px; font-weight: 700; color: #111827; }
+.provider-slot-meta { font-size: 12px; color: #6B7280; }
+.slot-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot-pill { padding: 6px 14px; border: 1.5px solid #E5E0D8; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; color: #374151; background: #fff; transition: all 0.12s; }
+.slot-pill:hover { border-color: #6B21A8; color: #6B21A8; background: #F5F0FB; }
+
+/* No results */
+.no-results { text-align: center; padding: 40px 20px; color: #9CA3AF; font-size: 14px; }
+
+/* Availability side panel */
+.avail-panel { width: 320px; background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 20px; height: fit-content; flex-shrink: 0; display: none; }
+.avail-panel.show { display: block; }
+.avail-panel-title { font-size: 14px; font-weight: 700; color: #111827; margin-bottom: 16px; border-bottom: 1px solid #E5E0D8; padding-bottom: 12px; }
+.avail-type-tabs { display: flex; gap: 0; border: 1px solid #E5E0D8; border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+.avail-tab { flex: 1; padding: 7px 10px; text-align: center; font-size: 12px; font-weight: 500; cursor: pointer; background: #fff; color: #6B7280; border: none; }
+.avail-tab.active { background: #6B21A8; color: #fff; font-weight: 600; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+.form-input { width: 100%; padding: 8px 10px; border: 1px solid #E5E0D8; border-radius: 6px; font-size: 13px; outline: none; }
+.form-input:focus { border-color: #6B21A8; }
+.form-select { width: 100%; padding: 8px 10px; border: 1px solid #E5E0D8; border-radius: 6px; font-size: 13px; background: #fff; outline: none; }
+.save-btn { width: 100%; padding: 10px; background: #6B21A8; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 4px; }
+.save-btn:hover { background: #5B1898; }
+
+/* Modal overlay */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 500; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal { background: #fff; border-radius: 14px; padding: 28px; width: 480px; max-width: 96vw; box-shadow: 0 20px 60px rgba(0,0,0,0.18); }
+.modal-title { font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.modal-sub { font-size: 13px; color: #6B7280; margin-bottom: 20px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-size: 11px; font-weight: 600; color: #374151; margin-bottom: 5px; }
+.modal-field .val { font-size: 13px; color: #111827; padding: 8px 10px; background: #F9FAFB; border: 1px solid #E5E0D8; border-radius: 6px; }
+.modal-field input, .modal-field select, .modal-field textarea { width: 100%; padding: 8px 10px; border: 1px solid #E5E0D8; border-radius: 6px; font-size: 13px; font-family: inherit; outline: none; }
+.modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: #6B21A8; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+.modal-btn { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.modal-btn.confirm { background: #6B21A8; color: #fff; }
+.modal-btn.confirm:hover { background: #5B1898; }
+.modal-btn.cancel { background: #F3F4F6; color: #374151; }
+.modal-btn.cancel:hover { background: #E5E7EB; }
+.success-banner { display: none; padding: 12px 16px; background: #D1FAE5; border: 1px solid #A7F3D0; border-radius: 8px; color: #065F46; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+.success-banner.show { display: block; }
+
+/* On Demand row button */
+.od-btn { background: #059669; color: #fff; border: none; border-radius: 16px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.12s; }
+.od-btn:hover { background: #047857; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="tool-shell">
+
+  <div class="tool-topbar">
+    <a href="/scheduler/" class="tool-topbar-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Scheduler
+    </a>
+    <div class="tool-topbar-title">Scheduling Tool</div>
+    <div class="tool-topbar-right">
+      <button class="tool-btn" onclick="toggleAvailPanel()">Manage Availability</button>
+    </div>
+  </div>
+
+  <div class="tool-tabs">
+    <div class="tool-tab active" id="tabA" onclick="switchTab('A')">📞 Patient Called In</div>
+    <div class="tool-tab" id="tabB" onclick="switchTab('B')">👨‍⚕️ Fill Provider's Schedule</div>
+    <div class="tool-tab" id="tabC" onclick="switchTab('C')">📅 Browse Available Slots</div>
+  </div>
+
+  <div class="filter-bar">
+    <label>State</label>
+    <select class="filter-select" id="filterState">
+      <option value="">— Any state —</option>
+      <option>Texas</option><option>California</option><option>Florida</option><option>New York</option>
+      <option>Illinois</option><option>Pennsylvania</option><option>Ohio</option><option>Georgia</option>
+    </select>
+    <label>Care Product</label>
+    <select class="filter-select" id="filterProduct" onchange="productChanged()">
+      <option value="">— Any care product —</option>
+      <option>Testosterone</option><option>Weight Management</option><option>Skincare</option>
+      <option>ED Treatment</option><option>Women's Health</option><option>Hair Loss</option>
+      <option>A1C Management</option><option>BRCA Counseling</option>
+    </select>
+    <label>Consult Type</label>
+    <select class="filter-select" id="filterType">
+      <option value="">— Any type —</option>
+      <option>Video</option><option>Telephonic</option><option>On Demand</option>
+    </select>
+    <label>Date</label>
+    <input type="date" class="filter-input" id="filterDate">
+    <span class="filter-clear" onclick="clearFilters()">Clear filters</span>
+    <!-- On Demand badge — shown when selected care product supports it -->
+    <span id="onDemandBadge" style="display:none;margin-left:8px;background:#059669;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;" onclick="openOnDemandModal()">
+      ⚡ On Demand Available — Connect Now
+    </span>
+  </div>
+
+  <div class="tool-body">
+
+    <!-- TAB A: Patient First -->
+    <div class="tool-panel" id="panelA">
+      <div class="success-banner" id="successBannerA"></div>
+      <div class="search-section">
+        <div class="search-section-title">1. Find Patient</div>
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="search-input" placeholder="Search by name or patient ID…" id="patientSearchA" oninput="searchPatients('A')">
+          </div>
+          <button class="search-btn" onclick="searchPatients('A')">Search</button>
+        </div>
+      </div>
+
+      <div class="search-section" id="patientResultsA" style="display:none;">
+        <div class="search-section-title">Select Patient</div>
+        <table class="results-table">
+          <thead><tr><th>Patient</th><th>DOB</th><th>State</th><th>Active Care Products</th><th></th></tr></thead>
+          <tbody id="patientTableA">
+            <tr onclick="selectPatient('A','Marcus Johnson','TX','Testosterone')">
+              <td><div class="patient-name">Marcus Johnson</div><div class="sub-text">PT-2026-00441</div></td>
+              <td>Mar 15, 1988</td><td>Texas</td>
+              <td><span class="cp-tag">Testosterone</span></td>
+              <td><span class="action-link">Select →</span></td>
+            </tr>
+            <tr onclick="selectPatient('A','Diana Martinez','CA','Weight Management')">
+              <td><div class="patient-name">Diana Martinez</div><div class="sub-text">PT-2026-00398</div></td>
+              <td>Jul 22, 1991</td><td>California</td>
+              <td><span class="cp-tag">Weight Management</span></td>
+              <td><span class="action-link">Select →</span></td>
+            </tr>
+            <tr onclick="selectPatient('A','Robert Kim','NY','A1C Management')">
+              <td><div class="patient-name">Robert Kim</div><div class="sub-text">PT-2026-00512</div></td>
+              <td>Dec 3, 1975</td><td>New York</td>
+              <td><span class="cp-tag">A1C Management</span></td>
+              <td><span class="action-link">Select →</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="search-section" id="providerResultsA" style="display:none;">
+        <div class="search-section-title">2. Available Providers — <span id="selectedPatientA" style="color:#6B21A8;font-weight:700;"></span></div>
+        <table class="results-table">
+          <thead><tr><th>Provider</th><th>States Licensed</th><th>Care Products</th><th>Next Available</th><th></th></tr></thead>
+          <tbody>
+            <tr onclick="showProviderCal('A','Dr. Sarah Lee, MD')">
+              <td><div class="patient-name">Dr. Sarah Lee, MD</div><div class="sub-text">Internal Medicine</div></td>
+              <td>TX, CA, FL, NY</td>
+              <td><span class="cp-tag">Testosterone</span><span class="cp-tag">Weight Mgmt</span></td>
+              <td><span class="avail-pill">Today 2:30 PM</span></td>
+              <td style="display:flex;gap:8px;align-items:center;">
+                <span class="action-link">View schedule →</span>
+                <button id="odBtnA1" class="od-btn" onclick="event.stopPropagation();openOnDemandModal('Dr. Sarah Lee, MD')" style="display:none;">⚡ On Demand</button>
+              </td>
+            </tr>
+            <tr onclick="showProviderCal('A','Maria Rodriguez, NP')">
+              <td><div class="patient-name">Maria Rodriguez, NP</div><div class="sub-text">Nurse Practitioner</div></td>
+              <td>TX, CA, FL, IL, PA</td>
+              <td><span class="cp-tag">Testosterone</span><span class="cp-tag">A1C Mgmt</span></td>
+              <td><span class="avail-pill">Today 3:00 PM</span></td>
+              <td style="display:flex;gap:8px;align-items:center;">
+                <span class="action-link">View schedule →</span>
+                <button id="odBtnA2" class="od-btn" onclick="event.stopPropagation();openOnDemandModal('Maria Rodriguez, NP')" style="display:none;">⚡ On Demand</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="calendarA" class="provider-calendar">
+          <div class="cal-header">
+            <h3>Week of Jun 9–13, 2026 — <span id="calProviderNameA"></span></h3>
+            <button class="cal-nav-btn" onclick="alert('Previous week')">‹ Prev</button>
+            <button class="cal-nav-btn" onclick="alert('Next week')">Next ›</button>
+          </div>
+          <div class="cal-week">
+            <div class="cal-day"><div class="cal-day-header">MON 9</div><div class="cal-slot busy">9:00 AM</div><div class="cal-slot busy">10:00 AM</div></div>
+            <div class="cal-day"><div class="cal-day-header">TUE 10</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Tue Jun 10','10:30 AM')">10:30 AM</div><div class="cal-slot busy">2:00 PM</div></div>
+            <div class="cal-day"><div class="cal-day-header">WED 11</div><div class="cal-slot busy">9:00 AM</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Wed Jun 11','11:00 AM')">11:00 AM</div></div>
+            <div class="cal-day"><div class="cal-day-header">THU 12</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Thu Jun 12','9:30 AM')">9:30 AM</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Thu Jun 12','2:30 PM')">2:30 PM</div></div>
+            <div class="cal-day"><div class="cal-day-header">FRI 13</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Fri Jun 13','2:30 PM')">2:30 PM</div><div class="cal-slot" onclick="openBookingModal('Dr. Sarah Lee, MD','Fri Jun 13','3:00 PM')">3:00 PM</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB B: Provider First -->
+    <div class="tool-panel hidden" id="panelB">
+      <div class="success-banner" id="successBannerB"></div>
+      <div class="search-section">
+        <div class="search-section-title">1. Find Provider</div>
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="search-input" placeholder="Search by provider name…" id="providerSearchB" oninput="searchProviders('B')">
+          </div>
+          <button class="search-btn" onclick="searchProviders('B')">Search</button>
+        </div>
+      </div>
+
+      <div class="search-section" id="providerResultsB" style="display:none;">
+        <div class="search-section-title">Select Provider</div>
+        <table class="results-table">
+          <thead><tr><th>Provider</th><th>Role</th><th>States Licensed</th><th>Care Products</th><th></th></tr></thead>
+          <tbody>
+            <tr onclick="selectProviderB('Dr. Sarah Lee, MD')">
+              <td><div class="patient-name">Dr. Sarah Lee, MD</div></td>
+              <td>MD/DO</td><td>TX, CA, FL, NY, IL</td>
+              <td><span class="cp-tag">Testosterone</span><span class="cp-tag">Weight Mgmt</span><span class="cp-tag">ED</span></td>
+              <td><span class="action-link">Select →</span></td>
+            </tr>
+            <tr onclick="selectProviderB('Maria Rodriguez, NP')">
+              <td><div class="patient-name">Maria Rodriguez, NP</div></td>
+              <td>NP</td><td>TX, CA, FL, IL, PA</td>
+              <td><span class="cp-tag">Testosterone</span><span class="cp-tag">A1C Mgmt</span><span class="cp-tag">Women's Health</span></td>
+              <td><span class="action-link">Select →</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="search-section" id="patientSearchSectionB" style="display:none;">
+        <div class="search-section-title">2. Find Patient — <span id="selectedProviderB" style="color:#6B21A8;font-weight:700;"></span></div>
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" class="search-input" placeholder="Search by patient name or ID…" id="patientSearchB" oninput="searchPatients('B')">
+          </div>
+          <button class="search-btn" onclick="searchPatients('B')">Search</button>
+        </div>
+        <div id="patientResultsB" style="margin-top:14px;display:none;">
+          <table class="results-table">
+            <thead><tr><th>Patient</th><th>DOB</th><th>State</th><th>Care Products</th><th></th></tr></thead>
+            <tbody>
+              <tr onclick="selectPatientAndShowCalB('Marcus Johnson')">
+                <td><div class="patient-name">Marcus Johnson</div><div class="sub-text">PT-2026-00441</div></td>
+                <td>Mar 15, 1988</td><td>Texas</td>
+                <td><span class="cp-tag">Testosterone</span></td>
+                <td><span class="action-link">Select →</span></td>
+              </tr>
+              <tr onclick="selectPatientAndShowCalB('Robert Kim')">
+                <td><div class="patient-name">Robert Kim</div><div class="sub-text">PT-2026-00512</div></td>
+                <td>Dec 3, 1975</td><td>New York</td>
+                <td><span class="cp-tag">A1C Management</span></td>
+                <td><span class="action-link">Select →</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="provider-calendar show" id="calendarB" style="display:none;">
+        <div class="cal-header">
+          <h3>Week of Jun 9–13, 2026 — <span id="calProviderNameB"></span></h3>
+          <button class="cal-nav-btn">‹ Prev</button>
+          <button class="cal-nav-btn">Next ›</button>
+        </div>
+        <div class="cal-week">
+          <div class="cal-day"><div class="cal-day-header">MON 9</div><div class="cal-slot busy">9:00 AM</div></div>
+          <div class="cal-day"><div class="cal-day-header">TUE 10</div><div class="cal-slot" onclick="openBookingModal('','Tue Jun 10','10:30 AM')">10:30 AM</div></div>
+          <div class="cal-day"><div class="cal-day-header">WED 11</div><div class="cal-slot" onclick="openBookingModal('','Wed Jun 11','11:00 AM')">11:00 AM</div><div class="cal-slot" onclick="openBookingModal('','Wed Jun 11','3:30 PM')">3:30 PM</div></div>
+          <div class="cal-day"><div class="cal-day-header">THU 12</div><div class="cal-slot" onclick="openBookingModal('','Thu Jun 12','9:30 AM')">9:30 AM</div></div>
+          <div class="cal-day"><div class="cal-day-header">FRI 13</div><div class="cal-slot" onclick="openBookingModal('','Fri Jun 13','2:30 PM')">2:30 PM</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB C: Browse Open Slots -->
+    <div class="tool-panel hidden" id="panelC">
+      <div class="success-banner" id="successBannerC"></div>
+      <div class="search-section">
+        <div class="search-section-title" style="display:flex;align-items:center;gap:16px;">
+          <span>Patient's preferred date</span>
+          <input type="date" class="filter-input" id="preferredDate" style="font-size:14px;padding:8px 12px;" onchange="loadSlots()">
+          <button class="search-btn" onclick="loadSlots()">Find Open Slots</button>
+        </div>
+        <div style="font-size:12px;color:#9CA3AF;margin-top:8px;">Also filter by state, care product, and consult type in the filter bar above.</div>
+      </div>
+
+      <div id="slotsResults" style="display:none;">
+        <div class="provider-slot-group">
+          <div class="provider-slot-group-header">
+            <div class="provider-slot-name">Dr. Sarah Lee, MD</div>
+            <div class="provider-slot-meta">Internal Medicine · TX CA FL NY · Testosterone · Weight Management</div>
+          </div>
+          <div class="slot-pills">
+            <button class="slot-pill" onclick="openBookingModal('Dr. Sarah Lee, MD','Jun 13','9:00 AM')">9:00 AM</button>
+            <button class="slot-pill" onclick="openBookingModal('Dr. Sarah Lee, MD','Jun 13','10:30 AM')">10:30 AM</button>
+            <button class="slot-pill" onclick="openBookingModal('Dr. Sarah Lee, MD','Jun 13','2:30 PM')">2:30 PM</button>
+            <button class="slot-pill" onclick="openBookingModal('Dr. Sarah Lee, MD','Jun 13','3:00 PM')">3:00 PM</button>
+          </div>
+        </div>
+        <div class="provider-slot-group">
+          <div class="provider-slot-group-header">
+            <div class="provider-slot-name">Maria Rodriguez, NP</div>
+            <div class="provider-slot-meta">Nurse Practitioner · TX CA FL IL PA · Testosterone · A1C Management</div>
+          </div>
+          <div class="slot-pills">
+            <button class="slot-pill" onclick="openBookingModal('Maria Rodriguez, NP','Jun 13','11:00 AM')">11:00 AM</button>
+            <button class="slot-pill" onclick="openBookingModal('Maria Rodriguez, NP','Jun 13','1:30 PM')">1:30 PM</button>
+            <button class="slot-pill" onclick="openBookingModal('Maria Rodriguez, NP','Jun 13','4:00 PM')">4:00 PM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-results" id="noResults" style="display:none;">
+        <div style="font-size:32px;margin-bottom:12px;">📭</div>
+        <div>No open slots found for the selected criteria.</div>
+        <div style="font-size:13px;margin-top:6px;">Try adjusting the date or filters.</div>
+      </div>
+    </div>
+
+    <!-- Availability side panel -->
+    <div class="avail-panel" id="availPanel">
+      <div class="avail-panel-title">Manage Availability</div>
+      <div class="form-group">
+        <label class="form-label">Provider</label>
+        <select class="form-select">
+          <option>Dr. Sarah Lee, MD</option>
+          <option>Maria Rodriguez, NP</option>
+          <option>Jennifer Martinez, Lead RN</option>
+        </select>
+      </div>
+      <div class="avail-type-tabs">
+        <button class="avail-tab active" onclick="setAvailTab('avail',this)">Available</button>
+        <button class="avail-tab" onclick="setAvailTab('unavail',this)">Unavailable</button>
+      </div>
+      <div id="availForm">
+        <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input"></div>
+        <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><label class="form-label">Start Time</label><input type="time" class="form-input" value="09:00"></div>
+          <div><label class="form-label">End Time</label><input type="time" class="form-input" value="17:00"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Repeat</label>
+          <select class="form-select"><option>None</option><option>Daily</option><option>Weekly</option></select>
+        </div>
+      </div>
+      <div id="unavailForm" style="display:none;">
+        <div class="form-group"><label class="form-label">Date</label><input type="date" class="form-input"></div>
+        <div class="form-group" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><label class="form-label">Start Time</label><input type="time" class="form-input" value="09:00"></div>
+          <div><label class="form-label">End Time</label><input type="time" class="form-input" value="17:00"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Label</label><input type="text" class="form-input" placeholder="e.g. Admin time"></div>
+        <div class="form-group">
+          <label class="form-label">Repeat</label>
+          <select class="form-select"><option>None</option><option>Daily</option><option>Weekly</option></select>
+        </div>
+      </div>
+      <button class="save-btn" onclick="saveAvailability()">Save Block</button>
+    </div>
+
+  </div><!-- /tool-body -->
+
+</div><!-- /tool-shell -->
+
+<!-- On Demand Modal -->
+<div class="modal-overlay" id="odModal">
+  <div class="modal">
+    <div style="font-size:28px;margin-bottom:8px;">⚡</div>
+    <div class="modal-title">Start On Demand Consult</div>
+    <div class="modal-sub">Connect the patient immediately with an available provider — no scheduled slot needed.</div>
+    <div class="modal-field"><label>Care Product</label><div class="val" id="odModalProduct">—</div></div>
+    <div class="modal-field"><label>Provider</label><div class="val" id="odModalProvider">—</div></div>
+    <div class="modal-field">
+      <label>Consult Type</label>
+      <select id="odConsultType"><option>Video</option><option>Telephonic</option></select>
+    </div>
+    <div class="modal-field">
+      <label>Notes (optional)</label>
+      <textarea id="odNotes" rows="2" placeholder="Any context for the provider…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeOnDemandModal()">Cancel</button>
+      <button class="modal-btn confirm" style="background:#059669;" onclick="confirmOnDemand()">⚡ Connect Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking Confirmation Modal -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-title">Confirm Appointment</div>
+    <div class="modal-sub">Review the details below and confirm.</div>
+    <div class="modal-field"><label>Patient</label><div class="val" id="modalPatient">Marcus Johnson</div></div>
+    <div class="modal-field"><label>Provider</label><div class="val" id="modalProvider">—</div></div>
+    <div class="modal-field"><label>Date &amp; Time</label><div class="val" id="modalDateTime">—</div></div>
+    <div class="modal-field">
+      <label>Consult Type</label>
+      <select id="modalConsultType"><option>Video</option><option>Telephonic</option></select>
+    </div>
+    <div class="modal-field">
+      <label>Care Product</label>
+      <select id="modalCareProduct">
+        <option>Testosterone</option><option>Weight Management</option><option>A1C Management</option>
+        <option>Women's Health</option><option>ED Treatment</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Notes for Provider (optional)</label>
+      <textarea id="modalNotes" rows="2" placeholder="Any context for the provider…"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="confirmBooking()">Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+let activeTab = 'A';
+let activePatient = { name: '', state: '', product: '' };
+let activeProvider = { name: '' };
+let activeBookingTab = 'A';
+
+function switchTab(tab) {
+  ['A','B','C'].forEach(t => {
+    document.getElementById('tab'+t).classList.remove('active');
+    document.getElementById('panel'+t).classList.add('hidden');
+    document.getElementById('panel'+t).classList.remove('tool-panel');
+  });
+  document.getElementById('tab'+tab).classList.add('active');
+  document.getElementById('panel'+tab).classList.remove('hidden');
+  document.getElementById('panel'+tab).classList.add('tool-panel');
+  activeTab = tab;
+}
+
+function clearFilters() {
+  ['filterState','filterProduct','filterType','filterDate'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function searchPatients(tab) {
+  const input = document.getElementById('patientSearch'+tab);
+  if (!input || input.value.length < 1) return;
+  if (tab === 'A') document.getElementById('patientResultsA').style.display = '';
+  else if (tab === 'B') document.getElementById('patientResultsB').style.display = '';
+}
+
+function selectPatient(tab, name, state, product) {
+  activePatient = { name, state, product };
+  if (tab === 'A') {
+    document.getElementById('patientResultsA').style.display = 'none';
+    document.getElementById('selectedPatientA').textContent = name + ' (' + state + ')';
+    document.getElementById('providerResultsA').style.display = '';
+    document.getElementById('filterState').value = state;
+  }
+}
+
+function showProviderCal(tab, providerName) {
+  activeProvider.name = providerName;
+  if (tab === 'A') {
+    document.getElementById('calProviderNameA').textContent = providerName;
+    document.getElementById('calendarA').classList.add('show');
+    activeBookingTab = 'A';
+  }
+}
+
+function searchProviders(tab) {
+  const input = document.getElementById('providerSearch'+tab);
+  if (!input || input.value.length < 1) return;
+  if (tab === 'B') document.getElementById('providerResultsB').style.display = '';
+}
+
+function selectProviderB(name) {
+  activeProvider.name = name;
+  document.getElementById('selectedProviderB').textContent = name;
+  document.getElementById('providerResultsB').style.display = 'none';
+  document.getElementById('patientSearchSectionB').style.display = '';
+}
+
+function selectPatientAndShowCalB(name) {
+  activePatient.name = name;
+  document.getElementById('patientResultsB').style.display = 'none';
+  const cal = document.getElementById('calendarB');
+  cal.style.display = '';
+  document.getElementById('calProviderNameB').textContent = activeProvider.name;
+  activeBookingTab = 'B';
+}
+
+function loadSlots() {
+  const date = document.getElementById('preferredDate').value;
+  document.getElementById('noResults').style.display = 'none';
+  document.getElementById('slotsResults').style.display = date ? '' : 'none';
+  if (!date) document.getElementById('noResults').style.display = '';
+  activeBookingTab = 'C';
+}
+
+function openBookingModal(provider, date, time) {
+  document.getElementById('modalPatient').textContent = activePatient.name || 'Marcus Johnson';
+  document.getElementById('modalProvider').textContent = provider || activeProvider.name || 'Dr. Sarah Lee, MD';
+  document.getElementById('modalDateTime').textContent = date + ' at ' + time;
+  document.getElementById('bookingModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('bookingModal').classList.remove('show');
+}
+
+function confirmBooking() {
+  closeModal();
+  // Show full-page confirmation overlay then redirect to dashboard
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = '<div style="font-size:56px;">✅</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#111827;">Appointment Booked</div>' +
+    '<div style="font-size:14px;color:#6B7280;">Confirmation has been sent to the patient.</div>' +
+    '<div style="font-size:13px;color:#9CA3AF;margin-top:8px;">Returning to dashboard…</div>';
+  document.body.appendChild(overlay);
+  setTimeout(() => { window.location.href = '/scheduler/dashboard'; }, 2200);
+}
+
+function toggleAvailPanel() {
+  const panel = document.getElementById('availPanel');
+  panel.classList.toggle('show');
+}
+
+function setAvailTab(type, btn) {
+  document.querySelectorAll('.avail-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('availForm').style.display = type === 'avail' ? '' : 'none';
+  document.getElementById('unavailForm').style.display = type === 'unavail' ? '' : 'none';
+}
+
+function saveAvailability() {
+  alert('Availability block saved. Provider schedule updated.');
+  toggleAvailPanel();
+}
+
+// Close modal on overlay click
+document.getElementById('bookingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── On Demand Logic ───────────────────────────────────────────────────────
+const ON_DEMAND_PRODUCTS = ['Testosterone', 'ED Treatment', 'Weight Management', "Women's Health", 'Hair Loss', 'Skincare'];
+
+function productChanged() {
+  const val = document.getElementById('filterProduct').value;
+  const isOnDemand = ON_DEMAND_PRODUCTS.includes(val);
+  document.getElementById('onDemandBadge').style.display = isOnDemand ? '' : 'none';
+  // Show/hide per-row On Demand buttons
+  document.querySelectorAll('.od-btn').forEach(btn => {
+    btn.style.display = isOnDemand ? '' : 'none';
+  });
+}
+
+function openOnDemandModal(providerName) {
+  const cp = document.getElementById('filterProduct').value || 'Selected Care Product';
+  document.getElementById('odModalProduct').textContent = cp;
+  document.getElementById('odModalProvider').textContent = providerName || 'Next Available Provider';
+  document.getElementById('odModal').classList.add('show');
+}
+
+function closeOnDemandModal() {
+  document.getElementById('odModal').classList.remove('show');
+}
+
+function confirmOnDemand() {
+  closeOnDemandModal();
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  overlay.innerHTML = '<div style="font-size:56px;">⚡</div>' +
+    '<div style="font-size:22px;font-weight:700;color:#111827;">On Demand Consult Started</div>' +
+    '<div style="font-size:14px;color:#6B7280;">Patient and provider have been notified. Connecting now.</div>' +
+    '<div style="font-size:13px;color:#9CA3AF;margin-top:8px;">Returning to dashboard…</div>';
+  document.body.appendChild(overlay);
+  setTimeout(() => { window.location.href = '/scheduler/dashboard'; }, 2400);
+}
+
+document.getElementById('odModal').addEventListener('click', function(e) {
+  if (e.target === this) closeOnDemandModal();
+});
+</script>
+{% endraw %}
+{% endblock %}

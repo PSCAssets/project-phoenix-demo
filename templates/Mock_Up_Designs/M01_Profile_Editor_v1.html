@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M01 — Profile Editor Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; background: #f0f2f5; color: #222; }
+
+  .frame-header {
+    background: #1F3864; color: #fff; padding: 12px 28px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; border-bottom: 3px solid #2E86AB;
+  }
+  .frame-header .title { font-size: 14px; font-weight: 700; }
+  .badge { background: #2E86AB; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; margin-left: 10px; }
+  .badge-green { background: #27AE60; }
+  .frame-meta { color: #b0c4de; font-size: 11px; }
+
+  .portal-shell { display: flex; min-height: calc(100vh - 55px); background: #f4f6f9; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 200px; background: #1F3864; flex-shrink: 0; display: flex; flex-direction: column;
+  }
+  .sidebar-logo { padding: 16px 16px 10px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; font-weight: 700; color: #fff; }
+  .sidebar-logo span { font-size: 10px; font-weight: 400; color: #8aa; display: block; margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 10px 0; }
+  .nav-section { font-size: 9px; color: #6a85a8; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; padding: 10px 14px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 8px; padding: 9px 14px; font-size: 12px; color: #b0c4de; cursor: pointer; }
+  .nav-item.active { background: rgba(46,134,171,0.25); color: #fff; border-left: 3px solid #2E86AB; }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+  .sidebar-footer { padding: 12px 14px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; color: #8aa; }
+
+  /* Main content */
+  .main-content { flex: 1; display: flex; flex-direction: column; }
+
+  /* Top bar with breadcrumb */
+  .top-bar {
+    background: #fff; padding: 14px 28px; border-bottom: 1px solid #e0e4ea;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .breadcrumb { display: flex; align-items: center; gap: 8px; }
+  .breadcrumb-back { color: #2E86AB; cursor: pointer; font-size: 14px; }
+  .breadcrumb-text { font-size: 13px; color: #888; }
+  .breadcrumb-current { font-size: 16px; font-weight: 700; color: #1F3864; }
+  .top-actions { display: flex; gap: 10px; }
+  .btn-clone {
+    border: 1.5px solid #2E86AB; color: #2E86AB; background: #fff;
+    padding: 7px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; font-weight: 600;
+  }
+  .btn-cancel {
+    border: 1.5px solid #d5d9e0; color: #555; background: #fff;
+    padding: 7px 16px; border-radius: 5px; font-size: 13px; cursor: pointer;
+  }
+  .btn-save {
+    background: #2E86AB; color: #fff; border: none;
+    padding: 7px 18px; border-radius: 5px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+
+  /* Profile info banner */
+  .profile-info-bar {
+    background: #EEF3FA; padding: 14px 28px; border-bottom: 1px solid #d5e0ef;
+    display: flex; align-items: center; gap: 28px;
+  }
+  .profile-name-big { font-size: 17px; font-weight: 700; color: #1F3864; }
+  .profile-meta-item { display: flex; flex-direction: column; }
+  .meta-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .meta-val { font-size: 13px; color: #222; font-weight: 600; }
+  .user-count-badge {
+    background: #1F3864; color: #fff; padding: 3px 10px; border-radius: 12px;
+    font-size: 12px; font-weight: 700; display: inline-block;
+  }
+
+  /* Warning banner */
+  .warning-banner {
+    background: #FEF9EC; border: 1.5px solid #F39C12; border-radius: 6px;
+    padding: 10px 16px; margin: 16px 28px; display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: #7d5a00;
+  }
+  .warning-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* Rights content */
+  .rights-area { padding: 8px 28px 40px; flex: 1; overflow-y: auto; }
+
+  /* Section / accordion */
+  .rights-section { background: #fff; border: 1.5px solid #e0e4ea; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+  .section-header {
+    padding: 13px 18px; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; background: #fff;
+  }
+  .section-header:hover { background: #fafbfc; }
+  .section-title { font-size: 13px; font-weight: 700; color: #1F3864; display: flex; align-items: center; gap: 8px; }
+  .section-badge { background: #EEF3FA; color: #1F3864; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .section-badge.all-checked { background: #EAFAF1; color: #27AE60; }
+  .section-chevron { color: #aaa; font-size: 12px; }
+  .section-body { padding: 4px 18px 14px; border-top: 1px solid #f0f2f5; }
+
+  /* Rights grid */
+  .rights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 20px; }
+  .right-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 4px; font-size: 13px; border-bottom: 1px solid #f8f9fa;
+  }
+  .right-item:last-child { border-bottom: none; }
+  .right-check { width: 16px; height: 16px; flex-shrink: 0; }
+  .check-on { color: #27AE60; font-size: 15px; font-weight: 700; }
+  .check-off { color: #d0d5dd; font-size: 15px; }
+  .right-name { flex: 1; }
+  .right-name.inactive { color: #aaa; }
+
+  .section-collapsed { cursor: pointer; }
+  .collapsed-summary { font-size: 12px; color: #888; margin-top: 2px; }
+
+  /* Annotation bar */
+  .annotation-bar {
+    background: #f4f6f9; border-top: 2px solid #2E86AB;
+    padding: 12px 28px; font-size: 11px; color: #555;
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .ann-item { display: flex; align-items: flex-start; gap: 6px; }
+  .ann-num { background: #2E86AB; color: #fff; border-radius: 50%; width: 18px; height: 18px; min-width: 18px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; margin-top: 1px; }
+</style>
+</head>
+<body>
+
+<!-- Frame header -->
+<div class="frame-header">
+  <div style="display:flex; align-items:center; gap:10px;">
+    <div class="title">M01 — Profile Editor: Provider MD/DO</div>
+    <span class="badge">Mockup 3 of 4</span>
+    <span class="badge badge-green">M01_Profile_Editor_v1</span>
+  </div>
+  <div class="frame-meta">Telehealth · M01 Roles &amp; Responsibilities · June 5, 2026</div>
+</div>
+
+<div class="portal-shell">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      Everlywell
+      <span>Admin Portal</span>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item"><span class="nav-icon">&#128202;</span> Dashboard</div>
+      <div class="nav-item"><span class="nav-icon">&#128101;</span> User Management</div>
+      <div class="nav-item active"><span class="nav-icon">&#128084;</span> Profiles</div>
+      <div class="nav-section">Configuration</div>
+      <div class="nav-item"><span class="nav-icon">&#128186;</span> Care Products</div>
+      <div class="nav-item"><span class="nav-icon">&#128203;</span> Workflows</div>
+      <div class="nav-section">Compliance</div>
+      <div class="nav-item"><span class="nav-icon">&#128196;</span> Audit Log</div>
+      <div class="nav-item"><span class="nav-icon">&#128218;</span> Reports</div>
+    </div>
+    <div class="sidebar-footer">&#9679; Admin User<br><span style="font-size:10px;">System Admin</span></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div class="breadcrumb">
+        <span class="breadcrumb-back">&#8592;</span>
+        <span class="breadcrumb-text">Profiles &nbsp;/&nbsp;</span>
+        <span class="breadcrumb-current">Edit Profile: Provider — MD/DO</span>
+      </div>
+      <div class="top-actions">
+        <button class="btn-clone">Clone Profile</button>
+        <button class="btn-cancel">Cancel</button>
+        <button class="btn-save">Save Profile</button>
+      </div>
+    </div>
+
+    <!-- Profile info bar -->
+    <div class="profile-info-bar">
+      <div>
+        <div class="profile-name-big">Provider — MD/DO</div>
+        <div style="font-size:12px; color:#555; margin-top:2px;">Edit profile rights. Changes apply to all assigned users.</div>
+      </div>
+      <div class="profile-meta-item">
+        <div class="meta-label">Role Category</div>
+        <div class="meta-val">Clinical Provider</div>
+      </div>
+      <div class="profile-meta-item">
+        <div class="meta-label">Users with this profile</div>
+        <div class="meta-val"><span class="user-count-badge">12 users</span></div>
+      </div>
+      <div class="profile-meta-item">
+        <div class="meta-label">Last Modified</div>
+        <div class="meta-val">May 18, 2026</div>
+      </div>
+    </div>
+
+    <!-- Warning banner -->
+    <div class="warning-banner">
+      <span class="warning-icon">&#9888;</span>
+      <span>Changes to this profile will apply to all <strong>12 users</strong> assigned to it. Individual right overrides applied to specific users will be preserved and are not affected by profile-level changes.</span>
+    </div>
+
+    <!-- Rights area -->
+    <div class="rights-area">
+
+      <!-- CLINICAL RIGHTS — expanded -->
+      <div class="rights-section">
+        <div class="section-header">
+          <div class="section-title">
+            &#128138; Clinical Rights
+            <span class="section-badge all-checked">10 of 10 granted</span>
+          </div>
+          <span class="section-chevron">&#9650;</span>
+        </div>
+        <div class="section-body">
+          <div class="rights-grid">
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">View Patient Chart</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">View Clinical Consult Notes</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Write Clinical Consult Notes</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Co-Sign Clinical Note</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Attest Genetic Order</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Prescribe Medication</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Approve Lab Order</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">View Lab Results</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Flag Clinical Escalation</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">View Intake Responses</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUEUE RIGHTS — expanded -->
+      <div class="rights-section">
+        <div class="section-header">
+          <div class="section-title">
+            &#128203; Queue Rights
+            <span class="section-badge" style="background:#EEF3FA; color:#1F3864;">5 of 7 granted</span>
+          </div>
+          <span class="section-chevron">&#9650;</span>
+        </div>
+        <div class="section-body">
+          <div class="rights-grid">
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Access Provider Queue</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-off">&#9744;</span>
+              <span class="right-name inactive">Access Care Team Queue</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-off">&#9744;</span>
+              <span class="right-name inactive">Access MA Queue</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Pull Consult from Queue</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Reassign Consult (own only)</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-on">&#10003;</span>
+              <span class="right-name">Advance Workflow Stage</span>
+            </div>
+            <div class="right-item">
+              <span class="right-check check-off">&#9744;</span>
+              <span class="right-name inactive">View All Queues (Supervisor)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCHEDULING RIGHTS — collapsed -->
+      <div class="rights-section section-collapsed">
+        <div class="section-header">
+          <div class="section-title">
+            &#128340; Scheduling Rights
+            <span class="section-badge" style="background:#EEF3FA; color:#1F3864;">3 of 5 granted</span>
+          </div>
+          <span class="section-chevron">&#9660;</span>
+        </div>
+      </div>
+
+      <!-- PATIENT MANAGEMENT — collapsed -->
+      <div class="rights-section section-collapsed">
+        <div class="section-header">
+          <div class="section-title">
+            &#128101; Patient Management Rights
+            <span class="section-badge" style="background:#EEF3FA; color:#1F3864;">4 of 8 granted</span>
+          </div>
+          <span class="section-chevron">&#9660;</span>
+        </div>
+      </div>
+
+      <!-- ADMIN PORTAL — collapsed, all off -->
+      <div class="rights-section section-collapsed">
+        <div class="section-header">
+          <div class="section-title">
+            &#9881; Admin Portal Rights
+            <span class="section-badge" style="background:#f4f6f9; color:#aaa;">0 of 12 granted</span>
+          </div>
+          <span class="section-chevron">&#9660;</span>
+        </div>
+      </div>
+
+      <!-- REPORTING — collapsed -->
+      <div class="rights-section section-collapsed">
+        <div class="section-header">
+          <div class="section-title">
+            &#128202; Reporting Rights
+            <span class="section-badge" style="background:#EEF3FA; color:#1F3864;">2 of 6 granted</span>
+          </div>
+          <span class="section-chevron">&#9660;</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Annotation bar -->
+<div class="annotation-bar">
+  <div class="ann-item">
+    <div class="ann-num">1</div>
+    <div><strong>Profile-level editing</strong> — changes cascade to all 12 users. Warning banner makes this explicit before saving.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">2</div>
+    <div><strong>Section badges</strong> — show granted vs. total at a glance without expanding each section. Green badge = fully granted.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">3</div>
+    <div><strong>Admin Portal Rights = 0 of 12</strong> — confirms Provider MD/DO has no admin access. Visually distinct with gray badge.</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">4</div>
+    <div><strong>Clone Profile button</strong> — enables creating new profiles from existing ones without starting from scratch (e.g., NP from MD/DO).</div>
+  </div>
+  <div class="ann-item">
+    <div class="ann-num">5</div>
+    <div><strong>Individual overrides preserved</strong> — noted explicitly in warning banner. Profile changes do not wipe user-level overrides.</div>
+  </div>
+</div>
+
+</body>
+</html>

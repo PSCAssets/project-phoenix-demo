@@ -1,0 +1,343 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.portal{display:flex;flex-direction:column;width:100%;height:960px;font-family:var(--font-sans);font-size:13px;color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;background:var(--color-background-tertiary);}
+.sf-header{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);flex-shrink:0;}
+.sf-header-top{background:#0C2340;padding:0 18px;display:flex;align-items:center;height:34px;}
+.sf-breadcrumb{font-size:11px;color:#8AB4CC;display:flex;align-items:center;gap:6px;}
+.sf-breadcrumb span{color:#C8DDE8;}
+.sf-record-bar{padding:10px 18px;display:flex;align-items:center;gap:14px;}
+.sf-avatar{width:52px;height:52px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--color-border-tertiary);background:#d4e8c2;}
+.sf-avatar svg{width:100%;height:100%;}
+.sf-identity{flex:1;}
+.sf-program{font-size:14px;font-weight:500;color:#0070D2;margin-bottom:1px;}
+.sf-record-type{font-size:10px;color:var(--color-text-secondary);margin-bottom:2px;}
+.sf-name{font-size:18px;font-weight:500;color:var(--color-text-primary);}
+.sf-meta-inline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:3px;}
+.sf-meta-item{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary);}
+.sf-meta-item strong{color:var(--color-text-primary);font-weight:500;}
+.sf-meta-lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);margin-right:2px;}
+.sf-meta-divider{width:1px;height:11px;background:var(--color-border-tertiary);}
+.sf-stats{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.stat-chip{display:flex;flex-direction:column;padding:5px 10px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);min-width:80px;}
+.stat-chip-lbl{font-size:9px;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);margin-bottom:1px;}
+.stat-chip-val{font-size:12px;font-weight:500;}
+.stat-chip-val.blue{color:#0070D2;}
+.stat-chip-val.green{color:#0F6E56;}
+.stat-chip-val.amber{color:#633806;}
+.sf-action-row{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.sf-btn{font-size:11px;padding:5px 10px;border-radius:4px;border:1px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500;}
+.sf-btn-primary{background:#0070D2;color:#fff;border-color:#0070D2;}
+.sf-btn-danger{background:#FCEBEB;color:#A32D2D;border-color:#F09595;}
+.sf-btn-warn{background:#FAEEDA;color:#633806;border-color:#FAC775;}
+.sf-btn-purple{background:#EEEDFE;color:#3C3489;border-color:#AFA9EC;}
+.sf-btn-teal{background:#E1F5EE;color:#085041;border-color:#99D6D3;}
+.badge{font-size:11px;padding:2px 8px;border-radius:99px;font-weight:500;white-space:nowrap;display:inline-flex;align-items:center;gap:4px;}
+.b-amber{background:#FAEEDA;color:#633806;}
+.b-coral{background:#FAECE7;color:#712B13;}
+.b-teal{background:#E1F5EE;color:#085041;}
+.b-blue{background:#E6F1FB;color:#0C447C;}
+.main-body{display:flex;flex:1;overflow:hidden;}
+.left-col{width:220px;min-width:220px;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);overflow-y:auto;display:flex;flex-direction:column;transition:width 0.2s;}
+.left-col.collapsed{width:32px;overflow:hidden;}
+.collapse-btn{display:flex;align-items:center;gap:6px;padding:8px 10px;cursor:pointer;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);background:var(--color-background-secondary);font-size:14px;flex-shrink:0;}
+.collapse-lbl{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap;overflow:hidden;}
+.left-content{flex:1;overflow-y:auto;overflow-x:hidden;}
+.accordion-section{border-bottom:0.5px solid var(--color-border-tertiary);}
+.accordion-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer;background:var(--color-background-secondary);user-select:none;}
+.accordion-hdr:hover{background:var(--color-background-tertiary);}
+.accordion-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-secondary);}
+.accordion-icon{font-size:12px;color:var(--color-text-secondary);transition:transform 0.2s;}
+.accordion-icon.open{transform:rotate(180deg);}
+.accordion-body{display:none;}
+.accordion-body.open{display:block;}
+.l-item{padding:5px 12px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.l-item:last-child{border-bottom:none;}
+.l-lbl{font-size:10px;color:var(--color-text-secondary);margin-bottom:1px;}
+.l-val-sm{font-size:11px;color:var(--color-text-primary);}
+.l-val-warn{font-size:11px;color:#A32D2D;font-weight:500;}
+.med-row{display:flex;justify-content:space-between;align-items:center;padding:5px 12px;border-bottom:0.5px solid var(--color-border-tertiary);}
+.med-row:last-child{border-bottom:none;}
+.med-name{font-size:11px;font-weight:500;}
+.med-dose{font-size:10px;color:var(--color-text-secondary);}
+.pmh-wrap{padding:6px 12px;}
+.pmh-tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:99px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);margin:2px;color:var(--color-text-secondary);}
+.center-col{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--color-background-secondary);}
+.log-toolbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:7px 12px;display:flex;align-items:center;gap:7px;}
+.log-toolbar select{font-size:11px;padding:3px 7px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);}
+.log-count{font-size:11px;color:var(--color-text-secondary);}
+.event-log{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px;}
+.day-sep{text-align:center;font-size:10px;color:var(--color-text-secondary);display:flex;align-items:center;gap:8px;margin:3px 0;}
+.day-sep::before,.day-sep::after{content:'';flex:1;height:0.5px;background:var(--color-border-tertiary);}
+.event{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 10px;border-left:3px solid #ccc;}
+.ev-patient{border-left-color:#1D9E75;}
+.ev-provider{border-left-color:#0070D2;}
+.ev-rn{border-left-color:#7F77DD;}
+.ev-system{border-left-color:#B4B2A9;}
+.ev-rx{border-left-color:#BA7517;}
+.ev-lab{border-left-color:#D85A30;}
+.ev-internal{border-left-color:#639922;}
+.ev-hdr{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.d-patient{background:#1D9E75;}.d-provider{background:#0070D2;}.d-rn{background:#7F77DD;}
+.d-system{background:#B4B2A9;}.d-rx{background:#BA7517;}.d-lab{background:#D85A30;}.d-internal{background:#639922;}
+.ev-sender{font-size:11px;font-weight:500;}
+.ev-type{font-size:10px;color:var(--color-text-secondary);}
+.ev-time{font-size:10px;color:var(--color-text-secondary);margin-left:auto;}
+.ev-body{font-size:11px;line-height:1.5;color:var(--color-text-primary);}
+.ev-more{font-size:10px;color:#0070D2;cursor:pointer;margin-top:2px;display:inline-block;}
+.modal-wrap{display:none;position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:20;align-items:center;justify-content:center;}
+.modal-wrap.open{display:flex;}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:20px;width:500px;max-width:92%;}
+.modal-title{font-size:14px;font-weight:500;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close{cursor:pointer;font-size:17px;color:var(--color-text-secondary);background:none;border:none;}
+.modal-field{margin-bottom:11px;}
+.modal-lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px;}
+.modal-select{width:100%;font-size:12px;padding:6px 9px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);}
+.modal-ta{width:100%;font-size:12px;padding:7px 9px;border-radius:4px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);resize:none;height:90px;font-family:var(--font-sans);line-height:1.5;}
+.modal-footer{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:0.5px solid var(--color-border-tertiary);}
+.modal-attach{display:flex;gap:6px;}
+.portal-inner{display:flex;flex:1;overflow:hidden;position:relative;}
+</style>
+
+<h2 class="sr-only">Provider portal mockup — updated header matching v2 design, full-width event log, no activity timeline panel</h2>
+
+<div class="portal">
+  <div class="sf-header">
+    <div class="sf-header-top">
+      <div class="sf-breadcrumb">
+        <i class="ti ti-home" aria-hidden="true"></i><i class="ti ti-chevron-right" aria-hidden="true"></i>
+        <span>Async Consults</span><i class="ti ti-chevron-right" aria-hidden="true"></i>
+        <span>Sarah Reynolds</span>
+      </div>
+    </div>
+    <div class="sf-record-bar">
+      <div class="sf-avatar">
+        <svg viewBox="0 0 56 56"><rect width="56" height="56" fill="#d4e8c2"/><ellipse cx="28" cy="22" rx="13" ry="14" fill="#e8c87a"/><ellipse cx="22" cy="19" rx="2.5" ry="3" fill="#fff"/><ellipse cx="34" cy="19" rx="2.5" ry="3" fill="#fff"/><circle cx="22" cy="20" r="1.5" fill="#333"/><circle cx="34" cy="20" r="1.5" fill="#333"/><ellipse cx="28" cy="26" rx="3" ry="2" fill="#c8a060"/><path d="M23 30 Q28 34 33 30" stroke="#333" stroke-width="1.2" fill="none" stroke-linecap="round"/><ellipse cx="28" cy="14" rx="9" ry="5" fill="#c8a060"/><ellipse cx="19" cy="16" rx="3" ry="4" fill="#e8c87a"/><ellipse cx="37" cy="16" rx="3" ry="4" fill="#e8c87a"/><ellipse cx="28" cy="44" rx="14" ry="10" fill="#e8a040"/></svg>
+      </div>
+      <div class="sf-identity">
+        <div class="sf-program">Weight Loss / GLP-1</div>
+        <div class="sf-record-type">Async consult · Follow-up</div>
+        <div class="sf-name">Sarah Reynolds</div>
+        <div class="sf-meta-inline">
+          <div class="sf-meta-item"><span class="sf-meta-lbl">Age</span><strong>43</strong></div>
+          <div class="sf-meta-divider"></div>
+          <div class="sf-meta-item"><span class="sf-meta-lbl">DOB</span><strong>03/14/1982</strong></div>
+          <div class="sf-meta-divider"></div>
+          <div class="sf-meta-item"><span class="sf-meta-lbl">Patient location</span><strong>Tampa, FL</strong></div>
+          <div class="sf-meta-divider"></div>
+          <span class="badge b-teal">Subscription · Active</span>
+          <span class="badge b-amber"><i class="ti ti-clock" aria-hidden="true"></i> SLA active</span>
+        </div>
+      </div>
+      <div class="sf-stats">
+        <div class="stat-chip"><div class="stat-chip-lbl">Consult state</div><div class="stat-chip-val blue">In progress</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Type</div><div class="stat-chip-val">Follow-up</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Rx ordered</div><div class="stat-chip-val green">1 active</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Labs on file</div><div class="stat-chip-val green">Confirmed</div></div>
+        <div class="stat-chip"><div class="stat-chip-lbl">Consults left</div><div class="stat-chip-val amber">3 follow-ups</div></div>
+      </div>
+      <div class="sf-action-row">
+        <button class="sf-btn sf-btn-primary" onclick="openCompose()"><i class="ti ti-edit" aria-hidden="true"></i> New message</button>
+        <button class="sf-btn sf-btn-teal"><i class="ti ti-phone" aria-hidden="true"></i> Call</button>
+        <button class="sf-btn sf-btn-teal"><i class="ti ti-video" aria-hidden="true"></i> Video</button>
+        <button class="sf-btn sf-btn-purple"><i class="ti ti-user-plus" aria-hidden="true"></i> Reassign</button>
+        <button class="sf-btn sf-btn-warn"><i class="ti ti-flag" aria-hidden="true"></i> Escalate</button>
+        <button class="sf-btn"><i class="ti ti-file-invoice" aria-hidden="true"></i> View intake</button>
+        <button class="sf-btn sf-btn-danger"><i class="ti ti-writing-sign" aria-hidden="true"></i> Sign &amp; close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-body">
+    <div class="left-col" id="leftCol">
+      <div class="collapse-btn" onclick="togglePanel()">
+        <i class="ti ti-layout-sidebar-left-collapse" id="collapseIcon" aria-hidden="true"></i>
+        <span class="collapse-lbl" id="collapseLbl">Medical chart</span>
+      </div>
+      <div class="left-content" id="leftContent">
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-pill" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Medications</span><i class="ti ti-chevron-down accordion-icon open" aria-hidden="true"></i></div>
+          <div class="accordion-body open">
+            <div class="med-row"><div><div class="med-name">Metformin</div><div class="med-dose">500mg · BID</div></div><span class="badge b-teal" style="font-size:9px;">Active</span></div>
+            <div class="med-row"><div><div class="med-name">Lisinopril</div><div class="med-dose">10mg · Daily</div></div><span class="badge b-teal" style="font-size:9px;">Active</span></div>
+            <div class="med-row"><div><div class="med-name">Semaglutide</div><div class="med-dose">1.0mg · Weekly</div></div><span class="badge b-blue" style="font-size:9px;">Active</span></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-alert-triangle" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Allergies</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-val-warn">Penicillin — rash</div></div>
+            <div class="l-item"><div class="l-val-warn">Sulfa — hives</div></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-clipboard-list" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Past medical history</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="pmh-wrap"><span class="pmh-tag">Type 2 diabetes</span><span class="pmh-tag">HTN</span><span class="pmh-tag">Hyperlipidemia</span><span class="pmh-tag">Obesity</span><span class="pmh-tag">GERD (resolved)</span></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-activity" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Vitals</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Blood pressure</div><div class="l-val-sm">138/86 mmHg</div></div>
+            <div class="l-item"><div class="l-lbl">BMI</div><div class="l-val-sm">34.2 · Obese class I</div></div>
+            <div class="l-item"><div class="l-lbl">Weight</div><div class="l-val-sm">201 lbs · Last 05/10/2026</div></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-flask" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Lab results</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">A1C (05/01/2026)</div><div class="l-val-sm" style="color:#0F6E56;">7.4% · Improving</div></div>
+            <div class="l-item"><div class="l-lbl">Fasting glucose</div><div class="l-val-sm">142 mg/dL</div></div>
+            <div class="l-item"><div class="l-lbl">LDL / HDL</div><div class="l-val-sm">118 / 52 mg/dL</div></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-building-hospital" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Insurance &amp; program</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-lbl">Insurance</div><div class="l-val-sm">Aetna PPO · Group #44821</div></div>
+            <div class="l-item"><div class="l-lbl">Pharmacy</div><div class="l-val-sm">CVS Tampa Bay Blvd</div></div>
+          </div>
+        </div>
+        <div class="accordion-section">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)"><span class="accordion-title"><i class="ti ti-info-circle" style="font-size:11px;margin-right:5px;" aria-hidden="true"></i>Additional information</span><i class="ti ti-chevron-down accordion-icon" aria-hidden="true"></i></div>
+          <div class="accordion-body">
+            <div class="l-item"><div class="l-val-sm">Prefers morning contact. Sedentary job. Walks 2x/week.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="portal-inner" id="portalInner">
+      <div class="center-col">
+        <div class="log-toolbar">
+          <i class="ti ti-filter" style="font-size:12px;color:var(--color-text-secondary);" aria-hidden="true"></i>
+          <select onchange="filterEvents(this.value)">
+            <option value="all">All event types</option>
+            <option value="patient">Patient messages</option>
+            <option value="provider">Provider messages</option>
+            <option value="rn">RN / MA / Care Team</option>
+            <option value="lab">Lab results</option>
+            <option value="rx">Prescriptions</option>
+            <option value="internal">Internal notes</option>
+            <option value="system">System events</option>
+          </select>
+          <select><option>All senders</option><option>Dr. A. Rivera, MD</option><option>RN J. Patel</option><option>MA C. Torres</option><option>Sarah Reynolds</option></select>
+          <span class="log-count" id="logCount">9 events</span>
+          <select style="margin-left:auto;width:110px;"><option>Newest first</option><option>Oldest first</option></select>
+        </div>
+        <div class="event-log" id="eventLog">
+
+          <div class="day-sep">May 1, 2026</div>
+
+          <div class="event ev-system" data-type="system">
+            <div class="ev-hdr"><span class="dot d-system"></span><span class="ev-sender">System</span><span class="ev-type">· Consult opened</span><span class="ev-time">8:32 AM</span></div>
+            <div class="ev-body">Follow-up consult opened. Lab results confirmed. Intake complete. Assigned to Dr. A. Rivera, MD.</div>
+          </div>
+
+          <div class="event ev-provider" data-type="provider">
+            <div class="ev-hdr"><span class="dot d-provider"></span><span class="ev-sender">Dr. A. Rivera, MD</span><span class="ev-type">· Provider message</span><span class="ev-time">9:04 AM</span></div>
+            <div class="ev-body">Hi Sarah, I've reviewed your updated A1C — great improvement from 8.1% to 7.4%. I'd like to discuss titrating your Semaglutide dose. Please confirm you have no new symptoms or concerns before I update the prescription.</div>
+          </div>
+
+          <div class="day-sep">May 3, 2026</div>
+
+          <div class="event ev-rn" data-type="rn">
+            <div class="ev-hdr"><span class="dot d-rn"></span><span class="ev-sender">RN J. Patel</span><span class="ev-type">· RN note</span><span class="ev-time">10:15 AM</span></div>
+            <div class="ev-body">Patient called with question about how to use the A1C kit to draw blood. Walked patient through the collection steps. Patient confirmed understanding and will complete the draw today. Duration: 8 min. <span class="ev-more" onclick="this.parentElement.innerHTML='Patient called with question about how to use the A1C kit to draw blood. Walked patient through the full finger-prick collection process including lancet depth, blood volume, and card placement. Patient was initially anxious but confirmed understanding after walkthrough. Will complete draw today and return kit. No clinical concerns raised. Duration: 8 min.'">View full note ↓</span></div>
+          </div>
+
+          <div class="day-sep">May 8, 2026</div>
+
+          <div class="event ev-lab" data-type="lab">
+            <div class="ev-hdr"><span class="dot d-lab"></span><span class="ev-sender">System</span><span class="ev-type">· Lab result posted</span><span class="ev-time">2:14 PM</span></div>
+            <div class="ev-body">A1C 7.4% · Fasting glucose 142 · LDL 118 · HDL 52 · Triglycerides 162. Results linked to chart.</div>
+          </div>
+
+          <div class="event ev-provider" data-type="provider">
+            <div class="ev-hdr"><span class="dot d-provider"></span><span class="ev-sender">Dr. A. Rivera, MD</span><span class="ev-type">· Provider message</span><span class="ev-time">3:30 PM</span></div>
+            <div class="ev-body">Sarah, your labs look great — A1C down to 7.4%. I'm recommending we titrate Semaglutide to 1.0mg weekly. Please reply to confirm no questions before I update the prescription.</div>
+          </div>
+
+          <div class="day-sep">May 14, 2026</div>
+
+          <div class="event ev-internal" data-type="internal">
+            <div class="ev-hdr"><span class="dot d-internal"></span><span class="ev-sender">Dr. A. Rivera, MD</span><span class="ev-type">· Internal note</span><span class="ev-time">9:00 AM</span></div>
+            <div class="ev-body">No patient response in 6 days. Have sent 3 follow-up messages. Referring to MA for outbound call attempt. SLA approaching.</div>
+          </div>
+
+          <div class="event ev-rn" data-type="rn">
+            <div class="ev-hdr"><span class="dot d-rn"></span><span class="ev-sender">MA C. Torres</span><span class="ev-type">· MA note</span><span class="ev-time">11:22 AM</span></div>
+            <div class="ev-body">Outbound call made — no answer. Voicemail left asking patient to return call or log in and reply. Patient has not responded to 3 provider messages over 14 days. Second call attempt scheduled May 15.</div>
+          </div>
+
+          <div class="day-sep">May 15, 2026</div>
+
+          <div class="event ev-patient" data-type="patient">
+            <div class="ev-hdr"><span class="dot d-patient"></span><span class="ev-sender">Sarah Reynolds</span><span class="ev-type">· Patient message</span><span class="ev-time">4:45 PM</span></div>
+            <div class="ev-body">Sorry for the delay — I was traveling. No questions on the dose increase. Ready to start whenever you send the updated prescription.</div>
+          </div>
+
+          <div class="event ev-rx" data-type="rx">
+            <div class="ev-hdr"><span class="dot d-rx"></span><span class="ev-sender">System</span><span class="ev-type">· Prescription ordered</span><span class="ev-time">5:02 PM</span></div>
+            <div class="ev-body">Semaglutide 1.0mg/week · Qty 4 · Refills 2 — sent to CVS Tampa Bay Blvd · Dr. A. Rivera, MD</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="modal-wrap" id="composeModal">
+        <div class="modal">
+          <div class="modal-title">New message<button class="modal-close" onclick="closeCompose()"><i class="ti ti-x" aria-hidden="true"></i></button></div>
+          <div class="modal-field">
+            <div class="modal-lbl">Message type</div>
+            <select class="modal-select">
+              <option>Provider message — visible to patient</option>
+              <option>Internal note — not visible to patient</option>
+              <option>RN / MA / Care Team note</option>
+              <option>Escalate to clinical team</option>
+              <option>Flag for admin review</option>
+            </select>
+          </div>
+          <div class="modal-field">
+            <div class="modal-lbl">Sending as</div>
+            <select class="modal-select"><option>Dr. A. Rivera, MD</option><option>RN J. Patel</option><option>MA C. Torres</option></select>
+          </div>
+          <div class="modal-field">
+            <div class="modal-lbl">Message</div>
+            <textarea class="modal-ta" placeholder="Type your message here..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <div class="modal-attach">
+              <button class="sf-btn"><i class="ti ti-paperclip" aria-hidden="true"></i> Attach</button>
+              <button class="sf-btn"><i class="ti ti-flask" aria-hidden="true"></i> Order lab</button>
+              <button class="sf-btn"><i class="ti ti-pill" aria-hidden="true"></i> Prescribe</button>
+            </div>
+            <div style="display:flex;gap:7px;">
+              <button class="sf-btn" onclick="closeCompose()">Cancel</button>
+              <button class="sf-btn sf-btn-primary" onclick="closeCompose()"><i class="ti ti-send" aria-hidden="true"></i> Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function togglePanel(){
+  const col=document.getElementById('leftCol'),icon=document.getElementById('collapseIcon'),lbl=document.getElementById('collapseLbl'),content=document.getElementById('leftContent');
+  col.classList.toggle('collapsed');
+  if(col.classList.contains('collapsed')){icon.className='ti ti-layout-sidebar-left-expand';lbl.style.display='none';content.style.display='none';}
+  else{icon.className='ti ti-layout-sidebar-left-collapse';lbl.style.display='';content.style.display='';}
+}
+function toggleAccordion(hdr){const b=hdr.nextElementSibling,i=hdr.querySelector('.accordion-icon');b.classList.toggle('open');i.classList.toggle('open');}
+function openCompose(){document.getElementById('composeModal').classList.add('open');}
+function closeCompose(){document.getElementById('composeModal').classList.remove('open');}
+function filterEvents(type){
+  const events=document.querySelectorAll('#eventLog .event');let v=0;
+  events.forEach(ev=>{if(type==='all'||ev.dataset.type===type){ev.style.display='';v++;}else{ev.style.display='none';}});
+  document.getElementById('logCount').textContent=v+' events';
+}
+</script>

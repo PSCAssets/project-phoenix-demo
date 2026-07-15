@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Provider License Expiration — Real-Time Alert and Resolution Flow</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #fff; margin: 0; padding: 20px; }
+  h1 { color: #1F3864; text-align: center; font-size: 16px; margin-bottom: 4px; letter-spacing: 1px; }
+  .subtitle { text-align: center; color: #666; font-size: 12px; margin-bottom: 16px; }
+  .legend { display: flex; gap: 20px; justify-content: center; margin-bottom: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; }
+  .dot { width: 14px; height: 14px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<h1>PROVIDER LICENSE EXPIRATION — REAL-TIME ALERT AND RESOLUTION FLOW</h1>
+<div class="subtitle">Telehealth · M01 Roles & Responsibilities · v2</div>
+<div class="legend">
+  <div class="legend-item"><div class="dot" style="background:#1F3864"></div>External / User Action</div>
+  <div class="legend-item"><div class="dot" style="background:#2E86AB"></div>System Action</div>
+  <div class="legend-item"><div class="dot" style="background:#27AE60"></div>Success / Resolved</div>
+  <div class="legend-item"><div class="dot" style="background:#E74C3C"></div>Alert / Critical</div>
+  <div class="legend-item"><div class="dot" style="background:#F39C12"></div>Decision</div>
+</div>
+
+<svg width="1300" height="1050" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0 0, 9 3, 0 6" fill="#444"/>
+  </marker>
+  <marker id="arr-red" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0 0, 9 3, 0 6" fill="#E74C3C"/>
+  </marker>
+  <marker id="arr-green" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0 0, 9 3, 0 6" fill="#27AE60"/>
+  </marker>
+  <marker id="arr-gray" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto">
+    <polygon points="0 0, 9 3, 0 6" fill="#888"/>
+  </marker>
+</defs>
+
+<!-- ============ SWIMLANE HEADERS ============ -->
+<rect x="0" y="0" width="1300" height="44" fill="#1F3864"/>
+<!-- Lane dividers -->
+<rect x="0" y="44" width="200" height="1006" fill="#F0F4FA"/>
+<rect x="200" y="44" width="320" height="1006" fill="#FAFAFA"/>
+<rect x="520" y="44" width="420" height="1006" fill="#F5F9F5"/>
+<rect x="940" y="44" width="200" height="1006" fill="#FFF8F5"/>
+<rect x="1140" y="44" width="160" height="1006" fill="#F5F5FF"/>
+
+<!-- Lane borders -->
+<line x1="200" y1="44" x2="200" y2="1050" stroke="#DDD" stroke-width="1"/>
+<line x1="520" y1="44" x2="520" y2="1050" stroke="#DDD" stroke-width="1"/>
+<line x1="940" y1="44" x2="940" y2="1050" stroke="#DDD" stroke-width="1"/>
+<line x1="1140" y1="44" x2="1140" y2="1050" stroke="#DDD" stroke-width="1"/>
+
+<!-- Lane labels -->
+<text x="100" y="27" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">VERIFIABLE</text>
+<text x="100" y="40" fill="#BDD7EE" font-size="10" text-anchor="middle" font-family="Arial">(External)</text>
+<text x="360" y="28" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">PLATFORM SYSTEM</text>
+<text x="730" y="28" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">CARE TEAM / RN / MA QUEUES</text>
+<text x="1040" y="28" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">PROVIDER</text>
+<text x="1220" y="28" fill="white" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">SYSTEM ADMIN</text>
+
+<!-- ============ ROW 1: Verifiable push + Platform receives ============ -->
+<!-- Verifiable box -->
+<rect x="15" y="68" width="170" height="60" rx="6" fill="#1F3864"/>
+<text x="100" y="89" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Verifiable pushes</text>
+<text x="100" y="104" fill="white" font-size="10" text-anchor="middle" font-family="Arial">license status change event</text>
+<text x="100" y="118" fill="#BDD7EE" font-size="9" text-anchor="middle" font-family="Arial">(expiration or invalidation)</text>
+
+<!-- Arrow: Verifiable → Platform -->
+<line x1="185" y1="98" x2="218" y2="98" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Platform receives box -->
+<rect x="220" y="68" width="280" height="60" rx="6" fill="#2E86AB"/>
+<text x="360" y="89" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Platform System receives</text>
+<text x="360" y="104" fill="white" font-size="10" text-anchor="middle" font-family="Arial">license status change event</text>
+<text x="360" y="118" fill="#BDD7EE" font-size="9" text-anchor="middle" font-family="Arial">real-time webhook / API push</text>
+
+<!-- Arrow down from Platform receives -->
+<line x1="360" y1="128" x2="360" y2="155" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 2: State removed ============ -->
+<rect x="220" y="157" width="280" height="52" rx="6" fill="#E74C3C"/>
+<text x="360" y="176" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Affected state immediately</text>
+<text x="360" y="191" fill="white" font-size="10" text-anchor="middle" font-family="Arial">removed from provider's active states</text>
+
+<!-- Dashed arrow right to Provider lane -->
+<line x1="500" y1="183" x2="952" y2="183" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arr-red)"/>
+
+<!-- Provider sees box -->
+<rect x="954" y="157" width="170" height="52" rx="6" fill="#FCE4D6" stroke="#E74C3C" stroke-width="1.5"/>
+<text x="1039" y="176" fill="#C0392B" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Provider sees affected</text>
+<text x="1039" y="191" fill="#C0392B" font-size="10" text-anchor="middle" font-family="Arial">state removed from assignment</text>
+
+<!-- Arrow down from State removed -->
+<line x1="360" y1="209" x2="360" y2="236" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 3: Decision diamond ============ -->
+<polygon points="360,238 430,265 360,292 290,265" fill="#F39C12"/>
+<text x="360" y="261" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">In-progress or</text>
+<text x="360" y="275" fill="white" font-size="10" text-anchor="middle" font-family="Arial">scheduled consults?</text>
+
+<!-- No branch - left -->
+<line x1="290" y1="265" x2="220" y2="265" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-green)"/>
+<text x="252" y="258" fill="#27AE60" font-size="10" font-family="Arial">No</text>
+<!-- No box -->
+<rect x="30" y="242" width="188" height="46" rx="6" fill="#27AE60"/>
+<text x="124" y="260" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Log event in audit trail.</text>
+<text x="124" y="275" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Send informational alert. Done.</text>
+
+<!-- Yes branch - down -->
+<line x1="360" y1="292" x2="360" y2="318" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-red)"/>
+<text x="370" y="310" fill="#E74C3C" font-size="10" font-family="Arial">Yes</text>
+
+<!-- ============ ROW 4: Flag affected consults ============ -->
+<rect x="220" y="320" width="280" height="52" rx="6" fill="#E74C3C"/>
+<text x="360" y="339" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Flag all affected consults</text>
+<text x="360" y="354" fill="white" font-size="10" text-anchor="middle" font-family="Arial">for patients in the affected state</text>
+<text x="360" y="367" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">status: HOLD — license invalid</text>
+
+<!-- Arrow down -->
+<line x1="360" y1="372" x2="360" y2="398" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 5: Critical System Alert ============ -->
+<rect x="220" y="400" width="280" height="60" rx="6" fill="#E74C3C"/>
+<text x="360" y="420" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">CRITICAL SYSTEM ALERT</text>
+<text x="360" y="435" fill="white" font-size="10" text-anchor="middle" font-family="Arial">generated simultaneously</text>
+<text x="360" y="450" fill="white" font-size="10" text-anchor="middle" font-family="Arial">on all three queue boards</text>
+
+<!-- THREE arrows from Critical Alert to the three queue boards -->
+<!-- Arrow to RN Queue (left) -->
+<path d="M 500 415 L 560 415" stroke="#E74C3C" stroke-width="1.5" fill="none" marker-end="url(#arr-red)"/>
+<!-- Arrow to MA Queue (center) -->
+<path d="M 500 430 L 700 430" stroke="#E74C3C" stroke-width="1.5" fill="none" marker-end="url(#arr-red)"/>
+<!-- Arrow to Care Team Queue (right) -->
+<path d="M 500 445 L 840 445" stroke="#E74C3C" stroke-width="1.5" fill="none" marker-end="url(#arr-red)"/>
+
+<!-- RN Queue box -->
+<rect x="562" y="400" width="130" height="70" rx="6" fill="#E74C3C"/>
+<text x="627" y="420" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">RN Queue</text>
+<text x="627" y="434" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Board</text>
+<text x="627" y="448" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">Alert shown</text>
+<text x="627" y="461" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">prominently</text>
+
+<!-- MA Queue box -->
+<rect x="702" y="400" width="130" height="70" rx="6" fill="#E74C3C"/>
+<text x="767" y="420" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">MA Queue</text>
+<text x="767" y="434" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Board</text>
+<text x="767" y="448" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">Alert shown</text>
+<text x="767" y="461" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">prominently</text>
+
+<!-- Care Team Queue box -->
+<rect x="842" y="400" width="86" height="70" rx="6" fill="#E74C3C"/>
+<text x="885" y="418" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Care Team</text>
+<text x="885" y="432" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Queue</text>
+<text x="885" y="446" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Board</text>
+<text x="885" y="461" fill="#FFD5D0" font-size="9" text-anchor="middle" font-family="Arial">Alert shown</text>
+
+<!-- ============ ROW 6: Alert contains ============ -->
+<!-- Arrow down from RN Queue -->
+<line x1="627" y1="470" x2="627" y2="496" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+<!-- Arrow down from MA Queue -->
+<line x1="767" y1="470" x2="767" y2="496" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+<!-- Arrow down from Care Team -->
+<line x1="885" y1="470" x2="885" y2="496" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Alert Contains box spanning all three -->
+<rect x="540" y="498" width="394" height="80" rx="6" fill="#FCE4D6" stroke="#E74C3C" stroke-width="1.5"/>
+<text x="737" y="518" fill="#C0392B" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Alert Contains:</text>
+<text x="737" y="534" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">Provider name · Affected state · License type</text>
+<text x="737" y="549" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">Expiration date · Patient count affected</text>
+<text x="737" y="564" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">Link to affected consult list</text>
+
+<!-- Arrow down from Alert Contains -->
+<line x1="737" y1="578" x2="737" y2="604" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 7: Care Team takes action ============ -->
+<rect x="540" y="606" width="394" height="60" rx="6" fill="#2E86AB"/>
+<text x="737" y="626" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Care Team / RN / MA takes action</text>
+<text x="737" y="642" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Reassigns affected consults to</text>
+<text x="737" y="657" fill="white" font-size="10" text-anchor="middle" font-family="Arial">available providers in that state</text>
+
+<!-- Arrow left from Care Team action to Platform System (logging) -->
+<line x1="540" y1="636" x2="510" y2="636" stroke="#888" stroke-width="1.5"/>
+<line x1="510" y1="636" x2="510" y2="686" stroke="#888" stroke-width="1.5"/>
+<line x1="510" y1="686" x2="358" y2="686" stroke="#888" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+<!-- Each reassignment logged box -->
+<rect x="220" y="662" width="136" height="46" rx="6" fill="#27AE60"/>
+<text x="288" y="680" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Each reassignment</text>
+<text x="288" y="695" fill="white" font-size="10" text-anchor="middle" font-family="Arial">logged in audit trail</text>
+
+<!-- Arrow down from Care Team action -->
+<line x1="737" y1="666" x2="737" y2="692" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 8: Decision - all reassigned? ============ -->
+<polygon points="737,694 810,720 737,746 664,720" fill="#F39C12"/>
+<text x="737" y="715" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">All affected patients</text>
+<text x="737" y="729" fill="white" font-size="10" text-anchor="middle" font-family="Arial">reassigned?</text>
+
+<!-- No - loop back up -->
+<line x1="664" y1="720" x2="620" y2="720" stroke="#E74C3C" stroke-width="1.5"/>
+<line x1="620" y1="720" x2="620" y2="636" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-red)"/>
+<text x="635" y="680" fill="#E74C3C" font-size="10" font-family="Arial">No — continue</text>
+
+<!-- Yes - down -->
+<line x1="737" y1="746" x2="737" y2="772" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-green)"/>
+<text x="748" y="764" fill="#27AE60" font-size="10" font-family="Arial">Yes</text>
+
+<!-- ============ ROW 9: Alert cleared ============ -->
+<rect x="540" y="774" width="394" height="52" rx="6" fill="#27AE60"/>
+<text x="737" y="793" fill="white" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">Alert cleared from all three queue boards</text>
+<text x="737" y="809" fill="white" font-size="10" text-anchor="middle" font-family="Arial">Compliance event logged in audit trail</text>
+
+<!-- Arrow down from Alert cleared -->
+<line x1="737" y1="826" x2="737" y2="852" stroke="#444" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============ ROW 10: M13 Report note ============ -->
+<rect x="540" y="854" width="394" height="60" rx="6" fill="#D9E1F2" stroke="#1F3864" stroke-width="1.5"/>
+<text x="737" y="874" fill="#1F3864" font-size="10" font-weight="bold" text-anchor="middle" font-family="Arial">M13 Compliance Report (separate — on demand)</text>
+<text x="737" y="890" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">Shows patients assigned to providers with expired</text>
+<text x="737" y="905" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">or invalid licenses in patient's state</text>
+
+<!-- ============ KEY RULES ============ -->
+<rect x="20" y="940" width="1260" height="90" rx="6" fill="#F5F6FA" stroke="#1F3864" stroke-width="1.5"/>
+<text x="650" y="960" fill="#1F3864" font-size="11" font-weight="bold" text-anchor="middle" font-family="Arial">KEY RULES</text>
+<text x="650" y="978" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">• State removal is automatic and immediate — no manual step required</text>
+<text x="650" y="994" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">• Critical alert fires simultaneously on RN, MA, and Care Team queue boards and cannot be dismissed until all affected patients are resolved</text>
+<text x="650" y="1010" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">• Proactive license expiration monitoring is managed in the external provider licensing system — this alert is the safety net</text>
+<text x="650" y="1026" fill="#333" font-size="10" text-anchor="middle" font-family="Arial">• SLA clock continues on affected consults while in HOLD status — Care Team response time is tracked</text>
+
+</svg>
+</body>
+</html>

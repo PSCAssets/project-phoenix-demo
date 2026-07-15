@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}Reports — Admin Portal{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .report-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+  .report-card-header { padding: 16px 20px; border-bottom: 1px solid #E5E0D8; background: #F2EDE4; display: flex; align-items: center; gap: 10px; }
+  .report-card-icon { font-size: 18px; }
+  .report-card-title { font-size: 15px; font-weight: 700; color: #111827; }
+  .report-card-body { padding: 20px; }
+  .report-stat { display: flex; align-items: baseline; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #F2EDE4; }
+  .report-stat:last-of-type { border-bottom: none; }
+  .report-stat-label { font-size: 13px; color: #6B7280; }
+  .report-stat-value { font-size: 15px; font-weight: 700; color: #111827; }
+  .report-stat-value.green { color: #059669; }
+  .report-stat-value.amber { color: #D97706; }
+  .btn-view { margin-top: 16px; display: inline-block; padding: 8px 18px; background: #7C3AED; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .btn-view:hover { background: #6D28D9; }
+  .bar-container { margin-top: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .bar-label { font-size: 12px; color: #6B7280; width: 140px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; background: #F2EDE4; border-radius: 20px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 20px; background: #7C3AED; }
+  .bar-pct { font-size: 12px; color: #374151; font-weight: 600; width: 36px; text-align: right; }
+</style>
+{% endblock %}
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding: 8px 0; flex: 1;">
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/users" class="nav-item"><span class="nav-icon">👥</span> User Management</a>
+    <a href="/admin/role-config" class="nav-item"><span class="nav-icon">🔐</span> Role Configuration</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">🏅</span> Providers</a>
+    <a href="/admin/integrations" class="nav-item"><span class="nav-icon">🔌</span> Integration Health</a>
+    <a href="/admin/sla-config" class="nav-item"><span class="nav-icon">⏱</span> SLA Configuration</a>
+    <a href="/admin/doh-config" class="nav-item"><span class="nav-icon">🏥</span> DOH Configuration</a>
+    <a href="/admin/notifications" class="nav-item"><span class="nav-icon">🔔</span> Notification Templates</a>
+    <a href="/admin/audit-log" class="nav-item"><span class="nav-icon">📋</span> Audit Log</a>
+    <a href="/admin/reports" class="nav-item active"><span class="nav-icon">📈</span> Reports</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Reports</div>
+    <span style="font-size:13px;color:#6B7280;">Week of Jun 9 – Jun 13, 2026</span>
+  </div>
+  <div class="content">
+    <div class="reports-grid">
+
+      <!-- 1. Provider Activity Report -->
+      <div class="report-card">
+        <div class="report-card-header">
+          <span class="report-card-icon">👩‍⚕️</span>
+          <span class="report-card-title">Provider Activity Report</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-stat">
+            <span class="report-stat-label">Consults completed this week</span>
+            <span class="report-stat-value">47</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Avg response time</span>
+            <span class="report-stat-value green">3.2 hours</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Overdue rate</span>
+            <span class="report-stat-value amber">4.2%</span>
+          </div>
+          <button class="btn-view" onclick="alert('Full Provider Activity Report — demo placeholder.')">View Full Report</button>
+        </div>
+      </div>
+
+      <!-- 2. Patient Enrollment Report -->
+      <div class="report-card">
+        <div class="report-card-header">
+          <span class="report-card-icon">👥</span>
+          <span class="report-card-title">Patient Enrollment Report</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-stat">
+            <span class="report-stat-label">New enrollments this week</span>
+            <span class="report-stat-value">23</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Active care products</span>
+            <span class="report-stat-value">184</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Retention rate</span>
+            <span class="report-stat-value green">91.3%</span>
+          </div>
+          <button class="btn-view" onclick="alert('Full Patient Enrollment Report — demo placeholder.')">View Full Report</button>
+        </div>
+      </div>
+
+      <!-- 3. SLA Compliance Report -->
+      <div class="report-card">
+        <div class="report-card-header">
+          <span class="report-card-icon">⏱</span>
+          <span class="report-card-title">SLA Compliance Report</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-stat">
+            <span class="report-stat-label">Overall SLA compliance</span>
+            <span class="report-stat-value green">95.8%</span>
+          </div>
+          <div style="margin-top:12px;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">By Care Product</div>
+          <div class="bar-container">
+            <div class="bar-row">
+              <span class="bar-label">Weight Mgmt</span>
+              <div class="bar-track"><div class="bar-fill" style="width:97%"></div></div>
+              <span class="bar-pct">97%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">Testosterone</span>
+              <div class="bar-track"><div class="bar-fill" style="width:96%"></div></div>
+              <span class="bar-pct">96%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">BRCA Counseling</span>
+              <div class="bar-track"><div class="bar-fill" style="width:94%"></div></div>
+              <span class="bar-pct">94%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label">GLP-1 Program</span>
+              <div class="bar-track"><div class="bar-fill" style="width:98%"></div></div>
+              <span class="bar-pct">98%</span>
+            </div>
+          </div>
+          <button class="btn-view" onclick="alert('Full SLA Compliance Report — demo placeholder.')">View Full Report</button>
+        </div>
+      </div>
+
+      <!-- 4. Care Product Performance -->
+      <div class="report-card">
+        <div class="report-card-header">
+          <span class="report-card-icon">🧬</span>
+          <span class="report-card-title">Care Product Performance</span>
+        </div>
+        <div class="report-card-body">
+          <div class="report-stat">
+            <span class="report-stat-label">Top care product</span>
+            <span class="report-stat-value" style="font-size:13px;">Weight Management<br><span style="font-size:12px;color:#6B7280;font-weight:400;">62 active consults</span></span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Avg consults / provider</span>
+            <span class="report-stat-value">8.4</span>
+          </div>
+          <div class="report-stat">
+            <span class="report-stat-label">Total active consults</span>
+            <span class="report-stat-value">184</span>
+          </div>
+          <button class="btn-view" onclick="alert('Full Care Product Performance Report — demo placeholder.')">View Full Report</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

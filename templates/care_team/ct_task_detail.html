@@ -1,0 +1,1084 @@
+{% extends "base.html" %}
+{% block title %}Task Detail · {{ task_id }}{% endblock %}
+
+{% block head %}
+<style>
+:root {
+  --ct-green: #059669; --ct-green-light: #D1FAE5;
+  --navy: #6B21A8; --blue-light: #F2EDE4;
+  --amber: #D97706; --amber-light: #FEF3C7;
+  --red: #DC2626; --red-light: #FEF2F2;
+  --bg: #FAF7F2; --border: #E5E0D8; --white: #FFFFFF;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; display: flex; min-height: 100vh; }
+
+.topbar { position: fixed; top: 60px; left: 56px; right: 0; height: 48px; background: var(--navy); display: flex; align-items: center; padding: 0 20px; z-index: 90; gap: 10px; }
+.back-btn { color: rgba(255,255,255,0.7); font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 5px; transition: background 0.15s; }
+.back-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
+.topbar-sep { color: rgba(255,255,255,0.3); }
+.topbar-title { color: #fff; font-size: 14px; font-weight: 600; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.urgency-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 20px; }
+.urg-critical { background: #FEF2F2; color: #DC2626; }
+.urg-high { background: #FEF3C7; color: #D97706; }
+.urg-normal { background: #D1FAE5; color: #059669; }
+
+.main { margin-left: 56px; margin-top: 108px; padding: 18px 20px; flex: 1; display: flex; gap: 14px; align-items: flex-start; }
+
+/* Left */
+.left-col { width: 232px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+.card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.card-title { font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+.pat-avatar { width: 44px; height: 44px; border-radius: 50%; background: #6B21A8; color: #fff; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+.pat-name { font-size: 15px; font-weight: 700; text-align: center; }
+.pat-sub { font-size: 12px; color: #6B7280; text-align: center; margin-top: 2px; }
+.detail-stack { display: flex; flex-direction: column; gap: 7px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.dl { display: flex; flex-direction: column; }
+.dl-k { font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.04em; }
+.dl-v { font-size: 12px; color: #374151; }
+
+.meta-row { display: flex; flex-direction: column; margin-bottom: 8px; }
+.meta-k { font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+.meta-v { font-size: 12px; color: #374151; }
+.sla-bar { height: 4px; border-radius: 2px; background: #E5E0D8; margin-top: 3px; overflow: hidden; }
+.sla-fill { height: 100%; border-radius: 2px; background: #059669; }
+.sla-fill.amber { background: #D97706; }
+.sla-fill.red { background: #DC2626; }
+
+.trigger-box { background: #FFF9F0; border: 1px solid #FDE68A; border-radius: 7px; padding: 9px; font-size: 11px; color: #92400E; line-height: 1.5; margin-top: 8px; }
+.trigger-box.auto { background: #EDE9FE; border-color: #C4B5FD; color: #5B21B6; }
+
+.ql-btn { display: flex; align-items: center; gap: 7px; width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 12px; font-weight: 500; color: #374151; background: #fff; cursor: pointer; text-decoration: none; transition: all 0.13s; margin-bottom: 6px; }
+.ql-btn:hover { border-color: #6B21A8; color: #6B21A8; background: #F9F5FF; }
+.ql-btn:last-child { margin-bottom: 0; }
+
+/* Center */
+.center-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.ctx-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.ctx-card h3 { font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 7px; display: flex; align-items: center; gap: 6px; }
+.ctx-text { font-size: 13px; color: #374151; line-height: 1.6; }
+
+.action-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.action-hdr { padding: 12px 16px; border-bottom: 1px solid var(--border); background: #FAF7F2; display: flex; align-items: center; justify-content: space-between; }
+.action-hdr h3 { font-size: 13px; font-weight: 700; }
+.action-hdr span { font-size: 12px; color: #6B7280; }
+.action-body { padding: 16px; }
+
+.fl { font-size: 11px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 5px; display: block; }
+.fs, .ft, .fi { width: 100%; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 13px; color: #374151; background: #fff; outline: none; }
+.ft { resize: vertical; }
+.fs:focus, .ft:focus, .fi:focus { border-color: #6B21A8; }
+.fg { margin-bottom: 12px; }
+.fr { display: flex; gap: 8px; }
+.fr .fg { flex: 1; margin-bottom: 0; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 7px 15px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.13s; text-decoration: none; }
+.btn-primary { background: #6B21A8; color: #fff; }
+.btn-primary:hover { background: #581C87; }
+.btn-success { background: #059669; color: #fff; }
+.btn-success:hover { background: #047857; }
+.btn-outline { background: #fff; border: 1.5px solid var(--border); color: #374151; }
+.btn-outline:hover { border-color: #6B21A8; color: #6B21A8; background: #F9F5FF; }
+.btn-danger { background: #DC2626; color: #fff; }
+.btn-sm { padding: 5px 11px; font-size: 11px; }
+.btn-row { display: flex; gap: 7px; flex-wrap: wrap; }
+
+.attempt-log { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.attempt-entry { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: #FAF7F2; border: 1px solid var(--border); border-radius: 7px; font-size: 12px; }
+.adot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.adot-miss { background: #DC2626; }
+.adot-vm { background: #D97706; }
+.adot-ok { background: #059669; }
+.adot-sms { background: #6B21A8; }
+.atype { font-weight: 600; }
+.atime { margin-left: auto; color: #9CA3AF; font-size: 11px; }
+
+.prov-list { display: flex; flex-direction: column; gap: 7px; }
+.prov-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.13s; }
+.prov-row:hover { border-color: #6B21A8; background: #F9F5FF; }
+.prov-row.selected { border-color: #6B21A8; background: #F9F5FF; }
+.pav { width: 34px; height: 34px; border-radius: 50%; background: #6B21A8; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.pname { font-size: 13px; font-weight: 600; }
+.pmeta { font-size: 11px; color: #6B7280; margin-top: 1px; }
+.pbadge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: #D1FAE5; color: #059669; white-space: nowrap; }
+.pbadge.busy { background: #FEF3C7; color: #D97706; }
+
+.cl-item { display: flex; align-items: flex-start; gap: 10px; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 7px; transition: background 0.13s; cursor: pointer; }
+.cl-item.done { background: #F0FDF4; border-color: #A7F3D0; }
+.cl-cb { width: 17px; height: 17px; flex-shrink: 0; margin-top: 2px; cursor: pointer; accent-color: #059669; }
+.cl-content { flex: 1; }
+.cl-title { font-size: 13px; font-weight: 600; }
+.cl-desc { font-size: 12px; color: #6B7280; margin-top: 2px; }
+.cl-act { margin-top: 6px; }
+
+.res-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.res-card h3 { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+
+.success-banner { background: #D1FAE5; border: 1px solid #6EE7B7; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 600; color: #065F46; align-items: center; gap: 8px; margin-top: 10px; }
+
+/* Right */
+.right-col { width: 252px; flex-shrink: 0; }
+.act-log { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px; position: sticky; top: 118px; max-height: calc(100vh - 134px); overflow-y: auto; }
+.act-log h3 { font-size: 10px; font-weight: 700; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
+.log-e { position: relative; padding-left: 20px; padding-bottom: 13px; }
+.log-e::before { content: ''; position: absolute; left: 6px; top: 16px; bottom: 0; width: 1px; background: var(--border); }
+.log-e:last-child::before { display: none; }
+.log-dot { position: absolute; left: 0; top: 3px; width: 13px; height: 13px; border-radius: 50%; background: #E5E0D8; border: 2px solid #fff; box-shadow: 0 0 0 1.5px #E5E0D8; }
+.log-dot.green { background: #059669; box-shadow: 0 0 0 1.5px #A7F3D0; }
+.log-dot.red { background: #DC2626; box-shadow: 0 0 0 1.5px #FCA5A5; }
+.log-dot.amber { background: #D97706; box-shadow: 0 0 0 1.5px #FCD34D; }
+.log-dot.purple { background: #6B21A8; box-shadow: 0 0 0 1.5px #C4B5FD; }
+.log-dot.blue { background: #1D4ED8; box-shadow: 0 0 0 1.5px #BFDBFE; }
+.log-time { font-size: 10px; color: #9CA3AF; margin-bottom: 2px; }
+.log-text { font-size: 12px; color: #374151; line-height: 1.4; }
+.log-sub { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+
+/* Modals */
+.mo { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.38); z-index: 1000; align-items: center; justify-content: center; }
+.mo.open { display: flex; }
+.mb { background: #fff; border-radius: 12px; width: 440px; max-width: 95vw; padding: 22px; box-shadow: 0 16px 48px rgba(0,0,0,0.18); }
+.mb h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.mf { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <a href="/care-team/queue" class="back-btn">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15,18 9,12 15,6"/></svg>
+    CT Queue
+  </a>
+  <span class="topbar-sep">/</span>
+  <span class="topbar-title" id="topType">—</span>
+  <div class="topbar-right">
+    <span class="urgency-badge" id="topUrg">—</span>
+    <span id="topId" style="color:rgba(255,255,255,0.55);font-size:12px;"></span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- LEFT -->
+  <div class="left-col">
+    <div class="card">
+      <div class="pat-avatar" id="patAv">--</div>
+      <div class="pat-name" id="patName">—</div>
+      <div class="pat-sub" id="patProd">—</div>
+      <div class="detail-stack">
+        <div class="dl"><span class="dl-k">Consult ID</span><span class="dl-v" id="patCid">—</span></div>
+        <div class="dl"><span class="dl-k">Date of Birth</span><span class="dl-v" id="patDob">—</span></div>
+        <div class="dl"><span class="dl-k">Phone</span><span class="dl-v" id="patPh">—</span></div>
+        <div class="dl"><span class="dl-k">Client</span><span class="dl-v" id="patCl">—</span></div>
+        <div class="dl"><span class="dl-k">Result Date</span><span class="dl-v" id="patRd">—</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Task</div>
+      <div class="meta-row"><span class="meta-k">Category</span><span class="meta-v" id="mCat">—</span></div>
+      <div class="meta-row"><span class="meta-k">Type</span><span class="meta-v" id="mType">—</span></div>
+      <div class="meta-row"><span class="meta-k">Wait time</span><span class="meta-v" id="mWait">—</span></div>
+      <div class="meta-row">
+        <span class="meta-k">SLA</span>
+        <span class="meta-v" id="mSLA" style="font-weight:600;color:#059669;">—</span>
+        <div class="sla-bar"><div class="sla-fill" id="slaFill" style="width:50%;"></div></div>
+      </div>
+      <div class="trigger-box" id="triggerBox">—</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Quick Actions</div>
+      <button class="ql-btn" onclick="openMo('msgProviderModal')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Message Patient
+      </button>
+      <button class="ql-btn" onclick="goTo('/provider/chart/1')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        View Full Chart
+      </button>
+      <button class="ql-btn" onclick="goTo('/provider/schedule')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule Appointment
+      </button>
+      <button class="ql-btn" onclick="openMo('routeModal')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z"/></svg>
+        Route Task
+      </button>
+    </div>
+  </div>
+
+  <!-- CENTER -->
+  <div class="center-col">
+
+    <!-- Required Action Banner (TASK-CHART-001) -->
+    <div id="requiredActionBanner" style="border-radius:10px;padding:16px 18px;border-left:4px solid #DC2626;background:#FEF2F2;border-top:1px solid #FECACA;border-right:1px solid #FECACA;border-bottom:1px solid #FECACA;">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#9CA3AF;margin-bottom:6px;">⚡ Required Action</div>
+      <div id="requiredActionText" style="font-size:14px;font-weight:700;color:#111827;line-height:1.5;"></div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap;">
+        <span id="requiredActionUrgency" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:12px;"></span>
+        <span id="requiredActionSLA" style="font-size:12px;color:#6B7280;"></span>
+        <span id="requiredActionWait" style="font-size:12px;color:#6B7280;margin-left:auto;"></span>
+      </div>
+    </div>
+
+    <!-- Stage Progress Bar -->
+    <div style="background:#fff;border:1px solid #E5E0D8;border-radius:10px;padding:12px 16px;display:flex;align-items:center;margin-bottom:4px;">
+      <div id="ctStageDot1" style="width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+      <div id="ctStageLabel1" style="font-size:11px;font-weight:700;color:#6B21A8;margin-left:7px;white-space:nowrap;">Verify &amp; Context</div>
+      <div style="flex:1;height:2px;background:#E5E0D8;margin:0 8px;"></div>
+      <div id="ctStageDot2" style="width:26px;height:26px;border-radius:50%;background:#E5E0D8;color:#9CA3AF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+      <div id="ctStageLabel2" style="font-size:11px;font-weight:600;color:#9CA3AF;margin-left:7px;white-space:nowrap;">Resolution</div>
+      <div style="flex:1;height:2px;background:#E5E0D8;margin:0 8px;"></div>
+      <div id="ctStageDot3" style="width:26px;height:26px;border-radius:50%;background:#E5E0D8;color:#9CA3AF;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+      <div id="ctStageLabel3" style="font-size:11px;font-weight:600;color:#9CA3AF;margin-left:7px;white-space:nowrap;">Log &amp; Close</div>
+    </div>
+
+    <!-- Stage 1: Verify & Context -->
+    <div id="ctStage1">
+
+    <!-- Script from admin config: Stage 1 — Patient Verification -->
+    <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#92400E;margin-bottom:6px;">📋 Stage 1 Script — Patient Verification <span style="font-family:monospace;font-size:9px;color:#D97706;">ADMIN-SCRIPT-S1</span></div>
+      <div style="font-size:12px;color:#374151;line-height:1.65;" id="ctScript1">Loading script…</div>
+    </div>
+
+    <div class="ctx-card">
+      <h3>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Task Context
+      </h3>
+      <p class="ctx-text" id="taskCtx">Loading…</p>
+    </div>
+
+    <!-- Contact Patient Button (shared across all task types) -->
+    <div class="action-card" style="background:linear-gradient(135deg,#F0FDF4 0%,#ECFDF5 100%);border:1.5px solid #6EE7B7;">
+      <div class="action-body" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#065F46;margin-bottom:3px;">Outbound Contact</div>
+          <div style="font-size:14px;font-weight:700;color:#111827;" id="patPhDisplay">—</div>
+          <div style="font-size:11px;color:#6B7280;margin-top:2px;" id="patEmailDisplay">—</div>
+        </div>
+        <button class="btn btn-success" onclick="openMo('contactModal')" style="font-size:13px;padding:9px 22px;white-space:nowrap;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 013 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          Contact Patient
+        </button>
+      </div>
+    </div>
+
+    <!-- Recent Activity Timeline (inline from chart) -->
+    <div class="ctx-card">
+      <h3 style="margin-bottom:10px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B21A8" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+        Recent Activity — Patient Chart
+        <button onclick="goTo('/provider/chart/1')" style="margin-left:auto;font-size:11px;font-weight:600;color:#6B21A8;background:none;border:none;cursor:pointer;text-decoration:underline;">Open Full Chart →</button>
+      </h3>
+      <div id="inlineTimeline" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <!-- Inline Activity Action Buttons -->
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid #F5F0EA;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#9CA3AF;margin-bottom:7px;">Log Activity</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;" id="inlineActivityBtns">
+          <button class="btn btn-outline" onclick="ctLogActivity('phone','inline')" style="border-color:#059669;color:#059669;font-size:11px;padding:5px 10px;">📞 Phone</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('email','inline')" style="border-color:#6B21A8;color:#6B21A8;font-size:11px;padding:5px 10px;">✉️ Email</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('note','inline')" style="border-color:#374151;color:#374151;font-size:11px;padding:5px 10px;">📝 Note</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('task','inline')" style="border-color:#D97706;color:#D97706;font-size:11px;padding:5px 10px;">✅ Task</button>
+        </div>
+        <div id="ctActivityFormInline" style="display:none;margin-top:9px;background:#F9F9F9;border-radius:8px;padding:10px;">
+          <div id="ctActivityTitleInline" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#374151;margin-bottom:8px;"></div>
+          <div id="ctActivityOutcomeRowInline" style="display:none;margin-bottom:8px;">
+            <select class="fs" id="ctActivityOutcomeInline" style="font-size:12px;"></select>
+          </div>
+          <textarea class="ft" id="ctActivityNotesInline" rows="2" placeholder="Add notes…" style="font-size:12px;margin-bottom:8px;"></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-success" onclick="ctSaveActivity('inline')" style="font-size:12px;">Save</button>
+            <button class="btn btn-outline" onclick="document.getElementById('ctActivityFormInline').style.display='none'" style="font-size:12px;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 1 nav -->
+    <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+      <button class="btn btn-primary" onclick="ctGoStage(2)" style="font-size:12px;">Next: Resolution →</button>
+    </div>
+
+    </div><!-- /Stage 1 -->
+
+    <!-- Stage 2: Resolution Action -->
+    <div id="ctStage2" style="display:none;">
+
+    <!-- Script from admin config: Stage 2 — Resolution (task-type specific) -->
+    <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;">
+      <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#92400E;margin-bottom:6px;">📋 Stage 2 Script — Resolution <span style="font-family:monospace;font-size:9px;color:#D97706;" id="ctScript2Tag">ADMIN-SCRIPT-S2</span></div>
+      <div style="font-size:12px;color:#374151;line-height:1.65;" id="ctScript2">Loading script…</div>
+    </div>
+
+    <!-- Task-specific action panel -->
+    <!-- CT001: No Show -->
+    <div id="action-CT001" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>⚠️ No Show — Reschedule Outreach</h3><span style="color:#DC2626;font-weight:600;">CRITICAL · Contact within 2h</span></div>
+      <div class="action-body">
+        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:11px;font-size:12px;color:#7F1D1D;margin-bottom:12px;line-height:1.6;">
+          Patient <strong>S.R.</strong> missed their scheduled Thyroid Program consult at <strong>9:30 AM</strong> today. Contact the patient to determine the reason and reschedule as soon as possible.
+        </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT001">
+            <option value="">— Select outcome —</option>
+            <option>Reached — appointment rescheduled</option>
+            <option>Reached — patient cancelled, no reschedule</option>
+            <option>Left voicemail — patient to call back</option>
+            <option>No answer — follow-up attempt scheduled</option>
+            <option>Escalate — third no-show</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT001" rows="2" placeholder="Document what was discussed…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Schedule Appointment</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CT002: Reschedule Appointment -->
+    <div id="action-CT002" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>📅 Reschedule Appointment</h3><span style="color:#D97706;font-weight:600;">HIGH · Patient requested change</span></div>
+      <div class="action-body">
+        <div style="background:#FAF7F2;border:1px solid #E5E0D8;border-radius:8px;padding:11px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Current Appt</span>Jul 18 at 2:00 PM</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Provider</span>Dr. Simone Patel, MD</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Program</span>Metabolic Health</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Reason</span>Patient schedule conflict</div>
+        </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT002">
+            <option value="">— Select outcome —</option>
+            <option>Rescheduled — new date confirmed with patient</option>
+            <option>Patient will self-schedule via portal</option>
+            <option>Patient cancelled — no reschedule requested</option>
+            <option>Unable to reach — follow-up needed</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT002" rows="2" placeholder="New date/time confirmed or other notes…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')">📅 Open Scheduling Wizard</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CT003: Pharmacy Question -->
+    <div id="action-CT003" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>💊 Pharmacy Question</h3><span style="color:#D97706;font-weight:600;">HIGH · Rx-related inquiry</span></div>
+      <div class="action-body">
+        <div style="background:#F9F5FF;border:1px solid #C4B5FD;border-radius:8px;padding:11px;font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px;">
+          "My pharmacy said they can't fill my Tirzepatide prescription — they're saying it's out of stock. What do I do?"
+          <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Via patient portal · Today · 8:47 AM</div>
+        </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT003">
+            <option value="">— Select outcome —</option>
+            <option>Pharmacy located — patient directed to alternative</option>
+            <option>Prior auth required — initiated with provider</option>
+            <option>Referred to clinical team for alternative Rx</option>
+            <option>Patient directed to contact pharmacy directly</option>
+            <option>Escalated to provider for review</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT003" rows="2" placeholder="Steps taken, pharmacy info, outcome…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="openMo('msgProviderModal')">✉️ Message Provider</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CT004: Billing Issue -->
+    <div id="action-CT004" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>💳 Billing Issue</h3><span style="color:#6B7280;">NORMAL · Charge dispute</span></div>
+      <div class="action-body">
+        <div style="background:#FAF7F2;border:1px solid #E5E0D8;border-radius:8px;padding:11px;font-size:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Charge Date</span>Jul 7, 2026</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Amount</span>$199.00</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Service</span>Annual Wellness Consult</div>
+          <div><span style="font-size:10px;font-weight:700;color:#9CA3AF;text-transform:uppercase;display:block;">Status</span><span style="color:#DC2626;font-weight:600;">Disputed</span></div>
+        </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT004">
+            <option value="">— Select outcome —</option>
+            <option>Charge explained — patient satisfied</option>
+            <option>Refund issued — documented in system</option>
+            <option>Escalated to billing department</option>
+            <option>Insurance submitted — pending EOB</option>
+            <option>Patient to follow up with insurance directly</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT004" rows="2" placeholder="Describe what was discussed and resolution…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Message Patient</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CT005: Product Question -->
+    <div id="action-CT005" class="action-card" style="display:none;">
+      <div class="action-hdr"><h3>❓ Product Question</h3><span style="color:#6B7280;">NORMAL · Education needed</span></div>
+      <div class="action-body">
+        <div style="background:#F9F5FF;border:1px solid #C4B5FD;border-radius:8px;padding:11px;font-size:13px;color:#374151;line-height:1.5;margin-bottom:12px;">
+          "I received my Testosterone test kit but I'm not sure how to collect the sample. Can someone walk me through it?"
+          <div style="font-size:11px;color:#9CA3AF;margin-top:5px;">Via patient portal · Today · 10:22 AM</div>
+        </div>
+        <div class="fg"><label class="fl">Resolution</label>
+          <select class="fs" id="res-CT005">
+            <option value="">— Select outcome —</option>
+            <option>Patient educated — collection instructions provided</option>
+            <option>Replacement kit sent — patient reported defect</option>
+            <option>Referred to provider education resources</option>
+            <option>Escalated to clinical team</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Notes</label><textarea class="ft" id="n-CT005" rows="2" placeholder="What was explained or actioned…"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="openMo('msgProviderModal')">✉️ Send Instructions to Patient</button>
+          <button class="btn btn-outline" onclick="goTo('/provider/chart/1')">👤 View Chart</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 2 nav -->
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:4px;">
+      <button class="btn btn-outline" onclick="ctGoStage(1)" style="font-size:12px;">← Back</button>
+      <button class="btn btn-primary" onclick="ctGoStage(3)" style="font-size:12px;">Next: Log &amp; Close →</button>
+    </div>
+
+    </div><!-- /Stage 2 -->
+
+    <!-- Stage 3: Log & Close -->
+    <div id="ctStage3" style="display:none;">
+
+    <!-- Activity Log Actions -->
+    <div class="action-card">
+      <div class="action-hdr"><h3>📋 Log Activity</h3><span style="color:#6B7280;font-size:11px;">Add entry to chart timeline</span></div>
+      <div class="action-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <button class="btn btn-outline" onclick="ctLogActivity('phone','s3')" style="border-color:#059669;color:#059669;font-size:11px;padding:6px 12px;">📞 Phone Call</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('email','s3')" style="border-color:#6B21A8;color:#6B21A8;font-size:11px;padding:6px 12px;">✉️ Email</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('note','s3')" style="border-color:#374151;color:#374151;font-size:11px;padding:6px 12px;">📝 Note</button>
+          <button class="btn btn-outline" onclick="ctLogActivity('task','s3')" style="border-color:#D97706;color:#D97706;font-size:11px;padding:6px 12px;">✅ Task</button>
+        </div>
+        <div id="ctActivityFormS3" style="display:none;background:#F9F9F9;border-radius:8px;padding:10px;">
+          <div id="ctActivityTitleS3" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#374151;margin-bottom:8px;"></div>
+          <div id="ctActivityOutcomeRowS3" style="display:none;margin-bottom:8px;">
+            <select class="fs" id="ctActivityOutcomeS3" style="font-size:12px;"></select>
+          </div>
+          <textarea class="ft" id="ctActivityNotesS3" rows="2" placeholder="Add notes…" style="font-size:12px;margin-bottom:8px;"></textarea>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-success" onclick="ctSaveActivity('s3')" style="font-size:12px;">Save to Timeline</button>
+            <button class="btn btn-outline" onclick="document.getElementById('ctActivityFormS3').style.display='none'" style="font-size:12px;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stage 3 back nav -->
+    <div style="display:flex;justify-content:flex-start;margin-bottom:4px;">
+      <button class="btn btn-outline" onclick="ctGoStage(2)" style="font-size:12px;">← Back to Resolution</button>
+    </div>
+
+    <!-- Bottom action bar -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-outline" onclick="goTo('/provider/chart/1')" style="flex:1;justify-content:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
+        Open Chart
+      </button>
+      <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient')" style="flex:1;justify-content:center;background:#059669;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule Consultation
+      </button>
+      <button class="btn btn-primary" onclick="goTo('/scheduler/search-patient?tab=patient&reschedule=1')" style="flex:1;justify-content:center;background:#7C3AED;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        Reschedule Consult
+      </button>
+    </div>
+
+    <!-- Resolution -->
+    <div class="res-card">
+      <h3>Resolution &amp; Notes</h3>
+      <div class="fg"><label class="fl">Resolution Notes</label><textarea class="ft" id="resNotes" rows="3" placeholder="Summarize what was done and any context for the record…"></textarea></div>
+      <div class="btn-row">
+        <button class="btn btn-success" onclick="completeTask()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+          Mark Task Complete
+        </button>
+        <button class="btn btn-outline" onclick="openMo('routeModal')">Route to Teammate</button>
+      </div>
+      <div id="completeBanner" class="success-banner" style="display:none;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+        Task completed and logged. Returning to queue…
+      </div>
+    </div>
+
+    </div><!-- /Stage 3 -->
+
+  </div>
+
+  <!-- RIGHT: Activity Log -->
+  <div class="right-col">
+    <div class="act-log">
+      <h3>Activity Log</h3>
+      <div id="actLog"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Contact Patient Modal -->
+<div class="mo" id="contactModal">
+  <div class="mb">
+    <h3>📞 Log Outbound Call</h3>
+    <div style="background:#F0FDF4;border:1px solid #6EE7B7;border-radius:8px;padding:10px 12px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:700;color:#065F46;text-transform:uppercase;margin-bottom:3px;">Calling</div>
+      <div style="font-size:14px;font-weight:700;color:#111827;" id="contactModalPhone">—</div>
+      <div style="font-size:12px;color:#6B7280;" id="contactModalPatient">—</div>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Call Outcome</label>
+      <select class="fs" id="callOutcome">
+        <option value="">— Select outcome —</option>
+        <option value="reached">Reached — spoke with patient</option>
+        <option value="voicemail">Left voicemail</option>
+        <option value="no_answer">No answer</option>
+        <option value="wrong_number">Wrong number / disconnected</option>
+        <option value="callback">Patient requested callback</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Call Notes</label>
+      <textarea class="ft" id="callNotes" rows="3" placeholder="What was discussed, next steps, patient response…"></textarea>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label class="fl">Resolution Status</label>
+      <select class="fs" id="callResolution">
+        <option value="">— Select status —</option>
+        <option value="resolved">Resolved — no further action needed</option>
+        <option value="followup">Follow-up needed</option>
+        <option value="escalate">Escalate to supervisor</option>
+      </select>
+    </div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('contactModal')">Cancel</button>
+      <button class="btn btn-success" onclick="saveCallLog()">Save Call Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- Route Modal -->
+<div class="mo" id="routeModal">
+  <div class="mb">
+    <h3>Route Task to Teammate</h3>
+    <div class="fg"><label class="fl">Assign to</label>
+      <select class="fs" id="routeSel"><option value="">— Select team member —</option><option>Jordan Davis</option><option>Maria Lopez</option><option>Sam Brooks</option><option>Taylor Reeves</option></select>
+    </div>
+    <div class="fg"><label class="fl">Note (optional)</label><textarea class="ft" id="routeNote" rows="2" placeholder="Add context for the assignee…"></textarea></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('routeModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmRoute()">Route Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Message Patient / Provider Modal -->
+<div class="mo" id="msgProviderModal">
+  <div class="mb">
+    <h3>✉️ Send Message</h3>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">To</label>
+      <select class="fs" id="msgTo">
+        <option>Patient</option>
+        <option>Primary Provider</option>
+        <option>Pharmacy</option>
+        <option>Billing Department</option>
+        <option>Care Team Supervisor</option>
+      </select>
+    </div>
+    <div class="fg" style="margin-bottom:10px;">
+      <label class="fl">Message</label>
+      <textarea class="ft" id="msgBody" rows="4" placeholder="Type your message here…"></textarea>
+    </div>
+    <div class="fg" style="margin-bottom:0;">
+      <label class="fl">Priority</label>
+      <select class="fs" id="msgPriority">
+        <option>Normal</option>
+        <option>Urgent</option>
+      </select>
+    </div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('msgProviderModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="sendProviderMessage()">Log &amp; Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Callback Modal (T003) -->
+<div class="mo" id="callbackModal">
+  <div class="mb">
+    <h3>Schedule Callback</h3>
+    <div class="fr">
+      <div class="fg"><label class="fl">Date</label><input type="date" class="fi" id="cbDate" /></div>
+      <div class="fg"><label class="fl">Time</label><input type="time" class="fi" id="cbTime" /></div>
+    </div>
+    <div class="fg"><label class="fl">Method</label>
+      <select class="fs" id="cbMethod"><option>Phone call</option><option>Telehealth video</option><option>DXS call (outbound)</option></select>
+    </div>
+    <div class="fg"><label class="fl">Note to patient (optional)</label><textarea class="ft" id="cbNote" rows="2" placeholder="Message to include with reminder SMS…"></textarea></div>
+    <div class="mf">
+      <button class="btn btn-outline" onclick="closeMo('callbackModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmCallback()">Schedule Callback</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>var TASK_ID = '{{ task_id }}';</script>
+{% raw %}
+<script>
+var TASKS = {
+  'CT001': {
+    patient:'S.R.',initials:'SR',dob:'04/12/1985 (41 yrs)',phone:'(512) 334-9801',email:'s.reyes@email.com',
+    product:'Thyroid Program',client:'Everlywell Direct',
+    consultId:'CST-2026-10871',resultDate:'Jul 14, 2026',
+    category:'No Show',type:'No Show',urgency:'CRITICAL',
+    wait:'1h 12m',sla:'Contact within 2h',slaW:'60%',slaC:'red',isAuto:false,
+    requiredAction:'Contact patient and reschedule the missed Thyroid Program consult. Patient did not attend their 9:30 AM appointment — no cancellation received. Contact required within 2 hours.',
+    trigger:'Patient did not attend scheduled consult at 9:30 AM. No cancellation notice received.',
+    ctx:'Patient S.R. had a Thyroid Program consult scheduled for 9:30 AM today and did not attend. No prior cancellation. This is the first no-show on record for this patient. Contact patient to reschedule as soon as possible.',
+    log:[
+      {dot:'green',time:'Jul 7 · 11:00 AM',text:'Consult scheduled',sub:'Dr. Patel, MD · Thyroid Program'},
+      {dot:'amber',time:'Jul 13 · 4:30 PM',text:'Appointment reminder sent',sub:'SMS + portal notification'},
+      {dot:'red',time:'Today · 9:35 AM',text:'No-show flagged',sub:'Patient did not attend — 9:30 AM consult'},
+      {dot:'',time:'Today · 10:02 AM',text:'Task created in CT Queue',sub:'Unassigned · 1h 12m wait'}
+    ]
+  },
+  'CT002': {
+    patient:'D.M.',initials:'DM',dob:'11/30/1978 (47 yrs)',phone:'(213) 667-4422',email:'d.martin@email.com',
+    product:'Metabolic Health',client:'Everlywell Direct',
+    consultId:'CST-2026-10864',resultDate:'Jul 9, 2026',
+    category:'Reschedule',type:'Reschedule Appointment',urgency:'HIGH',
+    wait:'38m',sla:'Reschedule within 48h',slaW:'40%',slaC:'amber',isAuto:false,
+    requiredAction:'Contact patient to confirm a new Metabolic Health consult time. Patient requested reschedule via portal due to travel conflict with the Jul 18 appointment. Coordinate with Dr. Patel availability.',
+    trigger:'Patient submitted reschedule request via portal — Jul 18 consult conflicts with work travel.',
+    ctx:'Patient D.M. submitted a portal request to reschedule their Metabolic Health consult on Jul 18 at 2:00 PM. Reason: work travel conflict. Contact patient to confirm a new date and time with Dr. Patel.',
+    log:[
+      {dot:'green',time:'Jul 9 · 2:00 PM',text:'Follow-up consult scheduled',sub:'Dr. Patel, MD · Jul 18 2:00 PM'},
+      {dot:'amber',time:'Today · 9:44 AM',text:'Patient submitted reschedule request',sub:'Reason: travel conflict'},
+      {dot:'',time:'Today · 9:52 AM',text:'Task created in CT Queue',sub:'Unassigned · 38 min wait'}
+    ]
+  },
+  'CT003': {
+    patient:'L.C.',initials:'LC',dob:'06/18/1991 (35 yrs)',phone:'(737) 558-3301',email:'l.chen@email.com',
+    product:'Weight Management',client:'Everlywell Direct',
+    consultId:'CST-2026-10869',resultDate:'Jul 11, 2026',
+    category:'Pharmacy',type:'Pharmacy Question',urgency:'HIGH',
+    wait:'55m',sla:'Respond within 4h',slaW:'50%',slaC:'amber',isAuto:false,
+    requiredAction:'Assist patient in locating an alternative pharmacy to fill the Tirzepatide 2.5mg Rx. CVS Austin reported out of stock. Contact patient to identify alternate pharmacy or next steps with prescribing NP.',
+    trigger:'Patient submitted portal message: pharmacy unable to fill Tirzepatide Rx — out of stock.',
+    ctx:'Patient L.C. was prescribed Tirzepatide 2.5mg after a Weight Management consult on Jul 11. The patient reports their local pharmacy cannot fill the prescription due to a stock shortage. Contact patient and assist with locating an alternative pharmacy or next steps.',
+    log:[
+      {dot:'green',time:'Jul 11 · 3:15 PM',text:'Consult completed',sub:'Dr. Alencar, NP · Weight Management'},
+      {dot:'purple',time:'Jul 11 · 3:18 PM',text:'Rx sent to pharmacy',sub:'Tirzepatide 2.5mg · CVS Austin'},
+      {dot:'amber',time:'Today · 8:47 AM',text:'Patient portal message received',sub:'"Pharmacy says out of stock"'},
+      {dot:'',time:'Today · 9:05 AM',text:'Task created in CT Queue',sub:'Unassigned · 55 min wait'}
+    ]
+  },
+  'CT004': {
+    patient:'T.W.',initials:'TW',dob:'09/03/1969 (56 yrs)',phone:'(469) 221-8847',email:'t.wilson@email.com',
+    product:'Annual Wellness',client:'Everlywell Health Plans',
+    consultId:'CST-2026-10858',resultDate:'Jul 7, 2026',
+    category:'Billing',type:'Billing Issue',urgency:'NORMAL',
+    wait:'2h 3m',sla:'Respond within 24h',slaW:'15%',slaC:'',isAuto:false,
+    requiredAction:'Resolve billing dispute for Annual Wellness consult. Patient T.W. is disputing the $199 charge, stating their Everlywell Health Plan covers this at 100%. Review benefit tier, clarify coverage, and communicate resolution to patient.',
+    trigger:'Patient called in disputing a $199 charge for Annual Wellness consult — claims insurance should cover.',
+    ctx:'Patient T.W. is disputing the $199 charge for an Annual Wellness consult on Jul 7. Patient states they were told their Everlywell Health Plan covers this service at 100%. Review the benefit tier and clarify coverage, or escalate to the billing department.',
+    log:[
+      {dot:'green',time:'Jul 7 · 10:30 AM',text:'Annual Wellness consult completed',sub:'Dr. Lee, MD'},
+      {dot:'amber',time:'Jul 10 · 9:00 AM',text:'Invoice sent to patient',sub:'$199.00 — Annual Wellness Consult'},
+      {dot:'red',time:'Today · 7:57 AM',text:'Patient called — billing dispute',sub:'Disputes charge — claims insurance covers'},
+      {dot:'',time:'Today · 7:58 AM',text:'Task created in CT Queue',sub:'Unassigned · 2h 3m wait'}
+    ]
+  },
+  'CT005': {
+    patient:'P.K.',initials:'PK',dob:'03/27/1995 (31 yrs)',phone:'(503) 812-4459',email:'p.kapoor@email.com',
+    product:'Testosterone',client:'Everlywell Direct',
+    consultId:'CST-2026-10861',resultDate:'Jul 12, 2026',
+    category:'Product',type:'Product Question',urgency:'NORMAL',
+    wait:'1h 47m',sla:'Respond within 8h',slaW:'25%',slaC:'',isAuto:false,
+    requiredAction:'Answer patient question about at-home Testosterone sample collection. Patient P.K. submitted a portal message unsure how to collect from their kit. Contact patient to walk through collection steps or send written instructions.',
+    trigger:'Patient submitted portal message — unsure how to collect Testosterone sample from at-home kit.',
+    ctx:'Patient P.K. received their Testosterone at-home test kit and submitted a portal question about sample collection. They are unsure of the correct process. Contact patient to walk through collection instructions or send written guidance.',
+    log:[
+      {dot:'green',time:'Jul 12 · 1:00 PM',text:'Lab kit delivered',sub:'Testosterone panel · At-home kit'},
+      {dot:'amber',time:'Today · 10:22 AM',text:'Patient portal question received',sub:'"How do I collect the sample?"'},
+      {dot:'',time:'Today · 10:23 AM',text:'Task created in CT Queue',sub:'Unassigned · 1h 47m wait'}
+    ]
+  }
+};
+
+var task = TASKS[TASK_ID] || TASKS['T001'];
+var logEntries = JSON.parse(JSON.stringify(task.log));
+
+function init() {
+  // Topbar
+  document.getElementById('topType').textContent = task.type;
+  var ub = document.getElementById('topUrg');
+  ub.textContent = task.urgency;
+  ub.className = 'urgency-badge urg-' + task.urgency.toLowerCase();
+  document.getElementById('topId').textContent = task.consultId;
+  document.title = 'Task Detail · ' + task.consultId;
+
+  // Patient card
+  document.getElementById('patAv').textContent = task.initials;
+  document.getElementById('patName').textContent = task.patient;
+  document.getElementById('patProd').textContent = task.product;
+  document.getElementById('patCid').textContent = task.consultId;
+  document.getElementById('patDob').textContent = task.dob;
+  document.getElementById('patPh').textContent = task.phone;
+  document.getElementById('patCl').textContent = task.client;
+  document.getElementById('patRd').textContent = task.resultDate;
+
+  // Required Action Banner (TASK-CHART-001)
+  var urgColor = task.urgency === 'CRITICAL' ? '#DC2626' : task.urgency === 'HIGH' ? '#D97706' : '#059669';
+  var urgBorderColor = task.urgency === 'CRITICAL' ? '#FECACA' : task.urgency === 'HIGH' ? '#FDE68A' : '#6EE7B7';
+  var urgBg = task.urgency === 'CRITICAL' ? '#FEF2F2' : task.urgency === 'HIGH' ? '#FFFBEB' : '#F0FDF4';
+  var banner = document.getElementById('requiredActionBanner');
+  banner.style.borderLeftColor = urgColor;
+  banner.style.background = urgBg;
+  banner.style.borderTopColor = urgBorderColor;
+  banner.style.borderRightColor = urgBorderColor;
+  banner.style.borderBottomColor = urgBorderColor;
+  document.getElementById('requiredActionText').textContent = task.requiredAction || task.ctx;
+  var urgTag = document.getElementById('requiredActionUrgency');
+  urgTag.textContent = task.urgency;
+  urgTag.style.background = urgColor + '18';
+  urgTag.style.color = urgColor;
+  urgTag.style.border = '1px solid ' + urgColor + '40';
+  document.getElementById('requiredActionSLA').textContent = '🕐 SLA: ' + task.sla;
+  document.getElementById('requiredActionWait').textContent = '⏱ In queue: ' + task.wait;
+
+  // Task meta
+  document.getElementById('mCat').textContent = task.category;
+  document.getElementById('mType').textContent = task.type;
+  document.getElementById('mWait').textContent = task.wait;
+  document.getElementById('mSLA').textContent = task.sla;
+  var fill = document.getElementById('slaFill');
+  fill.style.width = task.slaW;
+  if (task.slaC) fill.classList.add(task.slaC);
+
+  // Trigger
+  var tb = document.getElementById('triggerBox');
+  tb.textContent = task.trigger;
+  if (task.isAuto) tb.classList.add('auto');
+
+  // Context
+  document.getElementById('taskCtx').textContent = task.ctx;
+
+  // Contact Patient card
+  var phEl = document.getElementById('patPhDisplay');
+  var emEl = document.getElementById('patEmailDisplay');
+  if (phEl) phEl.textContent = task.phone || '—';
+  if (emEl) emEl.textContent = task.email || '—';
+
+  // Inline activity timeline (last 3 entries from chart)
+  var tl = document.getElementById('inlineTimeline');
+  if (tl) {
+    var entries = task.log.slice(-3).reverse();
+    tl.innerHTML = entries.map(function(e) {
+      return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #F5F0EA;">' +
+        '<div style="width:8px;height:8px;border-radius:50%;background:' + ({green:'#059669',amber:'#D97706',red:'#DC2626',purple:'#6B21A8',blue:'#1D4ED8'}[e.dot]||'#D1D5DB') + ';margin-top:4px;flex-shrink:0;"></div>' +
+        '<div><div style="font-size:11px;font-weight:600;color:#374151;">' + e.text + '</div>' +
+        (e.sub ? '<div style="font-size:10px;color:#9CA3AF;">' + e.sub + '</div>' : '') +
+        '<div style="font-size:10px;color:#9CA3AF;">' + e.time + '</div></div></div>';
+    }).join('');
+  }
+
+  // Show task-specific action panel
+  var panel = document.getElementById('action-' + TASK_ID);
+  if (panel) panel.style.display = '';
+
+  // Initialize stage 1 script
+  var s1 = document.getElementById('ctScript1');
+  if (s1) {
+    s1.textContent = ADMIN_SCRIPTS.stage1
+      .replace('[patient]', task.patient)
+      .replace('[name]', 'Alex Kim')
+      .replace('[program]', task.product);
+  }
+  // Start on stage 1
+  ctGoStage(1);
+
+  renderLog();
+}
+
+function renderLog() {
+  var c = document.getElementById('actLog');
+  c.innerHTML = '';
+  logEntries.slice().reverse().forEach(function(e) {
+    var d = document.createElement('div');
+    d.className = 'log-e';
+    d.innerHTML = '<div class="log-dot' + (e.dot ? ' ' + e.dot : '') + '"></div>' +
+      '<div class="log-time">' + e.time + '</div>' +
+      '<div class="log-text">' + e.text + '</div>' +
+      (e.sub ? '<div class="log-sub">' + e.sub + '</div>' : '');
+    c.appendChild(d);
+  });
+}
+
+function addLog(text, dot, sub) {
+  var now = new Date();
+  var t = 'Today · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  logEntries.push({dot:dot||'',time:t,text:text,sub:sub||''});
+  renderLog();
+}
+
+function logAttempt(tid) {
+  var sel = document.getElementById('at-' + tid);
+  var type = sel ? sel.value : '';
+  if (!type) { toast('Select an attempt type first.'); return; }
+  var now = new Date();
+  var t = 'Today · ' + now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  var alog = document.getElementById('alog-' + tid);
+  if (alog) {
+    var dc = type.includes('Spoke') ? 'adot-ok' : type.includes('SMS') ? 'adot-sms' : type.includes('Voicemail') ? 'adot-vm' : 'adot-miss';
+    var parts = type.split(' — ');
+    var e = document.createElement('div');
+    e.className = 'attempt-entry';
+    e.innerHTML = '<span class="adot ' + dc + '"></span><span class="atype">' + parts[0] + '</span>' +
+      '<span style="flex:1;font-size:11px;color:#6B7280;">' + (parts[1]||'') + '</span>' +
+      '<span class="atime">' + t + '</span>';
+    alog.appendChild(e);
+  }
+  sel.value = '';
+  addLog('Attempt: ' + type, type.includes('Spoke') ? 'green' : 'amber', 'Logged by Alex Kim');
+  toast('Attempt logged');
+}
+
+function goTo(url) { window.location.href = url; }
+
+function openMo(id) { document.getElementById(id).classList.add('open'); }
+function closeMo(id) { document.getElementById(id).classList.remove('open'); }
+
+function confirmRoute() {
+  var sel = document.getElementById('routeSel').value;
+  if (!sel) { toast('Please select a team member.'); return; }
+  addLog('Task routed to ' + sel, 'blue', 'Via CT Task Detail');
+  closeMo('routeModal');
+  toast('Task routed to ' + sel);
+  setTimeout(function(){ window.location.href = '/care-team/queue'; }, 1500);
+}
+
+function confirmCallback() {
+  var d = document.getElementById('cbDate').value;
+  var t = document.getElementById('cbTime').value;
+  var m = document.getElementById('cbMethod').value;
+  if (!d || !t) { toast('Please select date and time.'); return; }
+  var fmt;
+  try { fmt = new Date(d + 'T' + t).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}); } catch(e) { fmt = d + ' ' + t; }
+  closeMo('callbackModal');
+  addLog('Callback scheduled: ' + fmt + ' · ' + m, 'green', 'Patient reminder SMS queued');
+  toast('Callback scheduled for ' + fmt);
+}
+
+var _selProv = '';
+function selectProv(el, name) {
+  document.querySelectorAll('.prov-row').forEach(function(r){ r.classList.remove('selected'); });
+  el.classList.add('selected');
+  _selProv = name;
+  var btn = document.getElementById('reassignBtn');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+function doReassign() {
+  if (!_selProv) return;
+  document.getElementById('reassignOk').style.display = 'flex';
+  document.getElementById('reassignedTo').textContent = _selProv;
+  document.getElementById('reassignBtn').disabled = true;
+  document.getElementById('reassignBtn').style.opacity = '0.5';
+  addLog('Reassigned to ' + _selProv, 'green', 'SLA clock resumed · 8h remaining');
+  toast('Reassignment confirmed');
+}
+
+function toggleCl(itemId, cbId, label) {
+  var item = document.getElementById(itemId);
+  var cb = document.getElementById(cbId);
+  cb.checked = !cb.checked;
+  item.classList.toggle('done', cb.checked);
+  clProgress();
+  if (cb.checked) addLog('✓ ' + label, 'green', 'Checklist step complete');
+}
+function clProgress() {
+  var done = document.querySelectorAll('.cl-item input:checked').length;
+  var total = document.querySelectorAll('.cl-item').length;
+  document.getElementById('clProg').textContent = done + ' of ' + total + ' steps complete';
+}
+
+function completeTask() {
+  var notes = document.getElementById('resNotes').value.trim();
+  if (!notes) { toast('Please add resolution notes before completing.'); document.getElementById('resNotes').focus(); return; }
+  addLog('Task completed', 'green', notes.substring(0,60) + (notes.length>60?'…':''));
+  var b = document.getElementById('completeBanner');
+  b.style.display = 'flex';
+  toast('Task marked complete');
+  setTimeout(function(){ window.location.href = '/care-team/queue'; }, 2800);
+}
+
+function saveCallLog() {
+  var outcome = document.getElementById('callOutcome').value;
+  var notes = document.getElementById('callNotes').value.trim();
+  var resolution = document.getElementById('callResolution').value;
+  if (!outcome) { toast('Select a call outcome first.'); return; }
+  var outcomeLabels = {
+    reached: 'Reached — spoke with patient',
+    voicemail: 'Left voicemail',
+    no_answer: 'No answer',
+    wrong_number: 'Wrong number / disconnected',
+    callback: 'Patient requested callback'
+  };
+  var dot = outcome === 'reached' ? 'green' : outcome === 'voicemail' ? 'amber' : 'red';
+  addLog('📞 Call: ' + (outcomeLabels[outcome] || outcome), dot, notes ? notes.substring(0,60) : 'Logged by Alex Kim');
+  closeMo('contactModal');
+  document.getElementById('callOutcome').value = '';
+  document.getElementById('callNotes').value = '';
+  document.getElementById('callResolution').value = '';
+  toast('Call logged — activity updated');
+}
+
+// Populate contact modal when opened
+var _origOpenMo = openMo;
+openMo = function(id) {
+  if (id === 'contactModal') {
+    var ph = document.getElementById('contactModalPhone');
+    var pt = document.getElementById('contactModalPatient');
+    if (ph) ph.textContent = task.phone || '—';
+    if (pt) pt.textContent = task.patient + ' · ' + task.product;
+  }
+  _origOpenMo(id);
+};
+
+// ─── Admin scripting config (source of truth: admin/scripting_config page) ───
+var ADMIN_SCRIPTS = {
+  stage1: 'Hello, may I speak with [patient]? This is [name] from Everlywell\'s Care Team calling regarding your [program] account. This call may be recorded for quality purposes. Before we get started, could you please verify your date of birth for me?',
+  stage2: {
+    'No Show': 'I\'m reaching out because it looks like you had a scheduled consult with us today that we missed you at. I wanted to check in and see how you\'re doing, and help get you rescheduled at a time that works better for you. Would that work?',
+    'Reschedule Appointment': 'I see you submitted a request to reschedule your upcoming appointment — we\'re happy to help with that. Do you have a preferred date or time in mind, or would you like me to check what\'s available with your provider?',
+    'Pharmacy Question': 'I understand you\'re having some trouble getting your prescription filled at your pharmacy. I\'m going to work through some options with you right now to get this resolved as quickly as possible.',
+    'Billing Issue': 'I see there\'s a question about a recent charge on your account. I want to make sure we get this completely cleared up for you today. Could you walk me through what you\'re seeing on your end?',
+    'Product Question': 'I understand you have a question about your at-home test kit — I\'m happy to walk you through it step by step. Do you have the kit in front of you right now so we can go through it together?'
+  }
+};
+
+var _ctStage = 1;
+
+function ctGoStage(n) {
+  _ctStage = n;
+  [1,2,3].forEach(function(s) {
+    var el = document.getElementById('ctStage' + s);
+    if (el) el.style.display = (s === n) ? '' : 'none';
+  });
+  // Progress bar dot + label updates
+  var labels = ['Verify & Context','Resolution','Log & Close'];
+  [1,2,3].forEach(function(s) {
+    var dot = document.getElementById('ctStageDot' + s);
+    var lbl = document.getElementById('ctStageLabel' + s);
+    if (dot) {
+      if (s < n)       { dot.style.background = '#059669'; dot.style.color = '#fff'; }
+      else if (s === n){ dot.style.background = '#6B21A8'; dot.style.color = '#fff'; }
+      else             { dot.style.background = '#E5E0D8'; dot.style.color = '#9CA3AF'; }
+    }
+    if (lbl) {
+      lbl.style.color = (s <= n) ? '#6B21A8' : '#9CA3AF';
+      lbl.style.fontWeight = (s === n) ? '700' : '600';
+    }
+  });
+  // Populate stage 2 script from admin config
+  if (n === 2) {
+    var s2 = document.getElementById('ctScript2');
+    if (s2 && task) {
+      s2.textContent = ADMIN_SCRIPTS.stage2[task.type] || 'Please follow standard resolution protocol for this task type.';
+      var tag = document.getElementById('ctScript2Tag');
+      if (tag) tag.textContent = 'ADMIN-SCRIPT-' + task.type.replace(/\s+/g,'-').toUpperCase().substring(0,12);
+    }
+  }
+}
+
+// Activity logging (supports both inline and stage-3 instances)
+var _ctActivityType = '';
+var CT_ACTIVITY_OPTIONS = {
+  phone: { label: '📞 Phone Call', dot: 'green',  outcomes: ['Reached — spoke with patient','Left voicemail','No answer','Wrong number / disconnected','Patient requested callback'] },
+  email: { label: '✉️ Email',      dot: 'purple', outcomes: ['Email sent to patient','Email sent to provider','Email sent to pharmacy','Awaiting reply'] },
+  note:  { label: '📝 Note',       dot: '',       outcomes: [] },
+  task:  { label: '✅ Task',        dot: 'amber',  outcomes: ['Task created — assigned to team','Task created — self','Follow-up reminder set','Escalation flag added'] }
+};
+
+function ctLogActivity(type, ctx) {
+  var suffix = (ctx === 'inline') ? 'Inline' : 'S3';
+  _ctActivityType = type;
+  var cfg = CT_ACTIVITY_OPTIONS[type];
+  document.getElementById('ctActivityTitle'  + suffix).textContent = cfg.label;
+  var outRow = document.getElementById('ctActivityOutcomeRow' + suffix);
+  var outSel = document.getElementById('ctActivityOutcome'    + suffix);
+  if (cfg.outcomes.length > 0) {
+    outSel.innerHTML = '<option value="">— Select outcome —</option>' +
+      cfg.outcomes.map(function(o){ return '<option>' + o + '</option>'; }).join('');
+    outRow.style.display = '';
+  } else {
+    outRow.style.display = 'none';
+  }
+  document.getElementById('ctActivityNotes' + suffix).value = '';
+  document.getElementById('ctActivityForm'  + suffix).style.display = '';
+}
+
+function ctSaveActivity(ctx) {
+  var suffix = (ctx === 'inline') ? 'Inline' : 'S3';
+  var notes   = document.getElementById('ctActivityNotes'   + suffix).value.trim();
+  var outEl   = document.getElementById('ctActivityOutcome' + suffix);
+  var outcome = outEl ? outEl.value : '';
+  var cfg  = CT_ACTIVITY_OPTIONS[_ctActivityType] || { label: 'Activity', dot: '' };
+  var text = cfg.label + (outcome ? ': ' + outcome : '');
+  addLog(text, cfg.dot, notes || 'Logged by Alex Kim');
+  document.getElementById('ctActivityForm' + suffix).style.display = 'none';
+  toast((cfg.label || 'Activity') + ' logged to chart');
+}
+
+// Message provider/patient — logs inline instead of navigating away
+function sendProviderMessage() {
+  var to   = document.getElementById('msgTo').value;
+  var body = document.getElementById('msgBody').value.trim();
+  if (!body) { toast('Please enter a message.'); return; }
+  var dot = to === 'Patient' ? 'purple' : 'blue';
+  addLog('✉️ Message sent → ' + to, dot, body.substring(0,80) + (body.length > 80 ? '…' : ''));
+  closeMo('msgProviderModal');
+  document.getElementById('msgBody').value = '';
+  toast('Message logged in chart activity');
+}
+
+function toast(msg) {
+  var t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:22px;right:22px;background:#1F2937;color:#fff;padding:9px 15px;border-radius:8px;font-size:12px;font-weight:500;z-index:9999;transition:opacity 0.3s;box-shadow:0 4px 14px rgba(0,0,0,0.28);';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._t);
+  t._t = setTimeout(function(){ t.style.opacity='0'; }, 2500);
+}
+
+document.querySelectorAll('.mo').forEach(function(m){
+  m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('open'); });
+});
+
+init();
+</script>
+{% endraw %}
+{% endblock %}

@@ -1,0 +1,587 @@
+{% extends "base.html" %}
+{% block title %}Referral Tracker{% endblock %}
+{% block head %}
+<style>
+:root { --navy:#445D7A; --navy-light:#EEF2F7; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; --teal:#0F766E; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--navy); display:flex; align-items:center; padding:0 24px; z-index:99; gap:14px; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#2E4563; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+
+/* Stats */
+.stats-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:22px; }
+.strip-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9CA3AF; margin-bottom:4px; }
+.strip-val { font-size:22px; font-weight:800; line-height:1; }
+.strip-sub { font-size:11px; color:#9CA3AF; margin-top:2px; }
+
+/* Filter bar */
+.filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+.filter-bar input, .filter-bar select { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.filter-bar input { min-width:200px; }
+.filter-bar select:focus, .filter-bar input:focus { border-color:var(--navy); }
+.export-btn { margin-left:auto; background:var(--navy); color:#fff; border:none; border-radius:7px; padding:7px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+.export-btn:hover { background:#2E4563; }
+.row-count { font-size:12px; font-weight:600; color:#6B7280; }
+
+/* Table */
+.table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+tbody td { padding:10px 12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F5F7FA; }
+tbody tr.overdue-row { background:#FFF7F7; }
+
+.athena-id { font-family:monospace; font-size:12px; font-weight:700; color:var(--navy); }
+.provider-name { font-size:12px; color:#374151; }
+
+/* Referral type chips */
+.ref-chip { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; white-space:nowrap; }
+.ref-pcp    { background:#DBEAFE; color:#1E40AF; }
+.ref-cm     { background:#EDE9FE; color:#5B21B6; }
+.ref-oph    { background:#D1FAE5; color:#065F46; }
+.ref-behav  { background:#FEF3C7; color:#92400E; }
+.ref-endo   { background:#FCE7F3; color:#9D174D; }
+.ref-food   { background:#FEE2E2; color:#991B1B; }
+.ref-sw     { background:#E0F2FE; color:#0369A1; }
+.ref-dne    { background:#ECFDF5; color:#047857; }
+.ref-fu     { background:#F3F4F6; color:#374151; }
+
+/* Status chips */
+.status-chip { font-size:11px; font-weight:600; padding:2px 8px; border-radius:10px; }
+.s-signed    { background:#F3F4F6; color:#374151; }
+.s-submitted { background:#DBEAFE; color:#1E40AF; }
+.s-closed    { background:#D1FAE5; color:#065F46; }
+
+/* Attempt badge */
+.attempt-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; }
+.att-1 { color:#6B7280; }
+.att-2 { color:var(--amber); }
+.att-3 { color:var(--red); }
+
+/* Outcome */
+.outcome-text { font-size:11px; color:#374151; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.overdue-flag { font-size:10px; font-weight:700; color:var(--red); display:block; }
+
+/* Action button */
+.btn-log { border:1px solid var(--border); background:#fff; border-radius:6px; padding:4px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:var(--navy); }
+.btn-log:hover { border-color:var(--navy); background:var(--navy-light); }
+.btn-closed { font-size:11px; color:#9CA3AF; font-style:italic; }
+
+/* Tabs */
+.tab-bar { display:flex; gap:4px; margin-bottom:16px; border-bottom:2px solid var(--border); }
+.tab-btn { padding:8px 16px; font-size:13px; font-weight:600; background:none; border:none; cursor:pointer; color:#6B7280; font-family:inherit; border-bottom:3px solid transparent; margin-bottom:-2px; }
+.tab-btn.active { color:var(--navy); border-bottom-color:var(--navy); }
+.tab-btn:hover { color:var(--navy); }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:16px; width:520px; max-width:95vw; overflow:hidden; }
+.modal-header { padding:18px 20px; background:var(--navy); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:15px; font-weight:700; color:#fff; }
+.modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:rgba(255,255,255,0.7); }
+.modal-body { padding:20px; }
+.modal-field { margin-bottom:14px; }
+.modal-field label { display:block; font-size:11px; font-weight:700; color:#6B7280; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.05em; }
+.modal-field select, .modal-field input, .modal-field textarea { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 10px; font-size:13px; font-family:inherit; outline:none; color:#374151; }
+.modal-field select:focus, .modal-field input:focus, .modal-field textarea:focus { border-color:var(--navy); }
+.modal-field textarea { resize:vertical; min-height:72px; }
+.modal-info { background:#F0F4F8; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:12px; color:#374151; }
+.modal-info strong { display:block; font-size:11px; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px; }
+.modal-footer { display:flex; gap:10px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--border); }
+.btn-cancel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; }
+.btn-save { background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+.btn-save:hover { background:#2E4563; }
+.req-note { font-size:11px; color:var(--red); font-weight:600; display:none; margin-top:4px; }
+
+/* Appt date field */
+#apptDateGroup { display:none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">Referral Tracker</div>
+    <div class="topbar-sub">EverlyCare &amp; EverlyCare Treat Visit programs</div>
+  </div>
+  <div class="topbar-right">
+    <span>Lupe Torres, Medical Assistant</span>
+    <div class="avatar">LT</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-title">Referral Tracker</div>
+  <div class="page-sub">All open Athena referral orders — replaces the EverlyCare Referral Tracker spreadsheet. Attempt logs write back to the patient chart automatically.</div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="strip-card">
+      <div class="strip-label">Open Referrals</div>
+      <div class="strip-val" style="color:var(--navy);">34</div>
+      <div class="strip-sub">across all types</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Overdue</div>
+      <div class="strip-val" style="color:var(--red);">8</div>
+      <div class="strip-sub">>5 days, no attempt</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">3rd Attempt</div>
+      <div class="strip-val" style="color:var(--amber);">5</div>
+      <div class="strip-sub">final attempt reached</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Closed This Week</div>
+      <div class="strip-val" style="color:var(--green);">19</div>
+      <div class="strip-sub">any outcome</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Appt Scheduled</div>
+      <div class="strip-val" style="color:var(--green);">11</div>
+      <div class="strip-sub">this week</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="setTab('open',this)">Open (34)</button>
+    <button class="tab-btn" onclick="setTab('closed',this)">Closed (142)</button>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="Search Athena ID or provider…" oninput="filterTable()">
+    <select id="filterType" onchange="filterTable()">
+      <option value="">All Referral Types</option>
+      <option>PCP / Primary Care Provider</option>
+      <option>Case Manager / Care Coordinator</option>
+      <option>Diabetic Ophthalmology</option>
+      <option>Behavioral / Psychotherapy</option>
+      <option>Diabetic Nutrition Education</option>
+      <option>Endocrinology</option>
+      <option>Food Assistance Program</option>
+      <option>Social Worker</option>
+      <option>Patient Follow-Up Phone Call</option>
+    </select>
+    <select id="filterStatus" onchange="filterTable()">
+      <option value="">All Statuses</option>
+      <option>Order Signed</option>
+      <option>Order Submitted</option>
+      <option>Order Closed</option>
+    </select>
+    <select id="filterAttempt" onchange="filterTable()">
+      <option value="">All Attempts</option>
+      <option>No Attempt Yet</option>
+      <option>1st Attempt</option>
+      <option>2nd Attempt</option>
+      <option>3rd / Final Attempt</option>
+    </select>
+    <select id="filterProgram" onchange="filterTable()">
+      <option value="">All Programs</option>
+      <option>EVE</option>
+      <option>EverlyCare Treat Visit</option>
+    </select>
+    <button class="export-btn">Export CSV</button>
+  </div>
+  <div style="margin-bottom:12px;"><span class="row-count" id="rowCount">Showing 34 referrals</span></div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table id="referralTable">
+      <thead>
+        <tr>
+          <th>Athena ID</th>
+          <th>Program</th>
+          <th>Provider</th>
+          <th>Order Date</th>
+          <th>Referral Type</th>
+          <th>Status</th>
+          <th>Attempt</th>
+          <th>Last Outcome</th>
+          <th>Days Open</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="referralBody">
+        <!-- Open referrals — demo data based on actual tracker -->
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Signed" data-attempt="No Attempt Yet" data-overdue="true">
+          <td><span class="athena-id">63503</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 23</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-1">— None</span></td>
+          <td><span class="outcome-text">—</span><span class="overdue-flag">⚠ Overdue — no attempt logged</span></td>
+          <td style="color:var(--red);font-weight:700;">4d</td>
+          <td><button class="btn-log" onclick="openModal('63503','Case Mgr / Care Coord','Dr Patel','No Attempt Yet')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Diabetic Ophthalmology" data-status="Order Signed" data-attempt="No Attempt Yet" data-overdue="true">
+          <td><span class="athena-id">64133</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 23</td>
+          <td><span class="ref-chip ref-oph">Diabetic Ophthalmology</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-1">— None</span></td>
+          <td><span class="outcome-text">—</span><span class="overdue-flag">⚠ Overdue — no attempt logged</span></td>
+          <td style="color:var(--red);font-weight:700;">4d</td>
+          <td><button class="btn-log" onclick="openModal('64133','Diabetic Ophthalmology','Dr Patel','No Attempt Yet')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Diabetic Ophthalmology" data-status="Order Signed" data-attempt="No Attempt Yet" data-overdue="true">
+          <td><span class="athena-id">65079</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 25</td>
+          <td><span class="ref-chip ref-oph">Diabetic Ophthalmology</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-1">— None</span></td>
+          <td><span class="outcome-text">—</span><span class="overdue-flag">⚠ Overdue — no attempt logged</span></td>
+          <td style="color:var(--red);font-weight:700;">2d</td>
+          <td><button class="btn-log" onclick="openModal('65079','Diabetic Ophthalmology','Dr Patel','No Attempt Yet')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Signed" data-attempt="1st Attempt">
+          <td><span class="athena-id">65171</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr. Mota</span></td>
+          <td>May 19</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-2">2nd Attempt</span></td>
+          <td><span class="outcome-text">Left voicemail — no return</span></td>
+          <td style="color:var(--amber);font-weight:700;">39d</td>
+          <td><button class="btn-log" onclick="openModal('65171','Case Mgr / Care Coord','Dr. Mota','2nd Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Submitted" data-attempt="1st Attempt">
+          <td><span class="athena-id">64908</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr. Mota</span></td>
+          <td>May 19</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-1">1st Attempt</span></td>
+          <td><span class="outcome-text">Referral sent — alt PCP added</span></td>
+          <td style="color:#6B7280;">39d</td>
+          <td><button class="btn-log" onclick="openModal('64908','Case Mgr / Care Coord','Dr. Mota','1st Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Submitted" data-attempt="2nd Attempt">
+          <td><span class="athena-id">64134</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 17</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-2">2nd Attempt</span></td>
+          <td><span class="outcome-text">Referral sent — wheelchair transport</span></td>
+          <td style="color:#6B7280;">10d</td>
+          <td><button class="btn-log" onclick="openModal('64134','Case Mgr / Care Coord','Dr Patel','2nd Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Behavioral / Psychotherapy" data-status="Order Submitted" data-attempt="2nd Attempt">
+          <td><span class="athena-id">64134</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 17</td>
+          <td><span class="ref-chip ref-behav">Behavioral / Psych</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-2">2nd Attempt</span></td>
+          <td><span class="outcome-text">Referral recipient selected</span></td>
+          <td style="color:#6B7280;">10d</td>
+          <td><button class="btn-log" onclick="openModal('64134','Behavioral / Psych','Dr Patel','2nd Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Diabetic Ophthalmology" data-status="Order Submitted" data-attempt="2nd Attempt">
+          <td><span class="athena-id">64134</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 17</td>
+          <td><span class="ref-chip ref-oph">Diabetic Ophthalmology</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-2">2nd Attempt</span></td>
+          <td><span class="outcome-text">Referral recipient selected</span></td>
+          <td style="color:#6B7280;">10d</td>
+          <td><button class="btn-log" onclick="openModal('64134','Diabetic Ophthalmology','Dr Patel','2nd Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Signed" data-attempt="1st Attempt">
+          <td><span class="athena-id">68996</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr Patel</span></td>
+          <td>Jun 18</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-1">1st Attempt</span></td>
+          <td><span class="outcome-text">Voicemail left — awaiting callback</span></td>
+          <td style="color:#6B7280;">9d</td>
+          <td><button class="btn-log" onclick="openModal('68996','Case Mgr / Care Coord','Dr Patel','1st Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Diabetic Ophthalmology" data-status="Order Signed" data-attempt="3rd / Final Attempt">
+          <td><span class="athena-id">63292</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr. Goldstein</span></td>
+          <td>May 1</td>
+          <td><span class="ref-chip ref-oph">Diabetic Ophthalmology</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-3">3rd / Final</span></td>
+          <td><span class="outcome-text">Patient did not answer — voicemail</span></td>
+          <td style="color:var(--red);font-weight:700;">57d</td>
+          <td><button class="btn-log" onclick="openModal('63292','Diabetic Ophthalmology','Dr. Goldstein','3rd / Final Attempt')">Close Record</button></td>
+        </tr>
+        <tr data-program="EVE" data-type="Case Manager / Care Coordinator" data-status="Order Signed" data-attempt="3rd / Final Attempt">
+          <td><span class="athena-id">63292</span></td>
+          <td>EVE</td>
+          <td><span class="provider-name">Dr. Goldstein</span></td>
+          <td>May 1</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-3">3rd / Final</span></td>
+          <td><span class="outcome-text">Patient did not answer — voicemail</span></td>
+          <td style="color:var(--red);font-weight:700;">57d</td>
+          <td><button class="btn-log" onclick="openModal('63292','Case Mgr / Care Coord','Dr. Goldstein','3rd / Final Attempt')">Close Record</button></td>
+        </tr>
+        <tr data-program="EverlyCare Treat Visit" data-type="Patient Follow-Up Phone Call" data-status="Order Submitted" data-attempt="1st Attempt">
+          <td><span class="athena-id">55929</span></td>
+          <td>EVE Treat Visit</td>
+          <td><span class="provider-name">Alencar NP</span></td>
+          <td>Apr 13</td>
+          <td><span class="ref-chip ref-fu">Patient Follow-Up</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-2">2nd Attempt</span></td>
+          <td><span class="outcome-text">Appt scheduled May 4</span></td>
+          <td style="color:#6B7280;">75d</td>
+          <td><button class="btn-log" onclick="openModal('55929','Patient Follow-Up','Alencar NP','2nd Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EverlyCare Treat Visit" data-type="Case Manager / Care Coordinator" data-status="Order Submitted" data-attempt="1st Attempt">
+          <td><span class="athena-id">55929</span></td>
+          <td>EVE Treat Visit</td>
+          <td><span class="provider-name">Alencar NP</span></td>
+          <td>Apr 13</td>
+          <td><span class="ref-chip ref-cm">Case Mgr / Coord</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-1">1st Attempt</span></td>
+          <td><span class="outcome-text">Referral sent — legacy confirmed</span></td>
+          <td style="color:#6B7280;">75d</td>
+          <td><button class="btn-log" onclick="openModal('55929','Case Mgr / Care Coord','Alencar NP','1st Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EverlyCare Treat Visit" data-type="Endocrinology" data-status="Order Submitted" data-attempt="1st Attempt">
+          <td><span class="athena-id">59521</span></td>
+          <td>EVE Treat Visit</td>
+          <td><span class="provider-name">Alencar NP</span></td>
+          <td>Apr 14</td>
+          <td><span class="ref-chip ref-endo">Endocrinology</span></td>
+          <td><span class="status-chip s-submitted">Order Submitted</span></td>
+          <td><span class="attempt-badge att-1">1st Attempt</span></td>
+          <td><span class="outcome-text">St. Lukes referral sent — appt Jul 9</span></td>
+          <td style="color:#6B7280;">74d</td>
+          <td><button class="btn-log" onclick="openModal('59521','Endocrinology','Alencar NP','1st Attempt')">Log Attempt</button></td>
+        </tr>
+        <tr data-program="EverlyCare Treat Visit" data-type="Patient Follow-Up Phone Call" data-status="Order Signed" data-attempt="3rd / Final Attempt">
+          <td><span class="athena-id">59517</span></td>
+          <td>EVE Treat Visit</td>
+          <td><span class="provider-name">Dr. Goldstein</span></td>
+          <td>Apr 14</td>
+          <td><span class="ref-chip ref-fu">Patient Follow-Up</span></td>
+          <td><span class="status-chip s-signed">Order Signed</span></td>
+          <td><span class="attempt-badge att-3">3rd / Final</span></td>
+          <td><span class="outcome-text">Patient not scheduled — aware</span></td>
+          <td style="color:var(--red);font-weight:700;">74d</td>
+          <td><button class="btn-log" onclick="openModal('59517','Patient Follow-Up','Dr. Goldstein','3rd / Final Attempt')">Close Record</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Log Attempt Modal -->
+<div class="modal-overlay" id="attemptModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Log Outreach Attempt</div>
+      <button class="modal-close" onclick="closeModal()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info">
+        <strong>Referral</strong>
+        <span id="modalRefInfo">—</span>
+      </div>
+      <div class="modal-info" style="margin-top:-8px;">
+        <strong>Attempt Number</strong>
+        <span id="modalAttemptNum">—</span>
+      </div>
+      <div class="modal-field">
+        <label>Contact Method *</label>
+        <select id="methodSelect">
+          <option value="">Select method…</option>
+          <option>Phone Call — Spoke with Patient</option>
+          <option>Phone Call — No Answer</option>
+          <option>Voicemail Left</option>
+          <option>No Voicemail Option</option>
+          <option>Phone Not Accepting Calls</option>
+          <option>Phone Full / Mailbox Full</option>
+          <option>Portal Message Sent</option>
+          <option>Fax Sent</option>
+        </select>
+        <div class="req-note" id="methodReq">Required</div>
+      </div>
+      <div class="modal-field">
+        <label>Outcome *</label>
+        <select id="outcomeSelect" onchange="handleOutcomeChange()">
+          <option value="">Select outcome…</option>
+          <option>Spoke with Patient — Referral Accepted</option>
+          <option>Referral Sent</option>
+          <option>Office Appointment Scheduled</option>
+          <option>Patient Declined Referral</option>
+          <option>Patient Could Not Be Reached</option>
+          <option>Left Voicemail</option>
+          <option>Services No Longer Needed</option>
+          <option>Patient Scheduled with Alternate Provider</option>
+          <option>Visit Completed</option>
+        </select>
+        <div class="req-note" id="outcomeReq">Required</div>
+      </div>
+      <div class="modal-field" id="apptDateGroup">
+        <label>Appointment Scheduled Date *</label>
+        <input type="date" id="apptDate">
+      </div>
+      <div class="modal-field">
+        <label>Notes</label>
+        <textarea id="attemptNotes" placeholder="Enter contact notes, referral details, or patient response…"></textarea>
+      </div>
+      <!-- Set Reminder -->
+      <div class="modal-field" style="border-top:1px solid #E5E0D8;padding-top:12px;margin-top:4px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="reminderToggle" onchange="toggleReminder()" style="width:15px;height:15px;accent-color:#1B4F8A;">
+          <span>Set a follow-up reminder</span>
+        </label>
+      </div>
+      <div id="reminderSection" style="display:none;background:#F0F6FF;border:1px solid #BFDBFE;border-radius:8px;padding:12px 14px;margin-top:4px;">
+        <div style="font-size:11px;font-weight:700;color:#1B4F8A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Reminder Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Date</label>
+            <input type="date" id="reminderDate" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+          <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Time</label>
+            <input type="time" id="reminderTime" value="09:00" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+        </div>
+        <div><label style="font-size:11px;color:#6B7280;display:block;margin-bottom:3px;">Reminder Note (optional)</label>
+          <input type="text" id="reminderNote" placeholder="e.g. Check if appointment was confirmed" style="width:100%;padding:6px 9px;border:1px solid #BFDBFE;border-radius:6px;font-size:13px;box-sizing:border-box;"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveAttempt()">Save Attempt &amp; Update Athena</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+var currentRow = null;
+
+function setTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  // In demo, just show a message for Closed tab
+  if (tab === 'closed') {
+    document.getElementById('referralBody').innerHTML = '<tr><td colspan="10" style="padding:32px;text-align:center;color:#6B7280;font-size:13px;">142 closed referral records — filter and export available. In the full platform this view shows all historically closed records with full attempt history.</td></tr>';
+    document.getElementById('rowCount').textContent = 'Showing 142 closed referrals';
+  } else {
+    location.reload();
+  }
+}
+
+function filterTable() {
+  var search = document.getElementById('searchInput').value.toLowerCase();
+  var type   = document.getElementById('filterType').value.toLowerCase();
+  var status = document.getElementById('filterStatus').value.toLowerCase();
+  var attempt= document.getElementById('filterAttempt').value.toLowerCase();
+  var program= document.getElementById('filterProgram').value.toLowerCase();
+  var rows = document.querySelectorAll('#referralBody tr[data-program]');
+  var visible = 0;
+  rows.forEach(function(row) {
+    var text    = row.textContent.toLowerCase();
+    var rtype   = (row.dataset.type||'').toLowerCase();
+    var rstatus = (row.dataset.status||'').toLowerCase();
+    var rattmpt = (row.dataset.attempt||'').toLowerCase();
+    var rprog   = (row.dataset.program||'').toLowerCase();
+    var show = (!search || text.includes(search)) &&
+               (!type   || rtype.includes(type)) &&
+               (!status || rstatus.includes(status)) &&
+               (!attempt|| rattmpt.includes(attempt)) &&
+               (!program|| rprog.includes(program));
+    row.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('rowCount').textContent = 'Showing ' + visible + ' referrals';
+}
+
+function openModal(athenaId, refType, provider, currentAttempt) {
+  var nextAttempt = { 'No Attempt Yet':'1st Attempt', '1st Attempt':'2nd Attempt', '2nd Attempt':'3rd / Final Attempt', '3rd / Final Attempt':'Close Record' };
+  document.getElementById('modalRefInfo').textContent = athenaId + ' — ' + refType + ' (' + provider + ')';
+  document.getElementById('modalAttemptNum').textContent = nextAttempt[currentAttempt] || '1st Attempt';
+  document.getElementById('methodSelect').value = '';
+  document.getElementById('outcomeSelect').value = '';
+  document.getElementById('attemptNotes').value = '';
+  document.getElementById('apptDate').value = '';
+  document.getElementById('apptDateGroup').style.display = 'none';
+  document.getElementById('methodReq').style.display = 'none';
+  document.getElementById('outcomeReq').style.display = 'none';
+  document.getElementById('reminderToggle').checked = false;
+  document.getElementById('reminderSection').style.display = 'none';
+  document.getElementById('reminderDate').value = '';
+  document.getElementById('reminderNote').value = '';
+  document.getElementById('attemptModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('attemptModal').classList.remove('open');
+}
+
+function handleOutcomeChange() {
+  var outcome = document.getElementById('outcomeSelect').value;
+  document.getElementById('apptDateGroup').style.display = outcome === 'Office Appointment Scheduled' ? '' : 'none';
+}
+
+function toggleReminder() {
+  var on = document.getElementById('reminderToggle').checked;
+  document.getElementById('reminderSection').style.display = on ? '' : 'none';
+}
+
+function saveAttempt() {
+  var method = document.getElementById('methodSelect').value;
+  var outcome = document.getElementById('outcomeSelect').value;
+  var valid = true;
+  if (!method) { document.getElementById('methodReq').style.display='block'; valid=false; }
+  else { document.getElementById('methodReq').style.display='none'; }
+  if (!outcome) { document.getElementById('outcomeReq').style.display='block'; valid=false; }
+  else { document.getElementById('outcomeReq').style.display='none'; }
+  if (!valid) return;
+
+  var reminderOn = document.getElementById('reminderToggle').checked;
+  var reminderDate = document.getElementById('reminderDate').value;
+  var reminderTime = document.getElementById('reminderTime').value;
+  closeModal();
+  var msg = '✓ Attempt logged — Athena chart note written.';
+  if (reminderOn && reminderDate) {
+    msg += ' Reminder set for ' + reminderDate + ' at ' + (reminderTime || '09:00') + '.';
+  }
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:420px;';
+  banner.textContent = msg;
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 4000);
+}
+
+document.getElementById('attemptModal').addEventListener('click', function(e){
+  if (e.target === this) closeModal();
+});
+</script>
+{% endblock %}

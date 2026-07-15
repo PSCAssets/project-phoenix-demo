@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurable Workflow Engine — Consult Stage Routing</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #ffffff; }
+  .header { background: #1F3864; color: white; padding: 20px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .header-brand { font-size: 13px; opacity: 0.7; letter-spacing: 1px; text-transform: uppercase; }
+  .header-title { font-size: 22px; font-weight: 700; }
+  .header-sub { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+  .diagram-container { padding: 24px; overflow-x: auto; background: #f8f9fa; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="header-brand">Everlywell · Telehealth</div>
+    <div class="header-title">Configurable Workflow Engine — Consult Stage Routing</div>
+    <div class="header-sub">Module 04: Admin Portal · Workflow Design</div>
+  </div>
+  <div style="text-align:right;opacity:0.7;font-size:12px;">M04_Configurable_Workflow_Engine_v1<br>2026-06-04</div>
+</div>
+<div class="diagram-container">
+<svg viewBox="0 0 1380 1580" xmlns="http://www.w3.org/2000/svg" width="100%" style="max-width:1380px;display:block;margin:0 auto;font-family:'Segoe UI',Arial,sans-serif;">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#555"/></marker>
+    <marker id="arr-b" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#2E86AB"/></marker>
+    <marker id="arr-g" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#27AE60"/></marker>
+    <marker id="arr-r" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#E74C3C"/></marker>
+    <marker id="arr-o" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#E67E22"/></marker>
+    <filter id="sh"><feDropShadow dx="1" dy="2" stdDeviation="2" flood-opacity="0.12"/></filter>
+  </defs>
+
+  <!-- LANE BACKGROUNDS -->
+  <!-- Row 1: Entry -->
+  <rect x="8" y="8" width="1360" height="90" rx="6" fill="#EAF5FB"/>
+  <rect x="8" y="8" width="1360" height="32" rx="6" fill="#2E86AB"/>
+  <text x="688" y="29" text-anchor="middle" fill="white" font-size="12" font-weight="bold">CONSULT ENTRY — Patient Submits Consult</text>
+
+  <!-- 3 Branch lanes below -->
+  <!-- Path A -->
+  <rect x="8" y="108" width="420" height="1050" rx="6" fill="#EAF5FB"/>
+  <rect x="8" y="108" width="420" height="32" rx="6" fill="#2563A0"/>
+  <text x="218" y="129" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PATH A — Standard Async</text>
+
+  <!-- Path B -->
+  <rect x="438" y="108" width="460" height="1050" rx="6" fill="#E8F8F5"/>
+  <rect x="438" y="108" width="460" height="32" rx="6" fill="#1A8060"/>
+  <text x="668" y="129" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PATH B — Video with Pre-Visit</text>
+
+  <!-- Path C -->
+  <rect x="908" y="108" width="460" height="1050" rx="6" fill="#FDF2FB"/>
+  <rect x="908" y="108" width="460" height="32" rx="6" fill="#6C3483"/>
+  <text x="1138" y="129" text-anchor="middle" fill="white" font-size="12" font-weight="bold">PATH C — Genetics Pre-Screening</text>
+
+  <!-- ENTRY -->
+  <rect x="490" y="20" width="390" height="36" rx="7" fill="#1F3864" filter="url(#sh)"/>
+  <text x="685" y="44" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Patient submits consult → Enters Stage 1 (defined by care product workflow)</text>
+
+  <!-- Split arrows to 3 paths -->
+  <line x1="685" y1="56" x2="685" y2="72" stroke="#555" stroke-width="1.5"/>
+  <line x1="685" y1="72" x2="218" y2="72" stroke="#555" stroke-width="1.5"/>
+  <line x1="685" y1="72" x2="668" y2="72" stroke="#555" stroke-width="1.5"/>
+  <line x1="685" y1="72" x2="1138" y2="72" stroke="#555" stroke-width="1.5"/>
+  <line x1="218" y1="72" x2="218" y2="108" stroke="#2563A0" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <line x1="668" y1="72" x2="668" y2="108" stroke="#1A8060" stroke-width="1.5" marker-end="url(#arr-g)"/>
+  <line x1="1138" y1="72" x2="1138" y2="108" stroke="#6C3483" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- PATH A STAGES -->
+  <!-- Stage: Submitted -->
+  <rect x="68" y="158" width="300" height="46" rx="7" fill="#2563A0" filter="url(#sh)"/>
+  <text x="218" y="175" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Submitted</text>
+  <text x="218" y="191" text-anchor="middle" fill="white" font-size="9">Queue: Provider Queue · SLA clock starts</text>
+  <text x="218" y="204" text-anchor="middle" fill="white" font-size="9">Status visible to patient</text>
+
+  <line x1="218" y1="204" x2="218" y2="220" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Provider Review -->
+  <rect x="68" y="220" width="300" height="46" rx="7" fill="#2563A0" filter="url(#sh)"/>
+  <text x="218" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Provider Review</text>
+  <text x="218" y="253" text-anchor="middle" fill="white" font-size="9">Queue: Provider Queue · SLA clock running</text>
+  <text x="218" y="266" text-anchor="middle" fill="white" font-size="9">Provider takes action on consult</text>
+
+  <line x1="218" y1="266" x2="218" y2="282" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Waiting on Patient -->
+  <rect x="68" y="282" width="300" height="56" rx="7" fill="#F39C12" filter="url(#sh)"/>
+  <text x="218" y="299" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Waiting on Patient</text>
+  <text x="218" y="315" text-anchor="middle" fill="white" font-size="9">SLA clock PAUSES</text>
+  <text x="218" y="329" text-anchor="middle" fill="white" font-size="9">Patient inactivity timer starts</text>
+  <text x="218" y="342" text-anchor="middle" fill="white" font-size="9">Follow-up notifications sent per SLA config</text>
+
+  <line x1="218" y1="338" x2="218" y2="354" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Provider Response -->
+  <rect x="68" y="354" width="300" height="46" rx="7" fill="#2563A0" filter="url(#sh)"/>
+  <text x="218" y="371" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Provider Response</text>
+  <text x="218" y="387" text-anchor="middle" fill="white" font-size="9">Patient responds → SLA resumes</text>
+  <text x="218" y="400" text-anchor="middle" fill="white" font-size="9">Provider drafts response / Rx</text>
+
+  <line x1="218" y1="400" x2="218" y2="416" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+  <!-- Closed -->
+  <rect x="68" y="416" width="300" height="38" rx="7" fill="#27AE60" filter="url(#sh)"/>
+  <text x="218" y="430" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Closed</text>
+  <text x="218" y="446" text-anchor="middle" fill="white" font-size="9">Consult resolved · Patient notified</text>
+
+  <!-- PATH B STAGES -->
+  <!-- Scheduled -->
+  <rect x="496" y="158" width="344" height="46" rx="7" fill="#1A8060" filter="url(#sh)"/>
+  <text x="668" y="175" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Scheduled</text>
+  <text x="668" y="191" text-anchor="middle" fill="white" font-size="9">Queue: Scheduling Queue · Appointment set</text>
+  <text x="668" y="204" text-anchor="middle" fill="white" font-size="9">Patient receives confirmation</text>
+
+  <line x1="668" y1="204" x2="668" y2="220" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Pre-Visit Prep -->
+  <rect x="496" y="220" width="344" height="46" rx="7" fill="#1A8060" filter="url(#sh)"/>
+  <text x="668" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Pre-Visit Prep</text>
+  <text x="668" y="253" text-anchor="middle" fill="white" font-size="9">Queue: MA Queue · SLA clock running</text>
+  <text x="668" y="266" text-anchor="middle" fill="white" font-size="9">MA reviews intake, prepares chart</text>
+
+  <line x1="668" y1="266" x2="668" y2="282" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Ready for Provider -->
+  <rect x="496" y="282" width="344" height="46" rx="7" fill="#1A8060" filter="url(#sh)"/>
+  <text x="668" y="299" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Ready for Provider</text>
+  <text x="668" y="315" text-anchor="middle" fill="white" font-size="9">Queue: Provider Queue · Handoff from MA</text>
+  <text x="668" y="328" text-anchor="middle" fill="white" font-size="9">Provider joins video call</text>
+
+  <line x1="668" y1="328" x2="668" y2="344" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- In Progress -->
+  <rect x="496" y="344" width="344" height="38" rx="7" fill="#1A8060" filter="url(#sh)"/>
+  <text x="668" y="358" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: In Progress</text>
+  <text x="668" y="374" text-anchor="middle" fill="white" font-size="9">Live video consult · SLA paused during call</text>
+
+  <line x1="668" y1="382" x2="668" y2="398" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+  <!-- Completed -->
+  <rect x="496" y="398" width="344" height="38" rx="7" fill="#27AE60" filter="url(#sh)"/>
+  <text x="668" y="412" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Completed</text>
+  <text x="668" y="428" text-anchor="middle" fill="white" font-size="9">Visit ended · Notes finalized · Patient notified</text>
+
+  <!-- PATH C STAGES -->
+  <!-- Referral Received -->
+  <rect x="968" y="158" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="172" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Referral Received</text>
+  <text x="1138" y="188" text-anchor="middle" fill="white" font-size="9">Queue: GC Queue · Case opened</text>
+
+  <line x1="1138" y1="196" x2="1138" y2="212" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="968" y="212" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="226" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Pre-Screening Scheduled</text>
+  <text x="1138" y="242" text-anchor="middle" fill="white" font-size="9">GC schedules initial consult · Patient notified</text>
+
+  <line x1="1138" y1="250" x2="1138" y2="266" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="968" y="266" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="280" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Pre-Screening Completed</text>
+  <text x="1138" y="296" text-anchor="middle" fill="white" font-size="9">GC documents findings · Recommendation made</text>
+
+  <line x1="1138" y1="304" x2="1138" y2="320" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Patient Decision -->
+  <polygon points="1138,320 1228,345 1138,370 1048,345" fill="#F39C12" filter="url(#sh)"/>
+  <text x="1138" y="340" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Patient</text>
+  <text x="1138" y="356" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Decision</text>
+
+  <!-- Proceeds -->
+  <line x1="1138" y1="370" x2="1138" y2="386" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="1160" y="382" fill="#27AE60" font-size="9" font-weight="bold">Proceeds</text>
+
+  <rect x="968" y="386" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="400" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Test Ordered</text>
+  <text x="1138" y="416" text-anchor="middle" fill="white" font-size="9">Lab requisition created · Kit shipped</text>
+
+  <line x1="1138" y1="424" x2="1138" y2="440" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="968" y="440" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="454" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Results Pending</text>
+  <text x="1138" y="470" text-anchor="middle" fill="white" font-size="9">SLA paused · Waiting on lab results</text>
+
+  <line x1="1138" y1="478" x2="1138" y2="494" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <rect x="968" y="494" width="340" height="38" rx="7" fill="#6C3483" filter="url(#sh)"/>
+  <text x="1138" y="508" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Post-Screening Scheduled</text>
+  <text x="1138" y="524" text-anchor="middle" fill="white" font-size="9">Results received · Return consult scheduled</text>
+
+  <line x1="1138" y1="532" x2="1138" y2="548" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+
+  <rect x="968" y="548" width="340" height="38" rx="7" fill="#27AE60" filter="url(#sh)"/>
+  <text x="1138" y="562" text-anchor="middle" fill="white" font-size="10" font-weight="bold">Stage: Closed</text>
+  <text x="1138" y="578" text-anchor="middle" fill="white" font-size="9">Case closed · Summary documented</text>
+
+  <!-- Declines path from Patient Decision -->
+  <line x1="1048" y1="345" x2="978" y2="345" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+  <rect x="908" y="330" width="70" height="30" rx="5" fill="#E74C3C" filter="url(#sh)"/>
+  <text x="943" y="342" text-anchor="middle" fill="white" font-size="9">Declines</text>
+  <text x="943" y="354" text-anchor="middle" fill="white" font-size="8">→ Case Closed</text>
+
+  <!-- SLA ANNOTATIONS -->
+  <rect x="8" y="1170" width="1360" height="80" rx="6" fill="#FFF9E6" stroke="#F39C12" stroke-width="1"/>
+  <text x="688" y="1192" text-anchor="middle" fill="#8B6914" font-size="12" font-weight="bold">SLA ENGINE RULES (applies to all paths)</text>
+  <text x="28" y="1212" fill="#555" font-size="10">• SLA clock starts when consult enters each stage   • Waiting on Patient flag: SLA PAUSES — patient inactivity timer begins separately</text>
+  <text x="28" y="1228" fill="#555" font-size="10">• SLA continues through provider reassignment (does NOT reset)   • Stage name = patient-visible status label in portal</text>
+  <text x="28" y="1244" fill="#555" font-size="10">• Queue assignment is automatic based on stage config   • Each stage configured with: SLA time limit + warning threshold + assigned queue + SLA pause flag</text>
+
+  <!-- LEGEND -->
+  <rect x="8" y="1265" width="1360" height="120" rx="6" fill="white" stroke="#ddd" stroke-width="1"/>
+  <text x="28" y="1287" fill="#1F3864" font-size="12" font-weight="bold">LEGEND</text>
+  <rect x="28" y="1300" width="110" height="24" rx="5" fill="#2563A0"/>
+  <text x="83" y="1317" text-anchor="middle" fill="white" font-size="10">Async Stage</text>
+  <rect x="158" y="1300" width="110" height="24" rx="5" fill="#1A8060"/>
+  <text x="213" y="1317" text-anchor="middle" fill="white" font-size="10">Video Stage</text>
+  <rect x="288" y="1300" width="110" height="24" rx="5" fill="#6C3483"/>
+  <text x="343" y="1317" text-anchor="middle" fill="white" font-size="10">Genetics Stage</text>
+  <rect x="418" y="1300" width="110" height="24" rx="5" fill="#27AE60"/>
+  <text x="473" y="1317" text-anchor="middle" fill="white" font-size="10">Closed / Complete</text>
+  <polygon points="613,1300 653,1312 613,1324 573,1312" fill="#F39C12"/>
+  <text x="613" y="1344" text-anchor="middle" fill="#333" font-size="10">Decision Point</text>
+  <rect x="678" y="1300" width="110" height="24" rx="5" fill="#E74C3C"/>
+  <text x="733" y="1317" text-anchor="middle" fill="white" font-size="10">Error / Declined</text>
+  <text x="28" y="1360" fill="#555" font-size="9">• All stages are fully configurable per care product   • Stage sequence, queue assignments, and SLA values set in Step 6 &amp; 7 of the 17-step wizard</text>
+  <text x="28" y="1376" fill="#555" font-size="9">• Genetics path shown is illustrative — any number of stages can be configured for any care product type</text>
+</svg>
+</div>
+</body>
+</html>

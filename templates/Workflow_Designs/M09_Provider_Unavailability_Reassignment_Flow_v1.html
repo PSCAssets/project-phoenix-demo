@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scheduling — Provider Unavailability and Auto-Reassignment</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #fff; color: #1F3864; min-width: 800px; }
+  h1 { background: #1F3864; color: #fff; padding: 18px 32px; font-size: 20px; letter-spacing: 0.5px; }
+  .subtitle { background: #2c4a7c; color: #cce0ff; padding: 6px 32px; font-size: 13px; }
+  .diagram-wrap { overflow-x: auto; }
+  svg text { font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Scheduling — Provider Unavailability and Auto-Reassignment</h1>
+<div class="subtitle">M09 Scheduling &nbsp;|&nbsp; Telehealth</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 1400 1700" xmlns="http://www.w3.org/2000/svg" width="1400" height="1700">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27AE60"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#E74C3C"/>
+    </marker>
+    <filter id="shadow">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00000022"/>
+    </filter>
+  </defs>
+
+  <!-- Swimlane backgrounds -->
+  <rect x="0"    y="60" width="350" height="1600" fill="#f0f5ff" stroke="#c5d4f0" stroke-width="1"/>
+  <rect x="350"  y="60" width="350" height="1600" fill="#eaf7f0" stroke="#c5d4f0" stroke-width="1"/>
+  <rect x="700"  y="60" width="350" height="1600" fill="#fef9ef" stroke="#c5d4f0" stroke-width="1"/>
+  <rect x="1050" y="60" width="350" height="1600" fill="#fdf0f5" stroke="#c5d4f0" stroke-width="1"/>
+
+  <!-- Swimlane headers -->
+  <rect x="0"    y="0" width="350" height="60" fill="#1F3864"/>
+  <text x="175"  y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Provider</text>
+
+  <rect x="350"  y="0" width="350" height="60" fill="#1F3864"/>
+  <text x="525"  y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Platform System</text>
+
+  <rect x="700"  y="0" width="350" height="60" fill="#1F3864"/>
+  <text x="875"  y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Auto-Reassignment Engine</text>
+
+  <rect x="1050" y="0" width="350" height="60" fill="#1F3864"/>
+  <text x="1225" y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold">Care Team</text>
+
+  <!-- Provider sets unavailability -->
+  <rect x="30" y="90" width="290" height="44" rx="22" fill="#1F3864" filter="url(#shadow)"/>
+  <text x="175" y="112" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Provider Sets "Not Available"</text>
+  <text x="175" y="127" text-anchor="middle" fill="white" font-size="11">Block in scheduling calendar</text>
+
+  <line x1="310" y1="112" x2="370" y2="112" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision: Any overlapping appointments? -->
+  <polygon points="525,90 615,135 525,180 435,135" fill="#F39C12" filter="url(#shadow)"/>
+  <text x="525" y="127" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Confirmed Appts</text>
+  <text x="525" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Overlap?</text>
+
+  <!-- NO: done -->
+  <line x1="615" y1="135" x2="700" y2="135" stroke="#27AE60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="655" y="125" text-anchor="middle" fill="#27AE60" font-size="11">NO</text>
+
+  <rect x="700" y="113" width="290" height="44" rx="8" fill="#27AE60" filter="url(#shadow)"/>
+  <text x="845" y="131" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Unavailability Set</text>
+  <text x="845" y="147" text-anchor="middle" fill="white" font-size="11">No conflicts. Done.</text>
+
+  <!-- YES: process each appointment -->
+  <line x1="525" y1="180" x2="525" y2="220" stroke="#E74C3C" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="537" y="204" fill="#E74C3C" font-size="12">YES</text>
+
+  <rect x="370" y="220" width="290" height="50" rx="8" fill="#2E86AB" filter="url(#shadow)"/>
+  <text x="525" y="238" text-anchor="middle" fill="white" font-size="12">For Each Overlapping Appointment:</text>
+  <text x="525" y="253" text-anchor="middle" fill="white" font-size="11">Process reassignment check</text>
+  <text x="525" y="265" text-anchor="middle" fill="white" font-size="10">Loop for all affected appointments</text>
+
+  <line x1="660" y1="245" x2="720" y2="245" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision: max-providers-per-state = 1? -->
+  <polygon points="875,220 970,265 875,310 780,265" fill="#F39C12" filter="url(#shadow)"/>
+  <text x="875" y="256" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Max Providers</text>
+  <text x="875" y="272" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Per State = 1?</text>
+
+  <!-- YES: cannot auto-reassign -->
+  <line x1="970" y1="265" x2="1060" y2="265" stroke="#E74C3C" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="1013" y="255" text-anchor="middle" fill="#E74C3C" font-size="11">YES</text>
+
+  <rect x="1070" y="240" width="280" height="60" rx="8" fill="#E74C3C" filter="url(#shadow)"/>
+  <text x="1210" y="259" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Cannot Auto-Reassign</text>
+  <text x="1210" y="275" text-anchor="middle" fill="white" font-size="11">Single point of failure</text>
+  <text x="1210" y="289" text-anchor="middle" fill="white" font-size="10">Manual resolution required</text>
+
+  <!-- NO: search for provider -->
+  <line x1="875" y1="310" x2="875" y2="360" stroke="#27AE60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="887" y="340" fill="#27AE60" font-size="12">NO</text>
+
+  <!-- Search for matching provider -->
+  <rect x="720" y="360" width="290" height="80" rx="8" fill="#2E86AB" filter="url(#shadow)"/>
+  <text x="865" y="380" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Search for Next Available Provider</text>
+  <text x="865" y="396" text-anchor="middle" fill="white" font-size="11">Matching criteria:</text>
+  <text x="865" y="411" text-anchor="middle" fill="white" font-size="10">• Same state as patient</text>
+  <text x="865" y="424" text-anchor="middle" fill="white" font-size="10">• Same care product &amp; consult type</text>
+
+  <line x1="865" y1="440" x2="865" y2="480" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision: Matching provider found? -->
+  <polygon points="865,480 960,525 865,570 770,525" fill="#F39C12" filter="url(#shadow)"/>
+  <text x="865" y="517" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Matching Provider</text>
+  <text x="865" y="533" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Found?</text>
+
+  <!-- YES: auto-reassign -->
+  <line x1="865" y1="570" x2="865" y2="620" stroke="#27AE60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="877" y="599" fill="#27AE60" font-size="12">YES</text>
+
+  <!-- Auto-reassign -->
+  <rect x="720" y="620" width="290" height="44" rx="8" fill="#27AE60" filter="url(#shadow)"/>
+  <text x="865" y="638" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Auto-Reassign Appointment</text>
+  <text x="865" y="654" text-anchor="middle" fill="white" font-size="11">New provider assigned</text>
+
+  <line x1="865" y1="664" x2="865" y2="710" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Send patient notification -->
+  <rect x="720" y="710" width="290" height="50" rx="8" fill="#2E86AB" filter="url(#shadow)"/>
+  <text x="865" y="728" text-anchor="middle" fill="white" font-size="12">Send Patient Notification</text>
+  <text x="865" y="744" text-anchor="middle" fill="white" font-size="11">"Your provider has been updated"</text>
+  <text x="865" y="757" text-anchor="middle" fill="white" font-size="10">Automated transactional message</text>
+
+  <line x1="865" y1="760" x2="865" y2="810" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Decision: Within 24 hours? -->
+  <polygon points="865,810 955,850 865,890 775,850" fill="#F39C12" filter="url(#shadow)"/>
+  <text x="865" y="843" text-anchor="middle" fill="white" font-size="11" font-weight="bold">Within 24 Hours</text>
+  <text x="865" y="859" text-anchor="middle" fill="white" font-size="11" font-weight="bold">of Appointment?</text>
+
+  <!-- YES: short notice alert -->
+  <line x1="955" y1="850" x2="1060" y2="850" stroke="#E74C3C" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="1005" y="840" text-anchor="middle" fill="#E74C3C" font-size="11">YES</text>
+
+  <rect x="1070" y="820" width="280" height="60" rx="8" fill="#E74C3C" filter="url(#shadow)"/>
+  <text x="1210" y="840" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Short-Notice Alert to New Provider</text>
+  <text x="1210" y="856" text-anchor="middle" fill="white" font-size="11">"You have been assigned a consult</text>
+  <text x="1210" y="870" text-anchor="middle" fill="white" font-size="11">on short notice"</text>
+
+  <!-- NO: standard notification -->
+  <line x1="775" y1="850" x2="700" y2="850" stroke="#27AE60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <text x="737" y="840" text-anchor="middle" fill="#27AE60" font-size="11">NO</text>
+
+  <rect x="370" y="820" width="290" height="60" rx="8" fill="#27AE60" filter="url(#shadow)"/>
+  <text x="515" y="840" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Standard New Appointment</text>
+  <text x="515" y="856" text-anchor="middle" fill="white" font-size="11">Notification to New Provider</text>
+  <text x="515" y="870" text-anchor="middle" fill="white" font-size="10">Standard scheduling notification</text>
+
+  <!-- NO: no matching provider found -->
+  <line x1="960" y1="525" x2="1060" y2="525" stroke="#E74C3C" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="1008" y="515" text-anchor="middle" fill="#E74C3C" font-size="11">NO</text>
+
+  <rect x="1070" y="490" width="280" height="70" rx="8" fill="#E74C3C" filter="url(#shadow)"/>
+  <text x="1210" y="510" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Route to Care Team Queue</text>
+  <text x="1210" y="526" text-anchor="middle" fill="white" font-size="11">"No available provider for</text>
+  <text x="1210" y="541" text-anchor="middle" fill="white" font-size="11">reassignment"</text>
+  <text x="1210" y="556" text-anchor="middle" fill="white" font-size="10">No patient notification yet</text>
+
+  <!-- Care Team manual resolution -->
+  <line x1="1210" y1="300" x2="1210" y2="340" stroke="#555" stroke-width="1.5"/>
+  <line x1="1210" y1="560" x2="1210" y2="620" stroke="#555" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Care team section -->
+  <line x1="0" y1="1000" x2="1400" y2="1000" stroke="#ccc" stroke-width="1" stroke-dasharray="4,4"/>
+
+  <rect x="1070" y="340" width="280" height="50" rx="8" fill="#1F3864" filter="url(#shadow)"/>
+  <text x="1210" y="358" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Routes to Care Team Queue</text>
+  <text x="1210" y="374" text-anchor="middle" fill="white" font-size="11">Manual resolution required</text>
+  <text x="1210" y="388" text-anchor="middle" fill="white" font-size="10">(from max-providers = 1 path)</text>
+
+  <rect x="1070" y="620" width="280" height="70" rx="8" fill="#1F3864" filter="url(#shadow)"/>
+  <text x="1210" y="640" text-anchor="middle" fill="white" font-size="12" font-weight="bold">Care Team Receives Queue Item</text>
+  <text x="1210" y="656" text-anchor="middle" fill="white" font-size="11">Requires manual resolution</text>
+  <text x="1210" y="672" text-anchor="middle" fill="white" font-size="11">Resolves and updates appointment</text>
+  <text x="1210" y="686" text-anchor="middle" fill="white" font-size="10">Then notifies patient</text>
+
+  <!-- LEGEND -->
+  <rect x="30" y="1040" width="310" height="220" rx="8" fill="#f9f9f9" stroke="#ccc" stroke-width="1"/>
+  <text x="185" y="1064" text-anchor="middle" fill="#1F3864" font-size="13" font-weight="bold">LEGEND</text>
+  <rect x="48" y="1076" width="28" height="16" rx="4" fill="#2E86AB"/>
+  <text x="86" y="1089" fill="#333" font-size="12">System Action</text>
+  <rect x="48" y="1102" width="28" height="16" rx="4" fill="#1F3864"/>
+  <text x="86" y="1115" fill="#333" font-size="12">User/Provider Action</text>
+  <rect x="48" y="1128" width="28" height="16" rx="4" fill="#27AE60"/>
+  <text x="86" y="1141" fill="#333" font-size="12">Success / No Conflict</text>
+  <rect x="48" y="1154" width="28" height="16" rx="4" fill="#E74C3C"/>
+  <text x="86" y="1167" fill="#333" font-size="12">Conflict / Manual Required</text>
+  <polygon points="62,1184 82,1198 62,1212 42,1198" fill="#F39C12"/>
+  <text x="86" y="1203" fill="#333" font-size="12">Decision Point</text>
+  <line x1="48" y1="1230" x2="76" y2="1230" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="86" y="1235" fill="#333" font-size="12">Flow Direction</text>
+</svg>
+</div>
+</body>
+</html>

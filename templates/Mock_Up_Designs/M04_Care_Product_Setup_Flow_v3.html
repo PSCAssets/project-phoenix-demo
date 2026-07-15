@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Care Product Setup — 18-Step Wizard Flow v2</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #fff; color: #1F3864; min-width: 900px; }
+h1 { background: #1F3864; color: #fff; padding: 18px 32px; font-size: 20px; letter-spacing: 0.5px; }
+.subtitle { background: #2c4a7c; color: #cce0ff; padding: 6px 32px; font-size: 13px; }
+.diagram-wrap { overflow-x: auto; padding: 0 0 32px 0; }
+svg text { font-family: Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Care Product Setup — 18-Step Wizard Flow</h1>
+<div class="subtitle">M04 Admin Portal &nbsp;|&nbsp; Telehealth &nbsp;|&nbsp; v2 — Updated June 2026</div>
+<div class="diagram-wrap">
+<svg viewBox="0 0 1260 2280" xmlns="http://www.w3.org/2000/svg" width="1260" height="2280">
+<defs>
+  <marker id="arr" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#555"/></marker>
+  <marker id="arr-g" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#27AE60"/></marker>
+  <marker id="arr-r" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#E74C3C"/></marker>
+  <marker id="arr-o" markerWidth="9" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0,9 3,0 6" fill="#F39C12"/></marker>
+</defs>
+
+<!-- LANE BACKGROUNDS -->
+<rect x="0"   y="60" width="420" height="2190" fill="#EEF2FA" stroke="#C5D4F0" stroke-width="1"/>
+<rect x="420" y="60" width="420" height="2190" fill="#F0FAF8" stroke="#C5D4F0" stroke-width="1"/>
+<rect x="840" y="60" width="420" height="2190" fill="#FFFAF0" stroke="#C5D4F0" stroke-width="1"/>
+
+<!-- LANE HEADERS -->
+<rect x="0"   y="0" width="420" height="60" fill="#1F3864"/>
+<rect x="420" y="0" width="420" height="60" fill="#1F3864"/>
+<rect x="840" y="0" width="420" height="60" fill="#1F3864"/>
+<text x="210"  y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">ADMIN USER</text>
+<text x="630"  y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">WIZARD SYSTEM</text>
+<text x="1050" y="36" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">APPROVAL WORKFLOW</text>
+
+<!-- ============================================================ -->
+<!-- START -->
+<!-- ============================================================ -->
+<rect x="60" y="84" width="260" height="40" rx="20" fill="#1F3864"/>
+<text x="190" y="109" text-anchor="middle" fill="white" font-size="12" font-weight="bold" font-family="Arial">Clicks "New Care Product"</text>
+<line x1="190" y1="124" x2="190" y2="144" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Wizard initializes -->
+<rect x="440" y="84" width="260" height="40" rx="5" fill="#2E86AB"/>
+<text x="570" y="104" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Wizard initializes</text>
+<text x="570" y="118" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Draft care product created</text>
+<line x1="440" y1="104" x2="320" y2="104" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<line x1="190" y1="144" x2="190" y2="160" stroke="#555" stroke-width="1.5"/>
+<line x1="190" y1="160" x2="440" y2="160" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="440" y="144" width="260" height="34" rx="5" fill="#2E86AB"/>
+<text x="570" y="162" text-anchor="middle" fill="white" font-size="11" font-family="Arial">18-step navigator shown</text>
+<text x="570" y="176" text-anchor="middle" fill="white" font-size="11" font-family="Arial">Save &amp; Resume enabled</text>
+
+<!-- ============================================================ -->
+<!-- STEP ROWS — each step has: number tag, admin box, wizard validation box -->
+<!-- ============================================================ -->
+
+<!-- Helper: step row spacing starts at y=200, each step ~88px -->
+
+<!-- STEP 1 -->
+<line x1="190" y1="178" x2="190" y2="205" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="207" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="224" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">1</text>
+<rect x="62" y="207" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="227" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Basic Info</text>
+<text x="217" y="242" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Product name, display name, code, care type, specialty</text>
+<rect x="440" y="207" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="227" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Validates: unique product code,</text>
+<text x="570" y="242" text-anchor="middle" fill="white" font-size="10" font-family="Arial">care type sets visible steps</text>
+<line x1="372" y1="232" x2="440" y2="232" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 2 -->
+<line x1="190" y1="257" x2="190" y2="277" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="279" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="296" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">2</text>
+<rect x="62" y="279" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="299" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Provider Type</text>
+<text x="217" y="314" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Eligible credentials: Any / MD-DO / NP-PA / GC / Custom</text>
+<rect x="440" y="279" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="299" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Co-sign requirement stored.</text>
+<text x="570" y="314" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Filters provider assignment pool</text>
+<line x1="372" y1="304" x2="440" y2="304" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 3 -->
+<line x1="190" y1="329" x2="190" y2="349" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="351" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="368" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">3</text>
+<rect x="62" y="351" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="371" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">State Configuration</text>
+<text x="217" y="386" text-anchor="middle" fill="white" font-size="10" font-family="Arial">State matrix: consult types per state, GC licensure, max providers</text>
+<rect x="440" y="351" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="371" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Max providers per state = 1</text>
+<text x="570" y="386" text-anchor="middle" fill="white" font-size="10" font-family="Arial">triggers single-point-of-failure alert</text>
+<line x1="372" y1="376" x2="440" y2="376" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 4 -->
+<line x1="190" y1="401" x2="190" y2="421" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="423" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="440" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">4</text>
+<rect x="62" y="423" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="443" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Age and Guardian Rules</text>
+<text x="217" y="458" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Min/max age, guardian management toggle, access level</text>
+<rect x="440" y="423" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="443" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Guardian Management = Yes</text>
+<text x="570" y="458" text-anchor="middle" fill="white" font-size="10" font-family="Arial">enables minor enrollment flow</text>
+<line x1="372" y1="448" x2="440" y2="448" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 5 — conditional on care type -->
+<line x1="190" y1="473" x2="190" y2="493" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="495" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="512" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">5</text>
+<rect x="62" y="495" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="515" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Appointment Duration</text>
+<text x="217" y="530" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Slot size: 15 / 30 / 45 / 60 min (Scheduled care types only)</text>
+<rect x="440" y="495" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="515" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Step hidden for Async-only products.</text>
+<text x="570" y="530" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Drives scheduling slot calculation</text>
+<line x1="372" y1="520" x2="440" y2="520" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 6 -->
+<line x1="190" y1="545" x2="190" y2="565" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="567" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="584" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">6</text>
+<rect x="62" y="567" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="587" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Consult Payment Tiers</text>
+<text x="217" y="602" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Tier model (Visit Type or Complexity), patient charge, provider rate</text>
+<rect x="440" y="567" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="587" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Tier selection required/optional</text>
+<text x="570" y="602" text-anchor="middle" fill="white" font-size="10" font-family="Arial">at consult close. Feeds M11 Billing</text>
+<line x1="372" y1="592" x2="440" y2="592" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 7 -->
+<line x1="190" y1="617" x2="190" y2="637" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="639" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="656" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">7</text>
+<rect x="62" y="639" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="659" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Health Profile Requirements</text>
+<text x="217" y="674" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Required / optional / hidden per health profile section</text>
+<rect x="440" y="639" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="659" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Required sections validated</text>
+<text x="570" y="674" text-anchor="middle" fill="white" font-size="10" font-family="Arial">at consult submission</text>
+<line x1="372" y1="664" x2="440" y2="664" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 8 -->
+<line x1="190" y1="689" x2="190" y2="709" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="711" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="728" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">8</text>
+<rect x="62" y="711" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="731" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Intake Questionnaire</text>
+<text x="217" y="746" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Select from library / create new / No Intake Required (checkbox)</text>
+<rect x="440" y="711" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="731" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Per consult type (Initial / Follow-up</text>
+<text x="570" y="746" text-anchor="middle" fill="white" font-size="10" font-family="Arial">/ Refill) and per client supported</text>
+<line x1="372" y1="736" x2="440" y2="736" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 9 — NEW -->
+<line x1="190" y1="761" x2="190" y2="781" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="783" width="24" height="24" rx="12" fill="#E74C3C"/>
+<text x="42" y="800" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">9</text>
+<rect x="62" y="783" width="310" height="50" rx="5" fill="#1F3864" stroke="#E74C3C" stroke-width="2"/>
+<text x="217" y="803" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Workflow Configuration ★ NEW</text>
+<text x="217" y="818" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Select / clone template. Define stages, queues, entry/exit conditions</text>
+<rect x="440" y="783" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="803" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Stages = patient-visible statuses.</text>
+<text x="570" y="818" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Pre-populates Step 10 SLA values</text>
+<line x1="372" y1="808" x2="440" y2="808" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 10 -->
+<line x1="190" y1="833" x2="190" y2="853" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="855" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="872" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">10</text>
+<rect x="62" y="855" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="875" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">SLA Configuration</text>
+<text x="217" y="890" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Per stage: Time Limit, Warning At, Waiting on Patient, inactivity timers</text>
+<rect x="440" y="855" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="875" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Warning At &lt; Time Limit validated.</text>
+<text x="570" y="890" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Clock continues through reassignment</text>
+<line x1="372" y1="880" x2="440" y2="880" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 11 -->
+<line x1="190" y1="905" x2="190" y2="925" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="927" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="944" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">11</text>
+<rect x="62" y="927" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="947" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Lab Configuration</text>
+<text x="217" y="962" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Lab requirement, acceptable age, result release mode, lab partner</text>
+<rect x="440" y="927" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="947" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Release modes: Auto / Manual /</text>
+<text x="570" y="962" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Risk-Stratified. Feeds M10</text>
+<line x1="372" y1="952" x2="440" y2="952" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 12 -->
+<line x1="190" y1="977" x2="190" y2="997" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="999" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1016" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">12</text>
+<rect x="62" y="999" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1019" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Cancellation Policy</text>
+<text x="217" y="1034" text-anchor="middle" fill="white" font-size="10" font-family="Arial">No-charge window, late fee, no-show fee, wait time, client override</text>
+<rect x="440" y="999" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1019" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Scheduled care types only.</text>
+<text x="570" y="1034" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Feeds M11 Billing &amp; Payments</text>
+<line x1="372" y1="1024" x2="440" y2="1024" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 13 -->
+<line x1="190" y1="1049" x2="190" y2="1069" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1071" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1088" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">13</text>
+<rect x="62" y="1071" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1091" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Documents and Consent</text>
+<text x="217" y="1106" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Assign documents, presentation point, blocking vs non-blocking</text>
+<rect x="440" y="1071" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1091" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Blocking docs gate consult</text>
+<text x="570" y="1106" text-anchor="middle" fill="white" font-size="10" font-family="Arial">submission. Re-ack trigger configured</text>
+<line x1="372" y1="1096" x2="440" y2="1096" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 14 -->
+<line x1="190" y1="1121" x2="190" y2="1141" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1143" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1160" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">14</text>
+<rect x="62" y="1143" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1163" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Notification Templates</text>
+<text x="217" y="1178" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Per event: email/SMS, real-time/time-based, patient + provider</text>
+<rect x="440" y="1143" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1163" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Merge variables supported.</text>
+<text x="570" y="1178" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Editable post-publish. Fallback to global</text>
+<line x1="372" y1="1168" x2="440" y2="1168" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 15 -->
+<line x1="190" y1="1193" x2="190" y2="1213" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1215" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1232" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">15</text>
+<rect x="62" y="1215" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1235" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Patient Onboarding Configuration</text>
+<text x="217" y="1250" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Sequence of steps patient completes before first consult opens</text>
+<rect x="440" y="1215" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1235" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Mandatory steps block consult</text>
+<text x="570" y="1250" text-anchor="middle" fill="white" font-size="10" font-family="Arial">submission until complete</text>
+<line x1="372" y1="1240" x2="440" y2="1240" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 16 — NEW -->
+<line x1="190" y1="1265" x2="190" y2="1285" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1287" width="24" height="24" rx="12" fill="#E74C3C"/>
+<text x="42" y="1304" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">16</text>
+<rect x="62" y="1287" width="310" height="50" rx="5" fill="#1F3864" stroke="#E74C3C" stroke-width="2"/>
+<text x="217" y="1307" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Linked Consultations ★ NEW</text>
+<text x="217" y="1322" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Episode Reference ID toggle. Patient-facing care journey label</text>
+<rect x="440" y="1287" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1307" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Episode Reference ID auto-generated</text>
+<text x="570" y="1322" text-anchor="middle" fill="white" font-size="10" font-family="Arial">on first consult. Flows to billing</text>
+<line x1="372" y1="1312" x2="440" y2="1312" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 17 -->
+<line x1="190" y1="1337" x2="190" y2="1357" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1359" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1376" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">17</text>
+<rect x="62" y="1359" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1379" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Feature Flags</text>
+<text x="217" y="1394" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Enable/disable features at care product level (client can override)</text>
+<rect x="440" y="1359" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1379" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Three tiers: Global → Care Product</text>
+<text x="570" y="1394" text-anchor="middle" fill="white" font-size="10" font-family="Arial">→ Client. Client always takes precedence</text>
+<line x1="372" y1="1384" x2="440" y2="1384" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- STEP 18 -->
+<line x1="190" y1="1409" x2="190" y2="1429" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+<rect x="30" y="1431" width="24" height="24" rx="12" fill="#2E86AB"/>
+<text x="42" y="1448" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="Arial">18</text>
+<rect x="62" y="1431" width="310" height="50" rx="5" fill="#1F3864"/>
+<text x="217" y="1451" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Review and Submit</text>
+<text x="217" y="1466" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Full summary of all 17 steps with Edit links. Validation check runs</text>
+<rect x="440" y="1431" width="260" height="50" rx="5" fill="#27AE60"/>
+<text x="570" y="1451" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Cannot submit with incomplete steps.</text>
+<text x="570" y="1466" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Submit changes status to Pending Review</text>
+<line x1="372" y1="1456" x2="440" y2="1456" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- ============================================================ -->
+<!-- SAVE & RESUME (side annotation — within Wizard lane only) -->
+<!-- ============================================================ -->
+<rect x="720" y="207" width="110" height="200" rx="6" fill="#FFF8E1" stroke="#F39C12" stroke-width="1.5" stroke-dasharray="6,3"/>
+<text x="775" y="228" text-anchor="middle" fill="#B7791F" font-size="10" font-weight="bold" font-family="Arial">SAVE &amp; RESUME</text>
+<text x="775" y="244" text-anchor="middle" fill="#92400E" font-size="9" font-family="Arial">Auto-saved at each step.</text>
+<text x="775" y="258" text-anchor="middle" fill="#92400E" font-size="9" font-family="Arial">Admin can exit and</text>
+<text x="775" y="272" text-anchor="middle" fill="#92400E" font-size="9" font-family="Arial">return to exact step.</text>
+<text x="775" y="286" text-anchor="middle" fill="#92400E" font-size="9" font-family="Arial">Drafts not visible to</text>
+<text x="775" y="300" text-anchor="middle" fill="#92400E" font-size="9" font-family="Arial">patients or providers.</text>
+
+<!-- ============================================================ -->
+<!-- APPROVAL LIFECYCLE -->
+<!-- ============================================================ -->
+<line x1="190" y1="1481" x2="190" y2="1510" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Decision: passes validation? -->
+<polygon points="190,1512 260,1536 190,1560 120,1536" fill="#F39C12"/>
+<text x="190" y="1531" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">Passes</text>
+<text x="190" y="1545" text-anchor="middle" fill="white" font-size="10" font-family="Arial">validation?</text>
+
+<!-- No — route down then left, clear of diamond -->
+<line x1="120" y1="1536" x2="40" y2="1536" stroke="#E74C3C" stroke-width="1.5"/>
+<line x1="40"  y1="1536" x2="40" y2="1585" stroke="#E74C3C" stroke-width="1.5"/>
+<line x1="40"  y1="1585" x2="62" y2="1585" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+<text x="22" y="1560" fill="#E74C3C" font-size="10" font-family="Arial" transform="rotate(-90,22,1560)">No</text>
+<rect x="64" y="1568" width="210" height="40" rx="5" fill="#E74C3C"/>
+<text x="169" y="1585" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Incomplete step</text>
+<text x="169" y="1600" text-anchor="middle" fill="white" font-size="10" font-family="Arial">highlighted in navigator</text>
+
+<!-- Yes — right to approval lane -->
+<line x1="260" y1="1536" x2="862" y2="1536" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+<text x="555" y="1528" fill="#27AE60" font-size="10" font-family="Arial">Yes — Submit for Review</text>
+
+<!-- Status: Pending Review -->
+<rect x="864" y="1512" width="248" height="48" rx="5" fill="#FFF2CC" stroke="#F39C12" stroke-width="1.5"/>
+<text x="988" y="1531" text-anchor="middle" fill="#92400E" font-size="11" font-weight="bold" font-family="Arial">Status: PENDING REVIEW</text>
+<text x="988" y="1547" text-anchor="middle" fill="#92400E" font-size="10" font-family="Arial">Awaiting reviewer approval</text>
+<line x1="988" y1="1560" x2="988" y2="1580" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Reviewer decision -->
+<polygon points="988,1582 1058,1606 988,1630 918,1606" fill="#F39C12"/>
+<text x="988" y="1601" text-anchor="middle" fill="white" font-size="10" font-weight="bold" font-family="Arial">Reviewer</text>
+<text x="988" y="1615" text-anchor="middle" fill="white" font-size="10" text-anchor="middle" font-family="Arial">decision?</text>
+
+<!-- Approved -->
+<line x1="988" y1="1630" x2="988" y2="1650" stroke="#27AE60" stroke-width="1.5" marker-end="url(#arr-g)"/>
+<text x="998" y="1644" fill="#27AE60" font-size="10" font-family="Arial">Approved</text>
+<rect x="864" y="1652" width="248" height="40" rx="5" fill="#27AE60"/>
+<text x="988" y="1668" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Status: APPROVED</text>
+<text x="988" y="1682" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Ready to activate</text>
+<line x1="988" y1="1692" x2="988" y2="1712" stroke="#555" stroke-width="1.5" marker-end="url(#arr)"/>
+
+<!-- Active -->
+<rect x="864" y="1714" width="248" height="64" rx="5" fill="#1F3864"/>
+<text x="988" y="1733" text-anchor="middle" fill="white" font-size="11" font-weight="bold" font-family="Arial">Status: ACTIVE</text>
+<text x="988" y="1749" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Patient enrollment open</text>
+<text x="988" y="1763" text-anchor="middle" fill="#BDD7EE" font-size="9" font-family="Arial">Post-launch edits (notifications, SLA,</text>
+<text x="988" y="1776" text-anchor="middle" fill="#BDD7EE" font-size="9" font-family="Arial">feature flags) do not require re-approval</text>
+
+<!-- Returned — clean right-angle routing within Approval lane then across -->
+<line x1="918" y1="1606" x2="860" y2="1606" stroke="#E74C3C" stroke-width="1.5"/>
+<line x1="860" y1="1606" x2="860" y2="1740" stroke="#E74C3C" stroke-width="1.5"/>
+<line x1="860" y1="1740" x2="452" y2="1740" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+<text x="882" y="1598" fill="#E74C3C" font-size="10" font-weight="bold" font-family="Arial">Returned</text>
+
+<!-- Platform System: status reverts -->
+<rect x="454" y="1716" width="260" height="48" rx="5" fill="#E74C3C"/>
+<text x="584" y="1736" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Status reverts to Draft.</text>
+<text x="584" y="1751" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Admin notified with reviewer comments</text>
+
+<!-- Arrow left to Admin lane -->
+<line x1="454" y1="1740" x2="382" y2="1740" stroke="#E74C3C" stroke-width="1.5" marker-end="url(#arr-r)"/>
+
+<!-- Admin lane: return notification -->
+<rect x="30" y="1716" width="350" height="48" rx="5" fill="#E74C3C"/>
+<text x="205" y="1736" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Admin receives return notification.</text>
+<text x="205" y="1751" text-anchor="middle" fill="white" font-size="10" font-family="Arial">Returns to wizard to address comments.</text>
+
+<!-- KEY RULES BOX -->
+<rect x="20" y="1800" width="1220" height="120" rx="6" fill="#F5F6FA" stroke="#1F3864" stroke-width="1.5"/>
+<text x="630" y="1822" text-anchor="middle" fill="#1F3864" font-size="12" font-weight="bold" font-family="Arial">KEY RULES</text>
+<text x="630" y="1842" text-anchor="middle" fill="#333" font-size="10" font-family="Arial">★ Steps 9 (Workflow Configuration) and 16 (Linked Consultations) are new additions to the wizard — highlighted with red number badges above.</text>
+<text x="630" y="1860" text-anchor="middle" fill="#333" font-size="10" font-family="Arial">• Care product cannot be published without completing all required steps. Steps 5 and 12 only appear for Scheduled (Video/Phone) care types.</text>
+<text x="630" y="1878" text-anchor="middle" fill="#333" font-size="10" font-family="Arial">• Notification templates (Step 14), SLA rules (Step 10), and Feature Flags (Step 17) are fully editable post-launch without re-approval.</text>
+<text x="630" y="1896" text-anchor="middle" fill="#333" font-size="10" font-family="Arial">• Workflow configuration (Step 9) changes on an Active care product require creating a new care product version. In-flight consults continue on the current workflow.</text>
+<text x="630" y="1914" text-anchor="middle" fill="#333" font-size="10" font-family="Arial">• Platform Admin submits for review. System Admin can approve directly.</text>
+
+</svg>
+</div>
+</body>
+</html>

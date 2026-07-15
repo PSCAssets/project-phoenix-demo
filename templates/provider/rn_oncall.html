@@ -1,0 +1,433 @@
+{% extends "base.html" %}
+{% block title %}On-Call RN Schedule{% endblock %}
+{% block head %}
+<style>
+:root { --navy:#445D7A; --navy-light:#EEF2F7; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; --teal:#0F766E; --purple:#7C3AED; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--navy); display:flex; align-items:center; padding:0 24px; z-index:99; gap:14px; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#2E4563; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+
+/* Week nav */
+.week-nav { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+.week-label { font-size:15px; font-weight:700; color:#111827; }
+.week-btn { background:#fff; border:1px solid var(--border); border-radius:7px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; }
+.week-btn:hover { border-color:var(--navy); color:var(--navy); }
+.export-btn { margin-left:auto; background:var(--teal); color:#fff; border:none; border-radius:7px; padding:8px 16px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; }
+.export-btn:hover { background:#065F46; }
+
+/* Info banner */
+.info-banner { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.info-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.info-card-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#9CA3AF; margin-bottom:8px; }
+.shift-type { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.shift-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.shift-dot.weekday { background:var(--navy); }
+.shift-dot.weekend { background:var(--purple); }
+.shift-text { font-size:12px; color:#374151; }
+
+/* Schedule grid */
+.schedule-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:20px; }
+.schedule-header { display:grid; grid-template-columns:160px repeat(7,1fr); background:#FAF7F2; border-bottom:1px solid var(--border); }
+.schedule-header-cell { padding:10px 12px; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; text-align:center; }
+.schedule-header-cell.today-col { background:#EEF2F7; color:var(--navy); }
+.schedule-row { display:grid; grid-template-columns:160px repeat(7,1fr); border-bottom:1px solid #F3F4F6; }
+.schedule-row:last-child { border-bottom:none; }
+.rn-name-cell { padding:12px 14px; display:flex; flex-direction:column; justify-content:center; border-right:1px solid var(--border); }
+.rn-name { font-size:13px; font-weight:700; color:#111827; }
+.rn-rate { font-size:11px; color:#9CA3AF; }
+.rn-type-badge { display:inline-flex; padding:1px 6px; border-radius:6px; font-size:10px; font-weight:700; margin-top:2px; }
+.badge-lead { background:#EDE9FE; color:#5B21B6; }
+.badge-pool { background:#F3F4F6; color:#374151; }
+.shift-cell { padding:8px 6px; text-align:center; display:flex; align-items:center; justify-content:center; }
+.shift-cell.today-col { background:#F0F5FF; }
+.shift-block { border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; width:100%; text-align:center; cursor:pointer; transition:opacity 0.1s; }
+.shift-block:hover { opacity:0.8; }
+.shift-weekday-eve { background:#EEF2F7; color:var(--navy); }
+.shift-weekend-day { background:#EDE9FE; color:#5B21B6; }
+.shift-empty { color:#D1D5DB; font-size:18px; cursor:pointer; }
+.shift-empty:hover { color:var(--navy); }
+
+/* Pool roster */
+.pool-section { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+.pool-header { padding:14px 16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+.pool-title { font-size:14px; font-weight:700; color:#111827; }
+.pool-sub { font-size:12px; color:#6B7280; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 14px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); }
+tbody td { padding:10px 14px; border-bottom:1px solid #F3F4F6; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F5F7FA; }
+.avail-badge { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+.avail-yes { background:#D1FAE5; color:#065F46; }
+.avail-limited { background:#FEF3C7; color:#92400E; }
+.avail-no { background:#FEE2E2; color:#991B1B; }
+.shifts-count { font-weight:700; color:var(--navy); }
+
+/* Modal */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:#fff; border-radius:16px; width:460px; max-width:95vw; overflow:hidden; }
+.modal-header { padding:18px 20px; background:var(--navy); display:flex; align-items:center; justify-content:space-between; }
+.modal-title { font-size:15px; font-weight:700; color:#fff; }
+.modal-close { background:none; border:none; font-size:20px; cursor:pointer; color:rgba(255,255,255,0.7); }
+.modal-body { padding:20px; }
+.modal-field { margin-bottom:14px; }
+.modal-field label { display:block; font-size:11px; font-weight:700; color:#6B7280; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.05em; }
+.modal-field select, .modal-field input { width:100%; border:1px solid var(--border); border-radius:7px; padding:8px 10px; font-size:13px; font-family:inherit; outline:none; color:#374151; }
+.modal-field select:focus, .modal-field input:focus { border-color:var(--navy); }
+.modal-footer { display:flex; gap:10px; justify-content:flex-end; padding:14px 20px; border-top:1px solid var(--border); }
+.btn-cancel { background:#fff; border:1px solid var(--border); border-radius:8px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; color:#374151; }
+.btn-save { background:var(--navy); color:#fff; border:none; border-radius:8px; padding:9px 18px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit; }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">On-Call RN Schedule</div>
+    <div class="topbar-sub">After-hours coverage · 8 internal 1099 RN pool · $100/shift</div>
+  </div>
+  <div class="topbar-right" style="color:rgba(255,255,255,0.85);font-size:13px;display:flex;align-items:center;gap:10px;">
+
+    <span>Jennifer Martinez, Lead RN</span>
+    <div class="avatar">JP</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-title">My On-Call Schedule</div>
+  <div style="background:#EDE9FE;border:1px solid #C4B5FD;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#5B21B6;display:flex;align-items:center;gap:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+    <span>You are viewing <strong>your schedule only</strong>. RNs do not have visibility into other nurses' on-call shifts to prevent scheduling confusion. <span style="font-size:11px;color:#7C3AED;">(Req RN-SCHED-001)</span></span>
+  </div>
+  <div class="page-sub">After-hours coverage — your assigned shifts this week. Managed in the platform and exported to Notify MD weekly.</div>
+
+  <!-- Week nav -->
+  <div class="week-nav">
+    <button class="week-btn">&#8249; Prev Week</button>
+    <div class="week-label">June 23 – June 29, 2026</div>
+    <button class="week-btn">Next Week &#8250;</button>
+    <button class="export-btn" onclick="showToast('✓ Schedule exported to Notify MD — all 8 RNs notified of their shifts.')">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Export to Notify MD
+    </button>
+  </div>
+
+  <!-- Date range filter + CSV export -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:12px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:.05em;">Custom Range</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <input type="date" id="rangeStart" value="2026-06-23" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
+      <span style="font-size:12px;color:#9CA3AF;">to</span>
+      <input type="date" id="rangeEnd" value="2026-06-29" style="border:1px solid #E5E0D8;border-radius:7px;padding:6px 10px;font-size:13px;font-family:inherit;outline:none;color:#374151;">
+    </div>
+    <button onclick="applyDateRange()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;">Apply</button>
+    <button onclick="exportCSV()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;color:#374151;cursor:pointer;display:flex;align-items:center;gap:6px;">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4"/></svg>
+      Export CSV
+    </button>
+  </div>
+
+  <!-- Shift type info -->
+  <div class="info-banner">
+    <div class="info-card">
+      <div class="info-card-title">Shift Windows</div>
+      <div class="shift-type"><div class="shift-dot weekday"></div><div class="shift-text"><strong>Weeknight:</strong> Mon–Fri 8:00 PM – 8:00 AM ET (12h)</div></div>
+      <div class="shift-type"><div class="shift-dot weekend"></div><div class="shift-text"><strong>Weekend Day:</strong> Sat–Sun 8:00 AM – 8:00 PM ET (12h)</div></div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-title">Coverage This Week</div>
+      <div style="font-size:12px;color:#374151;line-height:1.7;">
+        5 of 7 nights covered &nbsp;·&nbsp; <span style="color:var(--red);font-weight:700;">Tue Jun 25 uncovered</span><br>
+        2 of 2 weekend days covered<br>
+        Notify MD export: <span style="color:var(--green);font-weight:700;">Sent Mon Jun 23</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule grid -->
+  <div class="schedule-wrap">
+    <div class="schedule-header">
+      <div class="schedule-header-cell" style="text-align:left;">RN</div>
+      <div class="schedule-header-cell">Mon 6/23</div>
+      <div class="schedule-header-cell" style="background:#FFF5F5;color:var(--red);">Tue 6/24<br><span style="font-size:9px;font-weight:400;">⚠ Uncovered</span></div>
+      <div class="schedule-header-cell">Wed 6/25</div>
+      <div class="schedule-header-cell today-col">Thu 6/26<br><span style="font-size:9px;color:var(--navy);">Today</span></div>
+      <div class="schedule-header-cell">Fri 6/27</div>
+      <div class="schedule-header-cell">Sat 6/28</div>
+      <div class="schedule-header-cell">Sun 6/29</div>
+    </div>
+    <!-- RN rows -->
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Desiree M.</div><div><span class="rn-type-badge badge-lead">Lead RN</span></div><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Desiree M.','Mon 6/23','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Desiree M.','Thu 6/26','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Marcus T.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Marcus T.','Wed 6/25','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Marcus T.','Fri 6/27','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Priya K.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekend-day" onclick="openShiftDetail('Priya K.','Sat 6/28','Weekend Day 8AM–8PM')">8AM–8PM</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekend-day" onclick="openShiftDetail('Priya K.','Sun 6/29','Weekend Day 8AM–8PM')">8AM–8PM</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Angela R.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Angela R.','Mon 6/23','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Kevin S.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Kevin S.','Wed 6/25','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Linda C.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Linda C.','Thu 6/26','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Tyrone B.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-block shift-weekday-eve" onclick="openShiftDetail('Tyrone B.','Fri 6/27','Weeknight 8PM–8AM')">8PM–8AM</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+    <div class="schedule-row">
+      <div class="rn-name-cell"><div class="rn-name">Naomi W.</div><span class="rn-type-badge badge-pool">Pool RN</span><div class="rn-rate">$100/shift</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Mon 6/23')">+</div></div>
+      <div class="shift-cell" style="background:#FFF5F5;"><div class="shift-empty" onclick="openAssign('Tue 6/24')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Wed 6/25')">+</div></div>
+      <div class="shift-cell today-col"><div class="shift-empty" onclick="openAssign('Thu 6/26')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Fri 6/27')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sat 6/28')">+</div></div>
+      <div class="shift-cell"><div class="shift-empty" onclick="openAssign('Sun 6/29')">+</div></div>
+    </div>
+  </div>
+
+  <!-- Pool Roster -->
+  <div class="pool-section">
+    <div class="pool-header">
+      <div>
+        <div class="pool-title">On-Call RN Pool Roster</div>
+        <div class="pool-sub">8 internal 1099 RNs · $100 flat rate per shift</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Availability</th>
+          <th>Shifts This Month</th>
+          <th>Last On-Call</th>
+          <th>Notify MD Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Desiree M.</strong></td>
+          <td>Lead RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">6</span></td>
+          <td>Jun 26</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Marcus T.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">4</span></td>
+          <td>Jun 25</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Priya K.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">5</span></td>
+          <td>Jun 28</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Angela R.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-limited">Limited</span></td>
+          <td><span class="shifts-count">3</span></td>
+          <td>Jun 23</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Kevin S.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">4</span></td>
+          <td>Jun 25</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Linda C.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">5</span></td>
+          <td>Jun 26</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Tyrone B.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-no">Unavailable Jul 1–7</span></td>
+          <td><span class="shifts-count">3</span></td>
+          <td>Jun 27</td>
+          <td><span style="color:var(--green);font-weight:600;">✓ Active</span></td>
+        </tr>
+        <tr>
+          <td>Naomi W.</td>
+          <td>Pool RN</td>
+          <td><span class="avail-badge avail-yes">Available</span></td>
+          <td><span class="shifts-count">2</span></td>
+          <td>Jun 20</td>
+          <td><span style="color:var(--amber);font-weight:600;">⚠ Pending</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Assign Modal -->
+<div class="modal-overlay" id="assignModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Assign On-Call Shift</div>
+      <button class="modal-close" onclick="document.getElementById('assignModal').classList.remove('open')">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>Date</label>
+        <input type="text" id="assignDate" readonly style="background:#F9FAFB;">
+      </div>
+      <div class="modal-field">
+        <label>Shift Type</label>
+        <select id="assignType">
+          <option>Weeknight — 8:00 PM – 8:00 AM ET</option>
+          <option>Weekend Day — 8:00 AM – 8:00 PM ET</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>RN</label>
+        <select id="assignRN">
+          <option>Desiree M. (Lead RN)</option>
+          <option>Marcus T.</option>
+          <option>Priya K.</option>
+          <option>Angela R.</option>
+          <option>Kevin S.</option>
+          <option>Linda C.</option>
+          <option>Tyrone B.</option>
+          <option>Naomi W.</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="document.getElementById('assignModal').classList.remove('open')">Cancel</button>
+      <button class="btn-save" onclick="saveAssign()">Save Shift</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openAssign(date) {
+  document.getElementById('assignDate').value = date;
+  document.getElementById('assignModal').classList.add('open');
+}
+
+function openShiftDetail(name, date, shift) {
+  showToast('Shift: ' + name + ' · ' + date + ' · ' + shift + ' · $100 flat rate');
+}
+
+function saveAssign() {
+  document.getElementById('assignModal').classList.remove('open');
+  showToast('✓ Shift assigned — RN notified. Notify MD will be updated on next export.');
+}
+
+function applyDateRange() {
+  var s = document.getElementById('rangeStart').value;
+  var e = document.getElementById('rangeEnd').value;
+  if (!s || !e) return;
+  showToast('✓ Schedule filtered: ' + s + ' to ' + e);
+}
+
+function exportCSV() {
+  var s = document.getElementById('rangeStart').value || '2026-06-23';
+  var e = document.getElementById('rangeEnd').value || '2026-06-29';
+  var rows = [
+    ['RN Name','Role','Shift Type','Date','Window','Rate'],
+    ['Desiree M.','Lead RN','Weeknight','Mon 6/23','8PM–8AM','$100'],
+    ['Desiree M.','Lead RN','Weeknight','Wed 6/25','8PM–8AM','$100'],
+    ['Marcus T.','Pool RN','Weeknight','Thu 6/26','8PM–8AM','$100'],
+    ['Sarah K.','Pool RN','Weekend Day','Sat 6/28','8AM–8PM','$100'],
+    ['James R.','Pool RN','Weekend Day','Sun 6/29','8AM–8PM','$100'],
+  ];
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  var blob = new Blob([csv], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'oncall_schedule_' + s + '_' + e + '.csv';
+  a.click();
+}
+
+function showToast(msg) {
+  var banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:80px;right:24px;background:#065F46;color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);max-width:420px;';
+  banner.textContent = msg;
+  document.body.appendChild(banner);
+  setTimeout(function(){ banner.remove(); }, 4000);
+}
+
+
+</script>
+{% endblock %}

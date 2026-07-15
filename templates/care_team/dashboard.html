@@ -1,0 +1,374 @@
+{% extends "base.html" %}
+{% block title %}Care Team Dashboard{% endblock %}
+
+{% block head %}
+<style>
+  :root {
+    --ct-green: #059669;
+    --ct-green-light: #D1FAE5;
+    --navy: #6B21A8;
+    --blue: #6B21A8;
+    --blue-light: #F2EDE4;
+    --amber: #D97706;
+    --amber-light: #FEF3C7;
+    --red: #DC2626;
+    --red-light: #FEF2F2;
+    --bg: #FAF7F2;
+    --border: #E5E0D8;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: #111827; display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 56px; background: #F2EDE4; position: fixed; top: 0; left: 0; bottom: 0;
+    display: flex; flex-direction: column; align-items: center; padding: 16px 0 12px; z-index: 100;
+    border-right: 1px solid #E5E0D8;
+  }
+  .sidebar-logo {
+    width: 36px; height: 36px; background: #6B21A8; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 13px; margin-bottom: 24px;
+  }
+  .sidebar-nav { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .nav-item { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6B7280; transition: background 0.15s, color 0.15s; text-decoration: none; position: relative; }
+  .nav-item:hover { background: rgba(107,33,168,0.08); color: #6B21A8; }
+  .nav-item.active { background: rgba(107,33,168,0.12); color: #6B21A8; }
+  .nav-item .tooltip { display: none; position: absolute; left: 52px; background: #3B1E5A; color: #fff; font-size: 11px; white-space: nowrap; padding: 4px 8px; border-radius: 4px; pointer-events: none; }
+  .nav-item:hover .tooltip { display: block; }
+
+  .topbar {
+    position: fixed; top: 0; left: 56px; right: 0; height: 56px;
+    background: var(--navy); display: flex; align-items: center;
+    padding: 0 24px; z-index: 90;
+  }
+  .topbar-title { color: #fff; font-size: 16px; font-weight: 600; }
+  .topbar-sub { color: rgba(255,255,255,0.5); font-size: 12px; margin-left: 12px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .topbar-user { color: rgba(255,255,255,0.8); font-size: 13px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--ct-green);
+    color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .main { margin-left: 56px; margin-top: 56px; padding: 24px; flex: 1; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--white); border-radius: 12px; border: 1px solid var(--border);
+    padding: 20px; position: relative; overflow: hidden;
+  }
+  .stat-card .accent {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    border-radius: 12px 0 0 12px;
+  }
+  .stat-label { font-size: 12px; color: #6B7280; font-weight: 500; margin-bottom: 8px; padding-left: 12px; }
+  .stat-value { font-size: 32px; font-weight: 700; padding-left: 12px; line-height: 1; }
+  .stat-sub { font-size: 11px; color: #9CA3AF; margin-top: 4px; padding-left: 12px; }
+
+  /* Quick Actions */
+  .qa-section { margin-bottom: 20px; }
+  .qa-label { font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .qa-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .qa-card { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; text-decoration: none; display: flex; flex-direction: column; gap: 6px; transition: box-shadow 0.15s, border-color 0.15s; }
+  .qa-card:hover { border-color: #6B21A8; box-shadow: 0 2px 8px rgba(107,33,168,0.1); }
+  .qa-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+  .qa-icon.purple { background: #EDE9FE; }
+  .qa-icon.green { background: #D1FAE5; }
+  .qa-icon.blue { background: #DBEAFE; }
+  .qa-card-title { font-size: 13px; font-weight: 700; color: #111827; }
+  .qa-card-sub { font-size: 11px; color: #6B7280; line-height: 1.4; }
+  .qa-link { font-size: 12px; font-weight: 600; color: #6B21A8; margin-top: 4px; }
+
+  .widget { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .widget-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .widget-title { font-size: 14px; font-weight: 600; color: #111827; }
+  .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .chip-blue { background: var(--blue-light); color: var(--blue); }
+  .chip-green { background: var(--ct-green-light); color: var(--ct-green); }
+  .widget-full { grid-column: 1 / -1; }
+  .widget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+  /* Table styles */
+  .queue-table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 9px 12px; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; text-align: left; background: #FAF7F2; border-bottom: 1px solid var(--border); white-space: nowrap; user-select: none; }
+  thead th:hover { background: #F2EDE4; }
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+  thead th.sorted .sort-arrow { opacity: 1; }
+  tbody tr { border-bottom: 1px solid #F5F0EA; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #FAF7F2; }
+  tbody td { padding: 10px 12px; vertical-align: middle; }
+  .pri-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .pri-critical { background: #DC2626; }
+  .pri-high { background: #D97706; }
+  .pri-normal { background: var(--ct-green); }
+  .urgency-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; }
+  .urg-critical { background: var(--red-light); color: var(--red); }
+  .urg-high { background: var(--amber-light); color: var(--amber); }
+  .urg-normal { background: var(--ct-green-light); color: var(--ct-green); }
+  .urg-scheduled { background: var(--blue-light); color: var(--blue); }
+  .action-btn { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid #6B21A8; background: transparent; color: #6B21A8; white-space: nowrap; }
+  .action-btn:hover { background: #6B21A8; color: #fff; }
+  .action-btn.green-btn { border-color: var(--ct-green); color: var(--ct-green); }
+  .action-btn.green-btn:hover { background: var(--ct-green); color: #fff; }
+  .cat-tag { font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .cat-edu { background: var(--blue-light); color: var(--blue); }
+  .cat-ae { background: var(--red-light); color: var(--red); }
+  .cat-async { background: var(--ct-green-light); color: var(--ct-green); }
+  .cat-followup { background: var(--amber-light); color: #92400E; }
+  .cat-coord { background: #F3E8FF; color: #6D28D9; }
+  .patient-name { font-weight: 500; }
+  .consult-id { font-size: 11px; color: #6B7280; }
+  .sort-hint { font-size: 11px; color: #6B7280; margin-left: auto; font-weight: 400; }
+
+  /* Messages list */
+  .msg-list { padding: 0; }
+  .msg-item { padding: 13px 18px; border-bottom: 1px solid #F5F0EA; display: flex; align-items: flex-start; gap: 12px; position: relative; }
+  .msg-item:last-child { border-bottom: none; }
+  .msg-item.unread { background: #F8F4F0; }
+  .unread-pip { position: absolute; top: 14px; right: 16px; width: 8px; height: 8px; border-radius: 50%; background: #6B21A8; }
+  .msg-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; color: #fff; }
+  .msg-avatar.md-avatar { background: var(--ct-green); }
+  .msg-avatar.rn-avatar { background: #059669; }
+  .msg-avatar.sup-avatar { background: #6B21A8; }
+  .msg-body { flex: 1; min-width: 0; }
+  .msg-sender-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+  .msg-sender { font-weight: 600; font-size: 13px; }
+  .role-chip { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 20px; }
+  .role-md { background: #D1FAE5; color: #065F46; }
+  .role-rn { background: #D1FAE5; color: #065F46; }
+  .role-sup { background: #EDE9F7; color: #6B21A8; }
+  .msg-preview { font-size: 12px; color: #6B7280; line-height: 1.5; }
+  .msg-preview .cid { color: #6B21A8; font-weight: 500; }
+  .msg-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+  .msg-time { font-size: 11px; color: #6B7280; }
+  .reply-btn { padding: 3px 10px; border: 1.5px solid #6B21A8; border-radius: 5px; font-size: 11px; font-weight: 500; cursor: pointer; background: transparent; color: #6B21A8; white-space: nowrap; }
+  .reply-btn:hover { background: #6B21A8; color: #fff; }
+
+  /* demo-nav-offset */
+  .sidebar { top: 60px !important; height: calc(100vh - 60px) !important; }
+  .topbar  { top: 60px !important; }
+  .main    { margin-top: 56px !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<header class="topbar" style="left:56px;">
+  <span class="topbar-title">My Dashboard</span>
+  <span class="topbar-sub">Care Team · Clinical Operations</span>
+  <div class="topbar-right">
+    <a href="/provider/new-patient?flow=new" style="background:#fff;color:#6B21A8;border:1.5px solid rgba(255,255,255,0.5);border-radius:7px;padding:6px 14px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;">+ New Patient</a>
+    {% set _dn = session.get('display_name', 'Alex Kim, Care Team Manager') %}
+    {% set _parts = _dn.split(', ', 1) %}
+    {% set _uname = _parts[0] %}
+    {% set _initials = (_uname.split()[0][0] + _uname.split()[-1][0])|upper if _uname.split()|length > 1 else _uname[:2]|upper %}
+    <span class="topbar-user">{{ _uname }}</span>
+    <div class="avatar">{{ _initials }}</div>
+  </div>
+</header>
+
+<main class="main" style="margin-left:56px;">
+
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
+  <div class="stat-grid">
+    <div class="stat-card" style="border:1.5px solid #DC2626;cursor:pointer;" onclick="openUrgentPanel()">
+      <div class="accent" style="background:#DC2626"></div>
+      <div class="stat-label" style="color:#DC2626;">Urgent Messages</div>
+      <div class="stat-value" style="color:#DC2626;">2</div>
+      <div class="stat-sub" style="color:#DC2626;">Require immediate action</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-queue-heading').scrollIntoView({behavior:'smooth'})">
+      <div class="accent" style="background:var(--ct-green)"></div>
+      <div class="stat-label">Active Cases</div>
+      <div class="stat-value" style="color:var(--ct-green)">18</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-msg-heading').scrollIntoView({behavior:'smooth'})">
+      <div class="accent" style="background:var(--blue)"></div>
+      <div class="stat-label">Messages (unread)</div>
+      <div class="stat-value" style="color:var(--blue)">4</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('ct-queue-heading').scrollIntoView({behavior:'smooth'})">
+      <div class="accent" style="background:var(--amber)"></div>
+      <div class="stat-label">Pending Follow-ups</div>
+      <div class="stat-value" style="color:var(--amber)">7</div>
+      <div class="stat-sub" style="color:var(--amber)">3 overdue</div>
+    </div>
+    <div class="stat-card">
+      <div class="accent" style="background:var(--ct-green)"></div>
+      <div class="stat-label">Avg Response</div>
+      <div class="stat-value" style="color:var(--ct-green)">26m</div>
+    </div>
+  </div>
+
+  <div class="widget-grid">
+
+    <section class="widget widget-full" aria-labelledby="ct-queue-heading">
+      <div class="widget-header">
+        <h2 class="widget-title" id="ct-queue-heading">My Assigned Tasks</h2>
+        <span class="chip chip-green">5 items</span>
+        <span class="sort-hint">Click column headers to sort</span>
+        <a href="/care-team/queue" style="margin-left:auto;font-size:12px;font-weight:600;color:#6B21A8;text-decoration:none;">View Unassigned Queue →</a>
+      </div>
+      <div class="queue-table-wrap">
+        <table id="ctQueueTable">
+          <thead>
+            <tr>
+              <th onclick="sortTable('ctQueueTable',0)">Pri <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',1)">Patient <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',2)">Consult ID <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',3)">Category <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',4)">Type <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',5)">Care Product <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',6)">Urgency <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',7)">Assigned <span class="sort-arrow">↕</span></th>
+              <th onclick="sortTable('ctQueueTable',8)">Wait <span class="sort-arrow">↕</span></th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="pri-dot pri-normal"></span></td><td><span class="patient-name">M.R.</span></td><td><span class="consult-id">CST-2026-10841</span></td><td><span class="cat-tag cat-async">Async Consult</span></td><td>Async</td><td>Weight Management</td><td><span class="urgency-tag urg-normal">NORMAL</span></td><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span></td><td>14m</td><td><button class="action-btn" onclick="ctCloseTask(this)">Close Task</button> <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart('CT003')">View</button></td></tr>
+            <tr><td><span class="pri-dot pri-high"></span></td><td><span class="patient-name">T.W.</span></td><td><span class="consult-id">CST-2026-10835</span></td><td><span class="cat-tag cat-edu">Education Q</span></td><td>Patient Q&amp;A</td><td>Thyroid</td><td><span class="urgency-tag urg-high">HIGH</span></td><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span></td><td>31m</td><td><button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart('CT001')">View Chart</button></td></tr>
+            <tr><td><span class="pri-dot pri-normal"></span></td><td><span class="patient-name">A.L.</span></td><td><span class="consult-id">CST-2026-10851</span></td><td><span class="cat-tag cat-async">Async Consult</span></td><td>Async</td><td>Lipid / Cardio</td><td><span class="urgency-tag urg-normal">NORMAL</span></td><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span></td><td>8m</td><td><button class="action-btn" onclick="ctCloseTask(this)">Close Task</button> <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart('CT002')">View</button></td></tr>
+            <tr><td><span class="pri-dot pri-normal"></span></td><td><span class="patient-name">C.S.</span></td><td><span class="consult-id">CST-2026-10844</span></td><td><span class="cat-tag cat-edu">Education Q</span></td><td>Patient Q&amp;A</td><td>Women's Health</td><td><span class="urgency-tag urg-normal">NORMAL</span></td><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span></td><td>19m</td><td><button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart('CT005')">View Chart</button></td></tr>
+            <tr><td><span class="pri-dot pri-normal"></span></td><td><span class="patient-name">R.M.</span></td><td><span class="consult-id">CST-2026-10847</span></td><td><span class="cat-tag cat-async">Async Consult</span></td><td>Async</td><td>Weight Management</td><td><span class="urgency-tag urg-normal">NORMAL</span></td><td><span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span></td><td>8m</td><td><button class="action-btn" onclick="ctCloseTask(this)">Close Task</button> <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart('CT004')">View</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="widget widget-full" aria-labelledby="ct-msg-heading">
+      <div class="widget-header">
+        <h2 class="widget-title" id="ct-msg-heading">Internal Messages · 3 unread</h2>
+        <span class="chip chip-blue">3 unread</span>
+        <span class="sort-hint" style="margin-left:auto;font-size:12px;color:#6B7280;">All staff → Alex Kim</span>
+      </div>
+      <div class="msg-list">
+        <div class="msg-item unread">
+          <div class="unread-pip"></div>
+          <div class="msg-avatar md-avatar">SL</div>
+          <div class="msg-body">
+            <div class="msg-sender-row"><span class="msg-sender">Dr. Lee</span><span class="role-chip role-md">MD</span></div>
+            <div class="msg-preview">M.R. care plan updated — please review the new GLP-1 dosing notes and confirm patient follow-up schedule. <span class="cid">CST-2026-10841</span></div>
+            <div class="msg-meta"><span class="msg-time">12m ago</span><button class="reply-btn">Reply</button></div>
+          </div>
+        </div>
+        <div class="msg-item unread">
+          <div class="unread-pip"></div>
+          <div class="msg-avatar rn-avatar">JM</div>
+          <div class="msg-body">
+            <div class="msg-sender-row"><span class="msg-sender">Jennifer M.</span><span class="role-chip role-rn">RN</span></div>
+            <div class="msg-preview">T.W. labs need follow-up — patient hasn't responded to the 48h check-in message. Can you reach out? <span class="cid">CST-2026-10835</span></div>
+            <div class="msg-meta"><span class="msg-time">34m ago</span><button class="reply-btn">Reply</button></div>
+          </div>
+        </div>
+        <div class="msg-item unread">
+          <div class="unread-pip"></div>
+          <div class="msg-avatar md-avatar">DP</div>
+          <div class="msg-body">
+            <div class="msg-sender-row"><span class="msg-sender">Dr. Patel</span><span class="role-chip role-md">MD</span></div>
+            <div class="msg-preview">J.P. missed his check-in call — please coordinate a callback and update the care plan. <span class="cid">CST-2026-10848</span></div>
+            <div class="msg-meta"><span class="msg-time">1h ago</span><button class="reply-btn">Reply</button></div>
+          </div>
+        </div>
+        <div class="msg-item">
+          <div class="msg-avatar sup-avatar">SV</div>
+          <div class="msg-body">
+            <div class="msg-sender-row"><span class="msg-sender">Supervisor</span><span class="role-chip role-sup">CT Director</span></div>
+            <div class="msg-preview">Monthly care team meeting Thursday at 4:00 PM — please prepare your active case summaries.</div>
+            <div class="msg-meta"><span class="msg-time">2h ago</span><button class="reply-btn">Reply</button></div>
+          </div>
+        </div>
+        <div class="msg-item">
+          <div class="msg-avatar rn-avatar">MT</div>
+          <div class="msg-body">
+            <div class="msg-sender-row"><span class="msg-sender">Michael T.</span><span class="role-chip role-rn">MA</span></div>
+            <div class="msg-preview">J.P. PA submission complete for testosterone — patient should receive coverage notice within 3–5 business days. <span class="cid">CST-2026-10848</span></div>
+            <div class="msg-meta"><span class="msg-time">3h ago</span><button class="reply-btn">Reply</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<!-- Urgent Messages Panel (URG-MSG-001) -->
+<div id="urgentPanel" style="display:none;flex-direction:column;position:fixed;top:0;right:0;width:500px;height:100vh;background:#fff;border-left:2px solid #DC2626;z-index:300;box-shadow:-4px 0 28px rgba(0,0,0,0.18);">
+  <div style="background:#DC2626;padding:16px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0;">
+    <span style="font-size:16px;">🚨</span>
+    <span style="font-size:15px;font-weight:700;color:#fff;flex:1;">Urgent Messages</span>
+    <span id="urgPanelCount" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.25);color:#fff;border-radius:10px;padding:2px 8px;">2</span>
+    <button onclick="closeUrgentPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:18px;cursor:pointer;border-radius:4px;padding:2px 10px;margin-left:8px;">✕</button>
+  </div>
+  <div style="padding:10px 16px;background:#FEF2F2;border-bottom:1px solid #FECACA;font-size:11px;color:#991B1B;flex-shrink:0;">
+    These messages require your immediate attention. Click any message to open it directly.
+    <span style="float:right;font-family:monospace;color:#FCA5A5;">URG-MSG-001</span>
+  </div>
+  <div id="urgPanelBody" style="flex:1;overflow-y:auto;"></div>
+</div>
+<div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+var sortState = {};
+function sortTable(tableId, colIndex) {
+  var table = document.getElementById(tableId);
+  var tbody = table.querySelector('tbody');
+  var rows = Array.from(tbody.querySelectorAll('tr'));
+  var ths = table.querySelectorAll('thead th');
+  var key = tableId + '_' + colIndex;
+  var asc = sortState[key] !== true;
+  sortState[key] = asc;
+  ths.forEach(function(th, i) {
+    th.classList.remove('sorted');
+    var arrow = th.querySelector('.sort-arrow');
+    if (arrow) arrow.textContent = '↕';
+  });
+  ths[colIndex].classList.add('sorted');
+  var sortedArrow = ths[colIndex].querySelector('.sort-arrow');
+  if (sortedArrow) sortedArrow.textContent = asc ? '↑' : '↓';
+  rows.sort(function(a, b) {
+    var cellA = a.querySelectorAll('td')[colIndex];
+    var cellB = b.querySelectorAll('td')[colIndex];
+    var valA = cellA ? cellA.innerText.trim().toLowerCase() : '';
+    var valB = cellB ? cellB.innerText.trim().toLowerCase() : '';
+    if (valA < valB) return asc ? -1 : 1;
+    if (valA > valB) return asc ? 1 : -1;
+    return 0;
+  });
+  rows.forEach(function(row) { tbody.appendChild(row); });
+}
+function ctTakeTask(btn) { var td = btn.closest('td'); btn.closest('tr').querySelectorAll('td')[7].innerHTML = '<span style="display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#6B21A8;color:#fff;font-size:11px;font-weight:700;">AK</span>'; td.innerHTML = '<button class="action-btn" onclick="ctCloseTask(this)">Close Task</button> <button class="action-btn" style="background:#F1F5F9;color:#374151;" onclick="ctViewChart()">View</button>'; }
+function ctRouteTask() { alert('Route task…\n\n(In production this opens a routing modal to reassign to another team member or escalate.)'); }
+function ctCloseTask(btn) { if (confirm('Close this task?\n\nNote: Close Task marks the task closed — separate from the consultation being marked Complete.')) { btn.closest('tr').remove(); } }
+function ctViewChart(taskId) { window.location.href = '/care-team/task/' + (taskId || 'CT001'); }
+
+var CT_URGENT_MSGS = [
+  { type:'chart', initials:'SL', bg:'#059669', sender:'Dr. Lee, MD', patient:'M.R. · CST-2026-10841', url:'/provider/messages', preview:'"M.R. care plan updated — please review the new GLP-1 dosing notes and confirm patient follow-up schedule before end of day."', time:'12 min ago' },
+  { type:'message', initials:'JM', bg:'#6B21A8', sender:'Jennifer M., RN', patient:'T.W. · CST-2026-10835', url:'/provider/messages', preview:'"T.W. labs need follow-up — patient hasn\'t responded to the 48h check-in message. Can you reach out today?"', time:'34 min ago' }
+];
+function openUrgentPanel() {
+  var body = document.getElementById('urgPanelBody');
+  if (!body) return;
+  body.innerHTML = CT_URGENT_MSGS.map(function(m) {
+    var patChip = m.patient ? '<span style="font-size:10px;background:#EDE9FE;color:#5B21B6;border-radius:6px;padding:1px 6px;font-weight:600;">📋 '+m.patient+'</span>' : '<span style="font-size:10px;background:#F3F4F6;color:#6B7280;border-radius:6px;padding:1px 6px;">Direct message</span>';
+    var actionLabel = m.type==='chart' ? '→ Open Chart' : '→ Open Message';
+    return '<div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid #FEE2E2;cursor:pointer;" onclick="window.location=\''+m.url+'\'" onmouseenter="this.style.background=\'#FFF5F5\'" onmouseleave="this.style.background=\'\'"><div style="width:34px;height:34px;border-radius:50%;background:'+m.bg+';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">'+m.initials+'</div><div style="flex:1;min-width:0;"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;"><span style="font-size:13px;font-weight:700;color:#111827;">'+m.sender+'</span><span style="font-size:10px;font-weight:700;background:#FEE2E2;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:1px 6px;">URGENT</span>'+patChip+'</div><div style="font-size:12px;color:#374151;line-height:1.5;margin-bottom:6px;">'+m.preview+'</div><div style="display:flex;align-items:center;gap:10px;"><span style="font-size:11px;color:#9CA3AF;">'+m.time+'</span><a href="'+m.url+'" onclick="event.stopPropagation()" style="font-size:11px;font-weight:600;color:#DC2626;text-decoration:none;">'+actionLabel+'</a></div></div></div>';
+  }).join('');
+  document.getElementById('urgentPanel').style.display = 'flex';
+  document.getElementById('urgOverlay').style.display = 'block';
+}
+function closeUrgentPanel() {
+  document.getElementById('urgentPanel').style.display = 'none';
+  document.getElementById('urgOverlay').style.display = 'none';
+}
+</script>
+{% endraw %}
+{% endblock %}

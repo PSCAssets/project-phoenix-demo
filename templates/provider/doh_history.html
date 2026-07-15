@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+{% block title %}DOH Submission History{% endblock %}
+{% block head %}
+<style>
+:root { --teal:#0F766E; --teal-light:#CCFBF1; --bg:#FAF7F2; --border:#E5E0D8; --amber:#D97706; --red:#DC2626; --green:#059669; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:var(--bg); color:#111827; }
+.topbar { position:fixed; top:60px; left:56px; right:0; height:56px; background:var(--teal); display:flex; align-items:center; padding:0 24px; z-index:99; }
+.topbar-title { color:#fff; font-weight:600; font-size:16px; }
+.topbar-sub { color:rgba(255,255,255,0.55); font-size:12px; margin-top:1px; }
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; color:rgba(255,255,255,0.85); font-size:13px; }
+.avatar { width:32px; height:32px; border-radius:50%; background:#0D5F58; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; }
+.page-wrap { margin-left:56px; margin-top:116px; padding:28px; }
+.page-title { font-size:20px; font-weight:800; color:#111827; margin-bottom:4px; }
+.page-sub { font-size:13px; color:#6B7280; margin-bottom:20px; }
+
+/* Stats strip */
+.stats-strip { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:22px; }
+.strip-card { background:#fff; border:1px solid var(--border); border-radius:10px; padding:14px 16px; }
+.strip-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#9CA3AF; margin-bottom:4px; }
+.strip-val { font-size:22px; font-weight:800; line-height:1; }
+.strip-sub { font-size:11px; color:#9CA3AF; margin-top:2px; }
+
+/* Filter bar */
+.filter-bar { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; align-items:center; }
+.filter-bar input, .filter-bar select { border:1px solid var(--border); border-radius:7px; padding:7px 11px; font-size:12px; font-family:inherit; outline:none; background:#fff; color:#374151; }
+.filter-bar input { min-width:200px; }
+.filter-bar select:focus, .filter-bar input:focus { border-color:var(--teal); }
+.export-btn { margin-left:auto; background:var(--teal); color:#fff; border:none; border-radius:7px; padding:7px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+.export-btn:hover { background:#0D5F58; }
+.row-count { font-size:12px; font-weight:600; color:#6B7280; }
+
+/* Table */
+.table-wrap { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+table { width:100%; border-collapse:collapse; font-size:13px; }
+thead th { background:#FAF7F2; padding:10px 12px; text-align:left; font-size:11px; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--border); white-space:nowrap; }
+tbody td { padding:11px 12px; border-bottom:1px solid #F3F4F6; vertical-align:middle; }
+tbody tr:last-child td { border-bottom:none; }
+tbody tr:hover { background:#F0FDFA; }
+
+.rec-id { font-family:monospace; font-size:12px; font-weight:700; color:var(--teal); text-decoration:none; }
+.rec-id:hover { text-decoration:underline; }
+.condition-chip { display:inline-flex; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:600; }
+.cond-sti  { background:#EDE9FE; color:#5B21B6; }
+.cond-hiv  { background:#FEE2E2; color:#991B1B; }
+.cond-tb   { background:#FEF3C7; color:#92400E; }
+.cond-lyme { background:#D1FAE5; color:#065F46; }
+.cond-lead { background:var(--teal-light); color:#134E4A; }
+
+.method-chip { font-size:11px; font-weight:600; }
+.m-fax   { color:var(--teal); }
+.m-email { color:#1D4ED8; }
+.m-phone { color:var(--amber); }
+
+.minor-dot { width:7px; height:7px; border-radius:50%; background:var(--amber); display:inline-block; margin-right:3px; }
+
+.status-ok   { background:#D1FAE5; color:#065F46; font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px; }
+.status-fail { background:#FEE2E2; color:var(--red); font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px; }
+.status-pend { background:#FEF3C7; color:#92400E; font-size:11px; font-weight:700; padding:2px 7px; border-radius:6px; }
+
+.sla-met    { font-size:11px; font-weight:700; color:var(--green); }
+.sla-missed { font-size:11px; font-weight:700; color:var(--red); }
+
+.who { font-size:11px; color:#6B7280; }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="topbar">
+  <div>
+    <div class="topbar-title">Submission History</div>
+    <div class="topbar-sub">Audit trail of all DOH report submissions</div>
+  </div>
+  <div class="topbar-right">
+    <span>Crystal Veliz, DOH Coordinator</span>
+    <div class="avatar">CV</div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div class="page-title">Submission History</div>
+  <div class="page-sub">All submitted DOH reports — immutable audit log. Records cannot be edited after submission.</div>
+
+  <div class="stats-strip">
+    <div class="strip-card">
+      <div class="strip-label">This Week</div>
+      <div class="strip-val" style="color:var(--teal);">58</div>
+      <div class="strip-sub">total submitted</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">SLA Met</div>
+      <div class="strip-val" style="color:var(--green);">51</div>
+      <div class="strip-sub">within 24h</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">SLA Missed</div>
+      <div class="strip-val" style="color:var(--red);">7</div>
+      <div class="strip-sub">late submissions</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Via Fax</div>
+      <div class="strip-val" style="color:#374151;">39</div>
+      <div class="strip-sub">67%</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Via Email / Phone</div>
+      <div class="strip-val" style="color:#374151;">19</div>
+      <div class="strip-sub">33%</div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Search record ID or state…" id="histSearch" oninput="filterHistory()">
+    <select id="histState" onchange="filterHistory()">
+      <option value="">All States</option>
+      <option>FL</option><option>CA</option><option>TX</option><option>NY</option>
+      <option>GA</option><option>VA</option><option>WA</option><option>MI</option>
+    </select>
+    <select id="histCondition" onchange="filterHistory()">
+      <option value="">All Conditions</option>
+      <option>STI</option><option>HIV</option><option>TB</option><option>Lyme</option><option>Lead</option>
+    </select>
+    <select id="histMethod" onchange="filterHistory()">
+      <option value="">All Methods</option>
+      <option value="fax">Fax</option>
+      <option value="email">Email</option>
+      <option value="phone">Phone</option>
+    </select>
+    <select id="histSLA" onchange="filterHistory()">
+      <option value="">All SLA Status</option>
+      <option value="met">Met</option>
+      <option value="missed">Missed</option>
+    </select>
+    <button class="export-btn" onclick="alert('Exporting audit log as CSV…\n\nIn production, this generates a timestamped CSV export of all visible records for compliance documentation.')">Export CSV</button>
+    <span class="row-count" id="histCount">Showing 15 of 15</span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="histTable">
+      <thead>
+        <tr>
+          <th>Record ID</th>
+          <th>State</th>
+          <th>Condition</th>
+          <th>Method</th>
+          <th>Submitted</th>
+          <th>By</th>
+          <th>Confirmation #</th>
+          <th>Minor</th>
+          <th>SLA</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="histBody">
+
+        <tr data-state="FL" data-condition="STI" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0441" class="rec-id">DOH-2026-0441</a></td>
+          <td>FL</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26 · 8:14 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">FL-8841-293</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="CA" data-condition="HIV" data-method="email" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0440" class="rec-id">DOH-2026-0440</a></td>
+          <td>CA</td>
+          <td><span class="condition-chip cond-hiv">HIV</span></td>
+          <td><span class="method-chip m-email">&#9993; Email</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26 · 8:02 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">CA-AUTO-9912</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="TX" data-condition="STI" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0439" class="rec-id">DOH-2026-0439</a></td>
+          <td>TX</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26 · 7:51 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">—</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="GA" data-condition="STI" data-method="phone" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0438" class="rec-id">DOH-2026-0438</a></td>
+          <td>GA</td>
+          <td><span class="condition-chip cond-sti">Syphilis</span></td>
+          <td><span class="method-chip m-phone">&#9990; Phone</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26 · 7:44 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">—</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="MI" data-condition="Lead" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0437" class="rec-id">DOH-2026-0437</a></td>
+          <td>MI</td>
+          <td><span class="condition-chip cond-lead">Lead (6.2 μg/dL)</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 26 · 7:38 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">MI-9834</td>
+          <td><span class="minor-dot"></span>Minor</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="FL" data-condition="STI" data-method="fax" data-sla="missed">
+          <td><a href="/provider/doh/report/DOH-2026-0431" class="rec-id">DOH-2026-0431</a></td>
+          <td>FL</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25 · 4:21 PM</td>
+          <td class="who">James Okafor</td>
+          <td style="font-family:monospace;font-size:11px;">FL-8820-011</td>
+          <td>—</td>
+          <td><span class="sla-missed">&#9888; Missed</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="NY" data-condition="TB" data-method="fax" data-sla="missed">
+          <td><a href="/provider/doh/report/DOH-2026-0428" class="rec-id">DOH-2026-0428</a></td>
+          <td>NY</td>
+          <td><span class="condition-chip cond-tb">Tuberculosis</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25 · 2:05 PM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">—</td>
+          <td>—</td>
+          <td><span class="sla-missed">&#9888; Missed</span></td>
+          <td><span class="status-pend">&#8987; Pending Ack</span></td>
+        </tr>
+
+        <tr data-state="CA" data-condition="STI" data-method="email" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0425" class="rec-id">DOH-2026-0425</a></td>
+          <td>CA</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><span class="method-chip m-email">&#9993; Email</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25 · 11:12 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">CA-AUTO-9881</td>
+          <td><span class="minor-dot"></span>Minor</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="WA" data-condition="Lyme" data-method="email" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0422" class="rec-id">DOH-2026-0422</a></td>
+          <td>WA</td>
+          <td><span class="condition-chip cond-lyme">Lyme Disease</span></td>
+          <td><span class="method-chip m-email">&#9993; Email</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 25 · 9:44 AM</td>
+          <td class="who">Sandra Chu</td>
+          <td style="font-family:monospace;font-size:11px;">—</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="VA" data-condition="HIV" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0419" class="rec-id">DOH-2026-0419</a></td>
+          <td>VA</td>
+          <td><span class="condition-chip cond-hiv">HIV</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 24 · 3:55 PM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">VA-DOH-2241</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="FL" data-condition="Lead" data-method="fax" data-sla="missed">
+          <td><a href="/provider/doh/report/DOH-2026-0415" class="rec-id">DOH-2026-0415</a></td>
+          <td>FL</td>
+          <td><span class="condition-chip cond-lead">Lead (5.4 μg/dL)</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 24 · 1:30 PM</td>
+          <td class="who">James Okafor</td>
+          <td style="font-family:monospace;font-size:11px;">FL-8803</td>
+          <td><span class="minor-dot"></span>Minor</td>
+          <td><span class="sla-missed">&#9888; Missed</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="TX" data-condition="STI" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0412" class="rec-id">DOH-2026-0412</a></td>
+          <td>TX</td>
+          <td><span class="condition-chip cond-sti">Syphilis</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 24 · 10:08 AM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">TX-5511-C</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="NY" data-condition="STI" data-method="fax" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0409" class="rec-id">DOH-2026-0409</a></td>
+          <td>NY</td>
+          <td><span class="condition-chip cond-sti">Chlamydia</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 23 · 4:40 PM</td>
+          <td class="who">Sandra Chu</td>
+          <td style="font-family:monospace;font-size:11px;">NY-DOH-5512</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+        <tr data-state="MI" data-condition="STI" data-method="fax" data-sla="missed">
+          <td><a href="/provider/doh/report/DOH-2026-0405" class="rec-id">DOH-2026-0405</a></td>
+          <td>MI</td>
+          <td><span class="condition-chip cond-sti">Gonorrhea</span></td>
+          <td><span class="method-chip m-fax">&#128231; Fax</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 23 · 2:18 PM</td>
+          <td class="who">Crystal Veliz</td>
+          <td style="font-family:monospace;font-size:11px;">—</td>
+          <td>—</td>
+          <td><span class="sla-missed">&#9888; Missed</span></td>
+          <td><span class="status-fail">&#215; Fax Failed</span></td>
+        </tr>
+
+        <tr data-state="CA" data-condition="TB" data-method="email" data-sla="met">
+          <td><a href="/provider/doh/report/DOH-2026-0401" class="rec-id">DOH-2026-0401</a></td>
+          <td>CA</td>
+          <td><span class="condition-chip cond-tb">Tuberculosis</span></td>
+          <td><span class="method-chip m-email">&#9993; Email</span></td>
+          <td style="font-size:12px;color:#6B7280;">Jun 23 · 9:55 AM</td>
+          <td class="who">James Okafor</td>
+          <td style="font-family:monospace;font-size:11px;">CA-AUTO-9833</td>
+          <td>—</td>
+          <td><span class="sla-met">&#10003; Met</span></td>
+          <td><span class="status-ok">&#10003; Accepted</span></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function filterHistory() {
+  var search = document.getElementById('histSearch').value.toLowerCase();
+  var state  = document.getElementById('histState').value;
+  var cond   = document.getElementById('histCondition').value;
+  var method = document.getElementById('histMethod').value;
+  var sla    = document.getElementById('histSLA').value;
+
+  var rows = document.querySelectorAll('#histBody tr');
+  var visible = 0;
+  rows.forEach(function(r) {
+    var ok = (!search || r.textContent.toLowerCase().includes(search))
+          && (!state  || r.dataset.state === state)
+          && (!cond   || r.dataset.condition === cond)
+          && (!method || r.dataset.method === method)
+          && (!sla    || r.dataset.sla === sla);
+    r.style.display = ok ? '' : 'none';
+    if (ok) visible++;
+  });
+  document.getElementById('histCount').textContent = 'Showing ' + visible + ' of ' + rows.length;
+}
+</script>
+{% endblock %}
