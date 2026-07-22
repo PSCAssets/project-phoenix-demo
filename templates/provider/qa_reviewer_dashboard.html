@@ -311,14 +311,14 @@ tbody tr:last-child td { border-bottom: none; }
 
   <!-- Unified Review Modal — replaces separate Review/Approve/Clarify/Reject popups -->
   <div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9993;align-items:center;justify-content:center;">
-    <div style="background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#F5F0FB;display:flex;align-items:center;gap:10px;">
+    <div style="background:#fff;border-radius:14px;width:620px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#F5F0FB;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:1;">
         <span style="font-size:14px;font-weight:700;color:#6B21A8;flex:1;">📄 Review — <span id="reviewConsultId"></span></span>
         <button onclick="closeReviewModal()" style="background:none;border:none;font-size:16px;color:#6B21A8;cursor:pointer;line-height:1;">✕</button>
       </div>
       <div style="padding:18px 20px;">
-        <div style="font-size:12px;color:#374151;margin-bottom:12px;">Documents loaded in read-only view. Review the uploaded files, then decide below.</div>
-        <div id="reviewFileList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
+        <div style="font-size:12px;color:#374151;margin-bottom:12px;">Documents loaded in read-only view. Scroll to review each file, then decide below.</div>
+        <div id="reviewFileList" style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px;max-height:360px;overflow-y:auto;padding:2px 6px 4px 2px;background:#FAF9F7;border:1px solid #F0EDE6;border-radius:10px;"></div>
 
         <!-- Decision: default 3-way choice -->
         <div id="decisionDefault">
@@ -435,27 +435,100 @@ function findAnyRow(id) {
   return null;
 }
 
+// ── Mock document previews (demo has no real uploaded files) ──
+// Each entry is what a QA Reviewer would actually see for that submission.
+var DOC_PREVIEWS = {
+  'CST-2026-11221': [
+    { kind: 'doc', title: 'Minor Consent & Assent Form', pageLabel: 'Page 1 of 2' },
+    { kind: 'id',  subtitle: 'Parent / Guardian Government-Issued Photo ID' }
+  ],
+  'CST-2026-11198': [
+    { kind: 'doc', title: 'Power of Attorney', pageLabel: 'Page 1 of 3' },
+    { kind: 'doc', title: "Physician's Certification of Incapacity", pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'POA Holder — Government-Issued Photo ID' }
+  ],
+  'GRD-2026-00659': [
+    { kind: 'id',  subtitle: 'Guardian — Government-Issued Photo ID' },
+    { kind: 'doc', title: 'Guardianship Order', pageLabel: 'Page 1 of 2' }
+  ],
+  'CST-2026-11244': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'Government-Issued Photo ID' },
+    { kind: 'doc', title: 'Supporting Clinical Documentation', pageLabel: 'Page 1 of 1' }
+  ],
+  'CST-2026-11302': [
+    { kind: 'doc', title: 'Power of Attorney', pageLabel: 'Page 1 of 4', flag: 'Healthcare-decision language is ambiguous — flagged for Compliance/Legal review' }
+  ]
+};
+
+function buildIdCardHtml(subtitle) {
+  return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
+    '<div style="padding:8px 12px;background:#F3F0FA;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:10px;font-weight:700;color:#6B21A8;letter-spacing:.04em;">🪪 GOVERNMENT-ISSUED PHOTO ID</span>' +
+      '<span style="font-size:10px;color:#9CA3AF;">Image</span>' +
+    '</div>' +
+    '<div style="padding:14px;display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#F5F3FF,#EEF2FF);">' +
+      '<div style="width:58px;height:72px;background:#D1D5DB;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🧑</div>' +
+      '<div style="flex:1;">' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:75%;margin-bottom:7px;"></div>' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:55%;margin-bottom:7px;"></div>' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:65%;"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="padding:8px 14px;background:#fff;border-top:1px solid #F0EDE6;">' +
+      '<div style="height:5px;background:repeating-linear-gradient(90deg,#111827 0 2px,transparent 2px 4px);opacity:.35;"></div>' +
+      '<div style="font-size:11px;color:#6B7280;margin-top:6px;">' + subtitle + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function buildScanDocHtml(title, pageLabel, flag) {
+  var flagHtml = flag ? '<div style="margin-top:10px;padding:7px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:11px;color:#92400E;">⚠ ' + flag + '</div>' : '';
+  return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
+    '<div style="padding:8px 12px;background:#F9F5EE;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:11px;font-weight:700;color:#374151;">📄 ' + title + '</span>' +
+      '<span style="font-size:10px;color:#9CA3AF;">' + pageLabel + '</span>' +
+    '</div>' +
+    '<div style="padding:16px 18px;background:#fff;">' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:92%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:97%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:88%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:94%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:60%;margin-bottom:18px;"></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-end;">' +
+        '<div style="border-bottom:1.5px solid #9CA3AF;width:130px;font-family:cursive,serif;font-size:14px;color:#6B7280;padding-bottom:2px;">Signature on file</div>' +
+        '<div style="font-size:10px;color:#9CA3AF;">Date on file</div>' +
+      '</div>' +
+      flagHtml +
+    '</div>' +
+  '</div>';
+}
+
 function openReview(id, submissionType, canDecide) {
   canDecide = (canDecide === false) ? false : true;
   reviewContext = { id: id, type: submissionType || 'poa', canDecide: canDecide };
   rejectSelected = null;
   document.getElementById('reviewConsultId').textContent = id;
 
-  var row = findAnyRow(id);
-  var docsCellText = '';
-  if (row) {
-    if (row.closest('#pendingQueueBody')) {
-      var cells = row.querySelectorAll('td');
-      if (cells.length >= 7) docsCellText = cells[6].textContent.trim();
-    } else {
+  var previewList = document.getElementById('reviewFileList');
+  var docs = DOC_PREVIEWS[id];
+  if (docs) {
+    previewList.innerHTML = docs.map(function(d) {
+      return d.kind === 'id' ? buildIdCardHtml(d.subtitle) : buildScanDocHtml(d.title, d.pageLabel, d.flag);
+    }).join('');
+  } else {
+    // Fallback for rows without a defined mock preview (e.g. Encounter Closure Flags,
+    // which are audit views of an override reason, not a document submission)
+    var row = findAnyRow(id);
+    var noteText = '';
+    if (row) {
       var noteCell = row.querySelector('td[style*="color:#DC2626"], td[style*="color:#92400E"]');
-      docsCellText = noteCell ? noteCell.textContent.trim() : '';
+      noteText = noteCell ? noteCell.textContent.trim() : '';
     }
+    previewList.innerHTML = '<div style="padding:14px;font-size:12px;color:#6B7280;">' +
+      (noteText ? '<strong style="color:#374151;">Note on file:</strong> ' + noteText : 'No document preview available for this record.') +
+      '</div>';
   }
-  var files = docsCellText ? docsCellText.split(/(?=[A-Z][a-z]+ [A-Z])|✓/).map(function(s){ return s.trim(); }).filter(Boolean) : ['No document metadata available for this record.'];
-  document.getElementById('reviewFileList').innerHTML = files.map(function(f) {
-    return '<div style="display:flex;align-items:center;gap:8px;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;color:#374151;">📄 ' + f + '</div>';
-  }).join('');
 
   showDecisionDefault();
   document.getElementById('decisionDefault').style.display = canDecide ? 'block' : 'none';
