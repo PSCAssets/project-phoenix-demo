@@ -52,18 +52,16 @@ tbody tr:last-child td { border-bottom: none; }
 
   <div class="qr-body">
     <div class="page-title">Completed Items</div>
-    <div class="page-sub">History of every approved and rejected QA decision. Search by patient, consult ID, care product, or outcome. Items still in progress live in <a href="/provider/qa-reviewer" style="color:#6B21A8;font-weight:600;">Review Queue</a> in the left-hand nav.</div>
+    <div class="page-sub">History of every approved QA decision. Search by patient, consult ID, or care product. Rejected items aren't finished yet — they stay in <a href="/provider/qa-reviewer" style="color:#6B21A8;font-weight:600;">Review Queue</a> in the left-hand nav until the patient resubmits.</div>
 
     <div class="stat-row">
-      <div class="stat-card"><div class="stat-label">Total Completed</div><div class="stat-value" id="statTotal">10</div></div>
-      <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value green" id="statApprovedTotal">6</div></div>
-      <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value red" id="statRejectedTotal">4</div></div>
+      <div class="stat-card"><div class="stat-label">Total Completed</div><div class="stat-value green" id="statTotal">6</div></div>
     </div>
 
     <div class="queue-card">
       <div class="queue-header">
         <div class="queue-title">Completed History</div>
-        <span class="badge badge-green" id="completedCountBadge">10 items</span>
+        <span class="badge badge-green" id="completedCountBadge">6 items</span>
         <div class="search-box">
           <span class="search-icon">🔍</span>
           <input type="text" id="completedSearch" placeholder="Search patient, consult ID, care product, outcome…" oninput="filterCompleted()">
@@ -81,16 +79,6 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Quinn Patel, QA Reviewer</td>
             <td>Jul 22, 7:58 AM</td>
             <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11175')">View →</button></td>
-          </tr>
-          <tr data-search="james o. cst-2026-11119 poa ed treatment rejected lacks healthcare decision-making authority">
-            <td><div class="p-name">James O.</div><div class="p-id">PT-2026-00388</div></td>
-            <td>CST-2026-11119</td>
-            <td><span class="cp-tag">ED Treatment</span></td>
-            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
-            <td style="font-size:12px;">POA — Third-party order<div class="qa-note" style="color:#DC2626;">Lacks Healthcare Decision-Making Authority</div></td>
-            <td>Quinn Patel, QA Reviewer</td>
-            <td>Jul 22, 8:22 AM</td>
-            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11119')">View →</button></td>
           </tr>
           <tr data-search="carla m. cst-2026-11052 everly care a1c approved">
             <td><div class="p-name">Carla M.</div><div class="p-id">PT-2026-00598</div></td>
@@ -112,16 +100,6 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Jul 20, 11:35 AM</td>
             <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11008')">View →</button></td>
           </tr>
-          <tr data-search="michael h. guardian grd-2026-00601 guardian access rejected guardianship authority not established">
-            <td><div class="p-name">Michael H. (guardian)</div><div class="p-id">PT-2026-00602</div></td>
-            <td>GRD-2026-00601</td>
-            <td><span class="cp-tag" style="background:#DCFCE7;color:#166534;">Guardian Access</span></td>
-            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
-            <td style="font-size:12px;">Guardian — Account Access<div class="qa-note" style="color:#DC2626;">Guardianship Authority Not Established</div></td>
-            <td>Quinn Patel, QA Reviewer</td>
-            <td>Jul 19, 3:47 PM</td>
-            <td><button class="action-btn btn-review" onclick="openHistory('GRD-2026-00601')">View →</button></td>
-          </tr>
           <tr data-search="sofia n. cst-2026-10977 dxs testosterone approved">
             <td><div class="p-name">Sofia N.</div><div class="p-id">PT-2026-00544</div></td>
             <td>CST-2026-10977</td>
@@ -131,16 +109,6 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Quinn Patel, QA Reviewer</td>
             <td>Jul 18, 9:12 AM</td>
             <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10977')">View →</button></td>
-          </tr>
-          <tr data-search="andre b. cst-2026-10933 poa glp-1 weight rejected missing required signatures or dates">
-            <td><div class="p-name">Andre B. (POA)</div><div class="p-id">PT-2026-00479</div></td>
-            <td>CST-2026-10933</td>
-            <td><span class="cp-tag">GLP-1 Weight</span></td>
-            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
-            <td style="font-size:12px;">POA — Third-party order<div class="qa-note" style="color:#DC2626;">Missing Required Signatures or Dates</div></td>
-            <td>Quinn Patel, QA Reviewer</td>
-            <td>Jul 17, 1:05 PM</td>
-            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10933')">View →</button></td>
           </tr>
           <tr data-search="priya k. minor cst-2026-10890 brca hereditary approved">
             <td><div class="p-name">Priya K. (minor)</div><div class="p-id">PT-2026-00460</div></td>
@@ -161,16 +129,6 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Quinn Patel, QA Reviewer</td>
             <td>Jul 15, 4:30 PM</td>
             <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10845')">View →</button></td>
-          </tr>
-          <tr data-search="marcus j. cst-2026-10801 third-party ed treatment rejected missing or incomplete pages">
-            <td><div class="p-name">Marcus J.</div><div class="p-id">PT-2026-00349</div></td>
-            <td>CST-2026-10801</td>
-            <td><span class="cp-tag">ED Treatment</span></td>
-            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
-            <td style="font-size:12px;">Third-party order<div class="qa-note" style="color:#DC2626;">Missing or Incomplete Pages / Illegible ID</div></td>
-            <td>Quinn Patel, QA Reviewer</td>
-            <td>Jul 14, 8:55 AM</td>
-            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10801')">View →</button></td>
           </tr>
         </tbody>
       </table>
@@ -194,6 +152,23 @@ tbody tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+<!-- Document zoom lightbox — click any preview card above to open here -->
+<div id="docLightbox" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:9995;align-items:center;justify-content:center;">
+  <div style="width:520px;max-width:92vw;max-height:88vh;display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;gap:10px;padding:0 4px 12px;">
+      <span id="docLightboxLabel" style="color:#fff;font-size:13px;font-weight:600;flex:1;"></span>
+      <button onclick="closeDocLightbox()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:16px;cursor:pointer;border-radius:6px;padding:4px 12px;">✕ Close</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;">
+      <div id="docLightboxBody" style="width:100%;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;padding:14px 4px 0;">
+      <button id="docLightboxPrev" onclick="navDocLightbox(-1)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:7px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">← Previous</button>
+      <button id="docLightboxNext" onclick="navDocLightbox(1)" style="background:rgba(255,255,255,0.15);border:none;color:#fff;border-radius:7px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Next →</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -204,9 +179,6 @@ var HISTORY_DOC_PREVIEWS = {
     { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
     { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
   ],
-  'CST-2026-11119': [
-    { kind: 'doc', title: 'Power of Attorney (Financial / Fiduciary)', pageLabel: 'Page 1 of 2', flag: 'Does not grant healthcare decision-making authority' }
-  ],
   'CST-2026-11052': [
     { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
     { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
@@ -215,16 +187,9 @@ var HISTORY_DOC_PREVIEWS = {
     { kind: 'doc', title: 'Minor Consent & Assent Form', pageLabel: 'Page 1 of 2' },
     { kind: 'id',  subtitle: 'Parent / Guardian Government-Issued Photo ID' }
   ],
-  'GRD-2026-00601': [
-    { kind: 'id',  subtitle: 'Guardian — Government-Issued Photo ID' },
-    { kind: 'doc', title: 'Guardianship Order', pageLabel: 'Page 1 of 1', flag: 'Document did not clearly establish legal guardian relationship' }
-  ],
   'CST-2026-10977': [
     { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
     { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
-  ],
-  'CST-2026-10933': [
-    { kind: 'doc', title: 'Power of Attorney', pageLabel: 'Page 1 of 3', flag: 'Missing required signature and date' }
   ],
   'CST-2026-10890': [
     { kind: 'doc', title: 'Minor Consent & Assent Form', pageLabel: 'Page 1 of 2' },
@@ -233,66 +198,105 @@ var HISTORY_DOC_PREVIEWS = {
   'CST-2026-10845': [
     { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
     { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
-  ],
-  'CST-2026-10801': [
-    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1', flag: 'Missing pages — ID photo illegible' }
   ]
 };
 
-function buildIdCardHtml(subtitle) {
+function buildIdCardHtml(subtitle, scale) {
+  scale = scale || 1;
+  var s = function(n) { return Math.round(n * scale); };
   return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
-    '<div style="padding:8px 12px;background:#F3F0FA;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
-      '<span style="font-size:10px;font-weight:700;color:#6B21A8;letter-spacing:.04em;">🪪 GOVERNMENT-ISSUED PHOTO ID</span>' +
-      '<span style="font-size:10px;color:#9CA3AF;">Image</span>' +
+    '<div style="padding:'+s(8)+'px '+s(12)+'px;background:#F3F0FA;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:'+s(10)+'px;font-weight:700;color:#6B21A8;letter-spacing:.04em;">🪪 GOVERNMENT-ISSUED PHOTO ID</span>' +
+      '<span style="font-size:'+s(10)+'px;color:#9CA3AF;">Image</span>' +
     '</div>' +
-    '<div style="padding:14px;display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#F5F3FF,#EEF2FF);">' +
-      '<div style="width:58px;height:72px;background:#D1D5DB;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🧑</div>' +
+    '<div style="padding:'+s(14)+'px;display:flex;gap:'+s(14)+'px;align-items:center;background:linear-gradient(135deg,#F5F3FF,#EEF2FF);">' +
+      '<div style="width:'+s(58)+'px;height:'+s(72)+'px;background:#D1D5DB;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:'+s(24)+'px;flex-shrink:0;">🧑</div>' +
       '<div style="flex:1;">' +
-        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:75%;margin-bottom:7px;"></div>' +
-        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:55%;margin-bottom:7px;"></div>' +
-        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:65%;"></div>' +
+        '<div style="height:'+s(8)+'px;background:#C7CBD1;border-radius:3px;width:75%;margin-bottom:'+s(7)+'px;"></div>' +
+        '<div style="height:'+s(8)+'px;background:#C7CBD1;border-radius:3px;width:55%;margin-bottom:'+s(7)+'px;"></div>' +
+        '<div style="height:'+s(8)+'px;background:#C7CBD1;border-radius:3px;width:65%;"></div>' +
       '</div>' +
     '</div>' +
-    '<div style="padding:8px 14px;background:#fff;border-top:1px solid #F0EDE6;">' +
-      '<div style="height:5px;background:repeating-linear-gradient(90deg,#111827 0 2px,transparent 2px 4px);opacity:.35;"></div>' +
-      '<div style="font-size:11px;color:#6B7280;margin-top:6px;">' + subtitle + '</div>' +
+    '<div style="padding:'+s(8)+'px '+s(14)+'px;background:#fff;border-top:1px solid #F0EDE6;">' +
+      '<div style="height:'+s(5)+'px;background:repeating-linear-gradient(90deg,#111827 0 '+s(2)+'px,transparent '+s(2)+'px '+s(4)+'px);opacity:.35;"></div>' +
+      '<div style="font-size:'+s(11)+'px;color:#6B7280;margin-top:'+s(6)+'px;">' + subtitle + '</div>' +
     '</div>' +
   '</div>';
 }
 
-function buildScanDocHtml(title, pageLabel, flag) {
-  var flagHtml = flag ? '<div style="margin-top:10px;padding:7px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:11px;color:#92400E;">⚠ ' + flag + '</div>' : '';
+function buildScanDocHtml(title, pageLabel, flag, scale) {
+  scale = scale || 1;
+  var s = function(n) { return Math.round(n * scale); };
+  var flagHtml = flag ? '<div style="margin-top:'+s(10)+'px;padding:'+s(7)+'px '+s(10)+'px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:'+s(11)+'px;color:#92400E;">⚠ ' + flag + '</div>' : '';
   return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
-    '<div style="padding:8px 12px;background:#F9F5EE;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
-      '<span style="font-size:11px;font-weight:700;color:#374151;">📄 ' + title + '</span>' +
-      '<span style="font-size:10px;color:#9CA3AF;">' + pageLabel + '</span>' +
+    '<div style="padding:'+s(8)+'px '+s(12)+'px;background:#F9F5EE;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:'+s(11)+'px;font-weight:700;color:#374151;">📄 ' + title + '</span>' +
+      '<span style="font-size:'+s(10)+'px;color:#9CA3AF;">' + pageLabel + '</span>' +
     '</div>' +
-    '<div style="padding:16px 18px;background:#fff;">' +
-      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:92%;margin-bottom:9px;"></div>' +
-      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:97%;margin-bottom:9px;"></div>' +
-      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:88%;margin-bottom:9px;"></div>' +
-      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:94%;margin-bottom:9px;"></div>' +
-      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:60%;margin-bottom:18px;"></div>' +
+    '<div style="padding:'+s(16)+'px '+s(18)+'px;background:#fff;">' +
+      '<div style="height:'+s(6)+'px;background:#E5E7EB;border-radius:3px;width:92%;margin-bottom:'+s(9)+'px;"></div>' +
+      '<div style="height:'+s(6)+'px;background:#E5E7EB;border-radius:3px;width:97%;margin-bottom:'+s(9)+'px;"></div>' +
+      '<div style="height:'+s(6)+'px;background:#E5E7EB;border-radius:3px;width:88%;margin-bottom:'+s(9)+'px;"></div>' +
+      '<div style="height:'+s(6)+'px;background:#E5E7EB;border-radius:3px;width:94%;margin-bottom:'+s(9)+'px;"></div>' +
+      '<div style="height:'+s(6)+'px;background:#E5E7EB;border-radius:3px;width:60%;margin-bottom:'+s(18)+'px;"></div>' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-end;">' +
-        '<div style="border-bottom:1.5px solid #9CA3AF;width:130px;font-family:cursive,serif;font-size:14px;color:#6B7280;padding-bottom:2px;">Signature on file</div>' +
-        '<div style="font-size:10px;color:#9CA3AF;">Date on file</div>' +
+        '<div style="border-bottom:1.5px solid #9CA3AF;width:'+s(130)+'px;font-family:cursive,serif;font-size:'+s(14)+'px;color:#6B7280;padding-bottom:2px;">Signature on file</div>' +
+        '<div style="font-size:'+s(10)+'px;color:#9CA3AF;">Date on file</div>' +
       '</div>' +
       flagHtml +
     '</div>' +
   '</div>';
 }
 
+// ── Document zoom lightbox — same pattern as the Review Queue's modal ──
+var lightboxDocs = [];
+var lightboxIndex = 0;
+
 function openHistory(id) {
   document.getElementById('historyConsultId').textContent = id;
   var previewList = document.getElementById('historyFileList');
   var docs = HISTORY_DOC_PREVIEWS[id];
+  lightboxDocs = docs || [];
   previewList.innerHTML = docs ?
-    docs.map(function(d) { return d.kind === 'id' ? buildIdCardHtml(d.subtitle) : buildScanDocHtml(d.title, d.pageLabel, d.flag); }).join('') :
+    docs.map(function(d, i) {
+      var inner = d.kind === 'id' ? buildIdCardHtml(d.subtitle) : buildScanDocHtml(d.title, d.pageLabel, d.flag);
+      return '<div style="position:relative;cursor:zoom-in;" onclick="openDocLightbox(' + i + ')" title="Click to zoom">' + inner +
+        '<div style="position:absolute;top:8px;right:8px;background:rgba(17,24,39,0.65);color:#fff;font-size:10px;font-weight:600;padding:3px 8px;border-radius:12px;">🔍 Zoom</div>' +
+      '</div>';
+    }).join('') :
     '<div style="padding:14px;font-size:12px;color:#6B7280;">No document preview available for this record.</div>';
   document.getElementById('historyModal').style.display = 'flex';
 }
 function closeHistoryModal() {
   document.getElementById('historyModal').style.display = 'none';
+}
+
+function openDocLightbox(idx) {
+  lightboxIndex = idx;
+  renderLightbox();
+  document.getElementById('docLightbox').style.display = 'flex';
+}
+function renderLightbox() {
+  var d = lightboxDocs[lightboxIndex];
+  if (!d) return;
+  var body = document.getElementById('docLightboxBody');
+  body.innerHTML = d.kind === 'id' ? buildIdCardHtml(d.subtitle, 1.8) : buildScanDocHtml(d.title, d.pageLabel, d.flag, 1.8);
+  document.getElementById('docLightboxLabel').textContent = (d.title || d.subtitle) + ' — Document ' + (lightboxIndex + 1) + ' of ' + lightboxDocs.length;
+  var prevBtn = document.getElementById('docLightboxPrev');
+  var nextBtn = document.getElementById('docLightboxNext');
+  prevBtn.disabled = lightboxIndex === 0;
+  nextBtn.disabled = lightboxIndex === lightboxDocs.length - 1;
+  prevBtn.style.opacity = prevBtn.disabled ? '0.35' : '1';
+  nextBtn.style.opacity = nextBtn.disabled ? '0.35' : '1';
+}
+function navDocLightbox(delta) {
+  var next = lightboxIndex + delta;
+  if (next < 0 || next >= lightboxDocs.length) return;
+  lightboxIndex = next;
+  renderLightbox();
+}
+function closeDocLightbox() {
+  document.getElementById('docLightbox').style.display = 'none';
 }
 
 function filterCompleted() {

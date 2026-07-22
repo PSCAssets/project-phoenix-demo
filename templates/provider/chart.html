@@ -2737,6 +2737,53 @@ P — Plan
   </div>
 </div>
 
+<!-- Pre-Closure QA Validation (QA-VALID-001) — runs when the provider attempts to close the
+     encounter, right after attestation. Any failed check must be resolved (with a documented
+     reason) or the chart cannot close. Overridden closures surface on the QA Reviewer's
+     Closure Flags list (M04-QA-CLOSE-001). -->
+<div id="qaValidModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9990;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;width:500px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+    <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#FEF2F2;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:14px;font-weight:700;color:#991B1B;flex:1;">⚑ Chart Closure — Validation Required</span>
+      <span style="font-size:10px;font-family:monospace;color:#FCA5A5;">QA-VALID-001</span>
+    </div>
+    <div style="padding:16px 18px;">
+      <div style="font-size:12px;color:#374151;margin-bottom:12px;">The following items must be resolved before this chart can be closed:</div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="qaCheckList">
+        <div class="qa-check-item" style="display:flex;flex-direction:column;gap:8px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="color:#DC2626;font-size:14px;flex-shrink:0;">✗</span>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#991B1B;">Social Needs Screener — Unanswered</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">Patient indicated food insecurity. Provider must document plan or referral in the template.</div></div>
+            <button class="qa-resolve-btn" onclick="showOverrideField(this)" style="background:#fff;border:1px solid #E5E0D8;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;color:#374151;white-space:nowrap;">Resolve</button>
+          </div>
+          <div class="qa-override-field" style="display:none;padding-left:24px;gap:6px;flex-direction:column;">
+            <textarea rows="2" placeholder="Override reason (required — logged to QA audit)" style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;resize:vertical;"></textarea>
+            <button onclick="confirmOverride(this)" style="align-self:flex-start;background:#065F46;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Confirm Override</button>
+          </div>
+        </div>
+        <div class="qa-check-item" style="display:flex;flex-direction:column;gap:8px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 12px;">
+          <div style="display:flex;align-items:flex-start;gap:10px;">
+            <span style="color:#DC2626;font-size:14px;flex-shrink:0;">✗</span>
+            <div style="flex:1;"><div style="font-size:12px;font-weight:600;color:#991B1B;">Assessment — Missing Diagnosis Code</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">At least one ICD-10 code is required in the Assessment section before closure.</div></div>
+            <button class="qa-resolve-btn" onclick="showOverrideField(this)" style="background:#fff;border:1px solid #E5E0D8;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;color:#374151;white-space:nowrap;">Resolve</button>
+          </div>
+          <div class="qa-override-field" style="display:none;padding-left:24px;gap:6px;flex-direction:column;">
+            <textarea rows="2" placeholder="Override reason (required — logged to QA audit)" style="width:100%;border:1px solid #E5E0D8;border-radius:6px;padding:6px 8px;font-size:11px;font-family:inherit;resize:vertical;"></textarea>
+            <button onclick="confirmOverride(this)" style="align-self:flex-start;background:#065F46;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Confirm Override</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding:10px 12px;background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;font-size:12px;color:#92400E;">
+        <strong>Override:</strong> You may override individual items by resolving them and providing a reason. Override reasons are flagged in the QA Closure audit log and appear on the QA Reviewer's Closure Flags list.
+      </div>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">
+      <button onclick="document.getElementById('qaValidModal').style.display='none'" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">Cancel</button>
+      <button id="qaCloseBtn" disabled onclick="completeClose()" style="background:#9CA3AF;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:not-allowed;font-family:inherit;">Close Encounter</button>
+    </div>
+  </div>
+</div>
+
 <!-- Ready to Connect Modal — single confirmation; timer starts only after this is confirmed -->
 <div class="modal-backdrop" id="connectCallModal">
   <div class="modal" style="width:460px;max-width:95vw;">
@@ -2981,7 +3028,12 @@ function updateSignBtn() {
   btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
 }
 function confirmSign() {
+  // Attestation is confirmed — now run the Pre-Closure QA Validation gate (QA-VALID-001)
+  // before the chart is actually allowed to close.
   closeSignModal();
+  openQaValidModal();
+}
+function finalizeSignAndClose() {
   var t = document.getElementById('routeToast');
   if (t) { t.textContent = '✓ Chart signed and closed — CST-2026-10849'; t.style.display = 'block'; setTimeout(function(){ t.style.display = 'none'; }, 3000); }
 }
@@ -2989,6 +3041,75 @@ document.addEventListener('DOMContentLoaded', function() {
   var sm = document.getElementById('signModal');
   if (sm) sm.addEventListener('click', function(e) { if (e.target === this) closeSignModal(); });
 });
+
+// ── Pre-Closure QA Validation (QA-VALID-001) — gates the actual chart closure ──
+function openQaValidModal() {
+  var modal = document.getElementById('qaValidModal');
+  modal.style.display = 'flex';
+  // Reset every check to unresolved each time the modal opens
+  document.querySelectorAll('.qa-check-item').forEach(function(item) {
+    var btn = item.querySelector('.qa-resolve-btn');
+    var field = item.querySelector('.qa-override-field');
+    var icon = item.querySelector('span');
+    var oldLabel = item.querySelector('.qa-overridden-label');
+    if (oldLabel) oldLabel.remove();
+    btn.textContent = 'Resolve';
+    btn.disabled = false;
+    btn.style.background = '#fff';
+    btn.style.color = '#374151';
+    btn.style.display = '';
+    field.style.display = 'none';
+    field.querySelector('textarea').value = '';
+    item.style.background = '#FEF2F2';
+    item.style.borderColor = '#FCA5A5';
+    if (icon) { icon.textContent = '✗'; icon.style.color = '#DC2626'; }
+  });
+  var closeBtn = document.getElementById('qaCloseBtn');
+  closeBtn.disabled = true;
+  closeBtn.style.background = '#9CA3AF';
+  closeBtn.style.cursor = 'not-allowed';
+}
+function showOverrideField(btn) {
+  var item = btn.closest('.qa-check-item');
+  item.querySelector('.qa-override-field').style.display = 'flex';
+  btn.style.display = 'none';
+}
+function confirmOverride(btn) {
+  var field = btn.closest('.qa-override-field');
+  var textarea = field.querySelector('textarea');
+  var reason = textarea.value.trim();
+  if (!reason) { textarea.style.borderColor = '#DC2626'; textarea.focus(); return; }
+  var item = field.closest('.qa-check-item');
+  item.style.background = '#F0FDF4';
+  item.style.borderColor = '#6EE7B7';
+  var icon = item.querySelector('span');
+  if (icon) { icon.textContent = '✓'; icon.style.color = '#059669'; }
+  field.style.display = 'none';
+  var resolvedLabel = document.createElement('span');
+  resolvedLabel.className = 'qa-overridden-label';
+  resolvedLabel.textContent = 'Overridden';
+  resolvedLabel.style.cssText = 'background:#059669;color:#fff;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;white-space:nowrap;';
+  item.querySelector('div[style*="align-items:flex-start"]').appendChild(resolvedLabel);
+  // Check if every item on the checklist is now resolved (icon shows ✓)
+  var unresolved = Array.from(document.querySelectorAll('.qa-check-item')).filter(function(i) {
+    return i.querySelector('span').textContent !== '✓';
+  });
+  if (unresolved.length === 0) {
+    var closeBtn = document.getElementById('qaCloseBtn');
+    closeBtn.disabled = false;
+    closeBtn.style.background = '#065F46';
+    closeBtn.style.cursor = 'pointer';
+  }
+}
+function completeClose() {
+  document.getElementById('qaValidModal').style.display = 'none';
+  finalizeSignAndClose();
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#059669;color:#fff;border-radius:10px;padding:12px 20px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
+  t.textContent = '✓ Encounter closed — override reasons logged to QA audit (QA-VALID-001)';
+  document.body.appendChild(t);
+  setTimeout(function() { t.remove(); }, 4000);
+}
 
 
 // Route modal
