@@ -377,6 +377,10 @@ def inject_sidebar_nav():
             ('Messages',      '/provider/messages',       'message',      ['/provider/messages']),
             ('Settings',      '/provider/settings',       'settings',     ['/provider/settings']),
         ],
+        'qa_reviewer': [
+            ('Review Queue',    '/provider/qa-reviewer',           'clipboard', ['/provider/qa-reviewer']),
+            ('Completed Items', '/provider/qa-reviewer/completed', 'check',     ['/provider/qa-reviewer/completed']),
+        ],
     }
 
     raw_items = RAW.get(role, [])
@@ -387,6 +391,9 @@ def inject_sidebar_nav():
         if href == '/provider/rn' and _path.startswith('/provider/rn/'):
             is_active = False
         if href == '/provider/ma' and _path.startswith('/provider/ma/'):
+            is_active = False
+        # special case: /provider/qa-reviewer is only active for the queue itself, not /provider/qa-reviewer/completed
+        if href == '/provider/qa-reviewer' and _path.startswith('/provider/qa-reviewer/'):
             is_active = False
         nav_items.append({'label': label, 'href': href, 'icon': ICONS[icon_key], 'active': is_active})
 

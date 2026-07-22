@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Completed Items — QA Reviewer{% endblock %}
+{% block head %}
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; }
+.qr-shell { margin-top: 60px; margin-left: 56px; }
+.qr-topbar { background: #6B21A8; color: #fff; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 14px; }
+.qr-topbar-title { font-size: 16px; font-weight: 700; }
+.qr-topbar-sub { font-size: 12px; color: #FDE68A; }
+.qr-body { padding: 28px 24px; }
+.page-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: #6B7280; margin-bottom: 20px; }
+.stat-row { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.stat-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; padding: 16px 20px; min-width: 160px; flex: 1; }
+.stat-label { font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.stat-value { font-size: 28px; font-weight: 700; }
+.stat-value.green { color: #059669; }
+.stat-value.red { color: #DC2626; }
+.queue-card { background: #fff; border: 1px solid #E5E0D8; border-radius: 10px; overflow: hidden; }
+.queue-header { padding: 14px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.queue-title { font-size: 14px; font-weight: 700; color: #111827; flex: 1; }
+.badge { font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 20px; }
+.badge-green { background: #D1FAE5; color: #065F46; }
+.search-box { position: relative; min-width: 260px; }
+.search-box input { width: 100%; border: 1px solid #E5E0D8; border-radius: 20px; padding: 7px 14px 7px 32px; font-size: 12.5px; font-family: inherit; color: #374151; }
+.search-box input:focus { outline: none; border-color: #6B21A8; }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: #9CA3AF; }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.04em; background: #F9F5EE; border-bottom: 1px solid #E5E0D8; }
+tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+.p-name { font-weight: 600; color: #111827; }
+.p-id { font-size: 11px; color: #9CA3AF; }
+.cp-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #EDE9FE; color: #5B21B6; }
+.status-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; display: inline-block; white-space: nowrap; }
+.st-approved { background: #D1FAE5; color: #065F46; }
+.st-rejected { background: #FEE2E2; color: #991B1B; }
+.qa-note { font-size: 11px; color: #6B7280; font-style: italic; margin-top: 3px; }
+.action-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; }
+.btn-review { border-color: #6B21A8; color: #6B21A8; background: #fff; }
+.btn-review:hover { background: #F5F0FB; }
+.empty-state { padding: 40px 20px; text-align: center; font-size: 13px; color: #9CA3AF; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="qr-shell">
+  <div class="qr-topbar">
+    <div class="qr-topbar-title">Completed Items — Quinn Patel</div>
+    <div class="qr-topbar-sub">Role: QA Reviewer · History of approved &amp; rejected decisions</div>
+  </div>
+
+  <div class="qr-body">
+    <div class="page-title">Completed Items</div>
+    <div class="page-sub">History of every approved and rejected QA decision. Search by patient, consult ID, care product, or outcome. Items still in progress live in <a href="/provider/qa-reviewer" style="color:#6B21A8;font-weight:600;">Review Queue</a> in the left-hand nav.</div>
+
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-label">Total Completed</div><div class="stat-value" id="statTotal">10</div></div>
+      <div class="stat-card"><div class="stat-label">Approved</div><div class="stat-value green" id="statApprovedTotal">6</div></div>
+      <div class="stat-card"><div class="stat-label">Rejected</div><div class="stat-value red" id="statRejectedTotal">4</div></div>
+    </div>
+
+    <div class="queue-card">
+      <div class="queue-header">
+        <div class="queue-title">Completed History</div>
+        <span class="badge badge-green" id="completedCountBadge">10 items</span>
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="completedSearch" placeholder="Search patient, consult ID, care product, outcome…" oninput="filterCompleted()">
+        </div>
+      </div>
+      <table>
+        <thead><tr><th>Patient</th><th>Consult</th><th>Care Product</th><th>Outcome</th><th>Detail</th><th>Reviewed By</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="completedBody">
+          <tr data-search="linda p. cst-2026-11175 third-party testosterone approved">
+            <td><div class="p-name">Linda P.</div><div class="p-id">PT-2026-00571</div></td>
+            <td>CST-2026-11175</td>
+            <td><span class="cp-tag">Testosterone</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Third-party order</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 22, 7:58 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11175')">View →</button></td>
+          </tr>
+          <tr data-search="james o. cst-2026-11119 poa ed treatment rejected lacks healthcare decision-making authority">
+            <td><div class="p-name">James O.</div><div class="p-id">PT-2026-00388</div></td>
+            <td>CST-2026-11119</td>
+            <td><span class="cp-tag">ED Treatment</span></td>
+            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
+            <td style="font-size:12px;">POA — Third-party order<div class="qa-note" style="color:#DC2626;">Lacks Healthcare Decision-Making Authority</div></td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 22, 8:22 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11119')">View →</button></td>
+          </tr>
+          <tr data-search="carla m. cst-2026-11052 everly care a1c approved">
+            <td><div class="p-name">Carla M.</div><div class="p-id">PT-2026-00598</div></td>
+            <td>CST-2026-11052</td>
+            <td><span class="cp-tag" style="background:#D1FAE5;color:#065F46;">Everly Care — A1C</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Third-party order</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 21, 2:10 PM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11052')">View →</button></td>
+          </tr>
+          <tr data-search="devon r. minor cst-2026-11008 brca hereditary approved">
+            <td><div class="p-name">Devon R. (minor)</div><div class="p-id">PT-2026-00611</div></td>
+            <td>CST-2026-11008</td>
+            <td><span class="cp-tag">BRCA Hereditary</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Minor — Under 18</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 20, 11:35 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-11008')">View →</button></td>
+          </tr>
+          <tr data-search="michael h. guardian grd-2026-00601 guardian access rejected guardianship authority not established">
+            <td><div class="p-name">Michael H. (guardian)</div><div class="p-id">PT-2026-00602</div></td>
+            <td>GRD-2026-00601</td>
+            <td><span class="cp-tag" style="background:#DCFCE7;color:#166534;">Guardian Access</span></td>
+            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
+            <td style="font-size:12px;">Guardian — Account Access<div class="qa-note" style="color:#DC2626;">Guardianship Authority Not Established</div></td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 19, 3:47 PM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('GRD-2026-00601')">View →</button></td>
+          </tr>
+          <tr data-search="sofia n. cst-2026-10977 dxs testosterone approved">
+            <td><div class="p-name">Sofia N.</div><div class="p-id">PT-2026-00544</div></td>
+            <td>CST-2026-10977</td>
+            <td><span class="cp-tag" style="background:#DBEAFE;color:#1E40AF;">DXS — Testosterone</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Third-party order</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 18, 9:12 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10977')">View →</button></td>
+          </tr>
+          <tr data-search="andre b. cst-2026-10933 poa glp-1 weight rejected missing required signatures or dates">
+            <td><div class="p-name">Andre B. (POA)</div><div class="p-id">PT-2026-00479</div></td>
+            <td>CST-2026-10933</td>
+            <td><span class="cp-tag">GLP-1 Weight</span></td>
+            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
+            <td style="font-size:12px;">POA — Third-party order<div class="qa-note" style="color:#DC2626;">Missing Required Signatures or Dates</div></td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 17, 1:05 PM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10933')">View →</button></td>
+          </tr>
+          <tr data-search="priya k. minor cst-2026-10890 brca hereditary approved">
+            <td><div class="p-name">Priya K. (minor)</div><div class="p-id">PT-2026-00460</div></td>
+            <td>CST-2026-10890</td>
+            <td><span class="cp-tag">BRCA Hereditary</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Minor — Under 18</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 16, 10:20 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10890')">View →</button></td>
+          </tr>
+          <tr data-search="grace t. cst-2026-10845 everly care diabetes approved">
+            <td><div class="p-name">Grace T.</div><div class="p-id">PT-2026-00402</div></td>
+            <td>CST-2026-10845</td>
+            <td><span class="cp-tag" style="background:#D1FAE5;color:#065F46;">Everly Care — Diabetes</span></td>
+            <td><span class="status-pill st-approved">✓ Approved</span></td>
+            <td style="font-size:12px;">Third-party order</td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 15, 4:30 PM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10845')">View →</button></td>
+          </tr>
+          <tr data-search="marcus j. cst-2026-10801 third-party ed treatment rejected missing or incomplete pages">
+            <td><div class="p-name">Marcus J.</div><div class="p-id">PT-2026-00349</div></td>
+            <td>CST-2026-10801</td>
+            <td><span class="cp-tag">ED Treatment</span></td>
+            <td><span class="status-pill st-rejected">✗ Rejected</span></td>
+            <td style="font-size:12px;">Third-party order<div class="qa-note" style="color:#DC2626;">Missing or Incomplete Pages / Illegible ID</div></td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td>Jul 14, 8:55 AM</td>
+            <td><button class="action-btn btn-review" onclick="openHistory('CST-2026-10801')">View →</button></td>
+          </tr>
+        </tbody>
+      </table>
+      <div id="completedEmptyState" class="empty-state" style="display:none;">No completed items match your search.</div>
+    </div>
+  </div>
+</div>
+
+<!-- View-only history modal — same document-preview pattern as the Review Queue, decision-free since these are already resolved -->
+<div id="historyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9993;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;width:620px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+    <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#F5F0FB;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:1;">
+      <span style="font-size:14px;font-weight:700;color:#6B21A8;flex:1;">📄 Completed — <span id="historyConsultId"></span></span>
+      <button onclick="closeHistoryModal()" style="background:none;border:none;font-size:16px;color:#6B21A8;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div style="padding:18px 20px;">
+      <div style="font-size:12px;color:#374151;margin-bottom:12px;">Documents loaded in read-only view. This decision has already been made and audit-logged.</div>
+      <div id="historyFileList" style="display:flex;flex-direction:column;gap:14px;margin-bottom:18px;max-height:360px;overflow-y:auto;padding:2px 6px 4px 2px;background:#FAF9F7;border:1px solid #F0EDE6;border-radius:10px;"></div>
+      <button onclick="closeHistoryModal()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+// ── Mock document previews for completed history (same visual pattern as Review Queue) ──
+var HISTORY_DOC_PREVIEWS = {
+  'CST-2026-11175': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
+  ],
+  'CST-2026-11119': [
+    { kind: 'doc', title: 'Power of Attorney (Financial / Fiduciary)', pageLabel: 'Page 1 of 2', flag: 'Does not grant healthcare decision-making authority' }
+  ],
+  'CST-2026-11052': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
+  ],
+  'CST-2026-11008': [
+    { kind: 'doc', title: 'Minor Consent & Assent Form', pageLabel: 'Page 1 of 2' },
+    { kind: 'id',  subtitle: 'Parent / Guardian Government-Issued Photo ID' }
+  ],
+  'GRD-2026-00601': [
+    { kind: 'id',  subtitle: 'Guardian — Government-Issued Photo ID' },
+    { kind: 'doc', title: 'Guardianship Order', pageLabel: 'Page 1 of 1', flag: 'Document did not clearly establish legal guardian relationship' }
+  ],
+  'CST-2026-10977': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
+  ],
+  'CST-2026-10933': [
+    { kind: 'doc', title: 'Power of Attorney', pageLabel: 'Page 1 of 3', flag: 'Missing required signature and date' }
+  ],
+  'CST-2026-10890': [
+    { kind: 'doc', title: 'Minor Consent & Assent Form', pageLabel: 'Page 1 of 2' },
+    { kind: 'id',  subtitle: 'Parent / Guardian Government-Issued Photo ID' }
+  ],
+  'CST-2026-10845': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1' },
+    { kind: 'id',  subtitle: 'Government-Issued Photo ID' }
+  ],
+  'CST-2026-10801': [
+    { kind: 'doc', title: 'Third-Party Authorization Letter', pageLabel: 'Page 1 of 1', flag: 'Missing pages — ID photo illegible' }
+  ]
+};
+
+function buildIdCardHtml(subtitle) {
+  return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
+    '<div style="padding:8px 12px;background:#F3F0FA;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:10px;font-weight:700;color:#6B21A8;letter-spacing:.04em;">🪪 GOVERNMENT-ISSUED PHOTO ID</span>' +
+      '<span style="font-size:10px;color:#9CA3AF;">Image</span>' +
+    '</div>' +
+    '<div style="padding:14px;display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#F5F3FF,#EEF2FF);">' +
+      '<div style="width:58px;height:72px;background:#D1D5DB;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🧑</div>' +
+      '<div style="flex:1;">' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:75%;margin-bottom:7px;"></div>' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:55%;margin-bottom:7px;"></div>' +
+        '<div style="height:8px;background:#C7CBD1;border-radius:3px;width:65%;"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div style="padding:8px 14px;background:#fff;border-top:1px solid #F0EDE6;">' +
+      '<div style="height:5px;background:repeating-linear-gradient(90deg,#111827 0 2px,transparent 2px 4px);opacity:.35;"></div>' +
+      '<div style="font-size:11px;color:#6B7280;margin-top:6px;">' + subtitle + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function buildScanDocHtml(title, pageLabel, flag) {
+  var flagHtml = flag ? '<div style="margin-top:10px;padding:7px 10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;font-size:11px;color:#92400E;">⚠ ' + flag + '</div>' : '';
+  return '<div style="border:1px solid #E5E0D8;border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.05);">' +
+    '<div style="padding:8px 12px;background:#F9F5EE;border-bottom:1px solid #E5E0D8;display:flex;justify-content:space-between;align-items:center;">' +
+      '<span style="font-size:11px;font-weight:700;color:#374151;">📄 ' + title + '</span>' +
+      '<span style="font-size:10px;color:#9CA3AF;">' + pageLabel + '</span>' +
+    '</div>' +
+    '<div style="padding:16px 18px;background:#fff;">' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:92%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:97%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:88%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:94%;margin-bottom:9px;"></div>' +
+      '<div style="height:6px;background:#E5E7EB;border-radius:3px;width:60%;margin-bottom:18px;"></div>' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-end;">' +
+        '<div style="border-bottom:1.5px solid #9CA3AF;width:130px;font-family:cursive,serif;font-size:14px;color:#6B7280;padding-bottom:2px;">Signature on file</div>' +
+        '<div style="font-size:10px;color:#9CA3AF;">Date on file</div>' +
+      '</div>' +
+      flagHtml +
+    '</div>' +
+  '</div>';
+}
+
+function openHistory(id) {
+  document.getElementById('historyConsultId').textContent = id;
+  var previewList = document.getElementById('historyFileList');
+  var docs = HISTORY_DOC_PREVIEWS[id];
+  previewList.innerHTML = docs ?
+    docs.map(function(d) { return d.kind === 'id' ? buildIdCardHtml(d.subtitle) : buildScanDocHtml(d.title, d.pageLabel, d.flag); }).join('') :
+    '<div style="padding:14px;font-size:12px;color:#6B7280;">No document preview available for this record.</div>';
+  document.getElementById('historyModal').style.display = 'flex';
+}
+function closeHistoryModal() {
+  document.getElementById('historyModal').style.display = 'none';
+}
+
+function filterCompleted() {
+  var q = document.getElementById('completedSearch').value.trim().toLowerCase();
+  var rows = document.querySelectorAll('#completedBody tr');
+  var visible = 0;
+  rows.forEach(function(r) {
+    var match = !q || (r.getAttribute('data-search') || '').indexOf(q) !== -1;
+    r.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  document.getElementById('completedCountBadge').textContent = visible + (visible === 1 ? ' item' : ' items');
+  document.getElementById('completedEmptyState').style.display = visible === 0 ? 'block' : 'none';
+}
+</script>
+{% endraw %}
+{% endblock %}
