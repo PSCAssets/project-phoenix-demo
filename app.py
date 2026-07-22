@@ -6,6 +6,7 @@ import requests
 from datetime import datetime, timedelta, timezone
 from flask import Flask, render_template, session, redirect, url_for, request
 from modules import provider, patient, admin, care_team, scheduler
+from modules import demo_state
 import workflow_config
 
 app = Flask(__name__)
@@ -625,7 +626,20 @@ def patient_login_page():
 
 @app.route('/patient/portal')
 def patient_portal_page():
-    return render_template('patient/portal.html')
+    return render_template('patient/portal.html', phone_notify=demo_state.get_phone_notify())
+
+# ── Cross-portal live demo signal (provider notifies patient of upcoming call) ──
+# See modules/demo_state.py. Not tied to a specific role/session on purpose so the
+# Provider Portal action is visible in the Patient Portal in a separate tab.
+@app.route('/demo/notify-patient', methods=['POST'])
+def demo_notify_patient():
+    demo_state.set_phone_notify()
+    return {'ok': True}
+
+@app.route('/demo/clear-notify', methods=['POST'])
+def demo_clear_notify():
+    demo_state.clear_phone_notify()
+    return {'ok': True}
 
 # M02 — Provider Portal (includes async consultation workflow)
 app.register_blueprint(provider.bp, url_prefix="/provider")

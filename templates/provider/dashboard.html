@@ -460,7 +460,7 @@
                 <td colspan="2"><span style="font-size:11px;color:#374151;">Documentation incomplete — Assessment section missing</span></td>
                 <td><button class="cr-btn" style="background:#DC2626;" onclick="event.stopPropagation();window.location.href='/provider/chart?type=async'">Review</button></td>
               </tr>
-              <tr data-program="Weight Management" data-type="Phone" data-ct-type="phone" data-wait-sec="11640" data-status="SLA Alert" onclick="window.location.href='/provider/chart?type=phone'" style="cursor:pointer">
+              <tr data-program="Weight Management" data-type="Phone" data-ct-type="phone" data-wait-sec="11640" data-status="SLA Alert" onclick="openPhoneConsultGate(event)" style="cursor:pointer">
                 <td><div class="cr-patient">T.W.</div><div class="cr-id">CST-2026-10849</div></td>
                 <td><span class="cr-program">Weight Management</span></td>
                 <td><span style="font-size:11px;color:#6B7280;font-weight:600">TX</span></td>
@@ -469,7 +469,7 @@
                 <td><span class="cr-status escalated">SLA Alert</span></td>
                 <td><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;background:#FEF3C7;color:#92400E;display:inline-block;">Intake review</span></td>
                 <td><span style="color:#DC2626;font-weight:600;">47 min overdue</span></td>
-                <td><button class="cr-btn" onclick="event.stopPropagation();window.location.href='/provider/chart?type=phone'">Open</button></td>
+                <td><button class="cr-btn" onclick="openPhoneConsultGate(event)">Open</button></td>
               </tr>
               <tr data-program="Testosterone" data-type="Async" data-ct-type="async" data-open-encounter="true" data-wait-sec="11760" data-status="In Progress" onclick="window.location.href='/provider/chart?type=async'" style="cursor:pointer">
                 <td><div class="cr-patient">G.O.</div><div class="cr-id">CST-2026-10832</div></td>
@@ -931,6 +931,25 @@
     </div>
   </div>
 
+  <!-- Phone Consult Gate — Notify Patient? (M08-NOT-011 / M08-NOTIFY-003) — shown BEFORE entering the chart -->
+  <div id="phoneGateOverlay" onclick="closePhoneConsultGate()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:500;"></div>
+  <div id="phoneGateModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:501;background:#fff;border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,0.18);width:440px;max-width:94vw;font-family:inherit;">
+    <div style="padding:20px 24px 0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-size:15px;font-weight:700;color:#374151;">Notify Patient?</div>
+        <button onclick="closePhoneConsultGate()" style="background:none;border:none;font-size:18px;color:#9CA3AF;cursor:pointer;line-height:1;">&#215;</button>
+      </div>
+      <div style="font-size:13px;color:#374151;line-height:1.6;margin-bottom:18px;">
+        Would you like to let <strong>Marcus Johnson</strong> know their provider is ready? They'll receive a text and email letting them know the call will begin in approximately <strong>5 minutes</strong>.
+      </div>
+      <div style="font-size:11px;color:#9CA3AF;margin-bottom:16px;">If you're not ready to start yet, you can open the chart without notifying — the patient will be notified automatically the moment you click Join Visit.</div>
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid #F0EBE4;display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="gateSkipAndEnter()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;color:#374151;font-family:inherit;">Not Yet</button>
+      <button onclick="gateNotifyAndEnter()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">Notify Patient</button>
+    </div>
+  </div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -1137,6 +1156,25 @@ function openLicenseModal() {
 function closeLicenseModal() {
   document.getElementById('licModal').style.display = 'none';
   document.getElementById('licModalOverlay').style.display = 'none';
+}
+
+// ── Phone Consult Gate — Notify Patient? (M08-NOT-011 / M08-NOTIFY-003) ──
+function openPhoneConsultGate(event) {
+  if (event) event.stopPropagation();
+  document.getElementById('phoneGateModal').style.display = 'block';
+  document.getElementById('phoneGateOverlay').style.display = 'block';
+}
+function closePhoneConsultGate() {
+  document.getElementById('phoneGateModal').style.display = 'none';
+  document.getElementById('phoneGateOverlay').style.display = 'none';
+}
+function gateNotifyAndEnter() {
+  // Live demo signal: Patient Portal (/patient/portal) reflects this notification in real time.
+  fetch('/demo/notify-patient', { method: 'POST' }).catch(function(){});
+  window.location.href = '/provider/chart?type=phone&notified=1';
+}
+function gateSkipAndEnter() {
+  window.location.href = '/provider/chart?type=phone&notified=0';
 }
 function selectLicOpt(n) {
   [1,2,3].forEach(function(i) {

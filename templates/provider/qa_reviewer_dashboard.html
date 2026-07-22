@@ -35,6 +35,10 @@ tbody tr:last-child td { border-bottom: none; }
 .trigger-minor { background: #DBEAFE; color: #1D4ED8; }
 .trigger-poa { background: #FEF3C7; color: #92400E; }
 .trigger-third { background: #F3E8FF; color: #6B21A8; }
+.trigger-guardian { background: #DCFCE7; color: #166534; }
+.reject-code-row { display: flex; align-items: flex-start; gap: 10px; border: 1px solid #E5E0D8; border-radius: 8px; padding: 10px 12px; cursor: pointer; }
+.reject-code-row:hover { background: #FAF7F2; }
+.reject-code-row.selected { border-color: #DC2626; background: #FEF2F2; }
 .action-btn { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid; margin-right: 6px; }
 .btn-review { border-color: #6B21A8; color: #6B21A8; background: #fff; }
 .btn-review:hover { background: #F5F0FB; }
@@ -42,6 +46,9 @@ tbody tr:last-child td { border-bottom: none; }
 .btn-approve:hover { background: #D1FAE5; }
 .btn-reject { border-color: #DC2626; color: #DC2626; background: #fff; }
 .btn-reject:hover { background: #FEF2F2; }
+.btn-clarify { border-color: #B45309; color: #B45309; background: #fff; }
+.btn-clarify:hover { background: #FEF3C7; }
+.trigger-clarify { background: #FEF3C7; color: #92400E; }
 .qa-note { font-size: 11px; color: #6B7280; font-style: italic; }
 .completed-tag { font-size: 11px; font-weight: 600; color: #059669; background: #D1FAE5; padding: 2px 8px; border-radius: 4px; }
 </style>
@@ -60,9 +67,10 @@ tbody tr:last-child td { border-bottom: none; }
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9CA3AF;margin-bottom:8px;">Today's snapshot</div>
     <div class="stat-row">
       <div class="stat-card" style="cursor:pointer;border-left:3px solid #DC2626;" onclick="openUrgentPanel()"><div class="stat-label">Urgent Messages</div><div class="stat-value red">3</div></div>
-      <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('pendingQueueBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">Pending Review</div><div class="stat-value amber">4</div></div>
+      <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('pendingQueueBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">Pending Review</div><div class="stat-value amber">5</div></div>
       <div class="stat-card"><div class="stat-label">Approved Today</div><div class="stat-value green">7</div></div>
       <div class="stat-card"><div class="stat-label">Rejected Today</div><div class="stat-value red">1</div></div>
+      <div class="stat-card" style="cursor:pointer;border-left:3px solid #B45309;" onclick="document.getElementById('clarifyQueueBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">Needs Clarification</div><div class="stat-value" style="color:#B45309;">1</div></div>
       <div class="stat-card" style="cursor:pointer;" onclick="document.getElementById('closureFlagsBody').scrollIntoView({behavior:'smooth'})"><div class="stat-label">SLA Breach Risk</div><div class="stat-value amber">1</div></div>
     </div>
 
@@ -70,7 +78,7 @@ tbody tr:last-child td { border-bottom: none; }
     <div class="queue-card">
       <div class="queue-header">
         <div class="queue-title">Pending Review</div>
-        <span class="badge badge-amber">4 items</span>
+        <span class="badge badge-amber">5 items</span>
       </div>
       <!-- Filter chips (QA-CHIP-001) -->
       <div style="padding:10px 16px;background:#FAF7F2;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -80,6 +88,7 @@ tbody tr:last-child td { border-bottom: none; }
         <button class="filter-chip" onclick="filterChip('brca',this)" style="background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">BRCA Hereditary</button>
         <button class="filter-chip" onclick="filterChip('minor',this)" style="background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Minor</button>
         <button class="filter-chip" onclick="filterChip('poa',this)" style="background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">POA</button>
+        <button class="filter-chip" onclick="filterChip('guardian',this)" style="background:#fff;color:#374151;border:1px solid #E5E0D8;border-radius:20px;padding:3px 12px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">Guardian</button>
         <span style="font-size:10px;font-family:monospace;color:#9CA3AF;margin-left:auto;">QA-CHIP-001</span>
       </div>
       <table>
@@ -96,7 +105,8 @@ tbody tr:last-child td { border-bottom: none; }
             <td>
               <button class="action-btn btn-review" onclick="openReview('CST-2026-11221')">Review Docs</button>
               <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11221')">Approve ✓</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11221')">Reject ✗</button>
+              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11221', 'minor')">Clarify ?</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11221', 'minor')">Reject ✗</button>
             </td>
           </tr>
           <tr data-program="poa">
@@ -106,11 +116,27 @@ tbody tr:last-child td { border-bottom: none; }
             <td><span class="trigger-badge trigger-poa">POA — Third-party order</span></td>
             <td>Jordan Patel, RN</td>
             <td>Today 9:02 AM</td>
-            <td>1 document uploaded ✓</td>
+            <td>POA + Physician Certification of Incapacity — 2 files, 3 pages declared ✓<div class="qa-note">Springing clause: Yes (certification attached — POA-004)</div></td>
             <td>
               <button class="action-btn btn-review" onclick="openReview('CST-2026-11198')">Review Docs</button>
               <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11198')">Approve ✓</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11198')">Reject ✗</button>
+              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11198', 'poa')">Clarify ?</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11198', 'poa')">Reject ✗</button>
+            </td>
+          </tr>
+          <tr data-program="guardian">
+            <td><div class="p-name">Jennifer T. (guardian)</div><div class="p-id">Minor: Ethan T. · PT-2026-00659</div></td>
+            <td>&mdash; <span class="qa-note">(account access, not consult-tied)</span></td>
+            <td><span class="cp-tag" style="background:#DCFCE7;color:#166534;">Guardian Access</span></td>
+            <td><span class="trigger-badge trigger-guardian">Guardian — Account Access</span></td>
+            <td>Self-service (Patient Portal)</td>
+            <td>Today 9:40 AM</td>
+            <td>Gov ID + Guardianship Order — 2 files, 2 pages declared ✓<div class="qa-note">M01-GRD-001 · POA-007</div></td>
+            <td>
+              <button class="action-btn btn-review" onclick="openReview('GRD-2026-00659')">Review Docs</button>
+              <button class="action-btn btn-approve" onclick="approveQA('GRD-2026-00659')">Approve ✓</button>
+              <button class="action-btn btn-clarify" onclick="clarifyQA('GRD-2026-00659', 'guardian')">Clarify ?</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('GRD-2026-00659', 'guardian')">Reject ✗</button>
             </td>
           </tr>
           <tr data-program="everly">
@@ -124,7 +150,8 @@ tbody tr:last-child td { border-bottom: none; }
             <td>
               <button class="action-btn btn-review" onclick="openReview('CST-2026-11244')">Review Docs</button>
               <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11244')">Approve ✓</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11244')">Reject ✗</button>
+              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11244', 'everly')">Clarify ?</button>
+              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11244', 'everly')">Reject ✗</button>
             </td>
           </tr>
           <tr data-program="minor">
@@ -140,6 +167,30 @@ tbody tr:last-child td { border-bottom: none; }
               <button class="action-btn btn-approve" style="opacity:0.4;cursor:not-allowed;" disabled>Approve ✓</button>
               <button class="action-btn btn-reject" style="opacity:0.4;cursor:not-allowed;" disabled>Reject ✗</button>
             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Escalated — Needs Clarification (POA-008) -->
+    <div class="queue-card" style="border-color:#FDE68A;">
+      <div class="queue-header" style="background:#FFFBEB;">
+        <div class="queue-title" style="color:#92400E;">? Escalated — Needs Clarification</div>
+        <span class="badge" style="background:#FEF3C7;color:#92400E;">1 open</span>
+        <span style="font-size:10px;font-family:monospace;color:#FDE68A;margin-left:auto;">POA-008</span>
+      </div>
+      <div style="padding:10px 16px;font-size:12px;color:#6B7280;background:#FFFDF6;border-bottom:1px solid #FDE68A;">Cases a QA Reviewer could not confidently approve or deny — escalated to CX Leadership / Compliance. No PHI is released and the patient sees a neutral "under review" status, not a rejection, while a case is open here.</div>
+      <table>
+        <thead><tr><th>Patient</th><th>Consult</th><th>Care Product</th><th>Escalated By</th><th>Reviewer Note</th><th>Escalated</th><th>Actions</th></tr></thead>
+        <tbody id="clarifyQueueBody">
+          <tr>
+            <td><div class="p-name">Diane H. (POA)</div><div class="p-id">PT-2026-00699</div></td>
+            <td>CST-2026-11302</td>
+            <td><span class="cp-tag">Testosterone</span></td>
+            <td>Quinn Patel, QA Reviewer</td>
+            <td style="font-size:12px;color:#92400E;">"General POA language is ambiguous on whether it covers healthcare decisions — needs Compliance/Legal read before I can approve or deny."</td>
+            <td>Yesterday 4:12 PM</td>
+            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11302')">Review →</button></td>
           </tr>
         </tbody>
       </table>
@@ -167,7 +218,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>CST-2026-11119</td>
             <td><span class="cp-tag">ED Treatment</span></td>
             <td><span class="trigger-badge trigger-poa">POA — Third-party order</span></td>
-            <td><span style="font-size:11px;font-weight:600;color:#DC2626;background:#FEF2F2;padding:2px 8px;border-radius:4px;">✗ Rejected — Missing POA doc</span></td>
+            <td><span style="font-size:11px;font-weight:600;color:#DC2626;background:#FEF2F2;padding:2px 8px;border-radius:4px;">✗ Rejected — Lacks Healthcare Decision-Making Authority</span></td>
             <td>8:22 AM</td>
           </tr>
         </tbody>
@@ -272,6 +323,32 @@ tbody tr:last-child td { border-bottom: none; }
   </div>
   <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
 
+  <!-- Structured Rejection Reason Modal (POA-002) -->
+  <div id="rejectModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9995;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#FEF2F2;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:14px;font-weight:700;color:#991B1B;flex:1;">✗ Reject Submission — <span id="rejectModalConsultId"></span></span>
+        <span style="font-size:10px;font-family:monospace;color:#FCA5A5;">POA-002</span>
+      </div>
+      <div style="padding:16px 18px;">
+        <div style="font-size:12px;color:#374151;margin-bottom:12px;">Select the reason for rejection. This drives the exact corrective-action message the patient receives — freeform notes alone are not sufficient.</div>
+        <div id="rejectCodeList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div style="margin-top:12px;">
+          <label style="font-size:11px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Additional notes (optional)</label>
+          <textarea id="rejectFreeform" rows="2" placeholder="Any additional context for the record..." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
+        </div>
+        <div id="rejectPatientPreview" style="display:none;margin-top:12px;padding:10px 12px;background:#F9F5EE;border:1px solid #E5E0D8;border-radius:8px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:4px;">Patient will see</div>
+          <div id="rejectPatientMsg" style="font-size:12px;color:#374151;"></div>
+        </div>
+      </div>
+      <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">
+        <button onclick="closeRejectModal()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">Cancel</button>
+        <button id="rejectConfirmBtn" disabled onclick="confirmReject()" style="background:#9CA3AF;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:not-allowed;font-family:inherit;">Reject &amp; Notify Patient</button>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -279,18 +356,105 @@ tbody tr:last-child td { border-bottom: none; }
 function openReview(id) {
   alert('Opening document viewer for consult ' + id + '\n\nDocuments loaded in read-only view.\nReview all uploaded files before approving or rejecting.');
 }
+function clarifyQA(id, submissionType) {
+  var note = prompt('Needs Clarification — consult ' + id + ':\n\nDescribe why you cannot confidently approve or deny (this routes to CX Leadership / Compliance, not the standard reject queue — POA-008):');
+  if (note) {
+    alert('? Escalated — ' + id + ' routed to CX Leadership / Compliance escalation queue.\nNote: ' + note +
+          '\n\nNo PHI released. Patient sees a neutral "under review" status — this is not a rejection.');
+    location.reload();
+  }
+}
 function approveQA(id) {
   if (confirm('Approve QA stage for consult ' + id + '?\n\nThe consult workflow will automatically resume.')) {
     alert('✓ Approved — Consult ' + id + ' resumed. GC notified.');
     location.reload();
   }
 }
-function rejectQA(id) {
-  var reason = prompt('Reject reason for consult ' + id + ':\n(Required — will be sent to GC Administrator queue)');
-  if (reason) {
-    alert('✗ Rejected — Consult ' + id + ' routed to GC Administrator queue.\nReason: ' + reason);
-    location.reload();
+// Structured rejection reason codes — POA-002
+var REJECT_CODES = [
+  { code: 'springing', label: 'Springing Clause Without Physician Certification', types: ['poa'],
+    desc: 'POA contains a springing clause (only effective upon incapacity) and no physician certification of incapacity was submitted.',
+    patientMsg: 'Your Power of Attorney document includes a springing clause, which only takes effect if the principal becomes incapacitated. To proceed, please upload a physician’s certification of incapacity along with your POA document.' },
+  { code: 'no_authority', label: 'Lacks Healthcare Decision-Making Authority', types: ['poa'],
+    desc: 'Document is financial/fiduciary-only or otherwise does not explicitly grant authority over health information/PHI.',
+    patientMsg: 'The document you submitted does not grant authority over healthcare decisions or health information. A financial or fiduciary-only Power of Attorney cannot be accepted — please submit a POA or legal document that explicitly covers healthcare decisions.' },
+  { code: 'missing_pages', label: 'Missing or Incomplete Pages / Illegible ID', types: ['poa', 'guardian', 'minor', 'everly'],
+    desc: 'Submission is missing pages, cuts off content, or the government ID is not legible.',
+    patientMsg: 'Part of your submission was missing, cut off, or not legible. Please re-upload all pages of your document and a clear photo of your government-issued ID, making sure the full page is in frame.' },
+  { code: 'guardian_authority', label: 'Guardianship Authority Not Established', types: ['guardian'],
+    desc: 'Document does not clearly show the legal parent/guardian relationship.',
+    patientMsg: 'The document you submitted does not clearly establish your legal guardian or parent relationship to this patient. Please submit a birth certificate, court-issued guardianship order, or equivalent documentation.' },
+  { code: 'missing_signature', label: 'Missing Required Signatures or Dates', types: ['poa', 'guardian'],
+    desc: 'Document lacks a required signature or date (SOP 51015 §5.4.2).',
+    patientMsg: 'Your document is missing a required signature or date. Please have the document fully signed and dated, then re-upload.' },
+  { code: 'altered', label: 'Evidence of Alteration or Tampering', types: ['poa', 'guardian'],
+    desc: 'Mismatched fonts, obvious edits, or other signs the document was altered (SOP 51015 §5.4.4).',
+    patientMsg: 'We were unable to accept this document because it appears to have been altered or edited after signing. Please submit a fresh, unaltered copy of the original document.' },
+  { code: 'expired', label: 'Expired, Revoked, or Outdated Document', types: ['poa', 'guardian'],
+    desc: 'The authorization is no longer current (SOP 51015 §5.4.4).',
+    patientMsg: 'The document you submitted is expired, revoked, or out of date. Please submit a current, valid authorization document.' },
+  { code: 'missing_id_info', label: 'Missing Member or Representative Identifiers', types: ['poa', 'guardian'],
+    desc: "Document does not clearly state the member's full name or the representative's full name (SOP 51015 §5.4.2).",
+    patientMsg: "Your document does not clearly identify the member and/or the representative by full name. Please submit a document that clearly names both parties." },
+  { code: 'other', label: 'Other', types: ['poa', 'guardian', 'minor', 'everly'],
+    desc: 'Reason not covered above — additional notes required.',
+    patientMsg: 'There was an issue with your submission. Please see the notes from your care team, or contact support for details.' }
+];
+var rejectContext = { id: null, type: null, selected: null };
+
+function rejectQA(id, submissionType) {
+  rejectContext = { id: id, type: submissionType || 'poa', selected: null };
+  document.getElementById('rejectModalConsultId').textContent = id;
+  document.getElementById('rejectFreeform').value = '';
+  document.getElementById('rejectPatientPreview').style.display = 'none';
+  var list = document.getElementById('rejectCodeList');
+  var applicable = REJECT_CODES.filter(function(c) { return c.types.indexOf(rejectContext.type) !== -1; });
+  list.innerHTML = applicable.map(function(c) {
+    return '<div class="reject-code-row" data-code="' + c.code + '" onclick="selectRejectCode(\'' + c.code + '\')">' +
+      '<span style="font-size:14px;flex-shrink:0;margin-top:1px;">○</span>' +
+      '<div><div style="font-size:12px;font-weight:700;color:#111827;">' + c.label + '</div>' +
+      '<div style="font-size:11px;color:#6B7280;margin-top:2px;">' + c.desc + '</div></div></div>';
+  }).join('');
+  document.getElementById('rejectConfirmBtn').disabled = true;
+  document.getElementById('rejectConfirmBtn').style.background = '#9CA3AF';
+  document.getElementById('rejectConfirmBtn').style.cursor = 'not-allowed';
+  document.getElementById('rejectModalOverlay').style.display = 'flex';
+}
+
+function selectRejectCode(code) {
+  rejectContext.selected = code;
+  document.querySelectorAll('.reject-code-row').forEach(function(r) {
+    var isSel = r.getAttribute('data-code') === code;
+    r.classList.toggle('selected', isSel);
+    r.querySelector('span').textContent = isSel ? '●' : '○';
+    r.querySelector('span').style.color = isSel ? '#DC2626' : '#374151';
+  });
+  var c = REJECT_CODES.filter(function(x) { return x.code === code; })[0];
+  document.getElementById('rejectPatientMsg').textContent = c.patientMsg;
+  document.getElementById('rejectPatientPreview').style.display = 'block';
+  var btn = document.getElementById('rejectConfirmBtn');
+  btn.disabled = false;
+  btn.style.background = '#991B1B';
+  btn.style.cursor = 'pointer';
+}
+
+function closeRejectModal() {
+  document.getElementById('rejectModalOverlay').style.display = 'none';
+}
+
+function confirmReject() {
+  if (!rejectContext.selected) return;
+  var c = REJECT_CODES.filter(function(x) { return x.code === rejectContext.selected; })[0];
+  var notes = document.getElementById('rejectFreeform').value;
+  if (rejectContext.selected === 'other' && !notes) {
+    alert('Notes are required when selecting "Other".');
+    return;
   }
+  closeRejectModal();
+  var queueLabel = rejectContext.type === 'guardian' ? 'Guardian resolution queue' : 'GC Administrator queue';
+  alert('✗ Rejected — ' + rejectContext.id + ' routed to ' + queueLabel + '.\nReason code: ' + c.label +
+        (notes ? '\nNotes: ' + notes : '') + '\n\nPatient notified with corrective-action message (POA-002).');
+  location.reload();
 }
 
 // Filter chips — Everly Care / product type

@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+{% block title %}POA / Guardian Documents — Everlywell{% endblock %}
+{% block head %}
+<style>
+  :root{--navy:#2D5C2E;--green:#3E8168;--green-dark:#2D5F4E;--green-light:#F0FDF4;--white:#FFFFFF;--bg:#FAF7F2;--border:#D4E4DC;--gray:#64748B;--text:#1E293B;--blue-bg:#F2EDE4;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);display:flex;min-height:100vh;}
+  .sidenav{width:240px;background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:fixed;top: 60px;left: 0;bottom:0;z-index:100;}
+  .nav-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,0.1);}
+  .nav-logo-text{font-size:18px;font-weight:700;color:#fff;}
+  .nav-logo-sub{font-size:11px;color:rgba(255,255,255,0.5);margin-top:2px;}
+  .nav-user{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;gap:10px;}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+  .nav-user-name{font-size:13px;font-weight:600;color:#fff;}
+  .nav-user-prog{font-size:11px;color:rgba(255,255,255,0.5);}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:rgba(255,255,255,0.7);border-radius:6px;margin:1px 8px;position:relative;text-decoration:none;}
+  .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+  .nav-item.active{background:rgba(62,129,104,0.25);color:#fff;}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--green);border-radius:0 2px 2px 0;margin-left:8px;}
+  .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0;}
+  .nav-badge{margin-left:auto;background:#EF4444;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .nav-bottom{margin-top:auto;padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1);}
+  .main{margin-left: 240px;flex:1;min-height:100vh;}
+  .topbar{background:#fff;border-bottom:1px solid var(--border);padding:0 28px;height:60px;display:flex;align-items:center;position:sticky;top:0;z-index:50;}
+  .topbar-title{font-size:18px;font-weight:700;color:var(--navy);flex:1;}
+  .content{padding:24px 28px;max-width:760px;}
+  .demo-toggle{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray);}
+  .demo-pill{border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;background:#fff;color:#374151;}
+  .demo-pill.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px 22px;margin-bottom:18px;}
+  .card-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px;}
+  .card-sub{font-size:12.5px;color:var(--gray);margin-bottom:14px;}
+  .existing-auth-card{background:var(--green-light);border:1.5px solid #BBF7D0;}
+  .checking-row{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--gray);padding:6px 0;}
+  .spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:6px;}
+  .sub-note{font-size:11.5px;color:var(--gray);margin-bottom:10px;line-height:1.5;}
+  .select-input{width:100%;border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);margin-bottom:16px;}
+  .radio-row{display:flex;gap:10px;margin-bottom:6px;}
+  .radio-pill{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;color:#374151;}
+  .radio-pill.sel{border-color:var(--green);background:var(--green-light);color:var(--green-dark);}
+  .disclaimer-box{background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#92400E;margin:10px 0 16px;line-height:1.5;}
+  .drop-zone{border:2px dashed var(--border);border-radius:10px;padding:22px;text-align:center;cursor:pointer;margin-bottom:6px;background:#FAF7F2;}
+  .drop-zone:hover{border-color:var(--green);}
+  .drop-zone.required-missing{border-color:#FCA5A5;background:#FEF2F2;}
+  .file-list{font-size:12px;color:var(--green-dark);font-weight:600;margin-top:6px;}
+  .page-count-row{display:flex;align-items:center;gap:10px;margin:10px 0 16px;}
+  .page-count-row input{width:70px;border:1px solid var(--border);border-radius:7px;padding:7px 10px;font-size:13px;text-align:center;}
+  .field-block{margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid #F0EBE2;}
+  .field-block:last-child{border-bottom:none;padding-bottom:0;}
+  .btn-submit{background:var(--green);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;}
+  .btn-submit:hover{background:var(--green-dark);}
+  .btn-submit:disabled{background:#D1D5DB;cursor:not-allowed;}
+  .btn-secondary{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;color:#374151;}
+  .req-tag{font-size:9.5px;font-family:monospace;color:#9CA3AF;}
+  .success-panel{display:none;text-align:center;padding:36px 24px;}
+</style>
+{% endblock %}
+{% block content %}
+  <aside class="sidenav">
+    <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Patient Portal</div></div>
+    <div class="nav-user">
+      <div class="nav-avatar" style="background:#0EA5E9">JR</div>
+      <div><div class="nav-user-name">Jamie Rivera</div><div class="nav-user-prog">2 Care Products</div></div>
+    </div>
+    <nav style="padding:8px 0;flex:1;">
+      <a href="/patient/" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+      <a href="/patient/consultations" class="nav-item"><span class="nav-icon">💬</span> My Consultations</a>
+      <a href="/patient/appointments" class="nav-item"><span class="nav-icon">📅</span> Appointments</a>
+      <a href="/patient/messages" class="nav-item"><span class="nav-icon">✉️</span> Messages <span class="nav-badge">2</span></a>
+      <a href="/patient/labs" class="nav-item"><span class="nav-icon">🧪</span> Lab Results</a>
+      <a href="/patient/health-profile" class="nav-item"><span class="nav-icon">👤</span> Health Profile</a>
+      <a href="/patient/documents" class="nav-item"><span class="nav-icon">📄</span> Documents</a>
+      <a href="/patient/poa-upload" class="nav-item active"><span class="nav-icon">🪪</span> POA / Guardian Docs</a>
+      <a href="/patient/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+    </nav>
+    <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Power of Attorney &amp; Guardian Documents</div>
+      <div class="demo-toggle">
+        Demo state:
+        <button class="demo-pill on" id="pillNone" onclick="setDemoState('none')">No existing authorization</button>
+        <button class="demo-pill" id="pillExisting" onclick="setDemoState('existing')">Existing authorization on file</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- Checking state (POA-009) -->
+      <div class="card" id="checkingCard">
+        <div class="checking-row"><span class="spinner"></span> Checking your account for an existing authorization on file&hellip; <span class="req-tag" style="margin-left:auto;">POA-009</span></div>
+      </div>
+
+      <!-- Existing authorization found (POA-009) -->
+      <div class="card existing-auth-card" id="existingAuthCard" style="display:none;">
+        <div class="card-title">✓ You already have an authorization on file</div>
+        <div class="card-sub">We found a Verified authorization for Robert Chen, reviewed Jun 2, 2026 by Quinn Patel, QA Reviewer. It covers healthcare decisions for this account and hasn't expired.</div>
+        <div style="font-size:12.5px;color:#166534;">No new documents are needed for this request. This replaces the manual "check the CX POA spreadsheet" step from SOP 51015 with an automatic check &mdash; you don't have to ask the patient to resend what we already have.</div>
+        <button class="btn-secondary" style="margin-top:14px;" onclick="document.getElementById('newSubmissionAnyway').style.display='block';this.style.display='none';">Submit a new document anyway</button>
+      </div>
+
+      <!-- Submission form (POA-004 / POA-006 / POA-007) -->
+      <div class="card" id="newSubmissionAnyway">
+        <div class="card-title">Submit POA or Guardian Documentation <span class="req-tag">POA-001 &middot; POA-004 &middot; POA-006 &middot; POA-007</span></div>
+        <div class="card-sub">Our QA team reviews everything submitted here before any access is granted. A government-issued photo ID is required for both Power of Attorney and guardian requests.</div>
+
+        <div class="field-block">
+          <label class="label">What are you submitting?</label>
+          <select class="select-input" id="docKind" onchange="onDocKindChange()">
+            <option value="poa">Power of Attorney (I'm authorized to act on someone's behalf)</option>
+            <option value="guardian">Guardian / Parent Access (I'm the parent or legal guardian of a minor patient)</option>
+          </select>
+        </div>
+
+        <div class="field-block" id="springingBlock">
+          <label class="label">Does this POA document include a springing clause? <span class="req-tag">POA-004</span></label>
+          <div class="sub-note">A springing clause means the POA only takes effect if the principal becomes incapacitated.</div>
+          <div class="radio-row">
+            <div class="radio-pill" id="springYes" onclick="setSpringing('yes')">Yes</div>
+            <div class="radio-pill" id="springNo" onclick="setSpringing('no')">No</div>
+            <div class="radio-pill" id="springUnsure" onclick="setSpringing('unsure')">Not sure</div>
+          </div>
+          <div class="disclaimer-box" id="springDisclaimer" style="display:none;">
+            Because your POA has a springing clause, you must also upload a physician's certification of incapacity below. Submissions with a springing clause and no certification will be rejected.
+          </div>
+        </div>
+
+        <div class="field-block" id="mainDocBlock">
+          <label class="label" id="mainDocLabel">Power of Attorney document</label>
+          <div class="sub-note">Capture every page. Make sure the full page is in frame and the text is easy to read, cell phone photos that cut off a page are the most common reason submissions get sent back. PDF, JPG, or PNG, up to 20MB per file.</div>
+          <div class="drop-zone" onclick="document.getElementById('mainDocInput').click()">
+            <div style="font-size:24px;margin-bottom:6px;">📎</div>
+            <div style="font-size:13px;color:var(--gray);">Click to browse or drag and drop</div>
+            <div class="file-list" id="mainDocFiles"></div>
+          </div>
+          <input type="file" id="mainDocInput" multiple style="display:none" onchange="onFilesChosen('mainDocFiles', this)">
+          <div class="page-count-row">
+            <label class="label" style="margin:0;">How many pages total? <span class="req-tag">POA-006</span></label>
+            <input type="number" min="1" id="mainDocPages" placeholder="e.g. 3">
+          </div>
+        </div>
+
+        <div class="field-block" id="certBlock" style="display:none;">
+          <label class="label">Physician's Certification of Incapacity <span class="req-tag">POA-004</span></label>
+          <div class="sub-note">Required because you indicated this POA has a springing clause.</div>
+          <div class="drop-zone" onclick="document.getElementById('certInput').click()">
+            <div style="font-size:24px;margin-bottom:6px;">📎</div>
+            <div style="font-size:13px;color:var(--gray);">Click to browse or drag and drop</div>
+            <div class="file-list" id="certFiles"></div>
+          </div>
+          <input type="file" id="certInput" style="display:none" onchange="onFilesChosen('certFiles', this)">
+        </div>
+
+        <div class="field-block">
+          <label class="label" id="idLabel">Your government-issued photo ID</label>
+          <div class="sub-note">Required for both POA and guardian requests as of our 2026 policy update.</div>
+          <div class="drop-zone" onclick="document.getElementById('idInput').click()">
+            <div style="font-size:24px;margin-bottom:6px;">🪪</div>
+            <div style="font-size:13px;color:var(--gray);">Click to browse or drag and drop</div>
+            <div class="file-list" id="idFiles"></div>
+          </div>
+          <input type="file" id="idInput" style="display:none" onchange="onFilesChosen('idFiles', this)">
+        </div>
+
+        <button class="btn-submit" onclick="submitPoa()">Submit for QA Review</button>
+      </div>
+
+      <!-- Success / pending state -->
+      <div class="card success-panel" id="successPanel">
+        <div style="font-size:36px;margin-bottom:10px;">✓</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Thank you for sending that over</div>
+        <div style="font-size:13.5px;color:var(--gray);max-width:440px;margin:0 auto;">Our QA team will review the documentation and we'll follow up once it's been approved or if anything else is needed.</div>
+        <button class="btn-secondary" style="margin-top:20px;" onclick="location.reload()">Done</button>
+      </div>
+
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+{% raw %}
+<script>
+var springingChoice = null;
+
+function setDemoState(state) {
+  document.getElementById('pillNone').classList.toggle('on', state === 'none');
+  document.getElementById('pillExisting').classList.toggle('on', state === 'existing');
+  document.getElementById('checkingCard').style.display = 'block';
+  document.getElementById('existingAuthCard').style.display = 'none';
+  document.getElementById('newSubmissionAnyway').style.display = 'none';
+  document.getElementById('successPanel').style.display = 'none';
+  setTimeout(function() {
+    document.getElementById('checkingCard').style.display = 'none';
+    if (state === 'existing') {
+      document.getElementById('existingAuthCard').style.display = 'block';
+    } else {
+      document.getElementById('newSubmissionAnyway').style.display = 'block';
+    }
+  }, 700);
+}
+
+function onDocKindChange() {
+  var kind = document.getElementById('docKind').value;
+  var isPoa = kind === 'poa';
+  document.getElementById('springingBlock').style.display = isPoa ? 'block' : 'none';
+  document.getElementById('mainDocLabel').textContent = isPoa ? 'Power of Attorney document' : 'Guardianship or parental authority document';
+  document.getElementById('idLabel').textContent = isPoa ? "Your government-issued photo ID" : "Guardian's government-issued photo ID";
+  if (!isPoa) {
+    document.getElementById('certBlock').style.display = 'none';
+    document.getElementById('springDisclaimer').style.display = 'none';
+    springingChoice = null;
+    ['springYes','springNo','springUnsure'].forEach(function(id){ document.getElementById(id).classList.remove('sel'); });
+  }
+}
+
+function setSpringing(choice) {
+  springingChoice = choice;
+  ['springYes','springNo','springUnsure'].forEach(function(id){ document.getElementById(id).classList.remove('sel'); });
+  var map = { yes: 'springYes', no: 'springNo', unsure: 'springUnsure' };
+  document.getElementById(map[choice]).classList.add('sel');
+  document.getElementById('springDisclaimer').style.display = choice === 'yes' ? 'block' : 'none';
+  document.getElementById('certBlock').style.display = choice === 'yes' ? 'block' : 'none';
+}
+
+function onFilesChosen(listId, input) {
+  var names = Array.from(input.files).map(function(f){ return f.name; });
+  document.getElementById(listId).textContent = names.length ? (names.length + ' file(s): ' + names.join(', ')) : '';
+}
+
+function submitPoa() {
+  var kind = document.getElementById('docKind').value;
+  var mainFiles = document.getElementById('mainDocInput').files;
+  var idFiles = document.getElementById('idInput').files;
+  var certFiles = document.getElementById('certInput').files;
+
+  if (!mainFiles.length) {
+    alert('Please upload the ' + (kind === 'poa' ? 'Power of Attorney document' : 'guardianship document') + ' before submitting.');
+    return;
+  }
+  if (!idFiles.length) {
+    alert('A government-issued photo ID is required before submitting (M01-POA-001).');
+    return;
+  }
+  if (kind === 'poa' && springingChoice === 'yes' && !certFiles.length) {
+    alert('Because you indicated this POA has a springing clause, a physician\'s certification of incapacity is required (POA-004).');
+    return;
+  }
+
+  document.getElementById('newSubmissionAnyway').style.display = 'none';
+  document.getElementById('existingAuthCard').style.display = 'none';
+  document.getElementById('successPanel').style.display = 'block';
+}
+
+onDocKindChange();
+setDemoState('none');
+</script>
+{% endraw %}
+{% endblock %}

@@ -22,6 +22,27 @@
   .main { margin-left: 240px; flex: 1; min-height: 100vh; }
   .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
   .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; }
+  .widget-header { padding: 16px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .widget-title { font-size: 15px; font-weight: 700; color: #111827; flex: 1; }
+  .widget-sub { font-size: 12px; color: #6B7280; padding: 0 20px 14px; border-bottom: 1px solid #E5E0D8; }
+  .filter-chip { background: #fff; color: #374151; border: 1px solid #E5E0D8; border-radius: 20px; padding: 3px 12px; font-size: 11px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .filter-chip.active { background: #1D4ED8; color: #fff; border-color: #1D4ED8; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 11px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; background: #F2EDE4; border-bottom: 1px solid #E5E0D8; white-space: nowrap; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: #374151; border-bottom: 1px solid #E5E0D8; vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #FAF7F2; }
+  .p-id { font-size: 11px; color: #9CA3AF; margin-top: 2px; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; display: inline-block; white-space: nowrap; }
+  .s-verified { background: #D1FAE5; color: #065F46; }
+  .s-pending { background: #FEF3C7; color: #92400E; }
+  .s-clarify { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+  .s-revoked { background: #FEE2E2; color: #991B1B; }
+  .action-link { color: #7C3AED; font-size: 12px; font-weight: 600; text-decoration: none; }
+  .action-link:hover { text-decoration: underline; }
+  .req-tag { font-size: 10px; font-family: monospace; color: #9CA3AF; }
 </style>
 {% endblock %}
 {% block content %}
@@ -48,10 +69,103 @@
     <div class="topbar-title">Patients</div>
     <span style="font-size:13px;color:#6B7280;">Chris Navarro · Platform Admin</span>
   </div>
-  <div style="padding: 48px 28px; text-align: center; color: #6B7280;">
-    <div style="font-size: 24px; margin-bottom: 12px;">👥</div>
-    <h2 style="font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 8px;">Patients</h2>
-    <p style="font-size: 14px;">Patient management coming soon.</p>
+  <div class="content">
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">Power of Attorney &amp; Guardian Access</span>
+        <button class="filter-chip active" onclick="filterPoa('all',this)">All</button>
+        <button class="filter-chip" onclick="filterPoa('verified',this)">Verified</button>
+        <button class="filter-chip" onclick="filterPoa('pending',this)">Pending</button>
+        <button class="filter-chip" onclick="filterPoa('clarify',this)">Needs Clarification</button>
+        <button class="filter-chip" onclick="filterPoa('revoked',this)">Revoked / Rejected</button>
+        <span class="req-tag">M03-POA-003a</span>
+      </div>
+      <div class="widget-sub">Patients with a POA or Guardian access record on file. Grant, verify, or revoke access from a patient's record. Matches the QA Reviewer queue and SOP 51015 §5.5.1 fields — no separate CX POA spreadsheet needed.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Patient</th>
+            <th>POA / Guardian Holder</th>
+            <th>Relationship</th>
+            <th>Status</th>
+            <th>Reviewed</th>
+            <th>Expires</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="patientsBody">
+          <tr data-status="verified">
+            <td><div style="font-weight:600;">Jamie Rivera</div><div class="p-id">PT-2026-00590</div></td>
+            <td>Robert Chen</td>
+            <td>Power of Attorney</td>
+            <td><span class="status-pill s-verified">✓ Verified</span></td>
+            <td>Jun 2, 2026 · Quinn Patel, QA Reviewer</td>
+            <td>&mdash;</td>
+            <td><a href="/admin/patients/PT-2026-00590" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="pending">
+            <td><div style="font-weight:600;">Robert C.</div><div class="p-id">PT-2026-00587</div></td>
+            <td>Susan Cole</td>
+            <td>Power of Attorney (springing)</td>
+            <td><span class="status-pill s-pending">Pending Review</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><a href="/admin/patients/PT-2026-00587" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="pending">
+            <td><div style="font-weight:600;">Ethan T. (minor)</div><div class="p-id">PT-2026-00659</div></td>
+            <td>Jennifer T.</td>
+            <td>Legal Guardian (parent)</td>
+            <td><span class="status-pill s-pending">Pending Review</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><a href="/admin/patients/PT-2026-00659" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="clarify">
+            <td><div style="font-weight:600;">Diane H.</div><div class="p-id">PT-2026-00699</div></td>
+            <td>Michael H.</td>
+            <td>Power of Attorney</td>
+            <td><span class="status-pill s-clarify">? Needs Clarification</span></td>
+            <td>&mdash;</td>
+            <td>&mdash;</td>
+            <td><a href="/admin/patients/PT-2026-00699" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="verified">
+            <td><div style="font-weight:600;">Linda P.</div><div class="p-id">PT-2026-00571</div></td>
+            <td>Carol Peterson</td>
+            <td>Power of Attorney</td>
+            <td><span class="status-pill s-verified">✓ Verified</span></td>
+            <td>Today 7:58 AM · Quinn Patel, QA Reviewer</td>
+            <td>Jul 12, 2027</td>
+            <td><a href="/admin/patients/PT-2026-00571" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="revoked">
+            <td><div style="font-weight:600;">James O.</div><div class="p-id">PT-2026-00388</div></td>
+            <td>David Ortiz</td>
+            <td>Power of Attorney (financial only)</td>
+            <td><span class="status-pill s-revoked">✗ Rejected</span></td>
+            <td>Today 8:22 AM · Quinn Patel, QA Reviewer</td>
+            <td>&mdash;</td>
+            <td><a href="/admin/patients/PT-2026-00388" class="action-link">View →</a></td>
+          </tr>
+          <tr data-status="none">
+            <td><div style="font-weight:600;">Maria S.</div><div class="p-id">PT-2026-00614</div></td>
+            <td colspan="4" style="color:#9CA3AF;">No POA or Guardian authorization on file</td>
+            <td><a href="/admin/patients/PT-2026-00614" class="action-link">View →</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
+<script>
+function filterPoa(status, btn) {
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  btn.classList.add('active');
+  document.querySelectorAll('#patientsBody tr').forEach(function(row){
+    if (status === 'all' || row.dataset.status === status) row.style.display = '';
+    else row.style.display = 'none';
+  });
+}
+</script>
 {% endblock %}

@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% block title %}Patient Record{% endblock %}
+{% block head %}
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #FAF7F2; display: flex; min-height: 100vh; }
+  .sidenav { width: 240px; background: #1D4ED8; min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 60px; left: 0; bottom: 0; z-index: 100; }
+  .nav-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .nav-logo-text { font-size: 18px; font-weight: 700; color: #fff; }
+  .nav-logo-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+  .nav-user { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .nav-user-name { font-size: 13px; font-weight: 600; color: #fff; }
+  .nav-user-role { font-size: 11px; color: rgba(255,255,255,0.5); }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; font-size: 13px; color: rgba(255,255,255,0.7); border-radius: 6px; margin: 1px 8px; position: relative; text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+  .nav-item.active { background: rgba(124,58,237,0.25); color: #fff; }
+  .nav-item.active::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: #7C3AED; border-radius: 0 2px 2px 0; margin-left: 8px; }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-bottom { margin-top: auto; padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+  .main { margin-left: 240px; flex: 1; min-height: 100vh; }
+  .topbar { background: #fff; border-bottom: 1px solid #E5E0D8; padding: 0 28px; height: 60px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-back { font-size: 13px; color: #7C3AED; text-decoration: none; font-weight: 600; }
+  .topbar-title { font-size: 18px; font-weight: 700; color: #111827; flex: 1; }
+  .content { padding: 24px 28px; }
+  .patient-header { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; padding: 18px 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .patient-avatar { width: 48px; height: 48px; border-radius: 50%; background: #EDE9FE; color: #6D28D9; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; flex-shrink: 0; }
+  .patient-name { font-size: 17px; font-weight: 700; color: #111827; }
+  .patient-meta { font-size: 12.5px; color: #6B7280; margin-top: 2px; }
+  .widget { background: #fff; border: 1px solid #E5E0D8; border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .widget-header { padding: 16px 20px; border-bottom: 1px solid #E5E0D8; display: flex; align-items: center; gap: 10px; }
+  .widget-title { font-size: 15px; font-weight: 700; color: #111827; flex: 1; }
+  .req-tag { font-size: 10px; font-family: monospace; color: #9CA3AF; }
+  .widget-body { padding: 20px; }
+  .status-pill { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; display: inline-block; white-space: nowrap; }
+  .s-verified { background: #D1FAE5; color: #065F46; }
+  .s-pending { background: #FEF3C7; color: #92400E; }
+  .s-clarify { background: #FEF3C7; color: #92400E; border: 1px solid #FDE68A; }
+  .s-revoked { background: #FEE2E2; color: #991B1B; }
+  .field-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 24px; }
+  .field-label { font-size: 11px; font-weight: 600; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+  .field-value { font-size: 13.5px; color: #111827; }
+  .note-box { margin-top: 16px; padding: 12px 14px; background: #F9F5EE; border: 1px solid #E5E0D8; border-radius: 8px; font-size: 12.5px; color: #374151; }
+  .doc-list { list-style: none; margin-top: 4px; }
+  .doc-list li { font-size: 13px; color: #374151; padding: 3px 0; }
+  .btn-row { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+  .btn { border-radius: 7px; padding: 8px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; font-family: inherit; border: none; }
+  .btn-grant { background: #065F46; color: #fff; }
+  .btn-expiry { background: #fff; color: #374151; border: 1px solid #E5E0D8; }
+  .btn-revoke { background: #FEF2F2; color: #991B1B; border: 1px solid #FCA5A5; }
+  .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
+  .audit-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid #F2EDE4; font-size: 12.5px; }
+  .audit-item:last-child { border-bottom: none; }
+  .audit-date { color: #9CA3AF; white-space: nowrap; width: 140px; flex-shrink: 0; }
+  .audit-actor { color: #6B7280; }
+  .empty-state { padding: 32px 20px; text-align: center; color: #6B7280; font-size: 13.5px; }
+</style>
+{% endblock %}
+{% block content %}
+<aside class="sidenav">
+  <div class="nav-logo"><div class="nav-logo-text">Everlywell</div><div class="nav-logo-sub">Admin Portal</div></div>
+  <div class="nav-user">
+    <div class="nav-avatar" style="background:#7C3AED">CN</div>
+    <div><div class="nav-user-name">Chris Navarro</div><div class="nav-user-role">Platform Admin</div></div>
+  </div>
+  <nav style="padding: 8px 0; flex: 1;">
+    <a href="/admin/" class="nav-item"><span class="nav-icon">📊</span> Dashboard</a>
+    <a href="/admin/care-products" class="nav-item"><span class="nav-icon">🧬</span> Care Products</a>
+    <a href="/admin/clients" class="nav-item"><span class="nav-icon" style="display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span> Clients</a>
+    <a href="/admin/providers" class="nav-item"><span class="nav-icon">👩‍⚕️</span> Providers</a>
+    <a href="/admin/patients" class="nav-item active"><span class="nav-icon">👥</span> Patients</a>
+    <a href="/admin/ma-queue" class="nav-item"><span class="nav-icon">📋</span> MA Queue</a>
+    <a href="/admin/reports" class="nav-item"><span class="nav-icon">📈</span> Reports</a>
+    <a href="/admin/settings" class="nav-item"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="nav-bottom"><a href="/logout" class="nav-item" style="font-size:12px;color:rgba(255,255,255,0.4)"><span class="nav-icon">←</span> Switch User</a></div>
+</aside>
+<div class="main">
+  <div class="topbar">
+    <a href="/admin/patients" class="topbar-back">← Patients</a>
+    <div class="topbar-title" style="margin-left:8px;">Patient Record</div>
+    <span style="font-size:13px;color:#6B7280;">Chris Navarro · Platform Admin</span>
+  </div>
+  <div class="content">
+    {% if record %}
+    <div class="patient-header">
+      <div class="patient-avatar">{{ record.name[:2].upper() }}</div>
+      <div>
+        <div class="patient-name">{{ record.name }}</div>
+        <div class="patient-meta">{{ patient_id }} · DOB {{ record.dob }} · {{ record.care_products|join(', ') }}</div>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">Power of Attorney &amp; Guardian Access</span>
+        <span class="req-tag">M03-POA-003a</span>
+      </div>
+      <div class="widget-body">
+        {% if record.poa %}
+        {% set poa = record.poa %}
+        <div style="margin-bottom:14px;">
+          {% if poa.status == 'verified' %}<span class="status-pill s-verified">✓ Verified</span>
+          {% elif poa.status == 'pending' %}<span class="status-pill s-pending">Pending Review</span>
+          {% elif poa.status == 'clarify' %}<span class="status-pill s-clarify">? Needs Clarification</span>
+          {% elif poa.status == 'revoked' %}<span class="status-pill s-revoked">✗ Rejected</span>
+          {% endif %}
+        </div>
+        <div class="field-grid">
+          <div><div class="field-label">Holder Full Name</div><div class="field-value">{{ poa.holder_name }}</div></div>
+          <div><div class="field-label">Relationship</div><div class="field-value">{{ poa.relationship }}</div></div>
+          <div><div class="field-label">Phone</div><div class="field-value">{{ poa.phone }}</div></div>
+          <div><div class="field-label">Email</div><div class="field-value">{{ poa.email }}</div></div>
+          <div><div class="field-label">Date Reviewed</div><div class="field-value">{{ poa.date_reviewed or '—' }}</div></div>
+          <div><div class="field-label">Reviewer</div><div class="field-value">{{ poa.reviewer or '—' }}</div></div>
+          <div><div class="field-label">Access Expiry</div><div class="field-value" id="expiryValue">{{ poa.expiry or '—' }}</div></div>
+          {% if poa.rejection_code %}
+          <div><div class="field-label">Rejection Reason Code</div><div class="field-value" style="color:#991B1B;">{{ poa.rejection_code }} <span class="req-tag">POA-002</span></div></div>
+          {% endif %}
+        </div>
+        <div>
+          <div class="field-label" style="margin-top:16px;">Documents on File</div>
+          <ul class="doc-list">
+            {% for doc in poa.documents %}<li>📄 {{ doc }}</li>{% endfor %}
+          </ul>
+        </div>
+        {% if poa.note %}<div class="note-box">{{ poa.note }}</div>{% endif %}
+        <div class="btn-row">
+          <button class="btn btn-grant" id="btnGrant" onclick="grantPoa()" {% if poa.status == 'verified' %}disabled{% endif %}>Grant / Verify Access</button>
+          <button class="btn btn-expiry" onclick="setExpiry()">Set Expiry Date</button>
+          <button class="btn btn-revoke" id="btnRevoke" onclick="revokePoa()" {% if poa.status == 'revoked' %}disabled{% endif %}>Revoke Access</button>
+        </div>
+        {% else %}
+        <div class="empty-state">No POA or Guardian authorization on file for this patient.</div>
+        <div class="btn-row">
+          <button class="btn btn-grant" onclick="alert('This would open the POA/Guardian upload flow on the patient\'s behalf — same fields as the self-service patient portal (/patient/poa-upload).')">+ Add POA / Guardian Record</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-header">
+        <span class="widget-title">Audit Trail</span>
+        <span class="req-tag">M03-POA-003a</span>
+      </div>
+      <div class="widget-body" id="auditBody">
+        {% if record.audit %}
+          {% for a in record.audit %}
+          <div class="audit-item"><div class="audit-date">{{ a.date }}</div><div><span class="audit-actor">{{ a.actor }}</span> — {{ a.action }}</div></div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">No POA/Guardian actions logged yet.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% else %}
+    <div class="widget"><div class="empty-state">No record found for patient ID {{ patient_id }}.</div></div>
+    {% endif %}
+  </div>
+</div>
+<script>
+function logAudit(action) {
+  var body = document.getElementById('auditBody');
+  var empty = body.querySelector('.empty-state');
+  if (empty) empty.remove();
+  var now = new Date();
+  var row = document.createElement('div');
+  row.className = 'audit-item';
+  row.innerHTML = '<div class="audit-date">Just now</div><div><span class="audit-actor">Chris Navarro, Platform Admin</span> — ' + action + '</div>';
+  body.prepend(row);
+}
+function grantPoa() {
+  logAudit('Granted / verified POA access');
+  var btn = document.getElementById('btnGrant'); if (btn) btn.disabled = true;
+  var revoke = document.getElementById('btnRevoke'); if (revoke) revoke.disabled = false;
+}
+function setExpiry() {
+  var input = prompt('Set POA access expiry date (e.g. Jul 21, 2027):');
+  if (!input) return;
+  var el = document.getElementById('expiryValue');
+  if (el) el.textContent = input;
+  logAudit('Set access expiry date to ' + input);
+}
+function revokePoa() {
+  if (!confirm('Revoke this POA/Guardian access? This takes effect immediately.')) return;
+  logAudit('Revoked POA access');
+  var btn = document.getElementById('btnRevoke'); if (btn) btn.disabled = true;
+  var grant = document.getElementById('btnGrant'); if (grant) grant.disabled = false;
+}
+</script>
+{% endblock %}

@@ -54,6 +54,10 @@ def documents():
 def settings():
     return render_template("patient/settings.html")
 
+@bp.route("/poa-upload")
+def poa_upload():
+    return render_template("patient/poa_upload.html")
+
 @bp.route("/labs/detail")
 def lab_detail():
     lab = request.args.get('lab', 'testosterone')

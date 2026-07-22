@@ -135,6 +135,9 @@
 .btn-end-call:hover { background: #DC2626; }
 .btn-hold { background: #fff; border: 1px solid #E5E0D8; color: #374151; padding: 10px 26px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
 .btn-hold:hover { background: #F9FAFB; }
+.btn-join-visit { background: #6B21A8; color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-join-visit:hover { background: #5B1898; }
+.phone-notify-badge { font-size: 11px; font-weight: 600; color: #059669; background: #ECFDF5; border: 1px solid #A7F3D0; padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; }
 
 /* Video workspace */
 .video-workspace { display: none; flex-direction: column; height: 100%; }
@@ -638,18 +641,18 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       </div>
       <div class="wf-line wf-line-done" style="margin-top:11px;"></div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-        <div class="wf-circle wf-active" style="background:#6B21A8;box-shadow:0 0 0 3px rgba(107,33,168,0.2);">2</div>
-        <div style="font-size:10px;color:#6B21A8;font-weight:700;text-align:center;white-space:nowrap;">MA<br>Review</div>
+        <div class="wf-circle wf-done">✓</div>
+        <div style="font-size:10px;color:#6B7280;text-align:center;white-space:nowrap;">MA<br>Review</div>
       </div>
-      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div class="wf-line wf-line-done" style="margin-top:11px;"></div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-        <div class="wf-circle wf-pending">3</div>
-        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Provider<br>Assigned</div>
+        <div class="wf-circle wf-done">✓</div>
+        <div style="font-size:10px;color:#6B7280;text-align:center;white-space:nowrap;">Provider<br>Assigned</div>
       </div>
-      <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
+      <div class="wf-line wf-line-done" style="margin-top:11px;"></div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
-        <div class="wf-circle wf-pending">4</div>
-        <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Consult</div>
+        <div class="wf-circle wf-active" style="background:#6B21A8;box-shadow:0 0 0 3px rgba(107,33,168,0.2);">4</div>
+        <div style="font-size:10px;color:#6B21A8;font-weight:700;text-align:center;white-space:nowrap;">Consult</div>
       </div>
       <div class="wf-line" style="margin-top:11px;border-top:2px dashed #D1D5DB;height:0;background:none;"></div>
       <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
@@ -662,7 +665,7 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
         <div style="font-size:10px;color:#9CA3AF;text-align:center;white-space:nowrap;">Complete</div>
       </div>
     </div>
-    <div class="wf-label">Currently: <strong>MA Review</strong> · Assigned to: MA</div>
+    <div class="wf-label">Currently: <strong>Consult</strong> · Assigned to: Dr. Sarah Lee</div>
   </div>
 
   <!-- Consult Type Banner — Phone -->
@@ -900,13 +903,22 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
           <div class="phone-icon-wrap">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498A1 1 0 0121 17.72V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
           </div>
-          <div class="phone-heading">Phone Consultation in Progress</div>
+          <div class="phone-heading" id="phoneHeading">Ready to Join — Marcus Johnson</div>
           <div class="phone-timer" id="phoneTimer">00:00</div>
           <div class="phone-meta">Patient Phone: (555) 234-5678</div>
-          <div class="phone-btns">
-            <button class="btn-end-call" onclick="alert('Call ended')">End Call</button>
+          <div class="phone-btns" id="phoneBtnsPreJoin">
+            <button class="btn-join-visit" onclick="openJoinVisitModal()">Join Visit</button>
+          </div>
+          <div class="phone-btns" id="phoneBtnsActive" style="display:none;">
+            <button class="btn-end-call" onclick="endPhoneCall()">End Call</button>
             <button class="btn-hold" onclick="alert('Patient on hold')">Hold</button>
           </div>
+          <div id="phoneCallEndedPanel" style="display:none;flex-direction:column;align-items:center;gap:10px;">
+            <div style="font-size:13px;color:#059669;font-weight:600;background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:10px 16px;">Call duration: <span id="phoneFinalDuration">00:00</span></div>
+            <div style="font-size:13px;color:#374151;text-align:center;max-width:320px;line-height:1.5;">The consultation has ended. Complete your documentation and sign the chart to close this encounter.</div>
+            <button class="btn-join-visit" onclick="openSignModal()">Document &amp; Sign Chart</button>
+          </div>
+          <div id="phoneJoinCaption" style="margin-top:2px;font-size:12px;color:#6B7280;text-align:center;max-width:280px;"></div>
         </div>
 
         <!-- Video workspace -->
@@ -1460,41 +1472,41 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
 
         <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
           <div style="padding:10px 14px;background:#F5F3FF;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">BRCA1 — Patient Education Overview</span>
+            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">Testosterone Replacement Therapy — Monitoring Guidelines</span>
             <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Published</span>
           </div>
           <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
-            BRCA1 is a tumor suppressor gene. A pathogenic variant significantly increases lifetime risk of breast and ovarian cancer. Surveillance and risk-reduction options are available.<br>
-            <span style="font-size:11px;color:#9CA3AF;">Gene: BRCA1 · Inheritance: Autosomal dominant · NIH ACMG81 eligible</span>
+            Baseline and follow-up labs for TRT should include Total Testosterone, Free Testosterone, Hematocrit (HCT), and PSA (men 40+). Recheck labs 90 days after initiation or dose adjustment, then every 6&ndash;12 months. Monitor for erythrocytosis (HCT &gt;54%) and evaluate PSA per age-appropriate screening guidelines.<br>
+            <span style="font-size:11px;color:#9CA3AF;">Care Product: Testosterone Care · Topic: Lab Monitoring</span>
           </div>
           <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
-            <button onclick="insertBlurb('BRCA1 Patient Education Overview')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
+            <button onclick="insertBlurb('Testosterone Replacement Therapy Monitoring Guidelines')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
             <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full</button>
           </div>
         </div>
 
         <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
           <div style="padding:10px 14px;background:#F5F3FF;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">Lynch Syndrome — Surveillance Guide</span>
+            <span style="font-size:12px;font-weight:700;color:#5B21B6;flex:1;">Trough vs. Peak Symptom Patterns — Patient Education</span>
             <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Published</span>
           </div>
           <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
-            Lynch syndrome is caused by variants in MMR genes (MLH1, MSH2, MSH6, PMS2). Carriers have elevated risk for colorectal, endometrial, and other cancers. Annual colonoscopy recommended from age 25.<br>
-            <span style="font-size:11px;color:#9CA3AF;">Gene: MLH1, MSH2, MSH6 · NIH ACMG81 eligible</span>
+            Patients on injectable TRT (e.g., Testosterone Cypionate) may notice symptom fluctuation between doses &mdash; fatigue and low energy in the days preceding the next injection (trough) versus improved energy shortly after (peak). Adjusting the injection interval (e.g., q14d &rarr; q10d) or moving to a more frequent, lower-dose schedule can reduce trough symptoms.<br>
+            <span style="font-size:11px;color:#9CA3AF;">Care Product: Testosterone Care · Topic: Patient Education</span>
           </div>
           <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
-            <button onclick="insertBlurb('Lynch Syndrome Surveillance Guide')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
+            <button onclick="insertBlurb('Trough vs Peak Symptom Patterns Patient Education')" style="padding:5px 14px;background:#6B21A8;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Insert into Letter</button>
             <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full</button>
           </div>
         </div>
 
         <div style="border:1.5px solid #FDE68A;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
           <div style="padding:10px 14px;background:#FEF9EE;border-bottom:1px solid #FDE68A;display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;font-weight:700;color:#92400E;flex:1;">BRCA2 Splice Variant — Patient Summary</span>
+            <span style="font-size:12px;font-weight:700;color:#92400E;flex:1;">Testosterone &amp; Cardiometabolic Risk — Comorbidity Guidance</span>
             <span style="font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:4px;">Pending Publish</span>
           </div>
           <div style="padding:10px 14px;font-size:12px;color:#374151;line-height:1.6;">
-            This article is pending review by the GC Administrator before it becomes available for use in patient letters.
+            This article is pending review by the Clinical Content team before it becomes available for use in patient letters.
           </div>
           <div style="padding:8px 14px;border-top:1px solid #FDE68A;display:flex;gap:8px;">
             <button disabled style="padding:5px 14px;background:#9CA3AF;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:not-allowed;">Insert into Letter</button>
@@ -1511,6 +1523,49 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
       <!-- Linked Consults panel — M02-LNK-001 -->
       <div class="right-panel" id="rightPanel4" style="padding:14px 16px;overflow-y:auto;display:none;flex-direction:column;gap:12px;">
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:4px;">🔗 Linked Consults</div>
+
+        {% if session.get('role') in ['provider_md', 'provider_np'] %}
+        <!-- Subscription-mode example (M04-CARE-REL-001) — Testosterone Care -->
+        <div style="background:#CFFAFE;border:1px solid #A5F3FC;border-radius:8px;padding:10px 14px;font-size:12px;color:#164E63;margin-bottom:4px;">
+          Episode ID: <strong>EP-2026-00849</strong> · Subscription (Testosterone Care) · 2 linked consults
+        </div>
+
+        <!-- Initial Consultation linked consult -->
+        <div style="border:1.5px solid #E5E0D8;border-radius:8px;overflow:hidden;background:#fff;margin-bottom:4px;">
+          <div style="padding:10px 14px;background:#F0FDF4;border-bottom:1px solid #E5E0D8;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;background:#D1FAE5;color:#065F46;padding:2px 7px;border-radius:4px;">Initial Consultation</span>
+            <span style="font-size:12px;font-weight:700;color:#111827;flex:1;">CST-2026-10721</span>
+            <span style="font-size:11px;color:#059669;font-weight:600;">Closed</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#374151;">
+            <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px;">
+              <span><span style="color:#9CA3AF;font-size:11px;">Provider</span><br>Dr. Sarah Lee, MD</span>
+              <span><span style="color:#9CA3AF;font-size:11px;">Date</span><br>Jun 5, 2026</span>
+              <span><span style="color:#9CA3AF;font-size:11px;">Care Product</span><br>Testosterone Care</span>
+            </div>
+            <div style="font-size:11px;color:#6B7280;background:#F9F5EE;border-radius:6px;padding:8px 10px;line-height:1.5;">
+              <strong>Note excerpt:</strong> Patient initiated Testosterone Cypionate 200mg/2mL weekly for Testosterone Care. Baseline labs reviewed: Total T 320 ng/dL, HCT within normal limits. Treatment plan and injection protocol discussed. Follow-up scheduled to reassess levels and symptoms.
+            </div>
+          </div>
+          <div style="padding:8px 14px;border-top:1px solid #E5E0D8;display:flex;gap:8px;">
+            <button onclick="importPriorNote('CST-2026-10721')" style="padding:5px 14px;background:#0E7490;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">Import Note into Current</button>
+            <button style="padding:5px 12px;border:1px solid #E5E0D8;border-radius:6px;font-size:11px;background:#fff;cursor:pointer;">View Full Chart</button>
+          </div>
+        </div>
+
+        <!-- Current consult indicator -->
+        <div style="border:2px solid #6B21A8;border-radius:8px;overflow:hidden;background:#F5F3FF;margin-bottom:4px;">
+          <div style="padding:10px 14px;border-bottom:1px solid #DDD6FE;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:10px;font-weight:700;background:#EDE9FE;color:#5B21B6;padding:2px 7px;border-radius:4px;">Follow-up</span>
+            <span style="font-size:12px;font-weight:700;color:#6B21A8;flex:1;">CST-2026-10849 (current)</span>
+            <span style="font-size:11px;color:#D97706;font-weight:600;">In Progress</span>
+          </div>
+          <div style="padding:10px 14px;font-size:12px;color:#5B21B6;">
+            This is the currently open consult.
+          </div>
+        </div>
+        {% else %}
+        <!-- Episode-mode example (M04-CARE-REL-001) — Genetics Pre-Test/Post-Test -->
         <div style="background:#CFFAFE;border:1px solid #A5F3FC;border-radius:8px;padding:10px 14px;font-size:12px;color:#164E63;margin-bottom:4px;">
           Episode ID: <strong>EP-2026-00849</strong> · 2 linked consults in this episode
         </div>
@@ -1549,6 +1604,7 @@ Expected connection in under 2 minutes.')" style="background:#6B21A8;color:#fff;
             This is the currently open consult.
           </div>
         </div>
+        {% endif %}
 
         <div style="margin-top:4px;">
           <button onclick="linkConsult()" style="width:100%;padding:9px;border:1.5px dashed #CBD5E1;border-radius:8px;background:#F9FAFB;color:#6B7280;font-size:12px;font-weight:600;cursor:pointer;">
@@ -2681,6 +2737,25 @@ P — Plan
   </div>
 </div>
 
+<!-- Ready to Connect Modal — single confirmation; timer starts only after this is confirmed -->
+<div class="modal-backdrop" id="connectCallModal">
+  <div class="modal" style="width:460px;max-width:95vw;">
+    <div class="modal-header">
+      <h3>Ready to Connect</h3>
+      <button class="modal-close" onclick="closeConnectCallModal()">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13px;color:#374151;line-height:1.65;">
+        You are now getting ready to be connected with patient <strong>Marcus Johnson</strong>. Please click OK to connect the call.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeConnectCallModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmConnectCall()">OK, Connect Call</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 {% block scripts %}
 {% raw %}
@@ -3252,16 +3327,88 @@ var concurrentViewerActive = false;
     if (chip) chip.style.display = 'flex';
   }
 
-  // Phone timer
+  // Phone consult — the notify-patient decision now happens on the dashboard BEFORE the provider
+  // enters the chart (see dashboard.html "Notify Patient?" gate). The choice is passed through via
+  // ?notified=1 / ?notified=0 on the URL. Timer does not start until the provider explicitly
+  // connects the call (Join Visit -> Initiating -> Connect).
+  var patientNotified = null; // null = no gate param present (direct nav) / true / false
   if (type === 'phone') {
-    var sec = 0;
-    setInterval(function() {
-      sec++;
-      var m = Math.floor(sec / 60), s = sec % 60;
-      var el = document.getElementById('phoneTimer');
-      if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-    }, 1000);
+    var notifiedParam = params.get('notified');
+    patientNotified = (notifiedParam === '1');
+    updatePhoneJoinCaption();
   }
+
+  function updatePhoneJoinCaption() {
+    var cap = document.getElementById('phoneJoinCaption');
+    if (!cap) return;
+    if (patientNotified) {
+      cap.innerHTML = '<span class="phone-notify-badge">&#10003; Patient notified via SMS &amp; email</span>';
+    } else {
+      cap.textContent = "Patient hasn't been notified yet — click Join Visit to initiate the call and we'll notify them then.";
+    }
+  }
+
+  // --- Phone consult modal chain: Join Visit -> Ready to Connect -> timer starts ---
+  window.openJoinVisitModal = function() {
+    // If the patient wasn't already notified from the dashboard gate, the act of initiating
+    // the call fires the notification now (M08-NOT-011: notice fires on provider call initiation).
+    // Live demo signal: Patient Portal (/patient/portal) reflects this notification in real time.
+    if (!patientNotified) {
+      patientNotified = true;
+      updatePhoneJoinCaption();
+      fetch('/demo/notify-patient', { method: 'POST' }).catch(function(){});
+    }
+    openConnectCallModal();
+  };
+  window.openConnectCallModal = function() {
+    var m = document.getElementById('connectCallModal');
+    if (m) m.classList.add('open');
+  };
+  window.closeConnectCallModal = function() {
+    var m = document.getElementById('connectCallModal');
+    if (m) m.classList.remove('open');
+  };
+  var phoneCallInterval = null;
+  var phoneCallSeconds = 0;
+  function formatPhoneTime(totalSec) {
+    var m = Math.floor(totalSec / 60), s = totalSec % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+  }
+  window.confirmConnectCall = function() {
+    closeConnectCallModal();
+    // Live demo signal: call is connecting now, so the "call in ~5 min" banner on the
+    // Patient Portal is no longer accurate — clear it.
+    fetch('/demo/clear-notify', { method: 'POST' }).catch(function(){});
+    var heading = document.getElementById('phoneHeading');
+    if (heading) heading.textContent = 'Phone Consultation in Progress';
+    var pre = document.getElementById('phoneBtnsPreJoin');
+    if (pre) pre.style.display = 'none';
+    var active = document.getElementById('phoneBtnsActive');
+    if (active) active.style.display = 'flex';
+    var cap = document.getElementById('phoneJoinCaption');
+    if (cap) cap.style.display = 'none';
+    phoneCallSeconds = 0;
+    phoneCallInterval = setInterval(function() {
+      phoneCallSeconds++;
+      var el = document.getElementById('phoneTimer');
+      if (el) el.textContent = formatPhoneTime(phoneCallSeconds);
+    }, 1000);
+  };
+  window.endPhoneCall = function() {
+    if (phoneCallInterval) { clearInterval(phoneCallInterval); phoneCallInterval = null; }
+    var heading = document.getElementById('phoneHeading');
+    if (heading) heading.textContent = 'Call Ended — Marcus Johnson';
+    var active = document.getElementById('phoneBtnsActive');
+    if (active) active.style.display = 'none';
+    var ended = document.getElementById('phoneCallEndedPanel');
+    if (ended) ended.style.display = 'flex';
+    var dur = document.getElementById('phoneFinalDuration');
+    if (dur) dur.textContent = formatPhoneTime(phoneCallSeconds);
+  };
+  ['connectCallModal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+  });
 
   // Concurrent viewer banner (Fix 11)
   if (concurrentViewerActive) {
