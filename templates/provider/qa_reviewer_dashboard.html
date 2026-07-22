@@ -103,10 +103,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Today 8:14 AM</td>
             <td>2 documents uploaded ✓</td>
             <td>
-              <button class="action-btn btn-review" onclick="openReview('CST-2026-11221')">Review Docs</button>
-              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11221')">Approve ✓</button>
-              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11221', 'minor')">Clarify ?</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11221', 'minor')">Reject ✗</button>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11221', 'minor')">Review →</button>
             </td>
           </tr>
           <tr data-program="poa">
@@ -118,10 +115,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Today 9:02 AM</td>
             <td>POA + Physician Certification of Incapacity — 2 files, 3 pages declared ✓<div class="qa-note">Springing clause: Yes (certification attached — POA-004)</div></td>
             <td>
-              <button class="action-btn btn-review" onclick="openReview('CST-2026-11198')">Review Docs</button>
-              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11198')">Approve ✓</button>
-              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11198', 'poa')">Clarify ?</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11198', 'poa')">Reject ✗</button>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11198', 'poa')">Review →</button>
             </td>
           </tr>
           <tr data-program="guardian">
@@ -133,10 +127,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Today 9:40 AM</td>
             <td>Gov ID + Guardianship Order — 2 files, 2 pages declared ✓<div class="qa-note">M01-GRD-001 · POA-007</div></td>
             <td>
-              <button class="action-btn btn-review" onclick="openReview('GRD-2026-00659')">Review Docs</button>
-              <button class="action-btn btn-approve" onclick="approveQA('GRD-2026-00659')">Approve ✓</button>
-              <button class="action-btn btn-clarify" onclick="clarifyQA('GRD-2026-00659', 'guardian')">Clarify ?</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('GRD-2026-00659', 'guardian')">Reject ✗</button>
+              <button class="action-btn btn-review" onclick="openReview('GRD-2026-00659', 'guardian')">Review →</button>
             </td>
           </tr>
           <tr data-program="everly">
@@ -148,10 +139,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Yesterday 3:45 PM</td>
             <td>3 documents uploaded ✓</td>
             <td>
-              <button class="action-btn btn-review" onclick="openReview('CST-2026-11244')">Review Docs</button>
-              <button class="action-btn btn-approve" onclick="approveQA('CST-2026-11244')">Approve ✓</button>
-              <button class="action-btn btn-clarify" onclick="clarifyQA('CST-2026-11244', 'everly')">Clarify ?</button>
-              <button class="action-btn btn-reject" onclick="rejectQA('CST-2026-11244', 'everly')">Reject ✗</button>
+              <button class="action-btn btn-review" onclick="openReview('CST-2026-11244', 'everly')">Review →</button>
             </td>
           </tr>
           <tr data-program="minor">
@@ -163,9 +151,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Today 10:33 AM</td>
             <td>Documents pending upload</td>
             <td>
-              <button class="action-btn btn-review" onclick="openReview('CST-2026-11267')" style="opacity:0.4;cursor:not-allowed;" disabled>Review Docs</button>
-              <button class="action-btn btn-approve" style="opacity:0.4;cursor:not-allowed;" disabled>Approve ✓</button>
-              <button class="action-btn btn-reject" style="opacity:0.4;cursor:not-allowed;" disabled>Reject ✗</button>
+              <button class="action-btn btn-review" style="opacity:0.4;cursor:not-allowed;" disabled>Review →</button>
             </td>
           </tr>
         </tbody>
@@ -190,7 +176,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td>Quinn Patel, QA Reviewer</td>
             <td style="font-size:12px;color:#92400E;">"General POA language is ambiguous on whether it covers healthcare decisions — needs Compliance/Legal read before I can approve or deny."</td>
             <td>Yesterday 4:12 PM</td>
-            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11302')">Review →</button></td>
+            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11302', 'poa', false)">Review →</button></td>
           </tr>
         </tbody>
       </table>
@@ -248,7 +234,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td style="font-size:12px;color:#DC2626;">"Missing social needs response — patient declined to answer"</td>
             <td>Dr. Sarah Lee</td>
             <td>Today 11:04 AM</td>
-            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11308')">Audit →</button></td>
+            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11308', 'everly', false)">Audit →</button></td>
           </tr>
           <tr data-program="dxs">
             <td><div class="p-name">K.M. (adult)</div><div class="p-id">PT-2026-00779</div></td>
@@ -257,7 +243,7 @@ tbody tr:last-child td { border-bottom: none; }
             <td style="font-size:12px;color:#DC2626;">"Medication list incomplete — patient unable to recall all meds"</td>
             <td>Dr. Priya Nair</td>
             <td>Today 9:47 AM</td>
-            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11291')">Audit →</button></td>
+            <td><button class="action-btn btn-review" onclick="openReview('CST-2026-11291', 'everly', false)">Audit →</button></td>
           </tr>
         </tbody>
       </table>
@@ -323,77 +309,60 @@ tbody tr:last-child td { border-bottom: none; }
   </div>
   <div id="urgOverlay" onclick="closeUrgentPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.2);z-index:299;"></div>
 
-  <!-- Structured Rejection Reason Modal (POA-002) -->
-  <div id="rejectModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9995;align-items:center;justify-content:center;">
+  <!-- Unified Review Modal — replaces separate Review/Approve/Clarify/Reject popups -->
+  <div id="reviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9993;align-items:center;justify-content:center;">
     <div style="background:#fff;border-radius:14px;width:560px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
-      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#FEF2F2;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:14px;font-weight:700;color:#991B1B;flex:1;">✗ Reject Submission — <span id="rejectModalConsultId"></span></span>
-        <span style="font-size:10px;font-family:monospace;color:#FCA5A5;">POA-002</span>
-      </div>
-      <div style="padding:16px 18px;">
-        <div style="font-size:12px;color:#374151;margin-bottom:12px;">Select the reason for rejection. This drives the exact corrective-action message the patient receives — freeform notes alone are not sufficient.</div>
-        <div id="rejectCodeList" style="display:flex;flex-direction:column;gap:8px;"></div>
-        <div style="margin-top:12px;">
-          <label style="font-size:11px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Additional notes (optional)</label>
-          <textarea id="rejectFreeform" rows="2" placeholder="Any additional context for the record..." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
-        </div>
-        <div id="rejectPatientPreview" style="display:none;margin-top:12px;padding:10px 12px;background:#F9F5EE;border:1px solid #E5E0D8;border-radius:8px;">
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:4px;">Patient will see</div>
-          <div id="rejectPatientMsg" style="font-size:12px;color:#374151;"></div>
-        </div>
-      </div>
-      <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">
-        <button onclick="closeRejectModal()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">Cancel</button>
-        <button id="rejectConfirmBtn" disabled onclick="confirmReject()" style="background:#9CA3AF;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:not-allowed;font-family:inherit;">Reject &amp; Notify Patient</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Document Viewer Modal -->
-  <div id="docViewerModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9993;align-items:center;justify-content:center;">
-    <div style="background:#fff;border-radius:14px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
       <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#F5F0FB;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:14px;font-weight:700;color:#6B21A8;flex:1;">📄 Document Viewer — <span id="docViewerConsultId"></span></span>
+        <span style="font-size:14px;font-weight:700;color:#6B21A8;flex:1;">📄 Review — <span id="reviewConsultId"></span></span>
+        <button onclick="closeReviewModal()" style="background:none;border:none;font-size:16px;color:#6B21A8;cursor:pointer;line-height:1;">✕</button>
       </div>
-      <div style="padding:18px 20px;font-size:13px;color:#374151;">
-        <div style="margin-bottom:12px;">Documents loaded in read-only view. Review all uploaded files before approving or rejecting.</div>
-        <div id="docViewerFileList" style="display:flex;flex-direction:column;gap:8px;"></div>
-      </div>
-      <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;">
-        <button onclick="document.getElementById('docViewerModal').style.display='none'" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>
-      </div>
-    </div>
-  </div>
+      <div style="padding:18px 20px;">
+        <div style="font-size:12px;color:#374151;margin-bottom:12px;">Documents loaded in read-only view. Review the uploaded files, then decide below.</div>
+        <div id="reviewFileList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
 
-  <!-- Approve Confirmation Modal -->
-  <div id="approveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9994;align-items:center;justify-content:center;">
-    <div style="background:#fff;border-radius:14px;width:440px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
-      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#F0FDF4;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:14px;font-weight:700;color:#065F46;flex:1;">✓ Approve QA Stage — <span id="approveConsultId"></span></span>
-      </div>
-      <div style="padding:18px 20px;font-size:13px;color:#374151;">The consult workflow will automatically resume once approved. This decision is audit-logged.</div>
-      <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">
-        <button onclick="document.getElementById('approveModal').style.display='none'" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">Cancel</button>
-        <button onclick="confirmApprove()" style="background:#065F46;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Approve ✓</button>
-      </div>
-    </div>
-  </div>
+        <!-- Decision: default 3-way choice -->
+        <div id="decisionDefault">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:8px;">Decision</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button onclick="doApprove()" style="background:#065F46;color:#fff;border:none;border-radius:7px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Approve ✓</button>
+            <button onclick="showClarifyForm()" style="background:#fff;color:#B45309;border:1.5px solid #B45309;border-radius:7px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Needs Clarification ?</button>
+            <button onclick="showRejectForm()" style="background:#fff;color:#DC2626;border:1.5px solid #DC2626;border-radius:7px;padding:8px 16px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Reject ✗</button>
+          </div>
+        </div>
 
-  <!-- Needs Clarification Modal (POA-008) -->
-  <div id="clarifyModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9994;align-items:center;justify-content:center;">
-    <div style="background:#fff;border-radius:14px;width:480px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,0.18);overflow:hidden;">
-      <div style="padding:16px 20px;border-bottom:1px solid #E5E0D8;background:#FFFBEB;display:flex;align-items:center;gap:10px;">
-        <span style="font-size:14px;font-weight:700;color:#92400E;flex:1;">? Needs Clarification — <span id="clarifyConsultId"></span></span>
-        <span style="font-size:10px;font-family:monospace;color:#FDE68A;">POA-008</span>
-      </div>
-      <div style="padding:16px 20px;">
-        <div style="font-size:12px;color:#374151;margin-bottom:10px;">Describe why you cannot confidently approve or deny. This routes to CX Leadership / Compliance, not the standard reject queue — freeform notes are required here.</div>
-        <textarea id="clarifyNote" rows="3" placeholder="e.g. General POA language is ambiguous on whether it covers healthcare decisions — needs Compliance/Legal read before I can approve or deny." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
-        <div style="margin-top:10px;font-size:11px;color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:8px 10px;">No PHI is released. Patient sees a neutral "under review" status — this is not a rejection.</div>
-      </div>
-      <div style="padding:12px 18px;border-top:1px solid #E5E0D8;display:flex;justify-content:flex-end;gap:8px;">
-        <button onclick="document.getElementById('clarifyModal').style.display='none'" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">Cancel</button>
-        <button onclick="confirmClarify()" style="background:#B45309;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Escalate ?</button>
+        <!-- Decision: view-only (Escalated / Closure Flags rows) -->
+        <div id="decisionNone" style="display:none;">
+          <button onclick="closeReviewModal()" style="background:#6B21A8;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;">Close</button>
+        </div>
+
+        <!-- Decision: Needs Clarification form (POA-008) -->
+        <div id="decisionClarify" style="display:none;">
+          <div style="font-size:12px;color:#374151;margin-bottom:10px;">Describe why you cannot confidently approve or deny. This routes to CX Leadership / Compliance, not the standard reject queue — a note is required.</div>
+          <textarea id="clarifyNote" rows="3" placeholder="e.g. General POA language is ambiguous on whether it covers healthcare decisions — needs Compliance/Legal read before I can approve or deny." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
+          <div style="margin:10px 0;font-size:11px;color:#92400E;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:8px 10px;">No PHI is released. Patient sees a neutral "under review" status — this is not a rejection. <span style="font-family:monospace;">POA-008</span></div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="showDecisionDefault()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">← Back</button>
+            <button onclick="confirmClarify()" style="background:#B45309;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;">Send to Compliance</button>
+          </div>
+        </div>
+
+        <!-- Decision: Reject form (POA-002) -->
+        <div id="decisionReject" style="display:none;">
+          <div style="font-size:12px;color:#374151;margin-bottom:10px;">Select the reason for rejection. This drives the exact corrective-action message the patient receives — freeform notes alone are not sufficient.</div>
+          <div id="rejectCodeList" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div style="margin-top:12px;">
+            <label style="font-size:11px;font-weight:600;color:#6B7280;display:block;margin-bottom:4px;">Additional notes (optional)</label>
+            <textarea id="rejectFreeform" rows="2" placeholder="Any additional context for the record..." style="width:100%;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;font-family:inherit;resize:vertical;"></textarea>
+          </div>
+          <div id="rejectPatientPreview" style="display:none;margin-top:12px;padding:10px 12px;background:#F9F5EE;border:1px solid #E5E0D8;border-radius:8px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#9CA3AF;margin-bottom:4px;">Patient will see</div>
+            <div id="rejectPatientMsg" style="font-size:12px;color:#374151;"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button onclick="showDecisionDefault()" style="background:#fff;border:1px solid #E5E0D8;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;color:#374151;">← Back</button>
+            <button id="rejectConfirmBtn" disabled onclick="confirmReject()" style="background:#9CA3AF;color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:not-allowed;font-family:inherit;">Reject &amp; Notify Patient</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -454,36 +423,88 @@ function getTriggerBadgeHtml(row) {
   return el ? el.outerHTML : '';
 }
 
-// ── Review Docs — in-app document viewer (replaces browser alert) ──
-function openReview(id) {
-  document.getElementById('docViewerConsultId').textContent = id;
-  var list = document.getElementById('docViewerFileList');
-  var row = findQueueRow(id);
-  var docsCellText = '';
-  if (row) {
-    var cells = row.querySelectorAll('td');
-    if (cells.length >= 7) docsCellText = cells[6].textContent.trim();
+// ── Unified Review flow — one modal for Review + Approve + Clarify + Reject ──
+var reviewContext = { id: null, type: 'poa', canDecide: true };
+var rejectSelected = null;
+
+function findAnyRow(id) {
+  var rows = document.querySelectorAll('tbody tr');
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].textContent.indexOf(id) !== -1) return rows[i];
   }
-  var files = docsCellText ? docsCellText.split(/(?=[A-Z][a-z]+ [A-Z])|✓/).map(function(s){ return s.trim(); }).filter(Boolean) : ['No document metadata available for this record.'];
-  list.innerHTML = files.map(function(f) {
-    return '<div style="display:flex;align-items:center;gap:8px;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;color:#374151;">📄 ' + f + '</div>';
-  }).join('');
-  document.getElementById('docViewerModal').style.display = 'flex';
+  return null;
 }
 
-// ── Approve — in-app confirmation modal (replaces browser confirm/alert) ──
-var approveContext = { id: null };
-function approveQA(id) {
-  approveContext.id = id;
-  document.getElementById('approveConsultId').textContent = id;
-  document.getElementById('approveModal').style.display = 'flex';
+function openReview(id, submissionType, canDecide) {
+  canDecide = (canDecide === false) ? false : true;
+  reviewContext = { id: id, type: submissionType || 'poa', canDecide: canDecide };
+  rejectSelected = null;
+  document.getElementById('reviewConsultId').textContent = id;
+
+  var row = findAnyRow(id);
+  var docsCellText = '';
+  if (row) {
+    if (row.closest('#pendingQueueBody')) {
+      var cells = row.querySelectorAll('td');
+      if (cells.length >= 7) docsCellText = cells[6].textContent.trim();
+    } else {
+      var noteCell = row.querySelector('td[style*="color:#DC2626"], td[style*="color:#92400E"]');
+      docsCellText = noteCell ? noteCell.textContent.trim() : '';
+    }
+  }
+  var files = docsCellText ? docsCellText.split(/(?=[A-Z][a-z]+ [A-Z])|✓/).map(function(s){ return s.trim(); }).filter(Boolean) : ['No document metadata available for this record.'];
+  document.getElementById('reviewFileList').innerHTML = files.map(function(f) {
+    return '<div style="display:flex;align-items:center;gap:8px;border:1px solid #E5E0D8;border-radius:7px;padding:8px 10px;font-size:12px;color:#374151;">📄 ' + f + '</div>';
+  }).join('');
+
+  showDecisionDefault();
+  document.getElementById('decisionDefault').style.display = canDecide ? 'block' : 'none';
+  document.getElementById('decisionNone').style.display = canDecide ? 'none' : 'block';
+  document.getElementById('reviewModal').style.display = 'flex';
 }
-function confirmApprove() {
-  var id = approveContext.id;
-  document.getElementById('approveModal').style.display = 'none';
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').style.display = 'none';
+}
+
+function showDecisionDefault() {
+  document.getElementById('decisionDefault').style.display = reviewContext.canDecide ? 'block' : 'none';
+  document.getElementById('decisionNone').style.display = reviewContext.canDecide ? 'none' : 'block';
+  document.getElementById('decisionClarify').style.display = 'none';
+  document.getElementById('decisionReject').style.display = 'none';
+}
+
+function showClarifyForm() {
+  document.getElementById('clarifyNote').value = '';
+  document.getElementById('decisionDefault').style.display = 'none';
+  document.getElementById('decisionNone').style.display = 'none';
+  document.getElementById('decisionClarify').style.display = 'block';
+  document.getElementById('decisionReject').style.display = 'none';
+}
+
+function showRejectForm() {
+  var applicable = REJECT_CODES.filter(function(c) { return c.types.indexOf(reviewContext.type) !== -1; });
+  document.getElementById('rejectCodeList').innerHTML = applicable.map(function(c) {
+    return '<div class="reject-code-row" data-code="' + c.code + '" onclick="selectRejectCode(\'' + c.code + '\')">' +
+      '<span style="font-size:14px;flex-shrink:0;margin-top:1px;">○</span>' +
+      '<div><div style="font-size:12px;font-weight:700;color:#111827;">' + c.label + '</div>' +
+      '<div style="font-size:11px;color:#6B7280;margin-top:2px;">' + c.desc + '</div></div></div>';
+  }).join('');
+  document.getElementById('rejectFreeform').value = '';
+  document.getElementById('rejectPatientPreview').style.display = 'none';
+  var btn = document.getElementById('rejectConfirmBtn');
+  btn.disabled = true; btn.style.background = '#9CA3AF'; btn.style.cursor = 'not-allowed';
+  document.getElementById('decisionDefault').style.display = 'none';
+  document.getElementById('decisionNone').style.display = 'none';
+  document.getElementById('decisionClarify').style.display = 'none';
+  document.getElementById('decisionReject').style.display = 'block';
+}
+
+function doApprove() {
+  var id = reviewContext.id;
+  closeReviewModal();
   var row = findQueueRow(id);
   if (row) {
-    var patient = getPatientLabel(row);
     fadeAndRemove(row, function() {
       bumpStat('statPending', -1);
       bumpStat('statApproved', 1);
@@ -493,22 +514,14 @@ function confirmApprove() {
   showToast('✓ Approved — Consult ' + id + ' resumed. GC notified.', '#059669');
 }
 
-// ── Needs Clarification — in-app modal (replaces browser prompt/alert) ──
-var clarifyContext = { id: null, type: null };
-function clarifyQA(id, submissionType) {
-  clarifyContext = { id: id, type: submissionType || 'poa' };
-  document.getElementById('clarifyConsultId').textContent = id;
-  document.getElementById('clarifyNote').value = '';
-  document.getElementById('clarifyModal').style.display = 'flex';
-}
 function confirmClarify() {
   var note = document.getElementById('clarifyNote').value.trim();
   if (!note) {
     showToast('A note is required to escalate — describe why this can\'t be confidently resolved.', '#B45309');
     return;
   }
-  var id = clarifyContext.id;
-  document.getElementById('clarifyModal').style.display = 'none';
+  var id = reviewContext.id;
+  closeReviewModal();
   var row = findQueueRow(id);
   if (row) {
     var patient = getPatientLabel(row);
@@ -521,7 +534,7 @@ function confirmClarify() {
       '<td>Quinn Patel, QA Reviewer</td>' +
       '<td style="font-size:12px;color:#92400E;">"' + note.replace(/</g,'&lt;') + '"</td>' +
       '<td>Just now</td>' +
-      '<td><button class="action-btn btn-review" onclick="openReview(\'' + id + '\')">Review →</button></td>';
+      '<td><button class="action-btn btn-review" onclick="openReview(\'' + id + '\', \'' + reviewContext.type + '\', false)">Review →</button></td>';
     document.getElementById('clarifyQueueBody').appendChild(newRow);
     fadeAndRemove(row, function() {
       bumpStat('statPending', -1);
@@ -562,29 +575,8 @@ var REJECT_CODES = [
     desc: 'Reason not covered above — additional notes required.',
     patientMsg: 'There was an issue with your submission. Please see the notes from your care team, or contact support for details.' }
 ];
-var rejectContext = { id: null, type: null, selected: null };
-
-function rejectQA(id, submissionType) {
-  rejectContext = { id: id, type: submissionType || 'poa', selected: null };
-  document.getElementById('rejectModalConsultId').textContent = id;
-  document.getElementById('rejectFreeform').value = '';
-  document.getElementById('rejectPatientPreview').style.display = 'none';
-  var list = document.getElementById('rejectCodeList');
-  var applicable = REJECT_CODES.filter(function(c) { return c.types.indexOf(rejectContext.type) !== -1; });
-  list.innerHTML = applicable.map(function(c) {
-    return '<div class="reject-code-row" data-code="' + c.code + '" onclick="selectRejectCode(\'' + c.code + '\')">' +
-      '<span style="font-size:14px;flex-shrink:0;margin-top:1px;">○</span>' +
-      '<div><div style="font-size:12px;font-weight:700;color:#111827;">' + c.label + '</div>' +
-      '<div style="font-size:11px;color:#6B7280;margin-top:2px;">' + c.desc + '</div></div></div>';
-  }).join('');
-  document.getElementById('rejectConfirmBtn').disabled = true;
-  document.getElementById('rejectConfirmBtn').style.background = '#9CA3AF';
-  document.getElementById('rejectConfirmBtn').style.cursor = 'not-allowed';
-  document.getElementById('rejectModalOverlay').style.display = 'flex';
-}
-
 function selectRejectCode(code) {
-  rejectContext.selected = code;
+  rejectSelected = code;
   document.querySelectorAll('.reject-code-row').forEach(function(r) {
     var isSel = r.getAttribute('data-code') === code;
     r.classList.toggle('selected', isSel);
@@ -600,20 +592,16 @@ function selectRejectCode(code) {
   btn.style.cursor = 'pointer';
 }
 
-function closeRejectModal() {
-  document.getElementById('rejectModalOverlay').style.display = 'none';
-}
-
 function confirmReject() {
-  if (!rejectContext.selected) return;
-  var c = REJECT_CODES.filter(function(x) { return x.code === rejectContext.selected; })[0];
+  if (!rejectSelected) return;
+  var c = REJECT_CODES.filter(function(x) { return x.code === rejectSelected; })[0];
   var notes = document.getElementById('rejectFreeform').value;
-  if (rejectContext.selected === 'other' && !notes) {
+  if (rejectSelected === 'other' && !notes) {
     showToast('Notes are required when selecting "Other".', '#DC2626');
     return;
   }
-  closeRejectModal();
-  var id = rejectContext.id;
+  var id = reviewContext.id;
+  closeReviewModal();
   var row = findQueueRow(id);
   if (row) {
     var patient = getPatientLabel(row);
