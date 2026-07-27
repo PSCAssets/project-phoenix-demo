@@ -23,7 +23,7 @@ _IS_LOCAL = os.environ.get('FLASK_ENV') == 'development' or (
 )
 DEMO_GATE = not _IS_LOCAL
 GATE_TIMEOUT_SECONDS = 15 * 60   # 15 minutes of inactivity
-GATE_BYPASS_ROUTES   = {'gate_login', 'gate_login_post', 'static'}
+GATE_BYPASS_ROUTES   = {'gate_login', 'gate_login_post', 'static', 'version'}
 
 _DB_PATH = os.path.join(os.path.dirname(__file__), 'project_phoenix.db')
 
@@ -565,6 +565,24 @@ ROLE_DESTINATIONS = {
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/version")
+def version():
+    """Reports which commit is actually running here — bypasses the demo gate so it can be
+    curled without logging in. Render auto-sets RENDER_GIT_COMMIT on every deploy; locally
+    that variable doesn't exist, so we fall back to asking git directly."""
+    commit = os.environ.get('RENDER_GIT_COMMIT')
+    env = 'render'
+    if not commit:
+        env = 'local'
+        try:
+            import subprocess
+            commit = subprocess.check_output(
+                ['git', 'rev-parse', 'HEAD'], cwd=os.path.dirname(__file__), timeout=3
+            ).decode().strip()
+        except Exception:
+            commit = 'unknown'
+    return {'environment': env, 'commit': commit, 'is_local': _IS_LOCAL}
 
 @app.route("/login/<role>")
 def login(role):
