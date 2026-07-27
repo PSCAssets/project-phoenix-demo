@@ -204,14 +204,6 @@ tbody tr:last-child td { border-bottom: none; }
       </table>
     </div>
 
-    <!-- Pre-Closure QA Validation (QA-VALID-001) runs on the PROVIDER's Sign & Close flow
-         (templates/provider/chart.html), not here — a QA Reviewer never closes an encounter.
-         The Closure Flags rows above are the audit trail this page is actually responsible for:
-         every encounter that was closed with an override shows up there automatically. -->
-    <div style="background:#F0FDF4;border:1.5px solid #6EE7B7;border-radius:10px;padding:16px 18px;margin-top:16px;font-size:12px;color:#065F46;">
-      <strong>🛡 Pre-Closure QA Validation (QA-VALID-001)</strong> runs when a provider attempts to close an encounter — see <em>Closure Flags</em> above for every encounter closed with an override. QA Reviewers don't trigger this check themselves.
-    </div>
-
     <div style="background:#FEF3C7;border:1px solid #FDE68A;border-radius:8px;padding:14px 18px;font-size:13px;color:#92400E;margin-top:16px;">
       <strong>Role reminder:</strong> As QA Reviewer, you may review documents and approve or reject the QA stage. You cannot edit clinical content or consult notes. All decisions are logged to the audit trail.
     </div>
